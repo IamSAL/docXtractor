@@ -1,0 +1,29 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PrescriptionService } from './prescription.service';
+import { PrescriptionController } from './prescription.controller';
+import { Prescription } from './entities/prescription.entity';
+import { Patient } from '../patient/entities/patient.entity';
+import { Doctor } from '../doctor/entities/doctor.entity';
+import { Pharmacist } from 'src/pharmacist/entities/pharmacist.entity';
+import { Notification } from 'src/notification/entities/notification.entity';
+import { NotificationService } from 'src/notification/notification.service';
+import { PushSubscription } from 'src/notification/entities/push-subscription.entity';
+import { MailService } from 'src/shared/mail/mail.service';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([
+      Prescription,
+      Patient,
+      Doctor,
+      Pharmacist,
+      Notification,
+      PushSubscription,
+    ]),
+  ],
+  controllers: [PrescriptionController],
+  providers: [PrescriptionService, NotificationService, MailService],
+  exports: [PrescriptionService],
+})
+export class PrescriptionModule {}
