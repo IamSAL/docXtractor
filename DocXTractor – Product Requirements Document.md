@@ -164,21 +164,68 @@ later to edit or reuse them. The UI will also allow previewing a
 pipeline on a sample document (client-side simulation using the current
 config).
 
-### 3. Inputs (Documents/URLs)
+### 3. Inputs (Documents/URLs) , Multi-Source Document Processing
 
-- **File Upload:**
-- Users can upload one or more documents per execution (bulk upload).
-  Supported: PDF, DOCX, TXT, HTML.
-- The system automatically extracts text: it uses docling from worker service.
-- Validate file type and size limits; show errors if unsupported.
-- **URL Input:**
-- Users can enter a web page URL. The system fetches the HTML content,
-  renders text (optionally ignoring scripts/styles), and then runs
-  extraction on the text.
-- Show error if the URL is unreachable or invalid.
-- **Queueing:** When a user submits inputs for a pipeline run, create
-  an "Execution Job" record with document list and initial status
-  Pending. Assign it to an available Executor agent.
+A core capability of DocXTractor is processing **multiple source documents** (PDFs, DOCX, HTML, URLs) within a single extraction job to produce a unified output. This enables extracting data that spans across multiple files – such as combining an invoice PDF with a contract DOCX and a terms-of-service webpage.
+
+#### Input Types Supported
+
+- **File Upload (Bulk):**
+  - Users can upload multiple documents in a single job (drag-drop or multi-select)
+  - Supported formats: PDF, DOCX, TXT, HTML, Images (PNG, JPG)
+  - Validate file types and size limits per file (configurable, default 50MB each)
+  - Show upload progress per file with individual success/error indicators
+
+- **URL Input (Multiple):**
+  - Users can enter multiple web page URLs
+  - System fetches HTML content, renders text (ignoring scripts/styles)
+  - Show reachability status per URL before job starts
+
+- **Mixed Sources:**
+  - A single job can combine uploaded files AND URLs
+  - Example: 2 PDFs + 1 DOCX + 3 URLs = 1 extraction job with 6 sources
+
+#### Processing Modes
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| **Unified Extraction** | All sources parsed and combined into single context for extraction | Extract data spanning multiple related documents |
+| **Per-Document Extraction** | Each source processed independently, results in array | Batch process similar documents (e.g., 10 invoices) |
+| **Hybrid** | Group related sources, extract per group | Multi-page contracts split across files |
+
+#### Unified Extraction Flow (Default)
+
+1. **Parse Phase**: Each document is independently parsed using `docling`
+2. **Combine Phase**: Parsed content is combined with source markers:
+   ```
+   === SOURCE 1: invoice.pdf (Page 1-3) ===
+   [parsed content]
+   
+   === SOURCE 2: contract.docx (Page 1-5) ===
+   [parsed content]
+   
+   === SOURCE 3: https://example.com/terms ===
+   [parsed content]
+   ```
+3. **Extract Phase**: `langextract` runs on combined content with source awareness
+4. **Citation Mapping**: Each extracted field cites which source document it came from
+
+#### Job Record Structure
+
+```json
+{
+  "jobId": "job_123",
+  "pipelineId": "pipe_456",
+  "sources": [
+    { "type": "file", "name": "invoice.pdf", "status": "parsed" },
+    { "type": "file", "name": "contract.docx", "status": "parsing" },
+    { "type": "url", "url": "https://example.com", "status": "pending" }
+  ],
+  "processingMode": "unified",
+  "status": "in_progress",
+  "progress": { "parsed": 1, "total": 3 }
+}
+```
 
 ### 4. Executor (Agent) Operations
 
@@ -203,14 +250,24 @@ config).
 - Sends results back through the message queue
 - Handles errors gracefully and reports failures
 
-**Processing Flow:**
+**Processing Flow (Multi-Source):**
 
-- *Text Extraction:* Convert the document to plain text (and structure if needed) using `docling`.
-- *Field Extraction:* For each defined field in the pipeline, apply either the AI model or the deterministic pattern to find the value:
-  - **AI mode:** Uses `langextract` with the defined schema and examples
-  - **Regex mode:** Applies the specified pattern to find matches
-  - **XPath mode:** Extracts data from structured content
-- *Error Handling:* If a field fails (no match or API error), log it and mark the field blank or error. Continue other fields.
+1. *Source Ingestion:* Core Backend receives all sources (files + URLs) and creates a job record
+2. *Parallel Parsing:* Worker Service parses each source document using `docling`:
+   - Each file is converted to structured text with page/line markers
+   - Each URL is fetched and converted to text
+   - Parsing happens in parallel for performance
+3. *Content Combination:* Parsed content is combined based on processing mode:
+   - **Unified**: All sources merged into single context with source markers
+   - **Per-Document**: Each source processed separately
+4. *Field Extraction:* For each defined field in the pipeline:
+   - **AI mode:** Uses `langextract` with the defined schema and source-aware prompt
+   - **Regex mode:** Applies the specified pattern across all sources
+   - **XPath mode:** Extracts from structured content (HTML sources)
+5. *Citation Generation:* Each extracted value includes source reference (document name, page, line)
+6. *Result Assembly:* Final output includes extracted data + citations + per-source metadata
+
+*Error Handling per Source:* If one source fails parsing, the job continues with remaining sources. Users can retry individual failed sources.
 
 **Error Handling:**
 
