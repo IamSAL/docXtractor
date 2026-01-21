@@ -29,6 +29,7 @@ import { PatientDashboardModule } from './dashboard/patient-dashboard-module';
 import { DoctorDashboardModule } from './dashboard/doctor-dashboard.module';
 import { PharmacistDashboardModule } from './dashboard/pharmacist-dashboard.module';
 import { MessagingModule } from './messaging/messaging.module';
+import { DocxtractorModule } from './docxtractor/docxtractor.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { MessagingModule } from './messaging/messaging.module';
     PatientDashboardModule,
     PharmacistDashboardModule,
     MessagingModule,
+    DocxtractorModule,
   ],
   controllers: [AppController],
   providers: [

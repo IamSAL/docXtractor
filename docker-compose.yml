@@ -47,7 +47,6 @@ services:
       - ./server/.env
     volumes:
       - ./server:/app
-      - /app/node_modules
     depends_on:
       db:
         condition: service_healthy
@@ -78,8 +77,83 @@ services:
       - docxtractor-network
     command: pnpm run dev
 
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: docxtractor-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      # KRaft settings
+      - KAFKA_NODE_ID=0
+      - KAFKA_PROCESS_ROLES=controller,broker
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    networks:
+      - docxtractor-network
+
+  minio:
+    image: minio/minio
+    container_name: docxtractor-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - docxtractor-network
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c " /usr/bin/mc config host add local http://minio:9000 minioadmin minioadmin; /usr/bin/mc mb -p local/docxtractor-documents; exit 0; "
+    networks:
+      - docxtractor-network
+
+  parser-service:
+    build:
+      context: ./workers/parser-service
+    container_name: docxtractor-parser
+    depends_on:
+      - kafka
+      - minio
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET=docxtractor-documents
+    networks:
+      - docxtractor-network
+
+  extraction-service:
+    build:
+      context: ./workers/extraction-service
+    container_name: docxtractor-extractor
+    depends_on:
+      - kafka
+      - minio
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    networks:
+      - docxtractor-network
+
 volumes:
   postgres_data:
+  minio_data:
 
 
 networks:

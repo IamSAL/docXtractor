@@ -92,7 +92,7 @@ async function bootstrap() {
   });
 
   const PORT = configService.get<number>('PORT') || 8800;
-  await app.listen(PORT);
+  await app.listen(PORT, '0.0.0.0');
 }
 
 bootstrap();
