@@ -98,6 +98,8 @@ development[\[6\]](https://www.perforce.com/blog/alm/how-write-product-requireme
 - **Responsive Web UI:** A modern, user-friendly frontend (desktop and
   tablet and mobile).
 - **Should:**
+- **Consensus Voting:** Run multiple extraction attempts with voting for critical fields to improve accuracy by 15-30%.
+- **Citations & Traceability:** Track source locations for each extracted value, enabling verification and audit trails.
 - **Human Validation (HITL):** Interface for users to review low-confidence extractions side-by-side with the document to ensure data quality.
 - **Few-Shot Examples UI:** When defining an AI field, allow uploading
   or entering example text-output pairs to improve model accuracy.
@@ -239,7 +241,51 @@ config).
 - These logs are sent to a central store (e.g., attach to the Execution Job record)
 - Users can view logs in real time or after completion
 
-### 5. Execution Monitoring & Logs
+### 5. Advanced Extraction Features
+
+#### Consensus Voting (Multi-Provider Voting)
+
+For critical extraction fields, DocXTractor supports running multiple extraction attempts in parallel and using voting to improve accuracy.
+
+**How It Works:**
+- Worker Service runs N extraction attempts (default: 3)
+- Core Backend aggregates results and determines winner via voting
+- Supports object-level or field-level voting strategies
+- Tie-breaking configurable: random selection, retry, or fail
+
+**Configuration Options:**
+- `runs`: Number of parallel extraction attempts (default: 3)
+- `votingLevel`: 'object' (full result matching) or 'field' (per-field majority)
+- `onTie`: 'random' | 'retry' | 'fail'
+- `minAgreement`: Minimum agreement threshold (0-1)
+
+**Output Metadata:**
+- `overallAgreement`: 0-1 score for extraction confidence
+- `fieldAgreement`: Per-field agreement scores
+- `confidence`: 'high' (≥0.9), 'medium' (≥0.7), 'low' (<0.7)
+- `votingDetails`: Which values each run produced
+
+#### Citations & Traceability
+
+Track exactly where each extracted value came from in the source document.
+
+**How It Works:**
+- Worker Service parses document into structured IR with line IDs
+- Extraction includes source references for each field
+- Core Backend stores citations alongside extracted data
+- UI can highlight source locations for verification
+
+**Citation Data Structure:**
+- `fieldPath`: JSON path to extracted field (e.g., "invoice.total")
+- `value`: The extracted value
+- `lineReferences`: Array of source line IDs (e.g., ["p1_l5", "p1_l6"])
+- `pageNumber`: Source page number
+- `bbox`: Bounding box coordinates (if available from OCR)
+- `confidence`: Extraction confidence score (0-1)
+- `isInferred`: True if value was calculated/derived
+- `reasoning`: Explanation for inferred values
+
+### 6. Execution Monitoring & Logs
 
 - **Dashboard View:** A table of recent executions (pipeline name, run
   date, #docs, status). Filterable by status (e.g. Failed, Done).
@@ -254,7 +300,7 @@ config).
 - **History:** Keep a history of all runs (timestamp, who ran it,
   pipeline version) for auditing. Allow downloading results per run.
 
-### 6. Output Formats
+### 7. Output Formats
 
 - **JSON Output:** By default, produce a JSON object per document with
   field names as keys and extracted values (empty if not found). For
@@ -294,8 +340,10 @@ config).
 
 - FastAPI framework with Python
 - Dedicated microservice for compute-heavy tasks
-- **Parsing:** `docling` library for high-fidelity PDF/DOCX to Markdown conversion
+- **Parsing:** `docling` library for high-fidelity PDF/DOCX to Markdown conversion with line IDs for citation tracking
 - **Extraction:** `langextract` library for schema-based data extraction
+- **Consensus Support:** Multiple extraction runs per request for voting
+- **Citation Tracking:** Line ID generation and source mapping
 - OpenAI API integration
 - Message queue consumer for job processing
 
@@ -389,13 +437,20 @@ The overall layout uses a fixed sidebar (or top bar) for navigation and a main c
 
   - A form in a centered container with soft shadow edges. Field inputs (text, dropdowns) appear as indent/sunken elements in the background (neumorphic style) to suggest depth[\[9\]](https://www.uxdesigninstitute.com/blog/neumorphism-in-ui-design/#:~:text=Neumorphism%20is%20all%20about%20creating,help%20to%20create%20this%20effect).
   - The Fields table uses alternating light panels. For each field row, the selected extraction mode shows either a multi-line AI prompt box (light gray, elevated slightly) or a regex input (monospace font).
+  - **Advanced Field Options:** Each field row includes toggles for:
+    - **Enable Consensus Voting:** Toggle to run multiple extraction attempts with voting (with dropdown for number of runs: 3, 5, 7)
+    - **Enable Citation Tracking:** Toggle to track source locations for this field
+    - **Minimum Confidence:** Slider (0.5-1.0) to flag low-confidence extractions for review
   - **Few-Shot Section:** An accordion or panel where examples can be added. Each example card floats with subtle shadow, blending into the background[\[9\]](https://www.uxdesigninstitute.com/blog/neumorphism-in-ui-design/#:~:text=Neumorphism%20is%20all%20about%20creating,help%20to%20create%20this%20effect).
   - Primary actions (Save, Test, Delete) are large buttons with thick borders (neobrutalist influence) and hover shadows.
 - **Execution Monitor (Run View):**
 
   - The run's detail page shows a progress bar at top (bold colored bar on a light track). Below, a table lists documents. Completed rows have green check icons; errors show red outlines or icons (contrasting with neutral row colors).
+  - **Confidence Indicators:** Each document row displays a confidence badge (high=green, medium=yellow, low=red) based on consensus voting results.
   - Clicking a document row expands a neumorphic panel with its JSON output or error log. The panel edges softly shadow inwards, visually grouping the data[\[9\]](https://www.uxdesigninstitute.com/blog/neumorphism-in-ui-design/#:~:text=Neumorphism%20is%20all%20about%20creating,help%20to%20create%20this%20effect).
-  - Sidebar (if any) or header shows quick stats (Jobs In-Progress, Failed, Succeeded) in bold text on pastel badges (neobrutal use of color) for at-a-glance status.
+  - **Citation Viewer:** A split-view panel showing extracted data on the left and the source document on the right. When hovering over an extracted field, the corresponding source lines are highlighted in the document preview with a colored underline and tooltip showing page/line reference.
+  - **Consensus Details Panel:** Collapsible section showing voting results per field (which runs agreed, agreement percentage, tie-breaker used if any).
+  - Sidebar (if any) or header shows quick stats (Jobs In-Progress, Failed, Succeeded, Needs Review) in bold text on pastel badges (neobrutal use of color) for at-a-glance status.
 - **Secrets & Settings Page:**
 
   - Simple list of saved secrets, each as a light card with masked key text. "Add Secret" is a prominent button (bold color accent). Input fields for keys are inset (sunken effect).
@@ -408,17 +463,17 @@ The overall layout uses a fixed sidebar (or top bar) for navigation and a main c
 User interactions follow clear step-by-step flows[\[11\]](https://www.perforce.com/blog/alm/how-write-product-requirements-document-prd#:~:text=Could,will%20interact%20with%20the%20product). Key flows include:
 
 - **Sign-In & Onboarding:** User registers or logs in (Email/Password). After login, they land on the Dashboard (list of pipelines).
-- **Create Pipeline Flow:** From Dashboard, user clicks **"New Pipeline"** → **Pipeline Editor** opens → User enters name/description → Adds fields one by one (specifying name, type, mode) → For AI fields, user enters example pairs → User clicks **"Save"** → Pipeline appears on Dashboard.
+- **Create Pipeline Flow:** From Dashboard, user clicks **"New Pipeline"** → **Pipeline Editor** opens → User enters name/description → Adds fields one by one (specifying name, type, mode) → For critical fields, user enables **Consensus Voting** (selects number of runs) and/or **Citation Tracking** → For AI fields, user enters example pairs → User clicks **"Save"** → Pipeline appears on Dashboard.
 - **Run Pipeline Flow:** User selects a pipeline (or clicks **"Upload & Run"**) → In a run dialog, user uploads one or more documents (or pastes a URL) → Click **"Start Run"** → System creates an Execution Job and routes to an Executor → User is taken to the **Run Monitor** page. They see progress (e.g. "Document 3 of 10 being processed").
-- **Monitor & Output Flow:** While running, user may click **"Logs"** to view real-time logs (frontend polls the API). After completion, the page shows final status. User clicks **"Download JSON"** or **"Download CSV"** to retrieve extracted data. If any docs failed, user clicks **"Retry Failed"** to reprocess them.
+- **Monitor & Output Flow:** While running, user may click **"Logs"** to view real-time logs (frontend polls the API). After completion, the page shows final status with **confidence badges** for each document. User clicks **"Download JSON"** or **"Download CSV"** to retrieve extracted data. If any docs failed or have low confidence, user clicks **"Review"** to verify extractions.
+- **Review Citations Flow:** User clicks on a low-confidence or flagged extraction → **Citation Viewer** opens with split-view (data on left, document on right) → User hovers over extracted fields to see highlighted source lines → User can approve, correct, or flag for re-extraction → Changes are saved and confidence is updated.
 - **Manage Secrets Flow:** Admin user opens **Settings → Secrets** → Clicks **"Add API Key"** → Enters key label and value → Clicks Save. The new key appears in the list, ready to be used by pipelines.
 
-*(Diagrams illustrating these flows would depict screens like Login → Dashboard → Pipeline Editor → Run Monitor. These flows ensure users move logically from creating a pipeline to executing and retrieving results[\[11\]](https://www.perforce.com/blog/alm/how-write-product-requirements-document-prd#:~:text=Could,will%20interact%20with%20the%20product).)*
+*(Diagrams illustrating these flows would depict screens like Login → Dashboard → Pipeline Editor → Run Monitor → Citation Viewer. These flows ensure users move logically from creating a pipeline to executing, verifying, and retrieving results[\[11\]](https://www.perforce.com/blog/alm/how-write-product-requirements-document-prd#:~:text=Could,will%20interact%20with%20the%20product).)*
 
 ### Inspirations & Market Landscape
 
 ---
-
 
 DocXTractor draws inspiration from leading **commercial IDP platforms** and **open-source document parsing tools** . These solutions validate the market but expose clear gaps around flexibility, transparency, and cost control. DocXTractor is intentionally designed to address those gaps.
 
@@ -449,13 +504,20 @@ DocXTractor draws inspiration from leading **commercial IDP platforms** and **op
 #### Open source self hostable alternatives
 
 
-| Tool            | Self-hostable | Schema/Field Support | Formats                 | UI  | License     | Links                                   | Score |
-| ----------------- | --------------- | :--------------------- | ------------------------- | ----- | ------------- | ----------------------------------------- | ------- |
-| **Data Wizard** | Yes (Docker)  | JSON Schema          | PDF, DOCX, Images       | Yes | AGPL-3.0    | https://github.com/capevace/data-wizard | 3.5   |
-| **DocStrange**  | Yes (local)   | Field/Schema         | PDF, DOCX, PPTX, Images | Yes | MIT         | https://github.com/NanoNets/docstrange  | 4     |
-| **Doclo SDK**   | Yes (code)    | Typed schemas        | Multiple                | No  | OSS         | https://github.com/docloai/sdk          | 5     |
+| Tool            | Self-hostable | Schema/Field Support | Formats                 | UI  | License  | Links                                   | Score |
+| ----------------- | --------------- | :--------------------- | ------------------------- | ----- | ---------- | ----------------------------------------- | ------- |
+| **Data Wizard** | Yes (Docker)  | JSON Schema          | PDF, DOCX, Images       | Yes | AGPL-3.0 | https://github.com/capevace/data-wizard | 3.5   |
+| **DocStrange**  | Yes (local)   | Field/Schema         | PDF, DOCX, PPTX, Images | Yes | MIT      | https://github.com/NanoNets/docstrange  | 4     |
+| **Doclo SDK**   | Yes (code)    | Typed schemas        | Multiple                | No  | OSS      | https://github.com/docloai/sdk          | 5     |
 
 ---
+
+
+### API First Design Philosophy Sample
+
+---
+
+FOllow doclo(https://docs.doclo.ai/) for the SDK/API first requirement.
 
 ## Positioning Summary
 
@@ -533,14 +595,7 @@ We adopt an **agile, milestone-based** plan[\[12\]](https://www.wrike.com/agile-
 - Perforce (ALM Blog) -- *Non-Functional Requirements Guide* (defines
   performance, security,
   etc.)[\[8\]](https://www.perforce.com/blog/alm/what-are-non-functional-requirements-examples#:~:text=%3E%20Non,security%2C%20usability%2C%20reliability%2C%20and%20scalability).
-- Wrike Agile Guide -- *What Is a Milestone in Agile?* (milestone
-  definition in agile
-  projects)[\[12\]](https://www.wrike.com/agile-guide/faq/what-is-a-milestone-in-agile/#:~:text=An%20Agile%20milestone%20is%20a,still%20needs%20to%20be%20done).
 
-[\[1\]](https://www.docsumo.com/blogs/data-extraction/document-parsing#:~:text=Document%20parsing%20is%20the%20key,it%20into%20a%20usable%20format)
-[\[2\]](https://www.docsumo.com/blogs/data-extraction/document-parsing#:~:text=,with%20sensitive%20information%20and%20regulatory)
-[\[4\]](https://www.docsumo.com/blogs/data-extraction/document-parsing#:~:text=The%20bottom%20line%20is%20that,compatible%20with%20multiple%20programming%20languages)
-[\[7\]](https://www.docsumo.com/blogs/data-extraction/document-parsing#:~:text=,other%20text%20extraction%20methods%2C%20too)
 What is Document Parsing? A Comprehensive Guide to Understanding and
 Utilizing This Crucial Process
 
