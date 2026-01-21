@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocXTractor - Merged Human Review - Consensus Focus</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "cream": "#F7F7F5",
+                        "primary": "#14b8b8",
+                        "dark": "#1f242e",
+                        "highlight": "#F0D83A",
+                        "purple-accent": "#8B5CF6",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'neo': '4px 4px 0px 0px rgba(0,0,0,1)',
+                        'neo-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
+                        'neo-hover': '6px 6px 0px 0px rgba(0,0,0,1)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .doc-pattern {
+            background-color: #e2e8f0;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F7F5;
+            border-left: 2px solid black;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #000;
+            border: 2px solid #F7F7F5;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #333;
+        }
+    </style>
+</head>
+<body class="bg-cream text-slate-900 font-display h-screen flex flex-col overflow-hidden">
+<header class="flex-none bg-white border-b-2 border-black z-30 h-16">
+<div class="px-6 h-full flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-black flex items-center justify-center text-white rounded-sm shadow-neo-sm">
+<span class="material-symbols-outlined text-[20px]">description</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">DocXTractor</h2>
+</div>
+<div class="h-8 w-0.5 bg-black rotate-12"></div>
+<nav class="hidden md:flex items-center gap-2 text-sm font-bold">
+<span class="text-slate-500">Queue</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="bg-yellow-200 px-2 py-0.5 border-2 border-black shadow-neo-sm text-black">INV-2023-001</span>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-red-100 border-2 border-black shadow-neo-sm rounded-sm">
+<span class="material-symbols-outlined text-red-600 text-sm">gavel</span>
+<span class="text-xs font-bold text-red-700 uppercase tracking-wide">Needs Review</span>
+</div>
+<div class="h-9 w-9 bg-cover bg-center border-2 border-black shadow-neo-sm cursor-pointer" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCMFXdo8ufwymj2LhvrLA-Gq7zmPP4fSpYIJymMTVVYZRLUesMg7I0Fghp0R6vCJ6w8E40PDKa2sFTS-YuGm8cyPFyzLBqntlqyJ-JjcIAswZKQUbpPS_b2wVrOm84Pc5sf1RvWtb3bL-VfFLC38P__v2UMzufalC_bx_R6HiZuxYD6kmqm13Xekui7kNIJEiDSqXThDEavqMoHAwLziP5vLHsBaZ9Z-cJiBc7wASnd1P_L--KslVWJv-fpjUgNJxht6_0RWKeN-u__')"></div>
+</div>
+</div>
+</header>
+<main class="flex-1 flex overflow-hidden relative">
+<aside class="w-80 flex-none bg-cream border-r-2 border-black flex flex-col z-20">
+<div class="p-4 border-b-2 border-black bg-white flex justify-between items-center">
+<h3 class="font-bold text-lg">Source Navigator</h3>
+<span class="material-symbols-outlined cursor-pointer hover:bg-slate-100 p-1 rounded">filter_list</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="bg-white p-3 border-2 border-black shadow-neo rounded-sm relative group cursor-pointer transition-transform hover:-translate-y-0.5">
+<div class="absolute top-2 right-2 bg-black text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm">PRIMARY</div>
+<div class="flex items-start gap-3">
+<div class="bg-red-100 p-2 border-2 border-black rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-red-600">picture_as_pdf</span>
+</div>
+<div>
+<p class="font-bold text-sm leading-tight">Invoice_Scan_001.pdf</p>
+<p class="text-xs text-slate-500 mt-1">2 pages • 1.4 MB</p>
+</div>
+</div>
+<div class="mt-3 flex gap-2">
+<span class="text-[10px] font-bold bg-green-100 px-2 py-0.5 border border-black rounded-sm">Processed</span>
+<span class="text-[10px] font-bold bg-yellow-100 px-2 py-0.5 border border-black rounded-sm">Low Conf.</span>
+</div>
+</div>
+<div class="bg-white p-3 border-2 border-black shadow-neo-sm hover:shadow-neo rounded-sm opacity-80 hover:opacity-100 cursor-pointer transition-all">
+<div class="flex items-start gap-3">
+<div class="bg-blue-100 p-2 border-2 border-black rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600">article</span>
+</div>
+<div>
+<p class="font-bold text-sm leading-tight">PO_Reference.docx</p>
+<p class="text-xs text-slate-500 mt-1">Supplementary</p>
+</div>
+</div>
+</div>
+<div class="bg-white p-3 border-2 border-black shadow-neo-sm hover:shadow-neo rounded-sm opacity-80 hover:opacity-100 cursor-pointer transition-all">
+<div class="flex items-start gap-3">
+<div class="bg-purple-100 p-2 border-2 border-black rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-purple-600">link</span>
+</div>
+<div>
+<p class="font-bold text-sm leading-tight">Vendor Portal</p>
+<p class="text-xs text-slate-500 mt-1">External Data</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-3 border-t-2 border-black bg-white">
+<button class="w-full py-2 bg-black text-white font-bold text-sm shadow-neo-sm active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> Add Source
+                </button>
+</div>
+</aside>
+<section class="flex-1 flex flex-col bg-slate-100 relative group/viewer overflow-hidden">
+<div class="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex gap-0 bg-white p-1 rounded-sm shadow-neo border-2 border-black transition-opacity opacity-0 group-hover/viewer:opacity-100 duration-200">
+<button class="p-2 hover:bg-slate-100 border-r border-slate-300" title="Zoom Out">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+<div class="flex items-center justify-center px-3 font-mono font-bold text-xs bg-slate-50">115%</div>
+<button class="p-2 hover:bg-slate-100 border-l border-slate-300" title="Zoom In">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+<div class="w-px bg-black mx-1 h-auto"></div>
+<button class="p-2 hover:bg-slate-100 text-black transition-colors" title="Fit Width">
+<span class="material-symbols-outlined text-[20px]">width_full</span>
+</button>
+</div>
+<div class="flex-1 overflow-auto p-8 flex justify-center doc-pattern relative cursor-grab active:cursor-grabbing">
+<div class="relative w-[700px] bg-white shadow-2xl min-h-[900px] border border-slate-300">
+<img alt="Scanned invoice document showing headers and tables" class="w-full h-auto opacity-100 select-none pointer-events-none grayscale-[10%] contrast-[1.05]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1hHIZltR_OZusjywor0c-owcs7dF2FIHukwXiSkCu0hUTBAJSh1qoCFJTouXf64yxi8ZsMckKFt9s-50_8PIV-FkAl-UKCBhQO3rBK9nnugN-CqzT2NF2v48wMtPtG7Rvw-cB38UTZbjuK9mb1DxfP92j2bqSM9xur1zhbPS84L31b6HEKs35vTtaUxqn6zWpdeLXimVmmzLufDI4exxrNJvuOzLISi20zoaZhzXxjAdtrha8JqLu2-Y5ZKmVFtc37l09f8XvsmR6"/>
+<div class="absolute top-[45%] left-[8%] w-[40%] h-[2.5%] bg-yellow-300/40 border-2 border-yellow-500 rounded-sm cursor-pointer ring-4 ring-yellow-400/20 z-10 group/highlight">
+<div class="absolute -right-3 -top-3 size-6 bg-yellow-400 border-2 border-black shadow-sm flex items-center justify-center z-20 transition-transform group-hover/highlight:scale-110">
+<span class="text-xs font-bold text-black">1</span>
+</div>
+</div>
+<div class="absolute bottom-[20%] right-[8%] w-[15%] h-[2.5%] bg-purple-200/40 border-2 border-purple-500 rounded-sm cursor-pointer z-10 hover:bg-purple-200/60">
+<div class="absolute -right-3 -top-3 size-6 bg-purple-400 border-2 border-black shadow-sm flex items-center justify-center z-20">
+<span class="material-symbols-outlined text-white text-[14px]">star</span>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white border-2 border-black px-4 py-2 shadow-neo flex items-center gap-4 z-10">
+<button class="hover:text-primary transition-colors disabled:opacity-50 font-bold">&lt;</button>
+<span class="font-mono font-bold text-sm">Page 1 / 3</span>
+<button class="hover:text-primary transition-colors font-bold">&gt;</button>
+</div>
+</section>
+<aside class="w-[450px] flex-none bg-cream border-l-2 border-black flex flex-col z-20 shadow-[-4px_0px_10px_rgba(0,0,0,0.05)]">
+<div class="px-5 py-4 border-b-2 border-black bg-white flex justify-between items-center">
+<h2 class="text-xl font-bold">Extraction Data</h2>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold uppercase text-slate-500">Confidence</span>
+<div class="w-20 h-3 border-2 border-black rounded-full bg-slate-200 overflow-hidden">
+<div class="h-full w-[75%] bg-yellow-400"></div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-5 space-y-6">
+<div class="bg-white border-2 border-black shadow-neo rounded-sm relative overflow-hidden">
+<div class="bg-yellow-100 px-4 py-3 border-b-2 border-black flex justify-between items-center">
+<label class="font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-700">warning</span>
+                            PO Number
+                        </label>
+<span class="bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-sm">CONSENSUS REQ.</span>
+</div>
+<div class="p-4 space-y-4">
+<div class="bg-slate-50 p-3 border-2 border-slate-200 rounded-sm">
+<div class="flex justify-between text-xs font-bold mb-1.5">
+<span>Model Agreement</span>
+<span class="text-red-500">Weak (66%)</span>
+</div>
+<div class="flex h-3 w-full border border-black rounded-full overflow-hidden">
+<div class="w-[66%] bg-primary h-full border-r border-black" title="Model A &amp; B"></div>
+<div class="w-[34%] bg-slate-300 h-full" title="Model C"></div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="relative flex items-start gap-3 p-3 bg-primary/10 border-2 border-primary cursor-pointer hover:bg-primary/20 transition-colors">
+<input checked="" class="mt-1 text-black focus:ring-0 border-2 border-black h-4 w-4" id="optA" name="consensus" type="radio"/>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<label class="font-bold text-lg" for="optA">PO-88229</label>
+<span class="text-xs font-bold bg-white px-1 border border-black rounded-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)]">GPT-4</span>
+</div>
+<p class="text-xs text-slate-600">High visual confidence.</p>
+</div>
+</div>
+<div class="relative flex items-start gap-3 p-3 border-2 border-transparent hover:border-black hover:bg-slate-50 cursor-pointer transition-all opacity-60 hover:opacity-100">
+<input class="mt-1 text-black focus:ring-0 border-2 border-black h-4 w-4" id="optB" name="consensus" type="radio"/>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<label class="font-bold text-lg text-slate-700" for="optB">PO-88220</label>
+<span class="text-xs font-bold bg-slate-100 px-1 border border-slate-300 rounded-sm">LayoutLM</span>
+</div>
+<p class="text-xs text-slate-500">Possible OCR error '9' vs '0'.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white border-2 border-black shadow-neo rounded-sm relative transition-all">
+<div class="px-4 py-3 border-b-2 border-slate-100 flex justify-between items-center bg-purple-50">
+<label class="font-bold text-slate-700">Vendor Address</label>
+<button class="text-xs font-bold bg-purple-600 text-white px-3 py-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 hover:shadow-none transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified</span> VERIFIED
+                        </button>
+</div>
+<div class="p-4 bg-white">
+<div class="text-lg font-bold mb-4">123 Industrial Pkwy, Springfield</div>
+<div class="border-t-2 border-dashed border-slate-300 pt-4">
+<h4 class="text-xs font-bold uppercase text-slate-500 mb-3 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">format_quote</span>
+                                Sources &amp; Citations
+                            </h4>
+<div class="space-y-3">
+<div class="p-2 border border-slate-200 bg-slate-50 rounded-sm text-sm relative pl-8">
+<div class="absolute left-2 top-2.5 text-yellow-500">
+<span class="material-symbols-outlined text-[16px] fill-current">star</span>
+</div>
+<p class="text-slate-600 mb-1 font-mono text-xs">Invoice_Scan.pdf (Pg 1)</p>
+<div class="bg-yellow-100/50 inline px-1 border-b-2 border-yellow-300">...ship to 123 Industrial Pkwy...</div>
+</div>
+<div class="p-2 border border-slate-200 bg-purple-50/50 rounded-sm text-sm relative pl-8">
+<div class="absolute left-2 top-2.5 text-purple-400">
+<span class="material-symbols-outlined text-[16px]">link</span>
+</div>
+<p class="text-slate-600 mb-1 font-mono text-xs">Vendor Portal API</p>
+<div class="text-slate-500 italic">"address_line_1": "123 Industrial Pkwy"</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white border-2 border-slate-300 border-l-4 border-l-purple-500 p-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-center">
+<div>
+<p class="text-xs font-bold text-slate-500 uppercase">Tax Amount</p>
+<p class="font-bold text-lg">$45.00</p>
+</div>
+<div class="flex items-center gap-1 text-purple-600 bg-purple-50 px-2 py-1 rounded text-xs font-bold">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span> Inferred
+                        </div>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<footer class="h-16 bg-white border-t-2 border-black flex items-center px-6 justify-between z-40 relative shadow-[0px_-4px_20px_rgba(0,0,0,0.05)]">
+<div class="flex items-center gap-4 text-xs font-bold text-slate-600">
+<div class="flex items-center gap-1.5">
+<kbd class="bg-slate-100 border-b-2 border-slate-300 px-2 py-1 rounded font-mono text-black min-w-[24px] text-center">A</kbd>
+<span>Accept</span>
+</div>
+<div class="flex items-center gap-1.5">
+<kbd class="bg-slate-100 border-b-2 border-slate-300 px-2 py-1 rounded font-mono text-black min-w-[24px] text-center">R</kbd>
+<span>Reject</span>
+</div>
+<div class="h-4 w-px bg-slate-300 mx-2"></div>
+<div class="flex items-center gap-1.5">
+<kbd class="bg-slate-100 border-b-2 border-slate-300 px-2 py-1 rounded font-mono text-black">⌘Z</kbd>
+<span>Undo</span>
+</div>
+</div>
+<div class="absolute left-1/2 -translate-x-1/2 w-1/3">
+<div class="flex justify-between text-xs font-bold mb-1">
+<span>Validation Progress</span>
+<span>85%</span>
+</div>
+<div class="h-2 w-full bg-slate-200 border border-black rounded-full overflow-hidden">
+<div class="h-full bg-green-500 w-[85%]"></div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 text-sm font-bold text-slate-600 hover:text-black hover:bg-slate-100 rounded transition-colors">Skip</button>
+<button class="px-6 py-2 bg-black text-white font-bold text-sm shadow-neo-sm hover:translate-y-px hover:shadow-none transition-all flex items-center gap-2">
+                Next Document <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</footer>
+
+</body></html>

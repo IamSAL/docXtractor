@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pipeline Editor - DocXTractor</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e5d161",
+                        "primary-dark": "#d4c04a",
+                        "accent-red": "#ff6b6b",
+                        "background-light": "#f9fafa",
+                        "background-dark": "#21242c",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2a2e37",
+                        "border-light": "#e2e4e7",
+                        "border-dark": "#3a3f4b",
+                        "text-main-light": "#1a190e",
+                        "text-main-dark": "#f9fafa",
+                        "text-secondary-light": "#6b7280",
+                        "text-secondary-dark": "#9ca3af",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.375rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                    boxShadow: {
+                        "subtle": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                        "neubrutalist": "4px 4px 0px 0px rgba(0,0,0,1)",
+                        "neubrutalist-sm": "2px 2px 0px 0px rgba(0,0,0,1)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #000;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #e5d161;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }.toggle-checkbox {
+            right: 4px;
+            z-index: 10;
+            border: 2px solid black;
+        }
+        .toggle-label {
+            width: 44px;
+            height: 24px;
+            border: 2px solid black;
+            border-radius: 999px;
+        }
+        .toggle-checkbox:checked {
+            right: 2px;
+            border-color: black;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main-light dark:text-text-main-dark min-h-screen flex flex-col overflow-hidden">
+<div class="flex h-screen w-full">
+<aside class="w-72 bg-surface-light dark:bg-surface-dark border-r-2 border-black/10 dark:border-border-dark flex-shrink-0 flex flex-col h-full z-20">
+<div class="flex flex-col h-full p-4">
+<div class="flex flex-col gap-8 h-full">
+<div class="flex items-center gap-3 px-2">
+<div class="bg-primary border-2 border-black aspect-square rounded-lg size-10 flex items-center justify-center text-text-main-light font-bold text-xl shadow-neubrutalist-sm">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-text-main-light dark:text-white text-base font-extrabold leading-none">DocXTractor</h1>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-xs mt-1 font-medium">Admin Workspace</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2 flex-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group border border-transparent hover:border-black/5" href="#">
+<span class="material-symbols-outlined group-hover:text-text-main-light dark:group-hover:text-white">dashboard</span>
+<span class="text-sm font-bold group-hover:text-text-main-light dark:group-hover:text-white">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-text-main-light border-2 border-black shadow-neubrutalist-sm font-bold" href="#">
+<span class="material-symbols-outlined fill-1">account_tree</span>
+<span class="text-sm">Pipelines</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group border border-transparent hover:border-black/5" href="#">
+<span class="material-symbols-outlined group-hover:text-text-main-light dark:group-hover:text-white">article</span>
+<span class="text-sm font-bold group-hover:text-text-main-light dark:group-hover:text-white">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group border border-transparent hover:border-black/5" href="#">
+<span class="material-symbols-outlined group-hover:text-text-main-light dark:group-hover:text-white">settings</span>
+<span class="text-sm font-bold group-hover:text-text-main-light dark:group-hover:text-white">Settings</span>
+</a>
+</nav>
+<div class="flex items-center gap-3 px-3 py-3 mt-auto border-t-2 border-black/5 dark:border-border-dark pt-4">
+<div class="h-9 w-9 rounded-full bg-gray-200 dark:bg-gray-700 bg-cover bg-center border-2 border-black dark:border-gray-600" data-alt="User avatar placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCB2eOJq2ZuBY4KRitkY9PEeDwOUDJtcmSfvgrme9Sxhq5hIMBDEoXxdrWuLorJP5D4RPVhRDqmxxXkzIwviP7REVuJwLbzPFL9LMky2vA3QZ3Ke8Qq8fKtQ_i94PpJL0xnfs-7zqGowgwCAyqiWNhBAuQGn_dREVSpwPvxIC3kEevA5CPHx33s2-2D04YFI7b5C2X1A9UANT7OLo8C4nOZa2NXaFUgO-UHOGGE1AIyqXKocQE907kJ4tPtYSnSyrHATmZb2Rla5n56');"></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-text-main-light dark:text-white">Alex Morgan</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Pro Plan</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
+<header class="sticky top-0 z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b-2 border-border-light dark:border-border-dark px-8 py-4 flex flex-col gap-2">
+<div class="flex items-center gap-2 text-sm">
+<a class="text-text-secondary-light dark:text-text-secondary-dark hover:text-black font-semibold transition-colors" href="#">Pipelines</a>
+<span class="text-text-secondary-light dark:text-text-secondary-dark">/</span>
+<span class="font-bold text-text-main-light dark:text-white">Edit Pipeline</span>
+</div>
+<div class="flex flex-wrap justify-between items-end gap-4">
+<div class="flex flex-col gap-1">
+<h2 class="text-3xl font-black tracking-tight text-text-main-light dark:text-white leading-none">Invoice Extraction Pipeline v2</h2>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                            Last edited 2 mins ago
+                        </p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 h-10 rounded-lg border-2 border-transparent hover:border-black/10 text-text-secondary-light dark:text-text-secondary-dark text-sm font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            Discard Changes
+                        </button>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto px-8 py-8 pb-32">
+<div class="max-w-6xl mx-auto flex flex-col gap-6">
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl border-2 border-border-light dark:border-border-dark overflow-hidden">
+<div class="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50">
+<h3 class="font-bold text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-dark">info</span>
+                                Basic Information
+                            </h3>
+<span class="material-symbols-outlined text-text-secondary-light">expand_more</span>
+</div>
+</section>
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-neubrutalist border-2 border-black dark:border-gray-600 overflow-hidden flex flex-col">
+<div class="px-6 py-5 border-b-2 border-black dark:border-gray-600 flex items-center justify-between bg-gray-50 dark:bg-gray-800">
+<div class="flex flex-col">
+<h3 class="font-black text-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-black font-bold">schema</span>
+                                    Field Schema
+                                </h3>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 font-semibold">Define extraction targets and validation rules.</p>
+</div>
+<button class="text-sm font-bold bg-white border-2 border-black text-black hover:bg-primary hover:text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all px-3 py-2 rounded-lg flex items-center gap-1">
+<span class="material-symbols-outlined text-lg">add</span>
+                                Add Field
+                            </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-white dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark text-xs uppercase tracking-wider font-extrabold border-b-2 border-black dark:border-gray-600">
+<th class="w-12 py-4 text-center"></th>
+<th class="px-6 py-4">Field Name</th>
+<th class="px-6 py-4">Data Type</th>
+<th class="px-6 py-4 text-center">Consensus</th>
+<th class="px-6 py-4 text-center">Citations</th>
+<th class="px-6 py-4 text-right"></th>
+</tr>
+</thead>
+<tbody class="divide-y-2 divide-gray-100 dark:divide-gray-700">
+<tr class="group hover:bg-yellow-50/50 dark:hover:bg-background-dark/50 transition-colors cursor-move">
+<td class="text-center py-4 text-gray-400 group-hover:text-black"><span class="material-symbols-outlined cursor-grab">drag_indicator</span></td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-text-secondary-light text-lg">abc</span>
+<span class="font-bold text-text-main-light dark:text-white">Vendor Name</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600 text-xs font-mono font-bold">String</span>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-11 h-6 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-6" id="cons1" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 dark:bg-gray-700 cursor-pointer transition-colors duration-300 ease-in-out" for="cons1"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-11 h-6 align-middle select-none">
+<input class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-6" id="cit1" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 dark:bg-gray-700 cursor-pointer transition-colors duration-300 ease-in-out" for="cit1"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-gray-400 hover:text-black"><span class="material-symbols-outlined">expand_more</span></button>
+</td>
+</tr>
+<tr class="bg-primary/10 border-l-4 border-l-primary border-t-2 border-t-black/10">
+<td class="text-center py-4 text-black"><span class="material-symbols-outlined cursor-grab">drag_indicator</span></td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-black text-lg">attach_money</span>
+<span class="font-bold text-black">Total Amount</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-white dark:bg-gray-800 rounded border border-black dark:border-gray-600 text-xs font-mono font-bold">Currency</span>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-11 h-6 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-6" id="cons2" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 dark:bg-gray-700 cursor-pointer transition-colors duration-300 ease-in-out" for="cons2"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-11 h-6 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-6" id="cit2" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 dark:bg-gray-700 cursor-pointer transition-colors duration-300 ease-in-out" for="cit2"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-black bg-white rounded-full p-1 border border-black hover:bg-gray-100"><span class="material-symbols-outlined">expand_less</span></button>
+</td>
+</tr>
+<tr class="bg-background-light dark:bg-surface-dark border-b-2 border-black/10">
+<td class="p-0" colspan="6">
+<div class="border-t border-border-light dark:border-border-dark flex flex-col">
+<div class="flex items-center px-6 border-b border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800/50">
+<button class="px-4 py-3 text-sm font-medium text-text-secondary-light hover:text-black border-b-2 border-transparent">General</button>
+<button class="px-4 py-3 text-sm font-medium text-text-secondary-light hover:text-black border-b-2 border-transparent">Validation Rules</button>
+<button class="px-4 py-3 text-sm font-bold text-black border-b-2 border-primary bg-primary/10">Few-Shot Examples</button>
+</div>
+<div class="p-6 bg-white dark:bg-surface-dark">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<label class="text-sm font-bold text-text-main-light dark:text-text-secondary-dark flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">code</span>
+                                                                    Sample Input
+                                                                </label>
+<span class="text-xs text-text-secondary-light font-mono">source_text_snippet</span>
+</div>
+<div class="relative group">
+<div class="absolute -inset-0.5 bg-gray-200 rounded-lg blur opacity-50 group-hover:opacity-75 transition"></div>
+<div class="relative">
+<textarea class="w-full h-40 px-4 py-3 bg-gray-900 text-green-400 font-mono text-xs rounded-lg border-2 border-gray-800 focus:outline-none focus:ring-0 resize-none leading-relaxed" spellcheck="false">...
+Order Summary:
+Subtotal: $450.00
+Tax (8%): $36.00
+Shipping: $15.00
+TOTAL AMOUNT DUE: $501.00
+Payment Terms: Net 30
+...</textarea>
+<div class="absolute top-2 right-2 px-2 py-1 bg-gray-800 text-gray-400 text-[10px] rounded font-mono uppercase">Raw Text</div>
+</div>
+</div>
+<p class="text-xs text-text-secondary-light">Paste a snippet of text containing the value to extract.</p>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<label class="text-sm font-bold text-text-main-light dark:text-text-secondary-dark flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">output</span>
+                                                                    Expected Output
+                                                                </label>
+<span class="text-xs text-text-secondary-light font-mono">target_value</span>
+</div>
+<div class="p-6 bg-gray-50 dark:bg-gray-800/30 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col gap-4 justify-center h-40">
+<div class="flex flex-col gap-1">
+<label class="text-xs font-bold uppercase text-text-secondary-light">Total Amount</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+<input class="w-full pl-7 pr-3 py-2 bg-white border-2 border-accent-red rounded-md text-sm font-bold focus:outline-none focus:border-primary" placeholder="0.00" type="text"/>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 text-accent-red">
+<span class="material-symbols-outlined text-lg">error</span>
+</div>
+</div>
+<span class="text-xs text-accent-red font-bold flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                                                                        Value is required for this example
+                                                                    </span>
+</div>
+</div>
+<div class="flex justify-end">
+<button class="text-xs font-bold text-primary-dark hover:text-black underline decoration-2 underline-offset-2">Use AI to generate</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<tr class="group hover:bg-yellow-50/50 dark:hover:bg-background-dark/50 transition-colors cursor-move">
+<td class="text-center py-4 text-gray-400 group-hover:text-black"><span class="material-symbols-outlined cursor-grab">drag_indicator</span></td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-text-secondary-light text-lg">calendar_today</span>
+<span class="font-bold text-text-main-light dark:text-white">Invoice Date</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600 text-xs font-mono font-bold">Date</span>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-11 h-6 align-middle select-none">
+<input class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-6" id="cons3" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 dark:bg-gray-700 cursor-pointer transition-colors duration-300 ease-in-out" for="cons3"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-11 h-6 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-6" id="cit3" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 dark:bg-gray-700 cursor-pointer transition-colors duration-300 ease-in-out" for="cit3"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-gray-400 hover:text-black"><span class="material-symbols-outlined">expand_more</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-gray-50 dark:bg-background-dark/30 border-t-2 border-black dark:border-gray-600 flex justify-center">
+<button class="w-full py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-text-secondary-light hover:border-black hover:text-black hover:bg-white transition-all flex items-center justify-center gap-2 font-bold text-sm">
+<span class="material-symbols-outlined">add_circle</span> Add another field
+                             </button>
+</div>
+</section>
+</div>
+</div>
+<div class="fixed bottom-0 left-72 right-0 bg-white dark:bg-surface-dark border-t-2 border-black dark:border-gray-600 p-4 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<div class="max-w-6xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button class="text-sm font-bold text-accent-red hover:text-red-700 underline decoration-2 underline-offset-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+                            Delete Pipeline
+                        </button>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs text-text-secondary-light font-medium">Unsaved changes</span>
+<button class="px-8 h-12 rounded-lg bg-primary hover:bg-primary-dark text-black text-sm font-black shadow-neubrutalist active:shadow-none active:translate-x-[4px] active:translate-y-[4px] border-2 border-black transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] filled">save</span>
+                            SAVE PIPELINE
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

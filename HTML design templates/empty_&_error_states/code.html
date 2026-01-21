@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocXTractor - Empty &amp; Error States</title>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ffde0a",
+                        "background-light": "#ffffff",
+                        "background-dark": "#000000",
+                    },
+                    fontFamily: {
+                        "display": ["Epilogue", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom utilities for Neubrutalism that might be verbose in inline classes */
+        .neu-shadow {
+            box-shadow: 4px 4px 0px 0px #000000;
+        }
+        .neu-shadow-hover:hover {
+            box-shadow: none;
+            transform: translate(2px, 2px);
+        }
+        .neu-shadow-lg {
+            box-shadow: 8px 8px 0px 0px #000000;
+        }
+        .neu-border {
+            border: 2px solid #000000;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-black min-h-screen flex flex-col overflow-x-hidden selection:bg-primary selection:text-black">
+<!-- Navbar -->
+<header class="w-full border-b-2 border-black bg-white px-6 py-4 sticky top-0 z-50">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary border-2 border-black flex items-center justify-center neu-shadow">
+<span class="material-symbols-outlined text-black text-lg font-bold">description</span>
+</div>
+<h1 class="text-xl font-black tracking-tighter uppercase">DocXTractor</h1>
+</div>
+<nav class="hidden md:flex gap-8">
+<a class="text-sm font-bold uppercase hover:underline decoration-2 underline-offset-4 decoration-primary" href="#">Pipelines</a>
+<a class="text-sm font-bold uppercase hover:underline decoration-2 underline-offset-4 decoration-primary" href="#">Documents</a>
+<a class="text-sm font-bold uppercase hover:underline decoration-2 underline-offset-4 decoration-primary" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full border-2 border-black bg-gray-200 overflow-hidden" data-alt="User profile avatar placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDx1KYcHs5dzIEZ65jwd9NhUpX9C2ypOhpGRv6FOpFrKeMpUoOF2DjzcuGbjvP-RHQH8dviS0jEbSSB4Yy06Y12eruUp5DKkXKjRAAbDX1XNCArC-KHzjQK0t3NyJ0ID7fbAPPVvFh1-wKxJdnia33wCNIoHcLKfwGDDLM299X74yg802cN8WHdPRAmEWo6HcwCiXyZGLz-lyKW7ePqlsRVUX1_LrwDoi1wpRJr8CKT3w5KryyhV7L96CDoFj-EVnhKfi9nZ7qZMyKo'); background-size: cover;"></div>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center py-16 px-4 md:px-8 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC4wNSIgLz4KPC9zdmc+')]">
+<div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+<!-- COLUMN 1: EMPTY STATE -->
+<div class="flex flex-col gap-6">
+<div class="bg-black text-white px-4 py-2 w-fit text-sm font-bold tracking-widest uppercase border-2 border-black">
+                    State 01: Empty
+                </div>
+<div class="bg-white border-2 border-black p-8 md:p-12 flex flex-col items-center text-center neu-shadow-lg relative overflow-hidden group">
+<!-- Decorative background element -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-gray-50 border-l-2 border-b-2 border-black rounded-bl-[4rem] -mr-2 -mt-2 z-0"></div>
+<!-- Illustration -->
+<div class="relative z-10 w-48 h-48 mb-8 flex items-center justify-center">
+<div class="absolute inset-0 border-2 border-black bg-white transform rotate-3"></div>
+<div class="absolute inset-0 border-2 border-black bg-white transform -rotate-2"></div>
+<div class="absolute inset-0 border-2 border-dashed border-black bg-gray-50 flex items-center justify-center flex-col gap-2">
+<span class="material-symbols-outlined text-6xl text-gray-300">find_in_page</span>
+</div>
+<div class="absolute -bottom-4 -right-4 bg-primary border-2 border-black px-2 py-1 transform rotate-12 shadow-sm">
+<span class="text-xs font-bold">NULL</span>
+</div>
+</div>
+<h2 class="relative z-10 text-3xl font-black uppercase mb-3 tracking-tight">No Pipelines Detected</h2>
+<p class="relative z-10 text-gray-600 font-medium mb-8 max-w-sm leading-relaxed">
+                        Your workspace is strictly empty. Initiate your first extraction protocol to begin processing logic.
+                    </p>
+<button class="relative z-10 flex items-center gap-3 bg-primary border-2 border-black px-8 py-4 text-sm font-bold uppercase tracking-wider neu-shadow transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:bg-[#e6c809]">
+<span class="material-symbols-outlined">add</span>
+                        Create New Pipeline
+                    </button>
+</div>
+</div>
+<!-- COLUMN 2: ERROR STATE -->
+<div class="flex flex-col gap-6">
+<div class="bg-primary text-black px-4 py-2 w-fit text-sm font-bold tracking-widest uppercase border-2 border-black">
+                    State 02: Alert
+                </div>
+<div class="relative">
+<!-- Pulsing effect container -->
+<div class="absolute -inset-1 bg-primary/30 blur-sm animate-pulse rounded-sm"></div>
+<div class="relative bg-white border-2 border-black p-0 neu-shadow-lg flex flex-col">
+<!-- Header of the card -->
+<div class="bg-primary border-b-2 border-black p-4 flex items-center justify-between">
+<div class="flex items-center gap-2 text-black">
+<span class="material-symbols-outlined filled" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="font-bold uppercase tracking-tight text-sm">System Alert: Confidence Threshold</span>
+</div>
+<span class="font-mono text-xs font-bold border border-black px-1 bg-white">ERR_42</span>
+</div>
+<div class="p-8 md:p-10 flex flex-col items-start gap-6">
+<div class="w-full flex items-start gap-6">
+<div class="hidden sm:flex flex-col items-center justify-center w-24 h-24 border-2 border-black bg-white shrink-0 shadow-[4px_4px_0px_0px_#e5e7eb]">
+<span class="text-3xl font-black text-black">42%</span>
+<span class="text-[10px] font-bold uppercase text-gray-500 mt-1">Score</span>
+</div>
+<div class="flex-1">
+<h3 class="text-2xl font-black uppercase mb-2 leading-none">Review Required:<br/>Low Confidence</h3>
+<p class="text-sm font-medium text-gray-600 leading-relaxed">
+                                        The extraction engine encountered ambiguity in <span class="font-bold text-black border-b-2 border-primary">Invoice #4022</span>. Manual verification is mandatory before data export.
+                                    </p>
+</div>
+</div>
+<!-- Confidence Bar -->
+<div class="w-full bg-gray-100 border-2 border-black h-6 relative mt-2">
+<!-- Stripes pattern for bar -->
+<div class="h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNCIgaGVpZ2h0PSI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xIDFoMnYySDF6IiBmaWxsPSIjZmZkZTBhIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] absolute left-0 top-0 bottom-0 border-r-2 border-black" style="width: 42%;"></div>
+<div class="absolute right-2 top-0 bottom-0 flex items-center text-[10px] font-bold text-gray-400 uppercase">Threshold: 85%</div>
+<!-- Marker for threshold -->
+<div class="absolute left-[85%] top-[-4px] bottom-[-4px] w-0.5 bg-black border-x border-black"></div>
+</div>
+<div class="w-full h-px bg-gray-200 my-2"></div>
+<div class="flex flex-wrap gap-4 w-full">
+<button class="flex-1 min-w-[160px] bg-black text-white border-2 border-black px-6 py-3 text-sm font-bold uppercase tracking-wider neu-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex justify-center items-center gap-2 group">
+<span>Verify Document</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<button class="bg-white text-black border-2 border-black px-4 py-3 text-sm font-bold uppercase tracking-wider neu-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all" title="Delete Pipeline">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Context (Just for design balance) -->
+<footer class="w-full py-6 text-center border-t-2 border-black bg-white mt-auto">
+<p class="text-xs font-bold uppercase tracking-widest text-gray-400">DocXTractor System v2.0 // Neubrutalism Build</p>
+</footer>
+</body></html>

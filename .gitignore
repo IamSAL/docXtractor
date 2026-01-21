@@ -45,3 +45,4 @@ server/upload/
 **/.cache/
 **/*.log
 **/temp/
+examples/

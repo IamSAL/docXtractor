@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocXTractor Mobile Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#e5d161",
+              "background-light": "#f9fafb",
+              "background-dark": "#1a1d23",
+              "retro-black": "#1a190e",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"],
+              "sans": ["Inter", "sans-serif"],
+            },
+            boxShadow: {
+              'retro': '4px 4px 0px 0px rgba(26, 25, 14, 1)',
+              'retro-sm': '2px 2px 0px 0px rgba(26, 25, 14, 1)',
+              'retro-hover': '6px 6px 0px 0px rgba(26, 25, 14, 1)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e5d161;
+            border-radius: 3px;
+        }
+        
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-[#f0f0eb] dark:bg-gray-900 font-display min-h-screen flex items-center justify-center p-4">
+<!-- Mobile Device Container / Simulator -->
+<div class="relative w-full max-w-[440px] bg-background-light dark:bg-background-dark h-[880px] rounded-[32px] border-[6px] border-retro-black overflow-hidden shadow-2xl flex flex-col group/design-root">
+<!-- Status Bar Simulator (Decorative) -->
+<div class="bg-background-light dark:bg-background-dark px-6 py-2 flex justify-between items-center text-xs font-bold text-retro-black dark:text-white z-20 select-none">
+<span>9:41</span>
+<div class="flex gap-2 items-center">
+<span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined text-[16px]">wifi</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<!-- Sticky Header -->
+<header class="sticky top-0 z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b-2 border-retro-black dark:border-white/20 px-5 py-4 flex items-center justify-between transition-all">
+<button class="p-2 -ml-2 rounded-lg active:bg-gray-200 dark:active:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-retro-black dark:text-white text-3xl">menu</span>
+</button>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 bg-retro-black dark:bg-primary flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined text-primary dark:text-retro-black text-sm font-bold">description</span>
+</div>
+<h1 class="text-retro-black dark:text-white text-lg font-black tracking-tighter uppercase">DocXTractor</h1>
+</div>
+<button class="relative w-10 h-10 rounded-full border-2 border-retro-black overflow-hidden bg-primary shadow-retro-sm">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Portrait of a user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRWwHWYiv3_z85ggC1lcqVlxn7WzCtdqpn13Kw32Q9hwSnkjJ418oSPpE88EYp3iRlqDitov9lQiqQvoHJ9Qh-rdae7_h6jGQo43a8QZrvhJ2xp6lBkKJUpEHAgBSxPCFQ5EJkw2qwlf5bgTU4CCZIlT9bwupsXZ37XYDfAvBkqpMS9prBAZJCQP6ocJMOVMTFP3x4nbWbAElMpsdZDjSn_SwwBllDoSv0byh0PyiCCZOlJs45Vy1rvR4AnMUQJcjtKNzO0uKOI59_"/>
+</button>
+</header>
+<!-- Main Content (Scrollable) -->
+<main class="flex-1 overflow-y-auto pb-24 px-5">
+<!-- Welcome Section -->
+<div class="mt-6 mb-8">
+<h2 class="text-3xl font-black text-retro-black dark:text-white tracking-tight leading-tight mb-2">
+                    Good morning,<br/>Alex.
+                </h2>
+<p class="text-gray-600 dark:text-gray-400 font-medium">Here's your extraction summary.</p>
+</div>
+<!-- Stats Grid -->
+<section class="grid grid-cols-2 gap-4 mb-8">
+<!-- Stat Card 1 -->
+<div class="bg-white dark:bg-gray-800 border-2 border-retro-black dark:border-white rounded-xl p-4 shadow-retro hover:translate-y-[-2px] hover:shadow-retro-hover transition-all duration-200 cursor-default">
+<div class="flex justify-between items-start mb-2">
+<div class="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-lg border border-retro-black dark:border-blue-400">
+<span class="material-symbols-outlined text-retro-black dark:text-blue-300">description</span>
+</div>
+</div>
+<p class="text-sm font-bold text-gray-500 dark:text-gray-400">Total Docs</p>
+<p class="text-2xl font-black text-retro-black dark:text-white">1,248</p>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-white dark:bg-gray-800 border-2 border-retro-black dark:border-white rounded-xl p-4 shadow-retro hover:translate-y-[-2px] hover:shadow-retro-hover transition-all duration-200 cursor-default">
+<div class="flex justify-between items-start mb-2">
+<div class="bg-green-100 dark:bg-green-900/50 p-2 rounded-lg border border-retro-black dark:border-green-400">
+<span class="material-symbols-outlined text-retro-black dark:text-green-300">check_circle</span>
+</div>
+<span class="text-xs font-bold text-green-600 dark:text-green-400 flex items-center">
+<span class="material-symbols-outlined text-sm mr-0.5">trending_up</span>
+                            2%
+                        </span>
+</div>
+<p class="text-sm font-bold text-gray-500 dark:text-gray-400">Success Rate</p>
+<p class="text-2xl font-black text-retro-black dark:text-white">98.5%</p>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-white dark:bg-gray-800 border-2 border-retro-black dark:border-white rounded-xl p-4 shadow-retro hover:translate-y-[-2px] hover:shadow-retro-hover transition-all duration-200 cursor-default">
+<div class="flex justify-between items-start mb-2">
+<div class="bg-primary/30 p-2 rounded-lg border border-retro-black dark:border-primary">
+<span class="material-symbols-outlined text-retro-black dark:text-primary">bolt</span>
+</div>
+</div>
+<p class="text-sm font-bold text-gray-500 dark:text-gray-400">Active Jobs</p>
+<p class="text-2xl font-black text-retro-black dark:text-white">12</p>
+</div>
+<!-- Stat Card 4 -->
+<div class="bg-white dark:bg-gray-800 border-2 border-retro-black dark:border-white rounded-xl p-4 shadow-retro hover:translate-y-[-2px] hover:shadow-retro-hover transition-all duration-200 cursor-default">
+<div class="flex justify-between items-start mb-2">
+<div class="bg-purple-100 dark:bg-purple-900/50 p-2 rounded-lg border border-retro-black dark:border-purple-400">
+<span class="material-symbols-outlined text-retro-black dark:text-purple-300">credit_card</span>
+</div>
+</div>
+<p class="text-sm font-bold text-gray-500 dark:text-gray-400">Credits Used</p>
+<div class="flex items-end gap-1">
+<p class="text-2xl font-black text-retro-black dark:text-white">450</p>
+<p class="text-sm font-bold text-gray-400 mb-1">/1k</p>
+</div>
+</div>
+</section>
+<!-- Search Bar -->
+<div class="mb-8 relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-retro-black dark:text-gray-400">search</span>
+</div>
+<input class="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-retro-black dark:border-gray-500 rounded-lg text-retro-black dark:text-white placeholder-gray-500 font-medium focus:ring-0 focus:border-retro-black dark:focus:border-primary focus:shadow-retro transition-all" placeholder="Filter recent jobs..." type="text"/>
+</div>
+<!-- Recent Pipelines -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-bold text-retro-black dark:text-white">Recent Pipelines</h3>
+<button class="text-sm font-bold text-retro-black dark:text-primary hover:underline">View All</button>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Pipeline Item 1 -->
+<div class="group relative bg-white dark:bg-gray-800 border-2 border-retro-black dark:border-gray-600 rounded-xl p-4 shadow-retro-sm hover:shadow-retro transition-all active:translate-y-[2px] active:shadow-none cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-red-100 border border-retro-black flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-red-800">picture_as_pdf</span>
+</div>
+<div>
+<h4 class="font-bold text-retro-black dark:text-white leading-tight">Invoice_2024_Oct.pdf</h4>
+<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Acme Corp • 2.4 MB</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded-md bg-green-100 border border-green-800 text-green-800 text-xs font-bold uppercase tracking-wider">
+                                Success
+                            </span>
+</div>
+<div class="mt-3 flex items-center justify-between text-xs font-semibold text-gray-500">
+<span>Finance Pipeline</span>
+<span>2m ago</span>
+</div>
+</div>
+<!-- Pipeline Item 2 -->
+<div class="group relative bg-white dark:bg-gray-800 border-2 border-retro-black dark:border-gray-600 rounded-xl p-4 shadow-retro-sm hover:shadow-retro transition-all active:translate-y-[2px] active:shadow-none cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-blue-100 border border-retro-black flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-blue-800">article</span>
+</div>
+<div>
+<h4 class="font-bold text-retro-black dark:text-white leading-tight">Contract_v2_Final.docx</h4>
+<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Legal Dept • 890 KB</p>
+</div>
+</div>
+<span class="flex items-center gap-1 px-2 py-1 rounded-md bg-primary/20 border border-yellow-700 text-yellow-900 dark:text-yellow-400 text-xs font-bold uppercase tracking-wider">
+<span class="block w-2 h-2 rounded-full bg-yellow-600 animate-pulse"></span>
+                                Processing
+                            </span>
+</div>
+<div class="mt-3 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden border border-retro-black/10">
+<div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
+</div>
+<div class="mt-2 flex items-center justify-between text-xs font-semibold text-gray-500">
+<span>Legal Review</span>
+<span>5m ago</span>
+</div>
+</div>
+<!-- Pipeline Item 3 -->
+<div class="group relative bg-white dark:bg-gray-800 border-2 border-retro-black dark:border-gray-600 rounded-xl p-4 shadow-retro-sm hover:shadow-retro transition-all active:translate-y-[2px] active:shadow-none cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-gray-100 border border-retro-black flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-gray-800">image</span>
+</div>
+<div>
+<h4 class="font-bold text-retro-black dark:text-white leading-tight">Receipt_scan_04.png</h4>
+<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Expenses • 1.2 MB</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded-md bg-red-100 border border-red-800 text-red-900 text-xs font-bold uppercase tracking-wider">
+                                Failed
+                            </span>
+</div>
+<div class="mt-3 flex items-center justify-between text-xs font-semibold text-gray-500">
+<span>OCR Scan</span>
+<span>1h ago</span>
+</div>
+</div>
+<!-- Pipeline Item 4 -->
+<div class="group relative bg-white dark:bg-gray-800 border-2 border-retro-black dark:border-gray-600 rounded-xl p-4 shadow-retro-sm hover:shadow-retro transition-all active:translate-y-[2px] active:shadow-none cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-purple-100 border border-retro-black flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-purple-800">table_chart</span>
+</div>
+<div>
+<h4 class="font-bold text-retro-black dark:text-white leading-tight">Q3_Report_Data.xlsx</h4>
+<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Analytics • 350 KB</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded-md bg-green-100 border border-green-800 text-green-800 text-xs font-bold uppercase tracking-wider">
+                                Success
+                            </span>
+</div>
+<div class="mt-3 flex items-center justify-between text-xs font-semibold text-gray-500">
+<span>Data Extraction</span>
+<span>3h ago</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button -->
+<button class="absolute bottom-6 right-6 w-16 h-16 bg-primary rounded-full border-[3px] border-retro-black shadow-retro flex items-center justify-center hover:scale-105 active:scale-95 active:shadow-none transition-all z-30 group">
+<span class="material-symbols-outlined text-retro-black text-4xl font-bold group-hover:rotate-90 transition-transform">add</span>
+</button>
+<!-- Bottom Gradient Fade for Scroll indication -->
+<div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background-light dark:from-background-dark to-transparent pointer-events-none z-10"></div>
+</div>
+</body></html>

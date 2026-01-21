@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocXTractor - AutoRun History</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df2f2",
+                        "primary-dark": "#0bcaca",
+                        "secondary-yellow": "#FFDE59",
+                        "background-light": "#F7F7F5",
+                        "background-dark": "#1a1a1a",
+                        "neutral-dark": "#1a1a1a",
+                        "accent-red": "#FF4d4d",
+                        "accent-red-light": "#ffe5e5",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                        "mono": ["monospace"],
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "sm": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "9999px" },
+                    boxShadow: {
+                        "hard": "4px 4px 0px 0px #1a1a1a",
+                        "hard-sm": "2px 2px 0px 0px #1a1a1a",
+                        "hard-red": "4px 4px 0px 0px #FF4d4d",
+                    }
+                },
+            },
+        }
+    </script>
+<style>.custom-scrollbar::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-left: 2px solid #1a1a1a;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1a1a1a;
+            border: 2px solid #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #0df2f2;
+        }.tab-active {
+            background-color: #0df2f2;
+            border-bottom-color: #0df2f2; 
+            transform: translateY(2px);
+            z-index: 20;
+        }
+        .tab-active-error {
+            background-color: #ffe5e5;border-bottom-color: #ffe5e5;
+            color: #FF4d4d !important;
+            transform: translateY(2px);
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-neutral-dark font-display min-h-screen flex flex-col overflow-x-hidden selection:bg-primary selection:text-black">
+<div class="w-full max-w-[1280px] mx-auto p-4 md:p-8 lg:p-12 flex flex-col gap-8">
+<header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-4 border-b-4 border-neutral-dark">
+<div class="flex flex-col gap-2">
+<a class="group flex items-center gap-2 text-sm font-bold uppercase tracking-wider hover:text-primary-dark transition-colors w-fit" href="#">
+<span class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
+                    Back to AutoRun
+                </a>
+<div class="flex flex-col">
+<h1 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">
+                        AutoRun History
+                    </h1>
+<div class="flex items-center gap-2 mt-2">
+<span class="bg-neutral-dark text-white px-2 py-0.5 text-xs font-bold uppercase tracking-widest">Workflow</span>
+<span class="text-lg font-bold">Invoice Extraction V2</span>
+</div>
+</div>
+</div>
+<button class="relative bg-primary text-neutral-dark border-2 border-neutral-dark px-6 py-3 font-bold uppercase tracking-wider shadow-hard hover:shadow-hard-sm hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all flex items-center gap-2 group">
+<span class="material-symbols-outlined group-hover:animate-pulse">play_arrow</span>
+                Run Now
+            </button>
+</header>
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-white border-2 border-neutral-dark p-6 shadow-hard flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<p class="text-neutral-dark font-bold uppercase tracking-wide text-sm">Total Runs</p>
+<span class="material-symbols-outlined text-3xl opacity-20 group-hover:opacity-100 transition-opacity">history</span>
+</div>
+<p class="text-4xl font-black tracking-tight">1,240</p>
+</div>
+<div class="bg-primary border-2 border-neutral-dark p-6 shadow-hard flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<p class="text-neutral-dark font-bold uppercase tracking-wide text-sm">Successful</p>
+<span class="material-symbols-outlined text-3xl opacity-20 group-hover:opacity-100 transition-opacity">check_circle</span>
+</div>
+<p class="text-4xl font-black tracking-tight">1,202</p>
+</div>
+<div class="bg-white border-2 border-neutral-dark p-6 shadow-hard-red flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<p class="text-neutral-dark font-bold uppercase tracking-wide text-sm text-accent-red">Failed</p>
+<span class="material-symbols-outlined text-3xl text-accent-red opacity-20 group-hover:opacity-100 transition-opacity">warning</span>
+</div>
+<p class="text-4xl font-black tracking-tight text-accent-red">38</p>
+</div>
+</section>
+<main class="w-full overflow-hidden border-2 border-neutral-dark bg-white shadow-hard relative">
+<div class="bg-neutral-dark text-white px-4 py-2 flex justify-between items-center border-b-2 border-neutral-dark">
+<span class="font-mono text-xs uppercase tracking-widest">/data/logs/recent_autoruns.json</span>
+<div class="flex gap-2">
+<div class="w-3 h-3 rounded-full bg-primary border border-white"></div>
+<div class="w-3 h-3 rounded-full bg-white border border-white"></div>
+<div class="w-3 h-3 rounded-full bg-accent-red border border-white"></div>
+</div>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-gray-50 border-b-2 border-neutral-dark">
+<th class="p-4 border-r-2 border-neutral-dark text-xs font-bold uppercase tracking-wider w-32">Status</th>
+<th class="p-4 border-r-2 border-neutral-dark text-xs font-bold uppercase tracking-wider">Run ID</th>
+<th class="p-4 border-r-2 border-neutral-dark text-xs font-bold uppercase tracking-wider">Trigger</th>
+<th class="p-4 border-r-2 border-neutral-dark text-xs font-bold uppercase tracking-wider">Docs</th>
+<th class="p-4 border-r-2 border-neutral-dark text-xs font-bold uppercase tracking-wider">Confidence</th>
+<th class="p-4 border-r-2 border-neutral-dark text-xs font-bold uppercase tracking-wider">Duration</th>
+<th class="p-4 text-xs font-bold uppercase tracking-wider">Timestamp</th>
+</tr>
+</thead>
+<tbody class="font-medium text-sm">
+<tr class="border-b-2 border-neutral-dark hover:bg-teal-50 transition-colors group cursor-pointer">
+<td class="p-4 border-r-2 border-neutral-dark">
+<span class="inline-flex items-center gap-1 px-2 py-1 bg-primary border border-neutral-dark rounded-sm text-xs font-bold uppercase">
+<span class="material-symbols-outlined text-[16px]">check</span> Success
+                                </span>
+</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono text-neutral-dark/70 group-hover:text-neutral-dark">#RUN-1240</td>
+<td class="p-4 border-r-2 border-neutral-dark">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">webhook</span> Webhook
+                                </span>
+</td>
+<td class="p-4 border-r-2 border-neutral-dark">5 docs</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono">98%</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono">1.2s</td>
+<td class="p-4 font-mono text-neutral-dark/60">2 mins ago</td>
+</tr>
+<tr class="border-b-2 border-neutral-dark hover:bg-teal-50 transition-colors group cursor-pointer">
+<td class="p-4 border-r-2 border-neutral-dark">
+<span class="inline-flex items-center gap-1 px-2 py-1 bg-primary border border-neutral-dark rounded-sm text-xs font-bold uppercase">
+<span class="material-symbols-outlined text-[16px]">check</span> Success
+                                </span>
+</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono text-neutral-dark/70 group-hover:text-neutral-dark">#RUN-1239</td>
+<td class="p-4 border-r-2 border-neutral-dark">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">terminal</span> Manual
+                                </span>
+</td>
+<td class="p-4 border-r-2 border-neutral-dark">12 docs</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono">92%</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono">4.5s</td>
+<td class="p-4 font-mono text-neutral-dark/60">15 mins ago</td>
+</tr>
+<tr class="bg-red-50 border-b-2 border-neutral-dark cursor-pointer relative shadow-[inset_4px_0px_0px_#FF4d4d]">
+<td class="p-4 border-r-2 border-neutral-dark">
+<span class="inline-flex items-center gap-1 px-2 py-1 bg-white border border-accent-red text-accent-red rounded-sm text-xs font-bold uppercase shadow-sm">
+<span class="material-symbols-outlined text-[16px]">close</span> Failed
+                                </span>
+</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono font-bold">#RUN-1238</td>
+<td class="p-4 border-r-2 border-neutral-dark">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">api</span> API
+                                </span>
+</td>
+<td class="p-4 border-r-2 border-neutral-dark">1 doc</td>
+<td class="p-4 border-r-2 border-neutral-dark">
+<div class="flex items-center justify-between gap-2">
+<span class="font-mono text-accent-red font-bold">65%</span>
+<button class="px-2 py-1 text-[10px] font-bold uppercase border border-neutral-dark bg-white hover:bg-neutral-dark hover:text-white transition-colors shadow-hard-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]">
+                                        Review
+                                    </button>
+</div>
+</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono">0.8s</td>
+<td class="p-4 font-mono text-neutral-dark/60">1 hour ago</td>
+</tr>
+<tr class="bg-white border-b-4 border-neutral-dark shadow-[inset_0px_4px_10px_rgba(0,0,0,0.05)]">
+<td class="p-0" colspan="7">
+<div class="flex flex-col border-b-2 border-neutral-dark bg-red-50/30">
+<div class="flex px-4 pt-4 gap-2 border-b-2 border-neutral-dark bg-white">
+<button class="px-6 py-2 border-2 border-b-0 border-neutral-dark font-bold text-sm bg-white hover:bg-gray-100 text-neutral-dark/60 hover:text-neutral-dark relative top-[2px] transition-colors">
+                                            Input Payload
+                                        </button>
+<button class="px-6 py-2 border-2 border-b-0 border-neutral-dark font-bold text-sm bg-white hover:bg-gray-100 text-neutral-dark/60 hover:text-neutral-dark relative top-[2px] transition-colors">
+                                            Output Result
+                                        </button>
+<button class="px-6 py-2 border-2 border-b-0 border-neutral-dark font-bold text-sm tab-active-error relative top-[2px] flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">warning</span> Errors
+                                        </button>
+<button class="px-6 py-2 border-2 border-b-0 border-neutral-dark font-bold text-sm bg-white hover:bg-gray-100 text-neutral-dark/60 hover:text-neutral-dark relative top-[2px] transition-colors">
+                                            Execution Logs
+                                        </button>
+</div>
+<div class="p-6 bg-white min-h-[300px]">
+<div class="flex flex-col gap-8">
+<div class="bg-neutral-light rounded-lg border-2 border-dashed border-neutral-dark/20 p-6">
+<h3 class="text-xs font-bold uppercase tracking-widest text-neutral-dark/60 mb-6">Execution Timeline</h3>
+<div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+<div class="flex items-center gap-2 group">
+<span class="material-symbols-outlined text-neutral-dark">fiber_manual_record</span>
+<div class="flex flex-col">
+<span class="font-bold text-sm uppercase">Run Started</span>
+<span class="text-xs font-mono text-neutral-dark/50">10:42:01 AM</span>
+</div>
+</div>
+<div class="h-8 w-0.5 md:h-0.5 md:w-16 bg-neutral-dark ml-3 md:ml-0"></div>
+<div class="flex items-center gap-2 text-accent-red">
+<span class="material-symbols-outlined">cancel</span>
+<div class="flex flex-col">
+<span class="font-bold text-sm uppercase">Attempt 1 Failed</span>
+<span class="text-xs font-mono opacity-80">Timeout (30s)</span>
+</div>
+</div>
+<div class="h-8 w-0.5 md:h-0.5 md:w-16 bg-neutral-dark ml-3 md:ml-0"></div>
+<div class="flex items-center gap-2 text-neutral-dark">
+<span class="material-symbols-outlined">autorenew</span>
+<div class="flex flex-col">
+<span class="font-bold text-sm uppercase">Retry 1</span>
+<span class="text-xs font-mono text-neutral-dark/50">Automatic</span>
+</div>
+</div>
+<div class="h-8 w-0.5 md:h-0.5 md:w-16 bg-neutral-dark ml-3 md:ml-0"></div>
+<div class="flex items-center gap-2 text-neutral-dark">
+<span class="material-symbols-outlined">mark_email_read</span>
+<div class="flex flex-col">
+<span class="font-bold text-sm uppercase">Alert Sent</span>
+<span class="text-xs font-mono text-neutral-dark/50">admin@corp.com</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col md:flex-row gap-6">
+<div class="flex-1 relative">
+<div class="absolute -top-3 -right-3 bg-accent-red text-white px-2 py-1 text-xs font-bold uppercase transform -rotate-1 shadow-sm z-10 border border-neutral-dark">
+                                                        Critical
+                                                    </div>
+<div class="bg-red-50 border-2 border-neutral-dark p-4 rounded-sm shadow-hard-sm h-full flex flex-col gap-2">
+<span class="font-bold text-sm uppercase text-accent-red flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">bug_report</span> Error Trace
+                                                        </span>
+<code class="text-xs font-mono text-neutral-dark overflow-x-auto whitespace-pre-wrap">Error: Connection timed out while waiting for upstream provider.
+    at APIClient.request (/usr/src/app/lib/api.js:42:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async AutoRunExecutor.runStep (/usr/src/app/worker.js:128:9)
+Code: ECONNRESET
+Retries remaining: 0</code>
+</div>
+</div>
+<div class="w-full md:w-1/3 flex flex-col justify-end gap-3">
+<div class="bg-secondary-yellow border-2 border-neutral-dark p-4 shadow-hard flex flex-col items-center text-center gap-3">
+<span class="material-symbols-outlined text-4xl">replay_circle_filled</span>
+<div class="flex flex-col">
+<h3 class="font-black text-lg uppercase leading-none">Recover Run</h3>
+<p class="text-xs font-mono text-neutral-dark/70 mt-1">Retry from failed step</p>
+</div>
+<button class="w-full bg-white border-2 border-neutral-dark py-3 px-4 font-bold uppercase tracking-wider hover:bg-neutral-dark hover:text-white transition-colors flex items-center justify-center gap-2 shadow-sm mt-2 group/btn">
+                                                            Retry This Run <span class="material-symbols-outlined group-hover/btn:rotate-180 transition-transform">refresh</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-teal-50 transition-colors group cursor-pointer">
+<td class="p-4 border-r-2 border-neutral-dark">
+<span class="inline-flex items-center gap-1 px-2 py-1 bg-primary border border-neutral-dark rounded-sm text-xs font-bold uppercase">
+<span class="material-symbols-outlined text-[16px]">check</span> Success
+                                </span>
+</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono text-neutral-dark/70 group-hover:text-neutral-dark">#RUN-1237</td>
+<td class="p-4 border-r-2 border-neutral-dark">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">schedule</span> Scheduled
+                                </span>
+</td>
+<td class="p-4 border-r-2 border-neutral-dark">3 docs</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono">99%</td>
+<td class="p-4 border-r-2 border-neutral-dark font-mono">2.2s</td>
+<td class="p-4 font-mono text-neutral-dark/60">Yesterday</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-gray-50 p-4 border-t-2 border-neutral-dark flex justify-between items-center">
+<p class="text-sm font-bold text-neutral-dark/60 uppercase tracking-wide">Showing 1-4 of 1,240</p>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center border-2 border-neutral-dark bg-white hover:bg-neutral-dark hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center border-2 border-neutral-dark bg-white hover:bg-neutral-dark hover:text-white transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<div class="flex gap-4 items-center justify-center text-xs font-mono text-neutral-dark/50 mt-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">info</span> Hint: Click a row to expand details</span>
+<span class="w-1 h-1 bg-neutral-dark rounded-full"></span>
+<span>Press 'R' to refresh data</span>
+</div>
+</div>
+</body></html>

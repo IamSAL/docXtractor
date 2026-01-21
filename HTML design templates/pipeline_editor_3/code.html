@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pipeline Editor - DocXTractor</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e5d161",
+                        "primary-dark": "#d4c04a",
+                        "background-light": "#f9fafa",
+                        "background-dark": "#21242c",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2a2e37",
+                        "border-light": "#e2e4e7",
+                        "border-dark": "#3a3f4b",
+                        "text-main-light": "#1a190e",
+                        "text-main-dark": "#f9fafa",
+                        "text-secondary-light": "#6b7280",
+                        "text-secondary-dark": "#9ca3af",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.375rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                    boxShadow: {
+                        "subtle": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                        "card": "0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02)"
+                    }
+                },
+            },
+        }
+    </script>
+<style>.toggle-checkbox:checked {
+            right: 0;
+            border-color: #e5d161;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #e5d161;
+        }textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 20px;
+        }.tooltip {
+            visibility: hidden;
+            position: absolute;
+            z-index: 50;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+        .group:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }.tooltip::after {
+            content: " ";
+            position: absolute;
+            bottom: 100%;left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #333 transparent;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main-light dark:text-text-main-dark min-h-screen flex flex-col overflow-hidden">
+<div class="flex h-screen w-full">
+<aside class="w-72 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex-shrink-0 flex flex-col h-full z-20">
+<div class="flex flex-col h-full p-4">
+<div class="flex flex-col gap-8 h-full">
+<div class="flex items-center gap-3 px-2">
+<div class="bg-primary aspect-square rounded-lg size-10 flex items-center justify-center text-text-main-light font-bold text-xl">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-text-main-light dark:text-white text-base font-bold leading-none">DocXTractor</h1>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-xs mt-1 font-medium">Admin Workspace</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-text-main-light dark:group-hover:text-white">dashboard</span>
+<span class="text-sm font-medium group-hover:text-text-main-light dark:group-hover:text-white">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/20 text-text-main-light dark:text-primary font-bold" href="#">
+<span class="material-symbols-outlined fill-1">account_tree</span>
+<span class="text-sm">Pipelines</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-text-main-light dark:group-hover:text-white">article</span>
+<span class="text-sm font-medium group-hover:text-text-main-light dark:group-hover:text-white">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-text-main-light dark:group-hover:text-white">settings</span>
+<span class="text-sm font-medium group-hover:text-text-main-light dark:group-hover:text-white">Settings</span>
+</a>
+</nav>
+<div class="flex items-center gap-3 px-3 py-3 mt-auto border-t border-border-light dark:border-border-dark pt-4">
+<div class="h-9 w-9 rounded-full bg-gray-200 dark:bg-gray-700 bg-cover bg-center border border-gray-300 dark:border-gray-600" data-alt="User avatar placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCB2eOJq2ZuBY4KRitkY9PEeDwOUDJtcmSfvgrme9Sxhq5hIMBDEoXxdrWuLorJP5D4RPVhRDqmxxXkzIwviP7REVuJwLbzPFL9LMky2vA3QZ3Ke8Qq8fKtQ_i94PpJL0xnfs-7zqGowgwCAyqiWNhBAuQGn_dREVSpwPvxIC3kEevA5CPHx33s2-2D04YFI7b5C2X1A9UANT7OLo8C4nOZa2NXaFUgO-UHOGGE1AIyqXKocQE907kJ4tPtYSnSyrHATmZb2Rla5n56');"></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-text-main-light dark:text-white">Alex Morgan</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Pro Plan</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
+<header class="sticky top-0 z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-border-light dark:border-border-dark px-8 py-4 flex flex-col gap-4">
+<div class="flex items-center gap-2 text-sm">
+<a class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Pipelines</a>
+<span class="text-text-secondary-light dark:text-text-secondary-dark">/</span>
+<span class="font-semibold text-text-main-light dark:text-white">Edit Pipeline</span>
+</div>
+<div class="flex flex-wrap justify-between items-end gap-4">
+<div class="flex flex-col gap-1">
+<h2 class="text-3xl font-black tracking-tight text-text-main-light dark:text-white leading-none">Invoice Extraction Pipeline v2</h2>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                            Last edited 2 mins ago
+                        </p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 h-10 rounded-lg text-text-secondary-light dark:text-text-secondary-dark text-sm font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            Cancel
+                        </button>
+<div class="relative group">
+<button class="px-4 h-10 rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-surface-dark text-text-main-light dark:text-white text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] filled">play_arrow</span>
+                            Test Run
+                        </button>
+<div class="tooltip top-full mt-2">Test with a sample document</div>
+</div>
+<button class="px-4 h-10 rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-surface-dark text-text-main-light dark:text-white text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+                            Duplicate
+                        </button>
+<button class="px-6 h-10 rounded-lg bg-primary hover:bg-primary-dark text-text-main-light text-sm font-bold shadow-sm transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] filled">save</span>
+                            Save Changes
+                        </button>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto px-8 py-8 pb-20">
+<div class="max-w-5xl mx-auto flex flex-col gap-8">
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-subtle border border-border-light dark:border-border-dark overflow-hidden">
+<div class="px-6 py-5 border-b border-border-light dark:border-border-dark flex items-center justify-between">
+<h3 class="font-bold text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">info</span>
+                                Basic Information
+                            </h3>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-main-light dark:text-text-secondary-dark">Pipeline Name</label>
+<input class="w-full px-3 py-2.5 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" type="text" value="Standard Invoice Processor"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-main-light dark:text-text-secondary-dark">Document Type</label>
+<div class="relative">
+<select class="w-full px-3 py-2.5 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all pr-10">
+<option>Invoice (PDF/Image)</option>
+<option>Receipt</option>
+<option>Contract</option>
+<option>Bank Statement</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-text-secondary-light">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 md:col-span-2">
+<label class="text-sm font-semibold text-text-main-light dark:text-text-secondary-dark">Description</label>
+<textarea class="w-full px-3 py-2 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none" rows="2">Extracts total, date, vendor address, and line items from standard PDF invoices.</textarea>
+</div>
+</div>
+</section>
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-subtle border border-border-light dark:border-border-dark overflow-hidden flex flex-col">
+<div class="px-6 py-5 border-b border-border-light dark:border-border-dark flex items-center justify-between">
+<div class="flex flex-col">
+<h3 class="font-bold text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">schema</span>
+                                    Field Schema
+                                </h3>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">Define the data points to be extracted from the documents.</p>
+</div>
+<button class="text-sm font-bold text-primary hover:text-primary-dark flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+                                Add Field
+                            </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark text-xs uppercase tracking-wider font-bold border-b border-border-light dark:border-border-dark">
+<th class="px-6 py-4">Field Name</th>
+<th class="px-6 py-4">Data Type</th>
+<th class="px-6 py-4 text-center">Consensus Voting</th>
+<th class="px-6 py-4 text-center">Citation Tracking</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light dark:divide-border-dark">
+<tr class="group hover:bg-background-light/50 dark:hover:bg-background-dark/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-text-secondary-light text-lg">abc</span>
+<span class="font-semibold text-text-main-light dark:text-white">Vendor Name</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs font-mono text-text-secondary-light dark:text-text-secondary-dark border border-gray-200 dark:border-gray-700">String</span>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-10 h-6 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 border-transparent appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-5" id="consensus1" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer transition-colors duration-300 ease-in-out" for="consensus1"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-10 h-6 align-middle select-none">
+<input class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 border-transparent appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-5" id="citation1" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer transition-colors duration-300 ease-in-out" for="citation1"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-text-secondary-light"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-500"><span class="material-symbols-outlined text-lg">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="group hover:bg-background-light/50 dark:hover:bg-background-dark/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-text-secondary-light text-lg">attach_money</span>
+<span class="font-semibold text-text-main-light dark:text-white">Total Amount</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs font-mono text-text-secondary-light dark:text-text-secondary-dark border border-gray-200 dark:border-gray-700">Currency</span>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-10 h-6 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 border-transparent appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-5" id="consensus2" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer transition-colors duration-300 ease-in-out" for="consensus2"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-10 h-6 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 border-transparent appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-5" id="citation2" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer transition-colors duration-300 ease-in-out" for="citation2"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-text-secondary-light"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-500"><span class="material-symbols-outlined text-lg">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="group hover:bg-background-light/50 dark:hover:bg-background-dark/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-text-secondary-light text-lg">calendar_today</span>
+<span class="font-semibold text-text-main-light dark:text-white">Invoice Date</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs font-mono text-text-secondary-light dark:text-text-secondary-dark border border-gray-200 dark:border-gray-700">Date</span>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-10 h-6 align-middle select-none">
+<input class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 border-transparent appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-5" id="consensus3" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer transition-colors duration-300 ease-in-out" for="consensus3"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="relative inline-block w-10 h-6 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 border-transparent appearance-none cursor-pointer transition-all duration-300 ease-in-out top-1 left-1 checked:left-5" id="citation3" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer transition-colors duration-300 ease-in-out" for="citation3"></label>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-text-secondary-light"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-500"><span class="material-symbols-outlined text-lg">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-background-light/30 dark:bg-background-dark/30 border-t border-border-light dark:border-border-dark flex justify-center">
+<button class="w-full py-2 border-2 border-dashed border-border-light dark:border-border-dark rounded-lg text-text-secondary-light hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 font-semibold text-sm">
+<span class="material-symbols-outlined">add</span> Add another field
+                             </button>
+</div>
+</section>
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-subtle border border-border-light dark:border-border-dark overflow-hidden">
+<div class="px-6 py-5 border-b border-border-light dark:border-border-dark flex items-center justify-between">
+<h3 class="font-bold text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">psychology</span>
+                                Advanced Options
+                            </h3>
+<span class="text-xs font-medium px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full dark:bg-yellow-900/30 dark:text-yellow-200">Pro Feature</span>
+</div>
+<div class="p-6 flex flex-col gap-6">
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<label class="text-sm font-semibold text-text-main-light dark:text-text-secondary-dark">System Prompt</label>
+<button class="text-xs text-primary hover:text-primary-dark font-medium">Reset to Default</button>
+</div>
+<div class="relative">
+<textarea class="w-full px-4 py-3 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg text-sm font-mono text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all leading-relaxed" rows="6">You are an expert accountant specializing in data extraction from financial documents. Your goal is to accurately identify and extract the Vendor Name, Total Amount, and Invoice Date from the provided invoice text. Ensure dates are formatted as YYYY-MM-DD and currency symbols are removed from the Total Amount. If a field is ambiguous, mark it as null.</textarea>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<label class="text-sm font-semibold text-text-main-light dark:text-text-secondary-dark">Few-Shot Examples</label>
+<div class="border border-border-light dark:border-border-dark rounded-lg overflow-hidden">
+<div class="border-b border-border-light dark:border-border-dark">
+<button class="w-full px-4 py-3 bg-background-light/50 dark:bg-background-dark/50 flex items-center justify-between text-left hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+<span class="text-sm font-medium text-text-main-light dark:text-white">Example 1: Standard Utility Bill</span>
+<span class="material-symbols-outlined text-text-secondary-light">expand_more</span>
+</button>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark">
+<button class="w-full px-4 py-3 flex items-center justify-between text-left border-b border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800/50">
+<span class="text-sm font-medium text-text-main-light dark:text-white">Example 2: Restaurant Receipt</span>
+<span class="material-symbols-outlined text-text-secondary-light rotate-180">expand_more</span>
+</button>
+<div class="p-4 grid grid-cols-2 gap-4">
+<div>
+<p class="text-xs font-bold text-text-secondary-light uppercase mb-2">Input Text</p>
+<div class="bg-background-light dark:bg-background-dark p-3 rounded border border-border-light dark:border-border-dark h-32 overflow-y-auto text-xs font-mono text-gray-600 dark:text-gray-400">
+                                                    BURGER KING #4322<br/>
+                                                    123 Main St<br/>
+                                                    New York, NY 10001<br/>
+<br/>
+                                                    Order: 55<br/>
+                                                    1 Whopper Meal  $12.50<br/>
+                                                    1 Coke Zero     $2.50<br/>
+<br/>
+                                                    Total:          $15.00<br/>
+                                                    Date: 04/12/2023
+                                                </div>
+</div>
+<div>
+<p class="text-xs font-bold text-text-secondary-light uppercase mb-2">Expected JSON Output</p>
+<div class="bg-background-light dark:bg-background-dark p-3 rounded border border-border-light dark:border-border-dark h-32 overflow-y-auto text-xs font-mono text-green-600 dark:text-green-400">
+                                                    {<br/>
+                                                      "vendor_name": "Burger King",<br/>
+                                                      "total_amount": 15.00,<br/>
+                                                      "invoice_date": "2023-04-12"<br/>
+                                                    }
+                                                </div>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-1 text-sm text-primary font-bold hover:text-primary-dark self-start flex items-center gap-1">
+<span class="material-symbols-outlined text-lg">add_circle</span>
+                                    Add Example
+                                </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-border-light dark:border-border-dark mt-2">
+<div class="flex flex-col gap-3">
+<div class="flex justify-between">
+<label class="text-sm font-semibold text-text-main-light dark:text-text-secondary-dark">Temperature</label>
+<span class="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-text-main-light dark:text-white">0.0</span>
+</div>
+<input class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-primary" max="1" min="0" step="0.1" type="range" value="0"/>
+<p class="text-xs text-text-secondary-light">Lower values are more deterministic.</p>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between">
+<label class="text-sm font-semibold text-text-main-light dark:text-text-secondary-dark">Top P</label>
+<span class="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-text-main-light dark:text-white">1.0</span>
+</div>
+<input class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-primary" max="1" min="0" step="0.1" type="range" value="1"/>
+<p class="text-xs text-text-secondary-light">Controls diversity via nucleus sampling.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+<script>
+        // Simple logic to ensure toggles behave visually if JS interaction was required, 
+        // but purely CSS solution is implemented above for reliability in this demo.
+    </script>
+</body></html>

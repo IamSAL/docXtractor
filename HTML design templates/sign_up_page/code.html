@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocXTractor - Sign Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#fae04c",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#23200f",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'hard': '6px 6px 0px 0px #000000',
+                        'hard-sm': '3px 3px 0px 0px #000000',
+                        'hard-active': '0px 0px 0px 0px #000000',
+                        'inset': 'inset 2px 2px 4px rgba(0,0,0,0.1)',
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        }
+        .retro-input:focus {
+            box-shadow: 0 0 0 3px #fae04c !important;
+            border-color: #000000 !important;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-stone-900 font-display min-h-screen flex flex-col bg-grid-pattern">
+<!-- Top Navigation (Simplified for focus) -->
+<nav class="w-full border-b-4 border-black bg-white px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-black flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px] font-bold">description</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-black">DocXTractor</h1>
+</div>
+<a class="hidden sm:flex items-center gap-1 font-bold text-sm border-2 border-transparent hover:border-black px-2 py-1 rounded transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">help</span>
+            Help Center
+        </a>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow flex items-center justify-center p-4 sm:p-8">
+<!-- Retro Card Container -->
+<div class="w-full max-w-[480px] bg-white border-4 border-black shadow-hard rounded-lg overflow-hidden relative group">
+<!-- Card Header decoration -->
+<div class="h-8 border-b-4 border-black bg-stone-100 flex items-center px-3 gap-2 justify-end">
+<div class="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
+<div class="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
+<div class="w-3 h-3 rounded-full border-2 border-black bg-black"></div>
+</div>
+<div class="p-6 sm:p-8 flex flex-col gap-6">
+<!-- Heading Section -->
+<div class="text-center space-y-2">
+<h2 class="text-3xl font-bold text-black uppercase tracking-tight">Create Account</h2>
+<p class="text-stone-600 font-sans text-sm font-medium">Start extracting data like it's 1999.</p>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-5">
+<!-- Full Name -->
+<div class="space-y-1">
+<label class="text-xs font-bold uppercase tracking-wide text-black flex items-center gap-1" for="fullname">
+                            Full Name
+                        </label>
+<div class="relative">
+<input class="retro-input w-full h-12 bg-stone-50 border-2 border-black rounded shadow-inset px-4 font-mono text-sm placeholder:text-stone-400 focus:outline-none transition-all" id="fullname" placeholder="e.g. Alex Smith" type="text"/>
+</div>
+</div>
+<!-- Email -->
+<div class="space-y-1">
+<label class="text-xs font-bold uppercase tracking-wide text-black flex items-center gap-1" for="email">
+                            Email Address
+                        </label>
+<div class="relative">
+<input class="retro-input w-full h-12 bg-stone-50 border-2 border-black rounded shadow-inset px-4 font-mono text-sm placeholder:text-stone-400 focus:outline-none transition-all" id="email" placeholder="name@company.com" type="email"/>
+</div>
+</div>
+<!-- Password Group -->
+<div class="grid gap-5">
+<!-- Password -->
+<div class="space-y-1">
+<label class="text-xs font-bold uppercase tracking-wide text-black flex items-center gap-1" for="password">
+                                Password
+                            </label>
+<div class="relative flex">
+<input class="retro-input w-full h-12 bg-stone-50 border-2 border-black rounded-l shadow-inset px-4 font-mono text-sm placeholder:text-stone-400 focus:outline-none focus:z-10 transition-all border-r-0" id="password" placeholder="••••••••" type="password"/>
+<button class="flex items-center justify-center w-12 border-2 border-black bg-white hover:bg-stone-100 rounded-r border-l-2" type="button">
+<span class="material-symbols-outlined text-stone-600">visibility</span>
+</button>
+</div>
+<!-- Strength Meter -->
+<div class="pt-2 flex flex-col gap-1">
+<div class="flex gap-1 h-1.5 w-full">
+<div class="h-full bg-primary border border-black flex-1"></div>
+<div class="h-full bg-primary border border-black flex-1"></div>
+<div class="h-full bg-stone-200 border border-black flex-1"></div>
+<div class="h-full bg-stone-200 border border-black flex-1"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold uppercase text-stone-500">
+<span>Strength: Medium</span>
+</div>
+</div>
+</div>
+<!-- Confirm Password -->
+<div class="space-y-1">
+<label class="text-xs font-bold uppercase tracking-wide text-black flex items-center gap-1" for="confirm_password">
+                                Confirm Password
+                            </label>
+<div class="relative">
+<input class="retro-input w-full h-12 bg-stone-50 border-2 border-black rounded shadow-inset px-4 font-mono text-sm placeholder:text-stone-400 focus:outline-none transition-all" id="confirm_password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+</div>
+<!-- Terms Checkbox -->
+<div class="flex items-start gap-3 mt-1">
+<div class="relative flex items-center">
+<input class="peer h-5 w-5 cursor-pointer appearance-none border-2 border-black bg-white checked:bg-primary transition-all hover:bg-stone-100 rounded-none checked:border-black focus:ring-0 focus:ring-offset-0" id="terms" type="checkbox"/>
+<span class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black opacity-0 peer-checked:opacity-100">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</span>
+</div>
+<label class="text-xs font-sans text-stone-600 leading-tight pt-1 cursor-pointer select-none" for="terms">
+                            I agree to the <a class="font-bold underline decoration-2 decoration-primary hover:text-black" href="#">Terms of Service</a> and <a class="font-bold underline decoration-2 decoration-primary hover:text-black" href="#">Privacy Policy</a>.
+                        </label>
+</div>
+<!-- Submit Button -->
+<button class="mt-2 w-full h-14 bg-primary border-4 border-black text-black text-lg font-bold uppercase tracking-wide shadow-hard hover:shadow-hard-active hover:translate-x-[6px] hover:translate-y-[6px] transition-all active:bg-[#fbd60c] flex items-center justify-center gap-2 group/btn" type="button">
+<span>Create Account</span>
+<span class="material-symbols-outlined group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<!-- Footer Link -->
+<div class="text-center border-t-2 border-dashed border-stone-300 pt-5 mt-2">
+<p class="text-sm font-sans text-stone-600">
+                        Already have an account? 
+                        <a class="inline-block ml-1 font-bold text-black border-b-4 border-primary/50 hover:border-primary transition-colors" href="#">Sign In</a>
+</p>
+</div>
+</div>
+</div>
+<!-- Decorative Floating Elements -->
+<div class="fixed bottom-10 right-10 hidden xl:block animate-bounce" style="animation-duration: 3s;">
+<div class="bg-white border-2 border-black p-2 shadow-hard-sm -rotate-6">
+<span class="material-symbols-outlined text-4xl">folder_zip</span>
+</div>
+</div>
+<div class="fixed top-32 left-20 hidden xl:block opacity-60">
+<div class="bg-primary/20 border-2 border-black p-4 shadow-hard-sm rotate-12 w-32 h-32 flex items-center justify-center">
+<span class="font-mono text-xs text-center font-bold">RAW DATA<br/>PROCESSING...</span>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Job Details - Unified Monitor</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19b3e6",
+                        "accent-yellow": "#FFD700",
+                        "accent-orange": "#FF6B00",
+                        "accent-purple": "#7A00FF",
+                        "accent-green": "#00FF99",
+                        "accent-blue": "#007AFF",
+                        "neu-white": "#F8F9FA",
+                        "neu-black": "#000000",
+                        "bg-paper": "#f2f0ea", 
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "mono": ["Space Grotesk", "monospace"] // Using Space Grotesk for mono feel as requested
+                    },
+                    boxShadow: {
+                        "neu": "4px 4px 0px 0px #000000",
+                        "neu-sm": "2px 2px 0px 0px #000000",
+                        "neu-hover": "2px 2px 0px 0px #000000",
+                        "neu-active": "0px 0px 0px 0px #000000",
+                    },
+                    borderWidth: {
+                        "3": "3px",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom Utilities for Neubrutalism */
+        .neu-border {
+            border: 3px solid #000000;
+        }
+        
+        .neu-card {
+            background-color: #ffffff;
+            border: 3px solid #000000;
+            box-shadow: 4px 4px 0px 0px #000000;
+            border-radius: 6px;
+        }
+
+        .neu-btn {
+            background-color: #ffffff;
+            border: 3px solid #000000;
+            box-shadow: 4px 4px 0px 0px #000000;
+            border-radius: 4px;
+            font-weight: 700;
+            transition: all 0.1s ease;
+        }
+
+        .neu-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px 0px #000000;
+        }
+
+        .neu-badge {
+            border: 3px solid #000000;
+            box-shadow: 2px 2px 0px 0px #000000;
+        }
+        
+        /* Sidebar Link Active State */
+        .nav-link.active {
+            background-color: #19b3e6;
+            box-shadow: 4px 4px 0px 0px #000000;
+            transform: translate(-2px, -2px);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ffffff;
+            border-left: 3px solid #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #19b3e6;
+            border: 3px solid #000000;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #000000;
+        }
+    </style>
+</head>
+<body class="bg-bg-paper font-display text-neu-black overflow-hidden h-screen flex">
+<!-- Left Sidebar -->
+<aside class="w-64 h-full bg-neu-white border-r-3 border-black flex flex-col z-20 shrink-0">
+<!-- Logo Area -->
+<div class="p-6 border-b-3 border-black bg-accent-yellow">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-neu-black rounded-sm flex items-center justify-center text-white">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-xl font-bold leading-none tracking-tight">DocXTractor</h1>
+<span class="text-xs font-medium opacity-70">v2.4.0 (Beta)</span>
+</div>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+<a class="nav-link flex items-center gap-3 px-4 py-3 neu-border rounded-sm hover:bg-gray-100 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-bold">Dashboard</span>
+</a>
+<a class="nav-link active flex items-center gap-3 px-4 py-3 neu-border rounded-sm transition-colors" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="font-bold">Jobs</span>
+</a>
+<a class="nav-link flex items-center gap-3 px-4 py-3 neu-border rounded-sm hover:bg-gray-100 transition-colors" href="#">
+<span class="material-symbols-outlined">library_books</span>
+<span class="font-bold">Templates</span>
+</a>
+<a class="nav-link flex items-center gap-3 px-4 py-3 neu-border rounded-sm hover:bg-gray-100 transition-colors" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-bold">Sources</span>
+</a>
+<div class="mt-auto border-t-3 border-black pt-4">
+<a class="nav-link flex items-center gap-3 px-4 py-3 neu-border rounded-sm hover:bg-gray-100 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-bold">Settings</span>
+</a>
+</div>
+</nav>
+<!-- User -->
+<div class="p-4 border-t-3 border-black bg-white">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full neu-border bg-primary overflow-hidden" data-alt="User avatar placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBtk65nl2bh3ahvzav-jJFFYtHxzlreViVPndTcztJv1xFebmO6E22SNBiV5ies7z8LHNwbd98R4rRwg8po14iyYWSD5hBWhN50QlGXo6uiwjdeeSVxNvKdu5miZDQG28oit8oi8a9QC76o6mBRWi9nO6iLs-ir3CDTO_oyJzcp9iyx4SQZIC37YBuUOvp9nmzUeIqAIYmcsHWv2fokOxEB60CkS4_w1RyazIV0d6Lit1NgAo6OMCvsX_uC69HNOWDMQjT5oLDOczqY');"></div>
+<div class="flex flex-col">
+<span class="font-bold text-sm">Alex Chen</span>
+<span class="text-xs text-gray-600">Admin</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-hidden relative">
+<!-- Top Header -->
+<header class="h-auto min-h-[80px] bg-neu-white border-b-3 border-black p-6 flex items-center justify-between shrink-0">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 text-sm font-bold text-gray-500">
+<a class="hover:underline hover:text-black" href="#">Jobs</a>
+<span>/</span>
+<span class="text-black">Job #12345</span>
+</div>
+<h2 class="text-3xl font-black uppercase tracking-tight">Invoice Processing Q3</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-4 py-2 bg-neu-white neu-badge rounded-full">
+<span class="material-symbols-outlined text-lg">layers</span>
+<span class="font-bold">6 Sources</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 bg-accent-yellow neu-badge rounded-full">
+<span class="w-3 h-3 bg-black rounded-full animate-pulse"></span>
+<span class="font-bold">IN PROGRESS</span>
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-8">
+<div class="max-w-5xl mx-auto flex flex-col gap-8">
+<!-- Unified Monitor Section -->
+<section class="flex flex-col gap-4">
+<div class="flex items-end justify-between">
+<h3 class="text-xl font-bold uppercase flex items-center gap-2">
+<span class="material-symbols-outlined">monitor_heart</span>
+                            Unified Extraction Monitor
+                        </h3>
+<span class="text-sm font-bold bg-black text-white px-2 py-1 rounded-sm">Step 2 of 3</span>
+</div>
+<!-- Progress Bar -->
+<div class="neu-card p-6 bg-white flex flex-col gap-6">
+<div class="flex justify-between items-center text-sm font-bold uppercase tracking-wider text-gray-500">
+<span class="text-accent-blue">01. Parsing</span>
+<span class="text-accent-purple">02. Combining</span>
+<span class="text-gray-400">03. Extracting</span>
+</div>
+<!-- Segmented Bar -->
+<div class="w-full h-8 neu-border bg-gray-100 flex rounded-sm overflow-hidden relative">
+<!-- Parsing (Done) -->
+<div class="h-full bg-accent-blue w-1/3 border-r-3 border-black flex items-center justify-center relative group">
+<span class="material-symbols-outlined text-white text-sm">check</span>
+</div>
+<!-- Combining (Active) -->
+<div class="h-full bg-accent-purple w-1/3 border-r-3 border-black relative overflow-hidden">
+<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEgMWwyIDE4SDEweiIgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3N2Zz4=')] opacity-20 animate-pulse"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="text-white font-bold text-xs tracking-widest uppercase">Processing</span>
+</div>
+</div>
+<!-- Extracting (Pending) -->
+<div class="h-full bg-gray-200 w-1/3"></div>
+</div>
+<div class="bg-blue-50 border-l-4 border-accent-blue p-4 flex gap-3 items-start">
+<span class="material-symbols-outlined text-accent-blue mt-0.5">info</span>
+<div>
+<p class="font-bold text-sm">Combining Context...</p>
+<p class="text-xs mt-1 text-gray-600">Currently merging text streams from PDF parsers and URL scrapers into a unified context window for the LLM.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Two Column Layout for Sources and Preview -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Sources List -->
+<section class="flex flex-col gap-4">
+<h3 class="text-xl font-bold uppercase flex items-center gap-2">
+<span class="material-symbols-outlined">folder_open</span>
+                            Active Sources
+                        </h3>
+<div class="flex flex-col gap-3">
+<!-- Source Item 1: Completed -->
+<div class="bg-white neu-card p-3 flex items-center justify-between group hover:translate-x-1 transition-transform">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-red-100 neu-border rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-red-600">picture_as_pdf</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-sm">invoice_2024_Q3.pdf</span>
+<span class="text-xs text-gray-500">1.2 MB • Local File</span>
+</div>
+</div>
+<div class="w-8 h-8 bg-accent-green neu-border rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-black text-sm">check</span>
+</div>
+</div>
+<!-- Source Item 2: Parsing -->
+<div class="bg-white neu-card p-3 flex items-center justify-between group hover:translate-x-1 transition-transform">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-blue-100 neu-border rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600">link</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-sm">linkedin.com/acme-corp</span>
+<span class="text-xs text-gray-500">URL Scraper</span>
+</div>
+</div>
+<div class="w-8 h-8 bg-accent-yellow neu-border rounded-full flex items-center justify-center animate-spin">
+<span class="material-symbols-outlined text-black text-sm">progress_activity</span>
+</div>
+</div>
+<!-- Source Item 3: Failed -->
+<div class="bg-white neu-card p-3 flex items-center justify-between group hover:translate-x-1 transition-transform relative overflow-hidden">
+<div class="absolute right-0 top-0 w-4 h-full bg-red-500 opacity-20 transform skew-x-12"></div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-100 neu-border rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-gray-600">image</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-sm text-red-600">receipt_scanned.png</span>
+<span class="text-xs text-red-500 font-bold">OCR Failed: Low Res</span>
+</div>
+</div>
+<div class="w-8 h-8 bg-red-500 neu-border rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">close</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Context Preview -->
+<section class="flex flex-col gap-4">
+<h3 class="text-xl font-bold uppercase flex items-center gap-2">
+<span class="material-symbols-outlined">visibility</span>
+                            Context Preview
+                        </h3>
+<div class="neu-card bg-neu-black text-white p-0 overflow-hidden flex flex-col h-full min-h-[300px]">
+<div class="bg-gray-800 border-b-3 border-black p-2 flex items-center justify-between px-4">
+<span class="text-xs font-mono text-accent-green">LIVE_STREAM_LOG</span>
+<span class="material-symbols-outlined text-sm text-gray-400">terminal</span>
+</div>
+<div class="p-4 font-mono text-sm leading-relaxed overflow-y-auto max-h-[300px]">
+<p class="text-gray-400 mb-2">// Stream merging started at 10:42:15</p>
+<p class="mb-2"><span class="text-accent-blue">[Source: invoice_2024_Q3.pdf]</span> <span class="text-white">Detected Total Amount: $4,500.00 USD. Vendor Address: 123 Innovation Dr, Tech City. Line Items detected: 4.</span></p>
+<p class="mb-2"><span class="text-accent-yellow">[Source: linkedin.com]</span> <span class="text-white">Company Size: 51-200 employees. Headquarters: San Francisco, CA. Recent post mentions "Quarterly Growth".</span></p>
+<p class="mb-2"><span class="text-accent-purple">[System]</span> <span class="text-white">Correlating Vendor Address with HQ location... Match confidence 85%.</span></p>
+<p class="animate-pulse text-accent-green">_</p>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+<!-- Right Sidebar (Stats) -->
+<aside class="w-80 h-full bg-neu-white border-l-3 border-black p-6 flex flex-col gap-6 shrink-0 overflow-y-auto">
+<h3 class="text-lg font-black uppercase border-b-3 border-black pb-2">Job Statistics</h3>
+<!-- Status Cards -->
+<div class="grid grid-cols-1 gap-4">
+<!-- Completed -->
+<div class="neu-card p-4 bg-white relative overflow-hidden">
+<div class="flex justify-between items-start">
+<span class="font-bold text-sm text-gray-500 uppercase">Completed</span>
+<span class="material-symbols-outlined text-accent-green">check_circle</span>
+</div>
+<div class="mt-2 text-4xl font-black">4</div>
+<div class="w-full bg-gray-100 h-2 mt-2 neu-border rounded-full overflow-hidden">
+<div class="bg-accent-green h-full w-[66%]"></div>
+</div>
+</div>
+<!-- In Progress -->
+<div class="neu-card p-4 bg-white">
+<div class="flex justify-between items-start">
+<span class="font-bold text-sm text-gray-500 uppercase">Processing</span>
+<span class="material-symbols-outlined text-accent-yellow">hourglass_top</span>
+</div>
+<div class="mt-2 text-4xl font-black">1</div>
+</div>
+<!-- Failed -->
+<div class="neu-card p-4 bg-white">
+<div class="flex justify-between items-start">
+<span class="font-bold text-sm text-gray-500 uppercase">Failed</span>
+<span class="material-symbols-outlined text-red-500">warning</span>
+</div>
+<div class="mt-2 text-4xl font-black text-red-500">1</div>
+</div>
+</div>
+<!-- Needs Review Badge -->
+<div class="neu-card bg-accent-orange p-4 flex items-center justify-between cursor-pointer hover:bg-orange-400 transition-colors">
+<div class="flex flex-col text-white drop-shadow-md">
+<span class="font-black text-xl">1 ISSUE</span>
+<span class="text-xs font-bold uppercase">Needs Review</span>
+</div>
+<span class="material-symbols-outlined text-white text-3xl drop-shadow-md">rate_review</span>
+</div>
+<div class="mt-auto flex flex-col gap-3">
+<button class="neu-btn bg-white w-full py-3 hover:bg-gray-50 text-black flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">description</span>
+                View Full Report
+            </button>
+<button class="neu-btn bg-red-100 w-full py-3 hover:bg-red-200 text-red-700 border-red-900 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">cancel</span>
+                Cancel Job
+            </button>
+</div>
+</aside>
+</body></html>

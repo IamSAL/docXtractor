@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocXTractor - My Pipelines</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e5d161",
+                        "primary-dark": "#d4c04d",
+                        "background-light": "#f8f8f6",
+                        "background-dark": "#201e12",
+                        "border-dark": "#1a190e",
+                        "border-light": "#f8f8f6",
+                        "text-main": "#1a190e",
+                        "text-light": "#f8f8f6",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                        "mono": ["monospace"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "sm": "0.25rem", 
+                        "md": "0.375rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                    },
+                    boxShadow: {
+                        'hard': '4px 4px 0px 0px #1a190e',
+                        'hard-sm': '2px 2px 0px 0px #1a190e',
+                        'hard-dark': '4px 4px 0px 0px #f8f8f6',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for a more technical feel */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-left: 2px solid #1a190e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1a190e; 
+            border: 1px solid #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #201e12;
+            border-left: 2px solid #f8f8f6;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #f8f8f6;
+            border: 1px solid #201e12;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-text-light font-display overflow-x-hidden min-h-screen">
+<div class="flex min-h-screen">
+<!-- Side Navigation (Desktop) -->
+<aside class="w-64 shrink-0 hidden lg:flex flex-col border-r-2 border-border-dark dark:border-border-light bg-background-light dark:bg-background-dark sticky top-0 h-screen z-20">
+<!-- Logo Section -->
+<div class="p-6 border-b-2 border-border-dark dark:border-border-light flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary border-2 border-border-dark flex items-center justify-center shadow-hard-sm">
+<span class="material-symbols-outlined text-lg font-bold text-border-dark">description</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-border-dark dark:text-white uppercase">DocXTractor</h1>
+</div>
+<p class="text-xs font-mono text-gray-500 dark:text-gray-400 mt-2 pl-1">v2.4.0-RC1</p>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 p-4 flex flex-col gap-3 overflow-y-auto">
+<a class="group flex items-center gap-3 px-4 py-3 border-2 border-transparent hover:border-border-dark dark:hover:border-border-light hover:shadow-hard-sm dark:hover:shadow-hard-dark hover:bg-white dark:hover:bg-gray-800 transition-all" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="group flex items-center gap-3 px-4 py-3 border-2 border-border-dark dark:border-border-light bg-primary shadow-hard dark:shadow-hard-dark text-border-dark font-bold" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span>Pipelines</span>
+</a>
+<a class="group flex items-center gap-3 px-4 py-3 border-2 border-transparent hover:border-border-dark dark:hover:border-border-light hover:shadow-hard-sm dark:hover:shadow-hard-dark hover:bg-white dark:hover:bg-gray-800 transition-all" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">integration_instructions</span>
+<span class="font-medium">Integrations</span>
+</a>
+<a class="group flex items-center gap-3 px-4 py-3 border-2 border-transparent hover:border-border-dark dark:hover:border-border-light hover:shadow-hard-sm dark:hover:shadow-hard-dark hover:bg-white dark:hover:bg-gray-800 transition-all" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<!-- User Profile / Footer -->
+<div class="p-4 border-t-2 border-border-dark dark:border-border-light">
+<div class="flex items-center gap-3 p-2 bg-gray-100 dark:bg-[#2a2818] border-2 border-border-dark dark:border-gray-600 rounded-sm">
+<div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full border border-border-dark overflow-hidden bg-cover bg-center" data-alt="User profile avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDzbJzYEC9KSeOxbXj-RD-Udyl5o7Ee5-UBrCI8SeuinWr3mBBOQsNBmK3vV_h1hDvLtGYskgo6OYUDoVYwdWA1h5rNpfT8YPY2jpKVdciGA_c65k68kYuFcqPwK7oSmtzQZ-rrzenx1uSn-D3WxFDfojibohr4sihT9Cl35Ejz-jUK8dHJLPmMJk_PBBgcqqPojVAAodsvsdy0tyORZidJP-g2H-tEcPOYmi49SKJKpKakVkx-Dl5ZV763hzeAhJ1rsA67o1JpxSlQ');"></div>
+<div class="flex flex-col overflow-hidden">
+<span class="text-sm font-bold truncate">Alex Chen</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 truncate">Pro Plan</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- Mobile Header -->
+<div class="lg:hidden flex items-center justify-between p-4 border-b-2 border-border-dark dark:border-border-light bg-background-light dark:bg-background-dark sticky top-0 z-20">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-3xl">menu</span>
+<h1 class="text-lg font-bold">DocXTractor</h1>
+</div>
+<div class="w-8 h-8 bg-primary rounded-full border-2 border-border-dark"></div>
+</div>
+<!-- Page Header Block -->
+<header class="p-6 md:p-8 border-b-2 border-border-dark dark:border-border-light bg-white dark:bg-[#201e12] flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="text-gray-500 dark:text-gray-400 font-mono text-sm">/ HOME / PIPELINES</span>
+</div>
+<h2 class="text-4xl md:text-5xl font-black tracking-tighter text-border-dark dark:text-white uppercase leading-none">
+                        My Pipelines
+                    </h2>
+<p class="mt-2 text-lg text-gray-600 dark:text-gray-300 font-body max-w-xl">
+                        Manage your AI extraction workflows. Create, test, and deploy data parsers.
+                    </p>
+</div>
+<button class="flex items-center justify-center gap-2 bg-primary hover:bg-yellow-300 text-border-dark px-6 py-3 border-2 border-border-dark dark:border-white shadow-hard dark:shadow-hard-dark active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all duration-100 rounded-sm">
+<span class="material-symbols-outlined font-bold">add</span>
+<span class="font-bold text-sm uppercase tracking-wide">New Pipeline</span>
+</button>
+</header>
+<!-- Filter & Search Toolbar -->
+<div class="bg-gray-100 dark:bg-[#1a180f] border-b-2 border-border-dark dark:border-border-light p-4 sticky top-0 lg:static z-10">
+<div class="max-w-7xl mx-auto w-full flex flex-col lg:flex-row gap-4">
+<!-- Search Input (Inset Style) -->
+<div class="flex-1 relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 material-symbols-outlined">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-white dark:bg-[#2a2818] border-2 border-border-dark dark:border-gray-500 rounded-sm focus:ring-0 focus:outline-none focus:border-primary shadow-[inset_3px_3px_6px_rgba(0,0,0,0.1)] dark:text-white font-mono text-sm placeholder:text-gray-400 transition-colors" placeholder="Search pipelines by name or ID..." type="text"/>
+</div>
+<!-- Filter Chips -->
+<div class="flex items-center gap-3 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+<div class="flex items-center gap-2 px-3 py-3 bg-white dark:bg-[#2a2818] border-2 border-border-dark dark:border-gray-500 shadow-hard-sm dark:shadow-[2px_2px_0px_0px_#ffffff] rounded-sm cursor-pointer hover:translate-y-[-1px] transition-transform shrink-0">
+<span class="text-xs font-bold uppercase tracking-wider">Status: All</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-3 bg-white dark:bg-[#2a2818] border-2 border-border-dark dark:border-gray-500 shadow-hard-sm dark:shadow-[2px_2px_0px_0px_#ffffff] rounded-sm cursor-pointer hover:translate-y-[-1px] transition-transform shrink-0">
+<span class="text-xs font-bold uppercase tracking-wider">Owner: Me</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<div class="flex items-center justify-center w-10 h-10 bg-white dark:bg-[#2a2818] border-2 border-border-dark dark:border-gray-500 shadow-hard-sm dark:shadow-[2px_2px_0px_0px_#ffffff] rounded-sm cursor-pointer hover:bg-gray-50 shrink-0" title="Sort Order">
+<span class="material-symbols-outlined">sort</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Grid Content -->
+<div class="p-4 md:p-8 flex-1 bg-background-light dark:bg-background-dark">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Card 1: Active -->
+<article class="flex flex-col bg-white dark:bg-[#201e12] border-2 border-border-dark dark:border-white shadow-hard dark:shadow-hard-dark rounded-sm overflow-hidden h-full hover:shadow-[6px_6px_0px_0px_#1a190e] dark:hover:shadow-[6px_6px_0px_0px_#ffffff] transition-all duration-200">
+<!-- Card Header Image -->
+<div class="h-32 bg-gray-100 dark:bg-gray-800 border-b-2 border-border-dark dark:border-white relative overflow-hidden group">
+<div class="absolute inset-0 opacity-10" data-alt="Technical dot grid pattern" style="background-image: radial-gradient(#1a190e 1px, transparent 1px); background-size: 10px 10px;"></div>
+<div class="absolute top-3 right-3 bg-green-400 text-border-dark text-[10px] font-bold px-2 py-1 border border-border-dark shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wider">
+                                    Active
+                                </div>
+<div class="absolute bottom-3 left-3 flex gap-1">
+<div class="w-2 h-2 rounded-full bg-red-400 border border-black"></div>
+<div class="w-2 h-2 rounded-full bg-yellow-400 border border-black"></div>
+<div class="w-2 h-2 rounded-full bg-green-400 border border-black"></div>
+</div>
+</div>
+<!-- Card Body -->
+<div class="p-5 flex-1 flex flex-col gap-4">
+<div>
+<h3 class="text-xl font-bold leading-tight mb-1">Invoice Processor</h3>
+<p class="text-xs font-mono text-gray-500">ID: INV-2023-X99</p>
+</div>
+<p class="text-sm font-body text-gray-600 dark:text-gray-300 line-clamp-2">
+                                    Automatically extracts total amount, date, vendor name, and line items from PDF invoices.
+                                </p>
+<div class="mt-auto pt-4 border-t-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400" title="AI Fields">
+<span class="material-symbols-outlined text-lg">data_object</span>
+<span class="text-xs font-bold font-mono">5 FIELDS</span>
+</div>
+<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400" title="Avg processing time">
+<span class="material-symbols-outlined text-lg">timer</span>
+<span class="text-xs font-bold font-mono">1.2s</span>
+</div>
+</div>
+</div>
+<!-- Card Actions -->
+<div class="grid grid-cols-[1fr_1fr_auto] border-t-2 border-border-dark dark:border-white divide-x-2 divide-border-dark dark:divide-white">
+<button class="py-3 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-sm group-hover:scale-110 transition-transform">edit</span>
+                                    Edit
+                                </button>
+<button class="py-3 bg-primary/20 hover:bg-primary text-border-dark font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">play_arrow</span>
+                                    Run
+                                </button>
+<button class="px-4 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center" title="Delete Pipeline">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</article>
+<!-- Card 2: Draft -->
+<article class="flex flex-col bg-white dark:bg-[#201e12] border-2 border-border-dark dark:border-white shadow-hard dark:shadow-hard-dark rounded-sm overflow-hidden h-full hover:shadow-[6px_6px_0px_0px_#1a190e] dark:hover:shadow-[6px_6px_0px_0px_#ffffff] transition-all duration-200">
+<div class="h-32 bg-yellow-50 dark:bg-yellow-900/20 border-b-2 border-border-dark dark:border-white relative overflow-hidden">
+<div class="absolute inset-0 opacity-20" data-alt="Abstract diagonal stripe pattern" style="background-image: repeating-linear-gradient(45deg, #1a190e 0, #1a190e 1px, transparent 0, transparent 50%); background-size: 10px 10px;"></div>
+<div class="absolute top-3 right-3 bg-white text-border-dark text-[10px] font-bold px-2 py-1 border border-border-dark shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wider">
+                                    Draft
+                                </div>
+</div>
+<div class="p-5 flex-1 flex flex-col gap-4">
+<div>
+<h3 class="text-xl font-bold leading-tight mb-1">Resume Parser V2</h3>
+<p class="text-xs font-mono text-gray-500">ID: RES-BETA-02</p>
+</div>
+<p class="text-sm font-body text-gray-600 dark:text-gray-300 line-clamp-2">
+                                    Extraction model for tech candidate resumes focusing on skills, experience years, and education.
+                                </p>
+<div class="mt-auto pt-4 border-t-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+<span class="material-symbols-outlined text-lg">data_object</span>
+<span class="text-xs font-bold font-mono">12 FIELDS</span>
+</div>
+<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+<span class="material-symbols-outlined text-lg">psychology</span>
+<span class="text-xs font-bold font-mono">GPT-4</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-[1fr_1fr_auto] border-t-2 border-border-dark dark:border-white divide-x-2 divide-border-dark dark:divide-white">
+<button class="py-3 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-sm group-hover:scale-110 transition-transform">edit</span>
+                                    Edit
+                                </button>
+<button class="py-3 bg-gray-100 text-gray-400 cursor-not-allowed font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">block</span>
+                                    Run
+                                </button>
+<button class="px-4 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</article>
+<!-- Card 3: Error/Alert -->
+<article class="flex flex-col bg-white dark:bg-[#201e12] border-2 border-border-dark dark:border-white shadow-hard dark:shadow-hard-dark rounded-sm overflow-hidden h-full hover:shadow-[6px_6px_0px_0px_#1a190e] dark:hover:shadow-[6px_6px_0px_0px_#ffffff] transition-all duration-200">
+<div class="h-32 bg-red-50 dark:bg-red-900/10 border-b-2 border-border-dark dark:border-white relative overflow-hidden">
+<div class="absolute inset-0 flex items-center justify-center text-red-200 dark:text-red-900 opacity-30">
+<span class="material-symbols-outlined text-8xl">warning</span>
+</div>
+<div class="absolute top-3 right-3 bg-red-100 text-red-800 text-[10px] font-bold px-2 py-1 border border-border-dark shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wider">
+                                    Config Error
+                                </div>
+</div>
+<div class="p-5 flex-1 flex flex-col gap-4">
+<div>
+<h3 class="text-xl font-bold leading-tight mb-1">Legal Contract Analyzer</h3>
+<p class="text-xs font-mono text-gray-500">ID: LEG-2023-A01</p>
+</div>
+<p class="text-sm font-body text-gray-600 dark:text-gray-300 line-clamp-2">
+                                    Identifies liability clauses and termination dates in MSA agreements.
+                                </p>
+<div class="mt-auto pt-4 border-t-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+<span class="material-symbols-outlined text-lg">data_object</span>
+<span class="text-xs font-bold font-mono">3 FIELDS</span>
+</div>
+<div class="flex items-center gap-2 text-red-500 font-bold">
+<span class="material-symbols-outlined text-lg">error</span>
+<span class="text-xs font-mono">API Key?</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-[1fr_1fr_auto] border-t-2 border-border-dark dark:border-white divide-x-2 divide-border-dark dark:divide-white">
+<button class="py-3 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-sm group-hover:scale-110 transition-transform">build</span>
+                                    Fix
+                                </button>
+<button class="py-3 bg-gray-100 text-gray-400 cursor-not-allowed font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">play_arrow</span>
+                                    Run
+                                </button>
+<button class="px-4 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</article>
+<!-- Card 4: Standard -->
+<article class="flex flex-col bg-white dark:bg-[#201e12] border-2 border-border-dark dark:border-white shadow-hard dark:shadow-hard-dark rounded-sm overflow-hidden h-full hover:shadow-[6px_6px_0px_0px_#1a190e] dark:hover:shadow-[6px_6px_0px_0px_#ffffff] transition-all duration-200">
+<div class="h-32 bg-blue-50 dark:bg-blue-900/10 border-b-2 border-border-dark dark:border-white relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-blue-100/50 to-transparent" data-alt="Blue gradient background"></div>
+<div class="absolute top-3 right-3 bg-green-400 text-border-dark text-[10px] font-bold px-2 py-1 border border-border-dark shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wider">
+                                    Active
+                                </div>
+</div>
+<div class="p-5 flex-1 flex flex-col gap-4">
+<div>
+<h3 class="text-xl font-bold leading-tight mb-1">Medical Claim Form</h3>
+<p class="text-xs font-mono text-gray-500">ID: MED-CLM-88</p>
+</div>
+<p class="text-sm font-body text-gray-600 dark:text-gray-300 line-clamp-2">
+                                    Extracts patient ID, diagnosis codes (ICD-10), and billing amounts.
+                                </p>
+<div class="mt-auto pt-4 border-t-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+<span class="material-symbols-outlined text-lg">data_object</span>
+<span class="text-xs font-bold font-mono">8 FIELDS</span>
+</div>
+<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+<span class="material-symbols-outlined text-lg">timer</span>
+<span class="text-xs font-bold font-mono">0.8s</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-[1fr_1fr_auto] border-t-2 border-border-dark dark:border-white divide-x-2 divide-border-dark dark:divide-white">
+<button class="py-3 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-sm group-hover:scale-110 transition-transform">edit</span>
+                                    Edit
+                                </button>
+<button class="py-3 bg-primary/20 hover:bg-primary text-border-dark font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">play_arrow</span>
+                                    Run
+                                </button>
+<button class="px-4 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</article>
+<!-- Card 5: New/Placeholder -->
+<article class="flex flex-col items-center justify-center p-8 bg-transparent border-2 border-dashed border-gray-400 dark:border-gray-600 rounded-sm h-full min-h-[300px] hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group">
+<div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4 border-2 border-gray-400 group-hover:border-primary group-hover:scale-110 transition-all">
+<span class="material-symbols-outlined text-3xl text-gray-400 group-hover:text-primary-dark">add</span>
+</div>
+<h3 class="text-xl font-bold text-gray-500 group-hover:text-primary-dark mb-1">Create New Pipeline</h3>
+<p class="text-sm text-gray-400 text-center">Start from scratch or use a template</p>
+</article>
+</div>
+</div>
+</div>
+<!-- Bottom Stats / Footer -->
+<div class="p-4 border-t-2 border-border-dark dark:border-border-light bg-white dark:bg-[#1a180f] text-xs font-mono text-gray-500 flex justify-between items-center">
+<span>SYSTEM STATUS: OPERATIONAL</span>
+<span>USAGE: 450/1000 DOCS</span>
+</div>
+</main>
+</div>
+</body></html>
