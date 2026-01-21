@@ -98,7 +98,7 @@ export function otpEmail({
   otpCode,
   expiryMinutes = 30,
   supportEmail = 'support@example.com',
-  companyName = 'NineHertz Medic',
+  companyName = 'DocXtractor Medic',
 }: otpEmailProps) {
   const minutesText = expiryMinutes === 1 ? 'minute' : 'minutes';
   const otpDigits = otpCode

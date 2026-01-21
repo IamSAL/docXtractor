@@ -1,17 +1,17 @@
-# NineHertz React Client with TanStack Query & Vite
+# DocXtractor React Client with TanStack Query & Vite
 
-![React Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/react?color=61dafb&logo=react)
-![TypeScript Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/dev/typescript?color=3178c6&logo=typescript)
-![Vite Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/vite?color=646cff&logo=vite)
-![TanStack Query Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/@tanstack/react-query?color=ff4154)
+![React Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/client/react?color=61dafb&logo=react)
+![TypeScript Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/client/dev/typescript?color=3178c6&logo=typescript)
+![Vite Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/client/vite?color=646cff&logo=vite)
+![TanStack Query Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/client/@tanstack/react-query?color=ff4154)
 ![PNPM](https://img.shields.io/badge/pnpm-✓-orange?logo=pnpm)
-![License](https://img.shields.io/github/license/devalentineomonya/NineHertz-NestJs-Tanstack-Start?color=blue)
+![License](https://img.shields.io/github/license/devalentineomonya/DocXtractor-NestJs-Tanstack-Start?color=blue)
 
 ## Overview
 
-This React client application is part of the NineHertz Full-Stack Starter project, providing a modern frontend interface built with React, TypeScript, and TanStack Query. It connects to the NestJS backend and features responsive design, state management, and authentication flows.
+This React client application is part of the DocXtractor Full-Stack Starter project, providing a modern frontend interface built with React, TypeScript, and TanStack Query. It connects to the NestJS backend and features responsive design, state management, and authentication flows.
 
-**Live Demo**: [https://nine-hertz-demo.com](https://nine-hertz-demo.com) (example)
+**Live Demo**: [https://doc-xtractor-demo.com](https://doc-xtractor-demo.com) (example)
 
 ## Project Structure
 
@@ -57,14 +57,14 @@ client/
 
 - Node.js v18+
 - PNPM (recommended) or npm
-- Backend server running (see [server README](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/tree/main/server))
+- Backend server running (see [server README](https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/tree/main/server))
 
 ## Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start.git
-   cd NineHertz-NestJs-Tanstack-Start/client
+   git clone https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start.git
+   cd DocXtractor-NestJs-Tanstack-Start/client
    ```
 
 2. Install dependencies:
@@ -199,7 +199,7 @@ const MainLayout = () => {
 | Variable              | Description                     | Default Value              |
 |-----------------------|--------------------------------|----------------------------|
 | VITE_API_BASE_URL    | Base URL for API requests      | http://localhost:3000     |
-| VITE_APP_NAME        | Application display name       | NineHertz App             |
+| VITE_APP_NAME        | Application display name       | DocXtractor App             |
 | VITE_DEFAULT_THEME   | Default color theme            | light                     |
 
 ## Deployment
@@ -207,10 +207,10 @@ const MainLayout = () => {
 The client is ready for deployment to various platforms:
 
 ### Vercel
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdevalentineomonya%2FNineHertz-NestJs-Tanstack-Start&project-name=ninehertz-app&repository-name=ninehertz-app)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdevalentineomonya%2FDocXtractor-NestJs-Tanstack-Start&project-name=docxtractor-app&repository-name=docxtractor-app)
 
 ### Netlify
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start)
 
 ### Static Hosting
 1. Build the production bundle:
@@ -252,11 +252,11 @@ Contributions are welcome! Please follow these guidelines:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/blob/main/LICENSE) file for details.
 
 ## Support
 
-For issues or feature requests, please [open an issue](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/issues) on GitHub.
+For issues or feature requests, please [open an issue](https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/issues) on GitHub.
 
 ---
 

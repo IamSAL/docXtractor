@@ -73,7 +73,7 @@ export default function ChatBot({
   open = false,
   initialMessage = "👋 Hey there! I'm an AI Chatbot.\n\nFeel free to ask me anything!",
   title = "Krista Chatbot",
-  description = "By NineHrtz Medic",
+  description = "By Starter System",
   descriptionIcon: DescriptionIcon = Sparkles,
   botIcon: BotIcon = Bot,
   chatIcon: ChatIcon = MessageSquare,
@@ -241,18 +241,16 @@ export default function ChatBot({
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out ${
-        fixed ? "fixed" : "flex flex-col items-center"
-      } ${fixed ? buttonPositionClass : ""} z-50`}
+      className={`transition-all duration-300 ease-in-out ${fixed ? "fixed" : "flex flex-col items-center"
+        } ${fixed ? buttonPositionClass : ""} z-50`}
       style={customStyles}
     >
       {!isOpen ? (
         <Button
           variant={"primary"}
           onClick={handleToggle}
-          className={`${buttonRoundedCorners} h-12 w-12 p-0 shadow-[0_0_30px_rgba(0,0,0,0.1)] bg-primary ${
-            animated ? "hover:scale-110 transition-all duration-300" : ""
-          } ${!fixed ? buttonPositionClass : ""}`}
+          className={`${buttonRoundedCorners} h-12 w-12 p-0 shadow-[0_0_30px_rgba(0,0,0,0.1)] bg-primary ${animated ? "hover:scale-110 transition-all duration-300" : ""
+            } ${!fixed ? buttonPositionClass : ""}`}
         >
           <IconOrImage
             icon={ChatIcon}
@@ -263,20 +261,17 @@ export default function ChatBot({
       ) : (
         <>
           <Card
-            className={`border-none ${fixed ? "fixed mb-8" : "mb-4"} ${
-              isMobile && mobileFullScreen && fixed
+            className={`border-none ${fixed ? "fixed mb-8" : "mb-4"} ${isMobile && mobileFullScreen && fixed
                 ? "bottom-0 right-0 w-full h-[100dvh] rounded-none mb-0"
-                : `rounded-md ${
-                    !isMobile ? positionClasses[position].chatbot : ""
-                  } max-h-[calc(100vh-6rem)]` // equivalent of pt-4
-            } flex flex-col shadow-[0_0_45px_rgba(0,0,0,0.15)] overflow-hidden ${
-              animated ? "animate-in slide-in-from-bottom-2 duration-200" : ""
-            }`}
+                : `rounded-md ${!isMobile ? positionClasses[position].chatbot : ""
+                } max-h-[calc(100vh-6rem)]` // equivalent of pt-4
+              } flex flex-col shadow-[0_0_45px_rgba(0,0,0,0.15)] overflow-hidden ${animated ? "animate-in slide-in-from-bottom-2 duration-200" : ""
+              }`}
             style={{
               ...(fixed
                 ? {
-                    width: !isMobile || !mobileFullScreen ? width : undefined,
-                  }
+                  width: !isMobile || !mobileFullScreen ? width : undefined,
+                }
                 : { maxWidth: width }),
               height:
                 !isMobile || !mobileFullScreen || !fixed
@@ -287,9 +282,8 @@ export default function ChatBot({
             }}
           >
             <div
-              className={`flex bg-background items-center p-4 relative z-20 ${
-                hasOverflow && !isScrolledTop ? "border-b" : ""
-              }`}
+              className={`flex bg-background items-center p-4 relative z-20 ${hasOverflow && !isScrolledTop ? "border-b" : ""
+                }`}
             >
               <Button
                 variant="ghost"
@@ -301,20 +295,18 @@ export default function ChatBot({
               </Button>
               <div className="flex-1">
                 <div
-                  className={`absolute inset-0 flex justify-center items-center transition-all duration-200 ${
-                    isScrolledTop
+                  className={`absolute inset-0 flex justify-center items-center transition-all duration-200 ${isScrolledTop
                       ? "opacity-100 visible delay-200"
                       : "opacity-0 invisible delay-0 pointer-events-none"
-                  }`}
+                    }`}
                 >
                   <span className="font-semibold">chatbot krista</span>
                 </div>
                 <div
-                  className={`flex items-center transition-all duration-200 ${
-                    isScrolledTop
+                  className={`flex items-center transition-all duration-200 ${isScrolledTop
                       ? "opacity-0 invisible delay-0 pointer-events-none"
                       : "opacity-100 visible delay-200"
-                  }`}
+                    }`}
                 >
                   {showAvatar && (
                     <Avatar
@@ -363,16 +355,14 @@ export default function ChatBot({
                 {chatMessages.map((message: ChatMessage, index) => (
                   <div
                     key={message.id}
-                    className={`flex flex-col ${
-                      message.role === "user" ? "items-end" : "items-start"
-                    }`}
+                    className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"
+                      }`}
                   >
                     <div
-                      className={`flex relative ${
-                        message.role === "user"
+                      className={`flex relative ${message.role === "user"
                           ? "justify-end"
                           : "justify-start items-end gap-3"
-                      }`}
+                        }`}
                     >
                       {showAvatar && message.role !== "user" && (
                         <Avatar
@@ -390,22 +380,20 @@ export default function ChatBot({
                         <div
                           className={`
     p-4 max-w-auto whitespace-pre-wrap rounded-md
-    ${
-      message.role === "user"
-        ? "bg-gradient-to-r from-green-700 to-emerald-800 text-green-100 ml-8"
-        : "bg-gradient-to-r from-green-500 to-emerald-600 text-white mr-8 font-light font-inter text-md"
-    }
+    ${message.role === "user"
+                              ? "bg-gradient-to-r from-green-700 to-emerald-800 text-green-100 ml-8"
+                              : "bg-gradient-to-r from-green-500 to-emerald-600 text-white mr-8 font-light font-inter text-md"
+                            }
   `}
                         >
                           {message.content}
                         </div>
                         {showTimestamp && (
                           <Card
-                            className={`absolute -top-10 left-0 ${
-                              animated
+                            className={`absolute -top-10 left-0 ${animated
                                 ? "opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                                 : ""
-                            } p-2 text-xs`}
+                              } p-2 text-xs`}
                           >
                             {(() => {
                               const date = message.createdAt;
@@ -451,7 +439,7 @@ export default function ChatBot({
                 {isLoading &&
                   (!chatMessages.length ||
                     chatMessages[chatMessages.length - 1].role !==
-                      "assistant") && (
+                    "assistant") && (
                     <div className="flex flex-col items-start">
                       <div className="flex items-start gap-3">
                         {showAvatar && (
@@ -503,17 +491,15 @@ export default function ChatBot({
           <Button
             variant={"primary"}
             onClick={handleToggle}
-            className={`${buttonRoundedCorners} h-12 w-12 p-0 shadow-lg bg-primary ${
-              animated ? "hover:scale-110 transition-all duration-300" : ""
-            } ${isMobile ? "m-4" : ""} ${!fixed ? buttonPositionClass : ""}`}
+            className={`${buttonRoundedCorners} h-12 w-12 p-0 shadow-lg bg-primary ${animated ? "hover:scale-110 transition-all duration-300" : ""
+              } ${isMobile ? "m-4" : ""} ${!fixed ? buttonPositionClass : ""}`}
           >
             <ChevronDown
               style={{ width: "22px", height: "22px", fill: "currentColor" }}
-              className={`text-primary-foreground ${
-                animated
+              className={`text-primary-foreground ${animated
                   ? "transition-transform duration-300 -rotate-45 animate-out [animation-fill-mode:forwards]"
                   : ""
-              }`}
+                }`}
             />
           </Button>
         </>

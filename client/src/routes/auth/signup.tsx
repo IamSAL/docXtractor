@@ -42,7 +42,7 @@ function RouteComponent() {
   return (
     <AuthLayout
       title="Create your account"
-      description="Create an account to start using NineHertz"
+      description="Create an account to start using DocXtractor"
     >
       <AnimatePresence mode="wait">
         {step === 1 && (

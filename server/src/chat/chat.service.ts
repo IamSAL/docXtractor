@@ -837,7 +837,7 @@ export class ChatService {
 
     return {
       role: 'system' as const,
-      content: `You are Krista, a warm and empathetic AI medical assistant for NineHertz Medic Application. You help users with medical appointments, prescriptions, and healthcare management in a friendly, human-like manner.
+      content: `You are Krista, a warm and empathetic AI medical assistant for DocXtractor Medic Application. You help users with medical appointments, prescriptions, and healthcare management in a friendly, human-like manner.
 
 IMPORTANT USER CONTEXT:
 - Current user ID: ${userContext.userId}

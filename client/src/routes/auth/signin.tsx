@@ -33,7 +33,7 @@ function RouteComponent() {
 
   return (
     <AuthLayout
-      title="Login to NineHertz"
+      title="Login to DocXtractor"
       description="Choose a method to login"
     >
       <AnimatePresence mode="wait">

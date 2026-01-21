@@ -1,34 +1,34 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: ninehertz-db
+    container_name: docxtractor-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ninehertz
+      POSTGRES_DB: docxtractor
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - ninehertz-network
+      - docxtractor-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:alpine
-    container_name: ninehertz-redis
+    container_name: docxtractor-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     networks:
-      - ninehertz-network
+      - docxtractor-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -37,7 +37,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
-    container_name: ninehertz-server
+    container_name: docxtractor-server
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -54,14 +54,14 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - ninehertz-network
+      - docxtractor-network
     command: pnpm run start:dev
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile.dev
-    container_name: ninehertz-client
+    container_name: docxtractor-client
     restart: unless-stopped
     ports:
       - "5173:5173"
@@ -75,12 +75,13 @@ services:
     depends_on:
       - server
     networks:
-      - ninehertz-network
+      - docxtractor-network
     command: pnpm run dev
 
 volumes:
   postgres_data:
 
+
 networks:
-  ninehertz-network:
+  docxtractor-network:
     driver: bridge

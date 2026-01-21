@@ -69,7 +69,7 @@ const Navbar = () => {
                 <span className="text-white font-bold text-lg">NH</span>
               </div>
               <h1 className="text-xl font-bold text-green-900 max-lg:hidden">
-                NineHertz<span className="text-green-600">Medic</span>
+                DocXtractor<span className="text-green-600">Medic</span>
               </h1>
             </Link>
           </motion.div>
@@ -126,7 +126,7 @@ const Navbar = () => {
                         <span className="text-white font-bold text-lg">NH</span>
                       </div>
                       <h1 className="text-xl font-bold text-green-900">
-                        NineHertz<span className="text-green-600">Medic</span>
+                        DocXtractor<span className="text-green-600">Medic</span>
                       </h1>
                     </Link>
                   </div>
@@ -169,13 +169,12 @@ const Navbar = () => {
                     >
                       {currentUser ? (
                         <Link
-                          to={`/${
-                            currentUser.role as
-                              | "patient"
-                              | "admin"
-                              | "doctor"
-                              | "pharmacist"
-                          }/dashboard`}
+                          to={`/${currentUser.role as
+                            | "patient"
+                            | "admin"
+                            | "doctor"
+                            | "pharmacist"
+                            }/dashboard`}
                         >
                           <span>Dashboard</span>
                           <ArrowRight className="ml-2 h-4 w-4" />
@@ -205,13 +204,12 @@ const Navbar = () => {
               >
                 {currentUser ? (
                   <Link
-                    to={`/${
-                      currentUser.role as
-                        | "patient"
-                        | "admin"
-                        | "doctor"
-                        | "pharmacist"
-                    }/dashboard`}
+                    to={`/${currentUser.role as
+                      | "patient"
+                      | "admin"
+                      | "doctor"
+                      | "pharmacist"
+                      }/dashboard`}
                   >
                     <span>Dashboard</span>
                     <ArrowRight className="ml-2 h-4 w-4" />

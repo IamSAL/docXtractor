@@ -167,7 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <div className="p-4 text-center">
           <h1 className="text-xl font-bold text-green-900">
-            NineHertz<span className="text-green-600">Medic</span>
+            DocXtractor<span className="text-green-600">Medic</span>
           </h1>
           <p className="text-sm text-muted-foreground">
             Medical Management System

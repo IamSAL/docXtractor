@@ -1,16 +1,16 @@
-# NineHertz NestJS Server with TypeORM & Docker
+# DocXtractor NestJS Server with TypeORM & Docker
 
-![NestJS Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/server/@nestjs/core?color=red&logo=nestjs)
-![Node.js Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/server/engines/node?color=green&logo=node.js)
-![TypeScript Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/server/dev/typescript?color=blue&logo=typescript)
-![TypeORM Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/server/typeorm?color=informational)
+![NestJS Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/server/@nestjs/core?color=red&logo=nestjs)
+![Node.js Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/server/engines/node?color=green&logo=node.js)
+![TypeScript Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/server/dev/typescript?color=blue&logo=typescript)
+![TypeORM Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/server/typeorm?color=informational)
 ![Docker](https://img.shields.io/badge/Docker-✓-blue?logo=docker)
 ![PNPM](https://img.shields.io/badge/pnpm-✓-orange?logo=pnpm)
-![License](https://img.shields.io/github/license/devalentineomonya/NineHertz-NestJs-Tanstack-Start?color=blue)
+![License](https://img.shields.io/github/license/devalentineomonya/DocXtractor-NestJs-Tanstack-Start?color=blue)
 
 ## Overview
 
-This NestJS server provides a robust backend API for the NineHertz full-stack application. It features a modern architecture with TypeORM for database operations, Docker for containerization, and JWT authentication. Designed for rapid development and easy deployment.
+This NestJS server provides a robust backend API for the DocXtractor full-stack application. It features a modern architecture with TypeORM for database operations, Docker for containerization, and JWT authentication. Designed for rapid development and easy deployment.
 
 ## Project Structure
 
@@ -54,8 +54,8 @@ server/
 
 ### 1. Clone the repository:
 ```bash
-git clone https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start.git
-cd NineHertz-NestJs-Tanstack-Start/server
+git clone https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start.git
+cd DocXtractor-NestJs-Tanstack-Start/server
 ```
 
 ### 2. Install dependencies:
@@ -104,7 +104,7 @@ pnpm typeorm migration:generate src/migrations/<MigrationName>
 
 **Access database container:**
 ```bash
-docker exec -it ninehertz-db psql -U postgres
+docker exec -it docxtractor-db psql -U postgres
 ```
 
 ## API Documentation
@@ -145,7 +145,7 @@ docker-compose up -d --build
 | DB_PORT         | Database port             | 5432            |
 | DB_USERNAME     | Database user             | postgres        |
 | DB_PASSWORD     | Database password         | postgres        |
-| DB_NAME         | Database name             | ninehertz       |
+| DB_NAME         | Database name             | docxtractor       |
 | JWT_SECRET      | JWT signing secret        | -               |
 | JWT_EXPIRES_IN  | Token expiration time     | 1h              |
 
@@ -153,15 +153,15 @@ docker-compose up -d --build
 
 ### Build Docker image:
 ```bash
-docker build -t ninehertz-server .
+docker build -t docxtractor-server .
 ```
 
 ### Run container:
 ```bash
-docker run -d --name ninehertz-app \
+docker run -d --name docxtractor-app \
   -p 3000:3000 \
   --env-file .env \
-  ninehertz-server
+  docxtractor-server
 ```
 
 ### Docker Compose (production):
@@ -198,8 +198,8 @@ export default registerAs('database', () => ({
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/blob/main/LICENSE) file for details.
 
 ## Support
 
-For issues or questions, please [open an issue](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/issues) on GitHub.
+For issues or questions, please [open an issue](https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/issues) on GitHub.

@@ -22,8 +22,8 @@ export default defineConfig({
       srcDir: "public",
       filename: "sw.js",
       manifest: {
-        name: "NineHertz Dashboard",
-        short_name: "NineHertzDashboard",
+        name: "DocXtractor Dashboard",
+        short_name: "DocXtractorDashboard",
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",

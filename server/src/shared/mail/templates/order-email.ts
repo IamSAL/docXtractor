@@ -9,7 +9,7 @@ export function orderEmail({
   items,
   totalAmount,
   action = 'created',
-  companyName = 'NineHertz Medic',
+  companyName = 'DocXtractor Medic',
   refundStatus,
   refundMessage,
 }: {

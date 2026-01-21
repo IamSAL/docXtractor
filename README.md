@@ -1,18 +1,18 @@
-# NineHertz Full-Stack Starter with NestJS & React
+# DocXtractor Full-Stack Starter with NestJS & React
 
-![NestJS Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/server/@nestjs/core?color=red&logo=nestjs)
-![React Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/react?color=61dafb&logo=react)
-![TypeScript Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/dev/typescript?color=3178c6&logo=typescript)
+![NestJS Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/server/@nestjs/core?color=red&logo=nestjs)
+![React Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/client/react?color=61dafb&logo=react)
+![TypeScript Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/client/dev/typescript?color=3178c6&logo=typescript)
 ![Docker](https://img.shields.io/badge/Docker-✓-blue?logo=docker)
 ![PNPM](https://img.shields.io/badge/pnpm-✓-orange?logo=pnpm)
 ![TypeORM](https://img.shields.io/badge/TypeORM-✓-informational)
-![License](https://img.shields.io/github/license/devalentineomonya/NineHertz-NestJs-Tanstack-Start?color=blue)
+![License](https://img.shields.io/github/license/devalentineomonya/DocXtractor-NestJs-Tanstack-Start?color=blue)
 
 ## Overview
 
-The NineHertz Full-Stack Starter is a modern application template featuring a NestJS backend with TypeORM and a React frontend with TanStack Query. Designed for rapid development and deployment, this project provides a complete foundation for building enterprise-grade applications with best practices in mind.
+The DocXtractor Full-Stack Starter is a modern application template featuring a NestJS backend with TypeORM and a React frontend with TanStack Query. Designed for rapid development and deployment, this project provides a complete foundation for building enterprise-grade applications with best practices in mind.
 
-**Live Demo**: [https://nine-hertz-demo.com](https://nine-hertz-demo.com) (example)
+**Live Demo**: [https://doc-xtractor-demo.com](https://doc-xtractor-demo.com) (example)
 
 ## Architecture Diagram
 
@@ -56,8 +56,8 @@ graph LR
 
 ### 1. Clone the repository:
 ```bash
-git clone https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start.git
-cd NineHertz-NestJs-Tanstack-Start
+git clone https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start.git
+cd DocXtractor-NestJs-Tanstack-Start
 ```
 
 ### 2. Configure environment variables:
@@ -78,7 +78,7 @@ docker-compose up -d --build
 
 ### 4. Run database migrations:
 ```bash
-docker exec ninehertz-server pnpm typeorm migration:run
+docker exec docxtractor-server pnpm typeorm migration:run
 ```
 
 ### 5. Access the applications:
@@ -96,15 +96,15 @@ docker-compose up -d
 ### Access containers:
 ```bash
 # API container
-docker exec -it ninehertz-server sh
+docker exec -it docxtractor-server sh
 
 # DB container
-docker exec -it ninehertz-db psql -U postgres
+docker exec -it docxtractor-db psql -U postgres
 ```
 
 ### Generate new migration:
 ```bash
-docker exec ninehertz-server pnpm typeorm migration:generate src/migrations/<MigrationName>
+docker exec docxtractor-server pnpm typeorm migration:generate src/migrations/<MigrationName>
 ```
 
 ### View logs:
@@ -115,7 +115,7 @@ docker-compose logs -f
 ## Project Structure
 
 ```
-NineHertz-NestJs-Tanstack-Start/
+DocXtractor-NestJs-Tanstack-Start/
 ├── client/               # React frontend application
 │   ├── public/           # Static assets
 │   ├── src/              # Application source code
@@ -138,11 +138,11 @@ NineHertz-NestJs-Tanstack-Start/
 ### Backend (.env)
 ```env
 PORT=3000
-DB_HOST=ninehertz-db
+DB_HOST=docxtractor-db
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
-DB_NAME=ninehertz
+DB_NAME=docxtractor
 JWT_SECRET=your-secret-key
 JWT_EXPIRES_IN=1h
 ```
@@ -150,7 +150,7 @@ JWT_EXPIRES_IN=1h
 ### Frontend (.env.local)
 ```env
 VITE_API_BASE_URL=http://localhost:3000
-VITE_APP_NAME=NineHertz App
+VITE_APP_NAME=DocXtractor App
 ```
 
 ## Deployment
@@ -173,8 +173,8 @@ docker-compose -f docker-compose.prod.yml up -d --build
    docker-compose -f docker-compose.prod.yml build
    
    # Push to container registry
-   docker push your-registry/ninehertz-client:latest
-   docker push your-registry/ninehertz-server:latest
+   docker push your-registry/docxtractor-client:latest
+   docker push your-registry/docxtractor-server:latest
    ```
 
 ## Key API Endpoints
@@ -228,11 +228,11 @@ Contributions are welcome! Please follow these steps:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/blob/main/LICENSE) file for details.
 
 ## Support
 
-For issues or questions, please [open an issue](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/issues) on GitHub.
+For issues or questions, please [open an issue](https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/issues) on GitHub.
 
 ---
 

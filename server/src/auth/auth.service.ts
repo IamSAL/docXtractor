@@ -56,7 +56,7 @@ export class AuthService {
     await this.userService.save(user);
 
     await this.mailService.sendOTPCode(user.email, {
-      companyName: 'NineHertz Medic',
+      companyName: 'DocXtractor Medic',
       otpCode: otp,
     });
   }

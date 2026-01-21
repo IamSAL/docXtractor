@@ -5,7 +5,7 @@ export function appointmentCreatedEmail({
   doctorName,
   appointmentTime,
   meetingLink,
-  companyName = 'NineHertz Medic',
+  companyName = 'DocXtractor Medic',
 }: {
   patientName: string;
   doctorName: string;
@@ -70,7 +70,7 @@ export function appointmentReminderEmail({
   doctorName,
   appointmentTime,
   meetingLink,
-  companyName = 'NineHertz Medic',
+  companyName = 'DocXtractor Medic',
 }: {
   patientName: string;
   doctorName: string;
@@ -137,7 +137,7 @@ export function appointmentCancelledEmail({
   reason,
   refundMessage = '',
   isDoctor = false,
-  companyName = 'NineHertz Medic',
+  companyName = 'DocXtractor Medic',
 }: {
   patientName: string;
   doctorName: string;
@@ -203,7 +203,7 @@ export function prescriptionEmail({
   issueDate,
   expiryDate,
   action = 'created',
-  companyName = 'NineHertz Medic',
+  companyName = 'DocXtractor Medic',
 }: {
   patientName: string;
   doctorName: string;

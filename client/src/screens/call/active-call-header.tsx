@@ -88,7 +88,7 @@ export const ActiveCallHeader = ({
             <span className="text-white font-bold text-lg">NH</span>
           </div>
           <h1 className="text-xl font-bold text-green-900 max-lg:hidden">
-            NineHertz<span className="text-green-600">Medic</span>
+            DocXtractor<span className="text-green-600">Medic</span>
           </h1>
         </Link>
 
@@ -143,8 +143,8 @@ export const ActiveCallHeader = ({
                     isMigrating
                       ? "Migrating..."
                       : isJoining
-                      ? "Joining..."
-                      : "Reconnecting..."
+                        ? "Joining..."
+                        : "Reconnecting..."
                   }
                 />
               }

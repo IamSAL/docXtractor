@@ -56,7 +56,7 @@ export class MailService {
     html: string,
   ): Promise<nodemailer.SentMessageInfo> {
     return this.transporter.sendMail({
-      from: `"NineHertz Medic - Your Health Our Pride" <${this.configService.get('MAIL_USER')}>`,
+      from: `"DocXtractor Medic - Your Health Our Pride" <${this.configService.get('MAIL_USER')}>`,
       to,
       subject,
       html,
@@ -101,7 +101,7 @@ export class MailService {
   ): Promise<void> {
     const html = appointmentCancelledEmail({
       ...data,
-      companyName: 'NineHertz Medic',
+      companyName: 'DocXtractor Medic',
     });
 
     await this.sendEmail(

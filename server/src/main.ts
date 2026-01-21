@@ -55,12 +55,12 @@ async function bootstrap() {
       name: 'jwt-access-token',
     })
 
-    .setTitle('Nine Hertz Medic Health Care Management System')
+    .setTitle('Starter System')
     .setDescription(
-      'A comprehensive Health Care Management System to manage patient records, appointments, and medical services effectively.',
+      'A comprehensive Starter System to manage patient records, appointments, and medical services effectively.',
     )
     .setVersion('1.0')
-    .addTag('Health Care')
+    .addTag('Starter System')
     .build();
 
   const swaggerUser = configService.get<string>('SWAGGER_USER') || 'admin';
