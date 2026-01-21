@@ -93,6 +93,10 @@ services:
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      # Single-node configuration
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
     networks:
       - docxtractor-network
 
@@ -116,7 +120,7 @@ services:
     depends_on:
       - minio
     entrypoint: >
-      /bin/sh -c " /usr/bin/mc config host add local http://minio:9000 minioadmin minioadmin; /usr/bin/mc mb -p local/docxtractor-documents; exit 0; "
+      /bin/sh -c " /usr/bin/mc alias set local http://minio:9000 minioadmin minioadmin; /usr/bin/mc mb -p local/docxtractor-documents; exit 0; "
     networks:
       - docxtractor-network
 
