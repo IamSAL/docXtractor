@@ -47,3 +47,4 @@ server/upload/
 **/temp/
 examples/
 .pnpm-store/
+__pycache__

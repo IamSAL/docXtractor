@@ -6,3 +6,4 @@ google-generativeai
 python-dotenv
 boto3
 pydantic
+watchfiles

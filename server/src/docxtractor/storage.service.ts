@@ -9,20 +9,28 @@ export class StorageService {
   private readonly bucketName: string;
 
   constructor(private configService: ConfigService) {
-    this.bucketName = this.configService.get<string>('MINIO_BUCKET') || 'docxtractor-documents';
-    
+    this.bucketName =
+      this.configService.get<string>('MINIO_BUCKET') || 'docxtractor-documents';
+
     this.s3Client = new S3Client({
       region: 'us-east-1', // MinIO ignores this but SDK needs it
-      endpoint: this.configService.get<string>('MINIO_ENDPOINT') || 'http://minio:9000',
+      endpoint:
+        this.configService.get<string>('MINIO_ENDPOINT') || 'http://minio:9000',
       forcePathStyle: true, // Required for MinIO
       credentials: {
-        accessKeyId: this.configService.get<string>('MINIO_ACCESS_KEY') || 'minioadmin',
-        secretAccessKey: this.configService.get<string>('MINIO_SECRET_KEY') || 'minioadmin',
+        accessKeyId:
+          this.configService.get<string>('MINIO_ACCESS_KEY') || 'minioadmin',
+        secretAccessKey:
+          this.configService.get<string>('MINIO_SECRET_KEY') || 'minioadmin',
       },
     });
   }
 
-  async uploadFile(key: string, body: Buffer, contentType: string): Promise<string> {
+  async uploadFile(
+    key: string,
+    body: Buffer,
+    contentType: string,
+  ): Promise<string> {
     try {
       const command = new PutObjectCommand({
         Bucket: this.bucketName,
@@ -33,7 +41,7 @@ export class StorageService {
 
       await this.s3Client.send(command);
       this.logger.log(`Uploaded file ${key} to bucket ${this.bucketName}`);
-      
+
       // Return the file key or simple S3 URI
       return key;
     } catch (error) {

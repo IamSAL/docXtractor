@@ -4,4 +4,6 @@ aiokafka
 docling
 python-dotenv
 boto3
-pydantic
+rapidocr-onnxruntime
+onnxruntime
+watchfiles

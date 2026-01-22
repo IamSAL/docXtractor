@@ -16,7 +16,7 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
 
-def run_extraction(content: str, schema_config: dict, model_id: str = "gemini-1.5-flash") -> dict:
+def run_extraction(content: str, schema_config: dict, model_id: str = "gemini-2.5-flash") -> dict:
     """
     Uses langextract to extract data.
     
