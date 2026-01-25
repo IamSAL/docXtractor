@@ -49,7 +49,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className='light'>
       <head>
         <HeadContent />
 
@@ -58,7 +58,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script> */}
       </head>
-      <body className='bg-background-cream min-h-screen overflow-hidden flex text-black'>
+      <body className='bg-background-cream min-h-screen  flex text-black'>
 
         {children}
         <TanStackDevtools
