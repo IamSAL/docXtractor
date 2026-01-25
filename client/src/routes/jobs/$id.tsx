@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { AppLayout } from '../../components/AppLayout'
+import { PageHeader } from '../../components/retroui/PageHeader'
 
 export const Route = createFileRoute('/jobs/$id')({
     component: JobDetailComponent,
@@ -10,17 +11,11 @@ function JobDetailComponent() {
 
     return (
         <AppLayout>
-            <div className="flex flex-col h-full overflow-hidden relative">
-                {/* Top Header */}
-                <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-sm font-bold text-gray-500">
-                            <Link to="/jobs" className="hover:underline hover:text-black no-underline text-gray-500 uppercase tracking-widest">Jobs</Link>
-                            <span>/</span>
-                            <span className="text-black uppercase tracking-widest">Job #{id}</span>
-                        </div>
-                        <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-black">Invoice Processing Q3</h2>
-                    </div>
+            <div className="flex flex-col h-full overflow-hidden relative p-4 lg:p-12">
+                <PageHeader
+                    breadcrumb={`Jobs / Job #${id}`}
+                    heading="Invoice Processing Q3"
+                >
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 px-4 py-2 bg-white border-3 border-black shadow-[2px_2px_0px_0px_#000000] rounded-full uppercase tracking-widest text-xs font-black">
                             <span className="material-symbols-outlined text-lg">layers</span>
@@ -31,7 +26,7 @@ function JobDetailComponent() {
                             <span>IN PROGRESS</span>
                         </div>
                     </div>
-                </header>
+                </PageHeader>
 
                 {/* Main Dashboard Area */}
                 <div className="flex flex-col xl:flex-row gap-8 pb-12">

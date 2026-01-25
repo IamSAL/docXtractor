@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { PageHeader } from '../../components/retroui/PageHeader'
 import { AppLayout } from '../../components/AppLayout'
 
 export const Route = createFileRoute('/autoruns/runs/$id')({
@@ -10,34 +11,24 @@ function AutoRunHistoryComponent() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-full bg-[#ffffff] selection:bg-[#0df2f2] selection:text-black">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b-4 border-black">
-          <div className="flex flex-col gap-2">
-            <Link
-              to="/autoruns"
-              className="group flex items-center gap-2 text-sm font-black uppercase tracking-widest hover:text-[#0bcaca] transition-colors w-fit no-underline text-black"
+      <div className="flex flex-col h-full bg-[#ffffff] selection:bg-[#0df2f2] selection:text-black p-4 lg:p-12">
+        <PageHeader
+          breadcrumb="AutoRuns / History"
+          heading="Run History"
+          description="Invoice Auto-Processor"
+          className="border-b-4 border-black pb-6"
+        >
+          <div className="flex items-center gap-4">
+            <span className="bg-black text-white px-2 py-1 text-xs font-black uppercase tracking-[0.2em] italic">Workflow ID: {id}</span>
+            <button
+              className="relative bg-[#0df2f2] text-black border-3 border-black px-8 py-3 font-black uppercase tracking-wider shadow-[4px_4px_0px_#000000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000000] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all flex items-center gap-2 group italic"
+              type="button"
             >
-              <span className="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
-              Back to AutoRuns
-            </Link>
-            <div className="flex flex-col">
-              <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none italic">
-                Run History
-              </h1>
-              <div className="flex items-center gap-3 mt-4">
-                <span className="bg-black text-white px-2 py-1 text-xs font-black uppercase tracking-[0.2em] italic">Workflow ID: {id}</span>
-                <span className="text-lg font-black tracking-tight border-b-2 border-black">Invoice Auto-Processor</span>
-              </div>
-            </div>
+              <span className="material-symbols-outlined font-black group-hover:animate-pulse">play_arrow</span>
+              Run Now
+            </button>
           </div>
-          <button
-            className="relative bg-[#0df2f2] text-black border-3 border-black px-8 py-3 font-black uppercase tracking-wider shadow-[4px_4px_0px_#000000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000000] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all flex items-center gap-2 group italic"
-            type="button"
-          >
-            <span className="material-symbols-outlined font-black group-hover:animate-pulse">play_arrow</span>
-            Run Now
-          </button>
-        </header>
+        </PageHeader>
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
           {[

@@ -8,7 +8,7 @@ function JobReviewComponent() {
   const { id } = Route.useParams()
 
   return (
-    <div className="bg-[#FFFDF5] text-slate-900 font-sans h-screen flex flex-col overflow-hidden">
+    <div className="bg-[#FFFDF5] text-slate-900 font-sans h-screen flex flex-col overflow-hidden  w-full">
       <header className="flex-none bg-white border-b-2 border-[#1e293b] z-20">
         <div className="px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-6">

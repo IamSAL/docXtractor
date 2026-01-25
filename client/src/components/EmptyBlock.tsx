@@ -55,7 +55,7 @@ export const EmptyBlock = ({
             {action && (
                 <button
                     onClick={action.onClick}
-                    className="relative z-10 flex items-center gap-3 bg-primary border-2 border-black px-8 py-4 text-sm font-bold uppercase tracking-wider neu-shadow transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:bg-[#e6c809]"
+                    className="relative cursor-pointer z-10 flex items-center gap-3 bg-primary border-2 border-black px-8 py-4 text-sm font-bold uppercase tracking-wider neu-shadow transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:bg-[#e6c809]"
                 >
                     {action.icon && (
                         <span className="material-symbols-outlined">{action.icon}</span>
