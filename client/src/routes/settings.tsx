@@ -1,5 +1,7 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
 import { AppLayout } from '../components/AppLayout'
+import { PageHeader } from '../components/retroui/PageHeader'
+import { Button } from '@/components/retroui/Button'
 
 export const Route = createFileRoute('/settings')({
     component: SettingsLayout,
@@ -8,24 +10,21 @@ export const Route = createFileRoute('/settings')({
 function SettingsLayout() {
     return (
         <AppLayout>
-            <div className="w-full max-w-5xl mx-auto">
-                <nav className="flex items-center gap-2 mb-6 text-sm">
-                    <Link to="/dashboard" className="text-[#948a51] hover:text-[#1a190e] font-medium transition-colors flex items-center gap-1 no-underline">
-                        <span className="material-symbols-outlined text-[18px]">home</span>
-                        Home
+            <div className="w-full  mx-auto p-4 lg:p-12">
+                <PageHeader
+                    heading="Settings"
+                    description="Configure your extraction engine. Tweak consensus algorithms and manage output formats."
+                    breadcrumb="/ HOME / PIPELINES"
+                >
+                    <Link to="/pipelines/new">
+                        <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide bg-white">
+                            <span className="material-symbols-outlined text-[20px]">logout</span>
+                            <span>Logout</span>
+                        </Button>
                     </Link>
-                    <span className="material-symbols-outlined text-[#948a51] text-[16px]">chevron_right</span>
-                    <span className="text-[#1a190e] font-bold bg-[#e5d161]/20 px-2 py-0.5 rounded">Settings</span>
-                </nav>
+                </PageHeader>
 
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-                    <div className="flex flex-col gap-2">
-                        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#1a190e]">Settings</h1>
-                        <p className="text-[#948a51] text-lg max-w-2xl">
-                            Configure your extraction engine. Tweak consensus algorithms and manage output formats.
-                        </p>
-                    </div>
-                </div>
+
 
                 <div className="overflow-x-auto mb-8 pb-1 no-scrollbar border-b-2 border-[#e6e3d1]">
                     <div className="flex min-w-max gap-8 px-2">

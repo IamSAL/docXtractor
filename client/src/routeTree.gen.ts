@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PipelinesIndexRouteImport } from './routes/pipelines/index'
@@ -67,6 +68,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -140,34 +146,34 @@ const JobsIdRoute = JobsIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRouteImport,
+  id: '/tanstack-query',
+  path: '/tanstack-query',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoTableRoute = DemoTableRouteImport.update({
-  id: '/demo/table',
-  path: '/demo/table',
-  getParentRoute: () => rootRouteImport,
+  id: '/table',
+  path: '/table',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/demo/store',
-  path: '/demo/store',
-  getParentRoute: () => rootRouteImport,
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoAiStructuredRoute = DemoAiStructuredRouteImport.update({
-  id: '/demo/ai-structured',
-  path: '/demo/ai-structured',
-  getParentRoute: () => rootRouteImport,
+  id: '/ai-structured',
+  path: '/ai-structured',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoAiImageRoute = DemoAiImageRouteImport.update({
-  id: '/demo/ai-image',
-  path: '/demo/ai-image',
-  getParentRoute: () => rootRouteImport,
+  id: '/ai-image',
+  path: '/ai-image',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoAiChatRoute = DemoAiChatRouteImport.update({
-  id: '/demo/ai-chat',
-  path: '/demo/ai-chat',
-  getParentRoute: () => rootRouteImport,
+  id: '/ai-chat',
+  path: '/ai-chat',
+  getParentRoute: () => DemoRoute,
 } as any)
 const AutorunsNewRoute = AutorunsNewRouteImport.update({
   id: '/autoruns/new',
@@ -175,9 +181,9 @@ const AutorunsNewRoute = AutorunsNewRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
-  id: '/demo/guitars/',
-  path: '/demo/guitars/',
-  getParentRoute: () => rootRouteImport,
+  id: '/guitars/',
+  path: '/guitars/',
+  getParentRoute: () => DemoRoute,
 } as any)
 const PipelinesEditIdRoute = PipelinesEditIdRouteImport.update({
   id: '/pipelines/edit/$id',
@@ -190,34 +196,34 @@ const JobsReviewIdRoute = JobsReviewIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
-  id: '/demo/start/server-funcs',
-  path: '/demo/start/server-funcs',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/server-funcs',
+  path: '/start/server-funcs',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
-  id: '/demo/start/api-request',
-  path: '/demo/start/api-request',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/api-request',
+  path: '/start/api-request',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
-  id: '/demo/sentry/testing',
-  path: '/demo/sentry/testing',
-  getParentRoute: () => rootRouteImport,
+  id: '/sentry/testing',
+  path: '/sentry/testing',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoGuitarsGuitarIdRoute = DemoGuitarsGuitarIdRouteImport.update({
-  id: '/demo/guitars/$guitarId',
-  path: '/demo/guitars/$guitarId',
-  getParentRoute: () => rootRouteImport,
+  id: '/guitars/$guitarId',
+  path: '/guitars/$guitarId',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoApiTqTodosRoute = DemoApiTqTodosRouteImport.update({
-  id: '/demo/api/tq-todos',
-  path: '/demo/api/tq-todos',
-  getParentRoute: () => rootRouteImport,
+  id: '/api/tq-todos',
+  path: '/api/tq-todos',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
-  id: '/demo/api/names',
-  path: '/demo/api/names',
-  getParentRoute: () => rootRouteImport,
+  id: '/api/names',
+  path: '/api/names',
+  getParentRoute: () => DemoRoute,
 } as any)
 const AutorunsRunsIdRoute = AutorunsRunsIdRouteImport.update({
   id: '/autoruns/runs/$id',
@@ -230,53 +236,54 @@ const AutorunsEditIdRoute = AutorunsEditIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
-  id: '/demo/start/ssr/',
-  path: '/demo/start/ssr/',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/ssr/',
+  path: '/start/ssr/',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
-  id: '/demo/start/ssr/spa-mode',
-  path: '/demo/start/ssr/spa-mode',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/ssr/spa-mode',
+  path: '/start/ssr/spa-mode',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoStartSsrFullSsrRoute = DemoStartSsrFullSsrRouteImport.update({
-  id: '/demo/start/ssr/full-ssr',
-  path: '/demo/start/ssr/full-ssr',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/ssr/full-ssr',
+  path: '/start/ssr/full-ssr',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
-  id: '/demo/start/ssr/data-only',
-  path: '/demo/start/ssr/data-only',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/ssr/data-only',
+  path: '/start/ssr/data-only',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoApiAiTtsRoute = DemoApiAiTtsRouteImport.update({
-  id: '/demo/api/ai/tts',
-  path: '/demo/api/ai/tts',
-  getParentRoute: () => rootRouteImport,
+  id: '/api/ai/tts',
+  path: '/api/ai/tts',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoApiAiTranscriptionRoute = DemoApiAiTranscriptionRouteImport.update({
-  id: '/demo/api/ai/transcription',
-  path: '/demo/api/ai/transcription',
-  getParentRoute: () => rootRouteImport,
+  id: '/api/ai/transcription',
+  path: '/api/ai/transcription',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoApiAiStructuredRoute = DemoApiAiStructuredRouteImport.update({
-  id: '/demo/api/ai/structured',
-  path: '/demo/api/ai/structured',
-  getParentRoute: () => rootRouteImport,
+  id: '/api/ai/structured',
+  path: '/api/ai/structured',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoApiAiImageRoute = DemoApiAiImageRouteImport.update({
-  id: '/demo/api/ai/image',
-  path: '/demo/api/ai/image',
-  getParentRoute: () => rootRouteImport,
+  id: '/api/ai/image',
+  path: '/api/ai/image',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DemoApiAiChatRoute = DemoApiAiChatRouteImport.update({
-  id: '/demo/api/ai/chat',
-  path: '/demo/api/ai/chat',
-  getParentRoute: () => rootRouteImport,
+  id: '/api/ai/chat',
+  path: '/api/ai/chat',
+  getParentRoute: () => DemoRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/demo': typeof DemoRouteWithChildren
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
@@ -323,6 +330,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/demo': typeof DemoRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/autoruns/new': typeof AutorunsNewRoute
@@ -369,6 +377,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/demo': typeof DemoRouteWithChildren
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
@@ -417,6 +426,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/demo'
     | '/login'
     | '/settings'
     | '/signup'
@@ -463,6 +473,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/demo'
     | '/login'
     | '/signup'
     | '/autoruns/new'
@@ -508,6 +519,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/demo'
     | '/login'
     | '/settings'
     | '/signup'
@@ -555,16 +567,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DemoRoute: typeof DemoRouteWithChildren
   LoginRoute: typeof LoginRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
   AutorunsNewRoute: typeof AutorunsNewRoute
-  DemoAiChatRoute: typeof DemoAiChatRoute
-  DemoAiImageRoute: typeof DemoAiImageRoute
-  DemoAiStructuredRoute: typeof DemoAiStructuredRoute
-  DemoStoreRoute: typeof DemoStoreRoute
-  DemoTableRoute: typeof DemoTableRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   JobsIdRoute: typeof JobsIdRoute
   PipelinesIdRoute: typeof PipelinesIdRoute
   PipelinesNewRoute: typeof PipelinesNewRoute
@@ -574,24 +581,8 @@ export interface RootRouteChildren {
   PipelinesIndexRoute: typeof PipelinesIndexRoute
   AutorunsEditIdRoute: typeof AutorunsEditIdRoute
   AutorunsRunsIdRoute: typeof AutorunsRunsIdRoute
-  DemoApiNamesRoute: typeof DemoApiNamesRoute
-  DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
-  DemoGuitarsGuitarIdRoute: typeof DemoGuitarsGuitarIdRoute
-  DemoSentryTestingRoute: typeof DemoSentryTestingRoute
-  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
-  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   JobsReviewIdRoute: typeof JobsReviewIdRoute
   PipelinesEditIdRoute: typeof PipelinesEditIdRoute
-  DemoGuitarsIndexRoute: typeof DemoGuitarsIndexRoute
-  DemoApiAiChatRoute: typeof DemoApiAiChatRoute
-  DemoApiAiImageRoute: typeof DemoApiAiImageRoute
-  DemoApiAiStructuredRoute: typeof DemoApiAiStructuredRoute
-  DemoApiAiTranscriptionRoute: typeof DemoApiAiTranscriptionRoute
-  DemoApiAiTtsRoute: typeof DemoApiAiTtsRoute
-  DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
-  DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
-  DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
-  DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -615,6 +606,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -717,45 +715,45 @@ declare module '@tanstack/react-router' {
     }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
+      path: '/tanstack-query'
       fullPath: '/demo/tanstack-query'
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/table': {
       id: '/demo/table'
-      path: '/demo/table'
+      path: '/table'
       fullPath: '/demo/table'
       preLoaderRoute: typeof DemoTableRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/store': {
       id: '/demo/store'
-      path: '/demo/store'
+      path: '/store'
       fullPath: '/demo/store'
       preLoaderRoute: typeof DemoStoreRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/ai-structured': {
       id: '/demo/ai-structured'
-      path: '/demo/ai-structured'
+      path: '/ai-structured'
       fullPath: '/demo/ai-structured'
       preLoaderRoute: typeof DemoAiStructuredRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/ai-image': {
       id: '/demo/ai-image'
-      path: '/demo/ai-image'
+      path: '/ai-image'
       fullPath: '/demo/ai-image'
       preLoaderRoute: typeof DemoAiImageRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/ai-chat': {
       id: '/demo/ai-chat'
-      path: '/demo/ai-chat'
+      path: '/ai-chat'
       fullPath: '/demo/ai-chat'
       preLoaderRoute: typeof DemoAiChatRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/autoruns/new': {
       id: '/autoruns/new'
@@ -766,10 +764,10 @@ declare module '@tanstack/react-router' {
     }
     '/demo/guitars/': {
       id: '/demo/guitars/'
-      path: '/demo/guitars'
+      path: '/guitars'
       fullPath: '/demo/guitars/'
       preLoaderRoute: typeof DemoGuitarsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/pipelines/edit/$id': {
       id: '/pipelines/edit/$id'
@@ -787,45 +785,45 @@ declare module '@tanstack/react-router' {
     }
     '/demo/start/server-funcs': {
       id: '/demo/start/server-funcs'
-      path: '/demo/start/server-funcs'
+      path: '/start/server-funcs'
       fullPath: '/demo/start/server-funcs'
       preLoaderRoute: typeof DemoStartServerFuncsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/start/api-request': {
       id: '/demo/start/api-request'
-      path: '/demo/start/api-request'
+      path: '/start/api-request'
       fullPath: '/demo/start/api-request'
       preLoaderRoute: typeof DemoStartApiRequestRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/sentry/testing': {
       id: '/demo/sentry/testing'
-      path: '/demo/sentry/testing'
+      path: '/sentry/testing'
       fullPath: '/demo/sentry/testing'
       preLoaderRoute: typeof DemoSentryTestingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/guitars/$guitarId': {
       id: '/demo/guitars/$guitarId'
-      path: '/demo/guitars/$guitarId'
+      path: '/guitars/$guitarId'
       fullPath: '/demo/guitars/$guitarId'
       preLoaderRoute: typeof DemoGuitarsGuitarIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/api/tq-todos': {
       id: '/demo/api/tq-todos'
-      path: '/demo/api/tq-todos'
+      path: '/api/tq-todos'
       fullPath: '/demo/api/tq-todos'
       preLoaderRoute: typeof DemoApiTqTodosRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/api/names': {
       id: '/demo/api/names'
-      path: '/demo/api/names'
+      path: '/api/names'
       fullPath: '/demo/api/names'
       preLoaderRoute: typeof DemoApiNamesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/autoruns/runs/$id': {
       id: '/autoruns/runs/$id'
@@ -843,69 +841,121 @@ declare module '@tanstack/react-router' {
     }
     '/demo/start/ssr/': {
       id: '/demo/start/ssr/'
-      path: '/demo/start/ssr'
+      path: '/start/ssr'
       fullPath: '/demo/start/ssr/'
       preLoaderRoute: typeof DemoStartSsrIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/start/ssr/spa-mode': {
       id: '/demo/start/ssr/spa-mode'
-      path: '/demo/start/ssr/spa-mode'
+      path: '/start/ssr/spa-mode'
       fullPath: '/demo/start/ssr/spa-mode'
       preLoaderRoute: typeof DemoStartSsrSpaModeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/start/ssr/full-ssr': {
       id: '/demo/start/ssr/full-ssr'
-      path: '/demo/start/ssr/full-ssr'
+      path: '/start/ssr/full-ssr'
       fullPath: '/demo/start/ssr/full-ssr'
       preLoaderRoute: typeof DemoStartSsrFullSsrRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/start/ssr/data-only': {
       id: '/demo/start/ssr/data-only'
-      path: '/demo/start/ssr/data-only'
+      path: '/start/ssr/data-only'
       fullPath: '/demo/start/ssr/data-only'
       preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/api/ai/tts': {
       id: '/demo/api/ai/tts'
-      path: '/demo/api/ai/tts'
+      path: '/api/ai/tts'
       fullPath: '/demo/api/ai/tts'
       preLoaderRoute: typeof DemoApiAiTtsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/api/ai/transcription': {
       id: '/demo/api/ai/transcription'
-      path: '/demo/api/ai/transcription'
+      path: '/api/ai/transcription'
       fullPath: '/demo/api/ai/transcription'
       preLoaderRoute: typeof DemoApiAiTranscriptionRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/api/ai/structured': {
       id: '/demo/api/ai/structured'
-      path: '/demo/api/ai/structured'
+      path: '/api/ai/structured'
       fullPath: '/demo/api/ai/structured'
       preLoaderRoute: typeof DemoApiAiStructuredRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/api/ai/image': {
       id: '/demo/api/ai/image'
-      path: '/demo/api/ai/image'
+      path: '/api/ai/image'
       fullPath: '/demo/api/ai/image'
       preLoaderRoute: typeof DemoApiAiImageRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/demo/api/ai/chat': {
       id: '/demo/api/ai/chat'
-      path: '/demo/api/ai/chat'
+      path: '/api/ai/chat'
       fullPath: '/demo/api/ai/chat'
       preLoaderRoute: typeof DemoApiAiChatRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DemoRoute
     }
   }
 }
+
+interface DemoRouteChildren {
+  DemoAiChatRoute: typeof DemoAiChatRoute
+  DemoAiImageRoute: typeof DemoAiImageRoute
+  DemoAiStructuredRoute: typeof DemoAiStructuredRoute
+  DemoStoreRoute: typeof DemoStoreRoute
+  DemoTableRoute: typeof DemoTableRoute
+  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  DemoApiNamesRoute: typeof DemoApiNamesRoute
+  DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
+  DemoGuitarsGuitarIdRoute: typeof DemoGuitarsGuitarIdRoute
+  DemoSentryTestingRoute: typeof DemoSentryTestingRoute
+  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
+  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  DemoGuitarsIndexRoute: typeof DemoGuitarsIndexRoute
+  DemoApiAiChatRoute: typeof DemoApiAiChatRoute
+  DemoApiAiImageRoute: typeof DemoApiAiImageRoute
+  DemoApiAiStructuredRoute: typeof DemoApiAiStructuredRoute
+  DemoApiAiTranscriptionRoute: typeof DemoApiAiTranscriptionRoute
+  DemoApiAiTtsRoute: typeof DemoApiAiTtsRoute
+  DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
+  DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
+  DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
+  DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
+}
+
+const DemoRouteChildren: DemoRouteChildren = {
+  DemoAiChatRoute: DemoAiChatRoute,
+  DemoAiImageRoute: DemoAiImageRoute,
+  DemoAiStructuredRoute: DemoAiStructuredRoute,
+  DemoStoreRoute: DemoStoreRoute,
+  DemoTableRoute: DemoTableRoute,
+  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  DemoApiNamesRoute: DemoApiNamesRoute,
+  DemoApiTqTodosRoute: DemoApiTqTodosRoute,
+  DemoGuitarsGuitarIdRoute: DemoGuitarsGuitarIdRoute,
+  DemoSentryTestingRoute: DemoSentryTestingRoute,
+  DemoStartApiRequestRoute: DemoStartApiRequestRoute,
+  DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  DemoGuitarsIndexRoute: DemoGuitarsIndexRoute,
+  DemoApiAiChatRoute: DemoApiAiChatRoute,
+  DemoApiAiImageRoute: DemoApiAiImageRoute,
+  DemoApiAiStructuredRoute: DemoApiAiStructuredRoute,
+  DemoApiAiTranscriptionRoute: DemoApiAiTranscriptionRoute,
+  DemoApiAiTtsRoute: DemoApiAiTtsRoute,
+  DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
+  DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
+  DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
+  DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
+}
+
+const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
 
 interface SettingsRouteChildren {
   SettingsApiKeysRoute: typeof SettingsApiKeysRoute
@@ -931,16 +981,11 @@ const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DemoRoute: DemoRouteWithChildren,
   LoginRoute: LoginRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
   AutorunsNewRoute: AutorunsNewRoute,
-  DemoAiChatRoute: DemoAiChatRoute,
-  DemoAiImageRoute: DemoAiImageRoute,
-  DemoAiStructuredRoute: DemoAiStructuredRoute,
-  DemoStoreRoute: DemoStoreRoute,
-  DemoTableRoute: DemoTableRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   JobsIdRoute: JobsIdRoute,
   PipelinesIdRoute: PipelinesIdRoute,
   PipelinesNewRoute: PipelinesNewRoute,
@@ -950,24 +995,8 @@ const rootRouteChildren: RootRouteChildren = {
   PipelinesIndexRoute: PipelinesIndexRoute,
   AutorunsEditIdRoute: AutorunsEditIdRoute,
   AutorunsRunsIdRoute: AutorunsRunsIdRoute,
-  DemoApiNamesRoute: DemoApiNamesRoute,
-  DemoApiTqTodosRoute: DemoApiTqTodosRoute,
-  DemoGuitarsGuitarIdRoute: DemoGuitarsGuitarIdRoute,
-  DemoSentryTestingRoute: DemoSentryTestingRoute,
-  DemoStartApiRequestRoute: DemoStartApiRequestRoute,
-  DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   JobsReviewIdRoute: JobsReviewIdRoute,
   PipelinesEditIdRoute: PipelinesEditIdRoute,
-  DemoGuitarsIndexRoute: DemoGuitarsIndexRoute,
-  DemoApiAiChatRoute: DemoApiAiChatRoute,
-  DemoApiAiImageRoute: DemoApiAiImageRoute,
-  DemoApiAiStructuredRoute: DemoApiAiStructuredRoute,
-  DemoApiAiTranscriptionRoute: DemoApiAiTranscriptionRoute,
-  DemoApiAiTtsRoute: DemoApiAiTtsRoute,
-  DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
-  DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
-  DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
-  DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

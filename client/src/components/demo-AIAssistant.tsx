@@ -35,11 +35,10 @@ function Messages({ messages }: { messages: ChatMessages }) {
       {messages.map(({ id, role, parts }) => (
         <div
           key={id}
-          className={`py-3 ${
-            role === 'assistant'
+          className={`py-3 ${role === 'assistant'
               ? 'bg-linear-to-r from-orange-500/5 to-red-600/5'
               : 'bg-transparent'
-          }`}
+            }`}
         >
           {parts.map((part, index) => {
             if (part.type === 'text' && part.content) {
@@ -54,7 +53,7 @@ function Messages({ messages }: { messages: ChatMessages }) {
                       Y
                     </div>
                   )}
-                  <div className="flex-1 min-w-0 text-white prose dark:prose-invert max-w-none prose-sm">
+                  <div className="flex-1 min-w-0 text-white prose xdark:prose-invert max-w-none prose-sm">
                     <Streamdown>{part.content}</Streamdown>
                   </div>
                 </div>

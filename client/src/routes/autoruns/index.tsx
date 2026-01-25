@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { AppLayout } from '../../components/AppLayout'
+import { PageHeader } from '@/components/retroui/PageHeader'
+import { Button } from '@/components/retroui/Button'
+import { Input } from '@/components/retroui/Input'
 
 export const Route = createFileRoute('/autoruns/')({
     component: AutoRunsComponent,
@@ -8,47 +11,41 @@ export const Route = createFileRoute('/autoruns/')({
 function AutoRunsComponent() {
     return (
         <AppLayout>
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full p-4 lg:p-12">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 z-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
 
-                <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="text-gray-500 font-mono text-sm tracking-widest uppercase">/ HOME / PIPELINES</span>
-                        </div>
-                        <h2 className="text-5xl font-extrabold tracking-tight text-black mb-1">
-                            AutoRuns
-                        </h2>
-                        <p className="text-black font-medium opacity-70 mt-3">
-                            Manage and monitor your extraction workflows.
-                        </p>
-                    </div>
+                <PageHeader
+                    heading="AutoRuns"
+                    description="Manage and monitor your extraction workflows."
+                    breadcrumb="/ HOME / PIPELINES"
+                >
 
-                    <div className="flex gap-4">
-                        <button className="neobrutal-btn bg-white flex items-center gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
-                            <span className="material-symbols-outlined">auto_awesome</span>
-                            Generate with AI
-                        </button>
-                        <Link
-                            to="/autoruns/new"
-                            className="neobrutal-btn flex items-center gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide"
-                        >
+                    <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide bg-white">
+                        <span className="material-symbols-outlined mr-2">auto_awesome</span>
+                        Generate with AI
+                    </Button>
+
+
+                    <Link to="/autoruns/new">
+                        <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
                             <span className="material-symbols-outlined text-[20px]">add</span>
                             <span>New AutoRun</span>
-                        </Link>
-                    </div>
-                </header>
+                        </Button>
+                    </Link>
+                </PageHeader>
 
 
                 <div className="pb-6 flex gap-4 z-10 shrink-0">
                     <div className="relative flex-1 max-w-md">
                         <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">search</span>
-                        <input
-                            className="w-full pl-12 pr-4 py-3 rounded-sm font-medium border-3 border-black bg-white shadow-[4px_4px_0px_rgba(0,0,0,0.1)] focus:shadow-[4px_4px_0px_#000000] focus:outline-none placeholder:text-gray-400"
+                        <Input
+                            className="w-full h-12 border-2 border-black bg-white px-4 py-2 font-display text-black shadow-[4px_4px_0px_0px_#000000] placeholder:text-gray-500 focus:outline-none focus:ring-0"
                             placeholder="Search AutoRuns..."
                             type="text"
+                            icon="search"
                         />
+
                     </div>
                     <div className="relative w-48">
                         <select className="w-full pl-4 pr-10 py-3 rounded-sm font-medium border-3 border-black bg-white shadow-[4px_4px_0px_rgba(0,0,0,0.1)] focus:shadow-[4px_4px_0px_#000000] appearance-none cursor-pointer focus:outline-none">

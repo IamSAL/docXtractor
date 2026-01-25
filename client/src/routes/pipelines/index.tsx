@@ -1,5 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { AppLayout } from '../../components/AppLayout'
+import { Button } from '../../components/retroui/Button'
+import { Input } from '../../components/retroui/Input'
+import { Card } from '../../components/retroui/Card'
+import { Badge } from '../../components/retroui/Badge'
+import { PageHeader } from '../../components/retroui/PageHeader'
 
 export const Route = createFileRoute('/pipelines/')({
     component: PipelinesComponent,
@@ -8,56 +13,46 @@ export const Route = createFileRoute('/pipelines/')({
 function PipelinesComponent() {
     return (
         <AppLayout>
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full p-4 lg:p-12">
                 {/* Page Header Block */}
-                <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="text-gray-500 font-mono text-sm tracking-widest uppercase">/ HOME / PIPELINES</span>
-                        </div>
-                        <h2 className="text-5xl font-extrabold tracking-tight text-black mb-1">
-                            My Pipelines
-                        </h2>
-                        <p className="text-black font-medium opacity-70 mt-3">
-                            Manage your AI extraction workflows. Create, test, and deploy data parsers.
-                        </p>
-                    </div>
-                    <Link
-                        to="/pipelines/new"
-
-                    >
-                        <button className="neobrutal-btn flex items-center gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
+                <PageHeader
+                    heading="My Pipelines"
+                    description="Manage your AI extraction workflows. Create, test, and deploy data parsers."
+                    breadcrumb="/ HOME / PIPELINES"
+                >
+                    <Link to="/pipelines/new">
+                        <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
                             <span className="material-symbols-outlined text-[20px]">add</span>
                             <span>New Pipeline</span>
-                        </button>
+                        </Button>
                     </Link>
-                </header>
+                </PageHeader>
 
                 {/* Filter & Search Toolbar */}
                 <div className="bg-gray-100 border-2 border-black p-4 mb-8">
                     <div className="w-full flex flex-col lg:flex-row gap-4">
                         {/* Search Input */}
                         <div className="flex-1 relative group">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 material-symbols-outlined">search</span>
-                            <input
-                                className="w-full pl-10 pr-4 py-3 bg-white border-2 border-black rounded-sm focus:ring-0 focus:outline-none focus:border-[#e5d161] shadow-[inset_3px_3px_6px_rgba(0,0,0,0.1)] text-black font-mono text-sm placeholder:text-gray-400 transition-colors"
+                            <Input
+                                className="w-full bg-white rounded-sm focus:border-[#e5d161] shadow-[inset_3px_3px_6px_rgba(0,0,0,0.1)] text-black font-mono text-sm placeholder:text-gray-400 transition-colors h-auto py-3"
                                 placeholder="Search pipelines by name or ID..."
                                 type="text"
+                                icon="search"
                             />
                         </div>
                         {/* Filter Chips */}
                         <div className="flex items-center gap-3 overflow-x-auto">
-                            <button className="flex items-center gap-2 px-3 py-3 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000000] rounded-sm cursor-pointer hover:-translate-y-[1px] transition-transform shrink-0" type="button">
+                            <Button variant="outline" className="flex items-center gap-2 px-3 py-3 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000000] rounded-sm cursor-pointer hover:-translate-y-[1px] transition-transform shrink-0 h-auto" type="button">
                                 <span className="text-xs font-bold uppercase tracking-wider">Status: All</span>
                                 <span className="material-symbols-outlined text-sm">expand_more</span>
-                            </button>
-                            <button className="flex items-center gap-2 px-3 py-3 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000000] rounded-sm cursor-pointer hover:-translate-y-[1px] transition-transform shrink-0" type="button">
+                            </Button>
+                            <Button variant="outline" className="flex items-center gap-2 px-3 py-3 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000000] rounded-sm cursor-pointer hover:-translate-y-[1px] transition-transform shrink-0 h-auto" type="button">
                                 <span className="text-xs font-bold uppercase tracking-wider">Owner: Me</span>
                                 <span className="material-symbols-outlined text-sm">expand_more</span>
-                            </button>
-                            <button className="flex items-center justify-center w-12 h-12 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000000] rounded-sm cursor-pointer hover:bg-gray-50 shrink-0" title="Sort Order" type="button">
+                            </Button>
+                            <Button variant="outline" className="flex items-center justify-center w-12 h-12 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000000] rounded-sm cursor-pointer hover:bg-gray-50 shrink-0 p-0" title="Sort Order" type="button">
                                 <span className="material-symbols-outlined">sort</span>
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -73,7 +68,7 @@ function PipelinesComponent() {
                         { id: 'LEG-2023-A02', title: 'Legal Contract Analyzer2', desc: 'Identifies liability clauses and termination dates in MSA agreements.', status: 'Config Error', fields: '3 fields', error: 'API Key?' },
 
                     ].map((pipeline, i) => (
-                        <article key={i} className="flex flex-col bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] rounded-sm overflow-hidden h-full hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-200">
+                        <Card key={i} className="flex flex-col bg-white border-2 border-black rounded-sm overflow-hidden h-full hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-200 p-0" shadowsize="sm">
                             {/* Card Header */}
                             <div className={`h-32 border-b-2 border-black relative overflow-hidden ${pipeline.status === 'Draft' ? 'bg-yellow-50' : pipeline.status === 'Config Error' ? 'bg-red-50' : 'bg-gray-100'}`}>
                                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000000 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
@@ -142,7 +137,7 @@ function PipelinesComponent() {
                                     <span className="material-symbols-outlined text-sm">delete</span>
                                 </button>
                             </div>
-                        </article>
+                        </Card>
                     ))}
 
                     {/* Placeholder for New */}

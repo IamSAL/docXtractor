@@ -94,11 +94,10 @@ function Messages({
           return (
             <div
               key={message.id}
-              className={`p-4 ${
-                message.role === 'assistant'
+              className={`p-4 ${message.role === 'assistant'
                   ? 'bg-linear-to-r from-orange-500/5 to-red-600/5'
                   : 'bg-transparent'
-              }`}
+                }`}
             >
               <div className="flex items-start gap-4 max-w-3xl mx-auto w-full">
                 {message.role === 'assistant' ? (
@@ -115,7 +114,7 @@ function Messages({
                     if (part.type === 'text' && part.content) {
                       return (
                         <div
-                          className="flex-1 min-w-0 prose dark:prose-invert max-w-none prose-sm"
+                          className="flex-1 min-w-0 prose xdark:prose-invert max-w-none prose-sm"
                           key={index}
                         >
                           <Streamdown>{part.content}</Streamdown>
@@ -226,11 +225,10 @@ function ChatPage() {
                   type="button"
                   onClick={handleMicClick}
                   disabled={isLoading || isTranscribing}
-                  className={`p-3 rounded-lg transition-colors ${
-                    isRecording
+                  className={`p-3 rounded-lg transition-colors ${isRecording
                       ? 'bg-red-600 hover:bg-red-700 text-white'
                       : 'bg-gray-800/50 text-gray-400 hover:text-orange-400 border border-orange-500/20'
-                  } disabled:opacity-50`}
+                    } disabled:opacity-50`}
                   title={isRecording ? 'Stop recording' : 'Start recording'}
                 >
                   {isTranscribing ? (

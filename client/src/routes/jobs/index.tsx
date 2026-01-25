@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { AppLayout } from '../../components/AppLayout'
-import { Button } from '@/components/retroui/Button'
-import { Card } from '@/components/retroui/Card'
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '@/components/retroui/Table'
-import { Badge } from '@/components/retroui/Badge'
+import { Button } from '../../components/retroui/Button'
+import { Card } from '../../components/retroui/Card'
+import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '../../components/retroui/Table'
+import { Badge } from '../../components/retroui/Badge'
+import { Input } from '../../components/retroui/Input'
+import { PageHeader } from '../../components/retroui/PageHeader'
 
 
 export const Route = createFileRoute('/jobs/')({
@@ -13,55 +15,46 @@ export const Route = createFileRoute('/jobs/')({
 function JobsComponent() {
   return (
     <AppLayout>
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full p-4 lg:p-12">
         {/* Section Header */}
-        <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-gray-500 font-mono text-sm tracking-widest uppercase">/ HOME / JOBS</span>
-            </div>
-            <h2 className="text-5xl font-extrabold tracking-tight text-black mb-1">
-              Extraction Jobs
-
-            </h2>
-            <p className="text-black font-medium opacity-70 mt-3">
-              Monitor and manage your AI extraction pipelines with precision.
-            </p>
-          </div>
-          <Link
-            to="/pipelines/new"
-
-          >
-            <button className="neobrutal-btn flex items-center gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
+        <PageHeader
+          heading="Extraction Jobs"
+          description="Monitor and manage your AI extraction pipelines with precision."
+          breadcrumb="/ HOME / JOBS"
+        >
+          <Link to="/pipelines/new">
+            <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
               <span className="material-symbols-outlined">add_circle</span>
               Run New Job
-            </button>
+            </Button>
           </Link>
-        </header>
+        </PageHeader>
 
         {/* Filter & Search Toolbar */}
         <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex flex-1 flex-col gap-4 md:flex-row md:items-end">
             <div className="flex w-full flex-col gap-1 md:max-w-xs">
               <label className="text-xs font-bold uppercase tracking-wider">Search</label>
-              <div className="relative">
-                <input className="w-full border-2 border-black bg-white px-4 py-2 font-display text-black shadow-[4px_4px_0px_0px_#000000] placeholder:text-gray-500 focus:outline-none h-12" placeholder="Search by Job ID..." type="text" />
-                <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-black">search</span>
-              </div>
+              <Input
+                className="w-full h-12 border-2 border-black bg-white px-4 py-2 font-display text-black shadow-[4px_4px_0px_0px_#000000] placeholder:text-gray-500 focus:outline-none focus:ring-0"
+                placeholder="Search by Job ID..."
+                type="text"
+                icon="search"
+              />
             </div>
             <div className="flex w-full flex-col gap-1 md:w-auto">
               <label className="text-xs font-bold uppercase tracking-wider">Pipeline</label>
-              <button className="flex h-12 min-w-[160px] items-center justify-between border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none">
+              <Button variant="outline" className="flex h-12 min-w-[160px] items-center justify-between border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none hover:bg-white">
                 <span>All Pipelines</span>
                 <span className="material-symbols-outlined">expand_more</span>
-              </button>
+              </Button>
             </div>
             <div className="flex w-full flex-col gap-1 md:w-auto">
               <label className="text-xs font-bold uppercase tracking-wider">Status</label>
-              <button className="flex h-12 min-w-[140px] items-center justify-between border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none">
+              <Button variant="outline" className="flex h-12 min-w-[140px] items-center justify-between border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none hover:bg-white">
                 <span>Any Status</span>
                 <span className="material-symbols-outlined">expand_more</span>
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -126,14 +119,14 @@ function JobsComponent() {
         <div className="mt-8 flex items-center justify-between pb-12">
           <p className="text-sm font-bold uppercase text-gray-500">Showing 1-4 of 248 jobs</p>
           <div className="flex gap-4">
-            <button className="flex h-10 w-28 items-center justify-center gap-2 border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all hover:bg-gray-100 active:translate-x-1 active:translate-y-1 active:shadow-none disabled:opacity-50">
+            <Button variant="outline" className="flex h-10 w-28 items-center justify-center gap-2 border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all hover:bg-gray-100 active:translate-x-1 active:translate-y-1 active:shadow-none disabled:opacity-50">
               <span className="material-symbols-outlined text-sm">arrow_back</span>
               Prev
-            </button>
-            <button className="flex h-10 w-28 items-center justify-center gap-2 border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all hover:bg-gray-100 active:translate-x-1 active:translate-y-1 active:shadow-none">
+            </Button>
+            <Button variant="outline" className="flex h-10 w-28 items-center justify-center gap-2 border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all hover:bg-gray-100 active:translate-x-1 active:translate-y-1 active:shadow-none">
               Next
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
