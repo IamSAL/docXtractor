@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { useAuth, useLogout } from '@/hooks/useAuth'
 
 interface SidebarProps {
     isOpen?: boolean
@@ -6,6 +7,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
+    const { user } = useAuth()
+    const logout = useLogout()
+
     return (
         <>
             {/* Mobile Backdrop */}
@@ -88,19 +92,25 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                 </nav>
                 {/* User Profile */}
                 <div className="p-4 border-t-3 border-black bg-yellow-50">
-                    <div className="flex items-center gap-3 p-2 rounded-lg border-2 border-black bg-white shadow-hard-sm cursor-pointer hover:bg-gray-50">
-                        <div className="size-8 rounded-full bg-gray-200 border-2 border-black overflow-hidden">
-                            <img
-                                alt="User Avatar"
-                                className="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPRa7B_KjGMFnt-GCzDzmllIlNq0fMO_xCTH4d0fYwyc_IJKp07LtB5AGrmYPqvi9hQpkmohkTuz4ITA5l8veRzLJIst8FCZ6JPuEIUyzfNOVqVDJ1r8TExfdcEd0vCZU3M6S7whm5PgsSteLx_VGKtH5_JEgneb4f2k4FIayqvDPhFQOoV-YoAqES6kkjrTaU2jiPWONvx9Kpqh3dTRM214SvdixEShPXEKGqztGfTcplP7gJINAIrgZgR3n8KluuAr_zfjH5mcq8"
-                            />
+                    <div className="group relative">
+                        <div className="flex items-center gap-3 p-2 rounded-lg border-2 border-black bg-white shadow-hard-sm cursor-pointer hover:bg-gray-50">
+                            <div className="size-8 rounded-full bg-gray-200 border-2 border-black overflow-hidden flex items-center justify-center">
+                                {user?.hasProfile ? (
+                                    <div className="w-full h-full flex items-center justify-center bg-primary font-bold text-xs">
+                                        {user.fullName?.[0] || user.email[0].toUpperCase()}
+                                    </div>
+                                ) : (
+                                    <span className="material-symbols-outlined text-black text-lg">person</span>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-bold truncate">{user?.fullName || user?.email}</p>
+                                <p className="text-xs text-gray-600 truncate capitalize">{user?.role}</p>
+                            </div>
+                            <button onClick={logout} className="p-1 hover:bg-red-100 rounded" title="Logout">
+                                <span className="material-symbols-outlined text-sm text-red-600">logout</span>
+                            </button>
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold truncate">Alex Designer</p>
-                            <p className="text-xs text-gray-600 truncate">Pro Plan</p>
-                        </div>
-                        <span className="material-symbols-outlined text-sm">expand_more</span>
                     </div>
                 </div>
             </aside>

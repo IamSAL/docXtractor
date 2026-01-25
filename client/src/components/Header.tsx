@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { useAuth, useLogout } from '@/hooks/useAuth'
 
 import TanChatAIAssistant from './demo-AIAssistant.tsx'
 
@@ -10,6 +11,7 @@ import {
   Globe,
   Home,
   ImageIcon,
+  LogOut,
   Menu,
   MessagesSquare,
   Network,
@@ -19,38 +21,75 @@ import {
   Table,
   X,
 } from 'lucide-react'
+import { Button } from './retroui/Button.tsx'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [groupedExpanded, setGroupedExpanded] = useState<
     Record<string, boolean>
   >({})
+  const { isAuthenticated, user } = useAuth()
+  const logout = useLogout()
 
   return (
     <>
-      <header className="p-4 flex items-center bg-gray-800 text-white shadow-lg">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-          aria-label="Open menu"
-        >
-          <Menu size={24} />
-        </button>
-        <h1 className="ml-4 text-xl font-semibold">
-          <Link to="/">
-            <img
-              src="/tanstack-word-logo-white.svg"
-              alt="TanStack Logo"
-              className="h-10"
-            />
-          </Link>
-        </h1>
+      <header className="p-4 flex items-center justify-between bg-gray-800 text-white shadow-lg sticky top-0 z-40">
+        <div className="flex items-center">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu size={24} />
+          </button>
+          <h1 className="ml-4 text-xl font-semibold">
+            <Link to="/">
+              <img
+                src="/tanstack-word-logo-white.svg"
+                alt="TanStack Logo"
+                className="h-10"
+              />
+            </Link>
+          </h1>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {isAuthenticated ? (
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex flex-col items-end">
+                <span className="font-bold text-sm">{user?.fullName || user?.email}</span>
+                <span className="text-xs text-gray-400 capitalize">{user?.role}</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={logout}
+                className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+              >
+                <LogOut size={16} className="mr-2" />
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Link to="/login">
+                <Button size="sm" variant="ghost" className="text-white hover:bg-gray-700">
+                  Login
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button size="sm" className="bg-primary text-black hover:bg-primary/90">
+                  Sign Up
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
       </header>
 
       <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <h2 className="text-xl font-bold">Navigation</h2>

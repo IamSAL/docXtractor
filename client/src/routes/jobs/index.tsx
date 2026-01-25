@@ -2,10 +2,11 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { AppLayout } from '../../components/AppLayout'
 import { Button } from '../../components/retroui/Button'
 import { Card } from '../../components/retroui/Card'
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '../../components/retroui/Table'
+import { Table } from '../../components/retroui/Table'
 import { Badge } from '../../components/retroui/Badge'
 import { Input } from '../../components/retroui/Input'
 import { PageHeader } from '../../components/retroui/PageHeader'
+
 
 
 export const Route = createFileRoute('/jobs/')({
@@ -60,42 +61,43 @@ function JobsComponent() {
 
         </div>
 
+
         {/* Table Section */}
         <Card shadowsize="md" className="p-0 border-2 overflow-hidden w-full">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Job ID</TableHead>
-                <TableHead>Pipeline</TableHead>
-                <TableHead>Timestamp</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Confidence</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            <Table.Header>
+              <Table.Row>
+                <Table.Head>Job ID</Table.Head>
+                <Table.Head>Pipeline</Table.Head>
+                <Table.Head>Timestamp</Table.Head>
+                <Table.Head>Status</Table.Head>
+                <Table.Head>Confidence</Table.Head>
+                <Table.Head className="text-right">Actions</Table.Head>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
               {[
                 { id: '8492-A', pipeline: 'Invoice_Parser_v2', time: 'Oct 24, 14:30', status: 'Success', statusVariant: 'success', confidence: 'High', confVariant: 'default' },
                 { id: '8492-B', pipeline: 'Receipt_Scanner_Main', time: 'Oct 24, 14:15', status: 'Review', statusVariant: 'warning', confidence: 'Medium', confVariant: 'warning' },
                 { id: '8491-X', pipeline: 'Legal_Doc_Analyzer', time: 'Oct 24, 13:45', status: 'Failed', statusVariant: 'destructive', confidence: 'Low', confVariant: 'outline' },
                 { id: '8490-C', pipeline: 'Invoice_Parser_v2', time: 'Oct 24, 13:30', status: 'Success', statusVariant: 'success', confidence: 'High', confVariant: 'default' }
               ].map((job, i) => (
-                <TableRow key={i}>
-                  <TableCell className="font-mono text-base font-bold underline decoration-2 underline-offset-2">
+                <Table.Row key={i}>
+                  <Table.Cell className="font-mono text-base font-bold underline decoration-2 underline-offset-2">
                     <Link to="/jobs/$id" params={{ id: job.id }} className="no-underline text-black">#{job.id}</Link>
-                  </TableCell>
-                  <TableCell className="font-bold uppercase tracking-tight">{job.pipeline}</TableCell>
-                  <TableCell className="text-gray-500 font-bold">{job.time}</TableCell>
-                  <TableCell>
+                  </Table.Cell>
+                  <Table.Cell className="font-bold uppercase tracking-tight">{job.pipeline}</Table.Cell>
+                  <Table.Cell className="text-gray-500 font-bold">{job.time}</Table.Cell>
+                  <Table.Cell>
                     <Badge variant={job.statusVariant as any}>{job.status}</Badge>
-                  </TableCell>
-                  <TableCell>
+                  </Table.Cell>
+                  <Table.Cell>
                     <Badge variant={job.confVariant as any} className="gap-2 px-3 py-1.5 min-w-[100px] justify-center">
                       <span className="material-symbols-outlined text-[16px] font-black">verified</span>
                       {job.confidence}
                     </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
+                  </Table.Cell>
+                  <Table.Cell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Link to="/jobs/$id" params={{ id: job.id }} className="no-underline">
                         <Button variant="outline" size="icon" className="size-10 bg-white">
@@ -109,10 +111,10 @@ function JobsComponent() {
                         <span className="material-symbols-outlined text-[20px]">delete</span>
                       </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </Table.Cell>
+                </Table.Row>
               ))}
-            </TableBody>
+            </Table.Body>
           </Table>
         </Card>
         {/* Pagination */}
