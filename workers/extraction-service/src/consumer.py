@@ -24,16 +24,28 @@ async def consume():
                 content_block = data.get("content", {})
                 markdown_text = content_block.get("combined_markdown") or content_block.get("markdown", "")
                 schema = data.get("schema", {})
+                extraction_type = data.get("extractionType", "llm")
+                examples = data.get("examples", [])
+                model_id = data.get("model_id") or data.get("modelId")
                 
                 if not markdown_text:
                     logger.warning("No markdown content provided")
                     continue
 
                 # Run Extraction (Blocking IO -> Thread)
+                # We pass model_id if it exists, otherwise the extractor's default will be used
+                kwargs = {
+                    "extraction_type": extraction_type,
+                    "examples": examples
+                }
+                if model_id:
+                    kwargs["model_id"] = model_id
+
                 result = await asyncio.to_thread(
                     run_extraction,
                     markdown_text,
-                    schema
+                    schema,
+                    **kwargs
                 )
                 
                 # Produce Request

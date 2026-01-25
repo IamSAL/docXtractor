@@ -1,24 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import HomeHero from "@/screens/home/hero";
-import Services from "@/screens/home/services";
-import Values from "@/screens/home/values";
-import Appointment from "@/screens/home/appointment";
-import Telemedicine from "@/screens/home/telemedicine";
-import { SmoothCursor } from "@/components/ui/smooth-cursor";
+import { Button } from '@/components/retroui/Button'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
-export const Route = createFileRoute("/")({
-  component: RouteComponent,
-});
+export const Route = createFileRoute('/')({ component: App })
 
-function RouteComponent() {
+function App() {
+
+
   return (
-    <main className="max-w-6xl px-4 mx-auto w-full mt-4">
-      <HomeHero />
-      <Services />
-      <Values />
-      <Appointment />
-      <Telemedicine />
-      <SmoothCursor />
-    </main>
-  );
+    <Link to="/dashboard"><Button>Click Me!</Button></Link>
+  )
 }

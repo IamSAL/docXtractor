@@ -56,6 +56,8 @@ services:
         condition: service_started
       init-kafka:
         condition: service_completed_successfully
+      createbuckets:
+        condition: service_completed_successfully
     networks:
       - docxtractor-network
     command: pnpm run start:dev
@@ -125,7 +127,9 @@ services:
     depends_on:
       - minio
     entrypoint: >
-      /bin/sh -c " /usr/bin/mc alias set local http://minio:9000 minioadmin minioadmin; /usr/bin/mc mb -p local/docxtractor-documents; exit 0; "
+      /bin/sh -c " echo 'Waiting for MinIO...'; while ! /usr/bin/mc alias set local http://minio:9000 minioadmin minioadmin > /dev/null 2>&1; do
+        sleep 2;
+      done; /usr/bin/mc mb -p local/docxtractor-documents; exit 0; "
     networks:
       - docxtractor-network
 
@@ -148,6 +152,8 @@ services:
       minio:
         condition: service_started
       init-kafka:
+        condition: service_completed_successfully
+      createbuckets:
         condition: service_completed_successfully
     environment:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -172,6 +178,8 @@ services:
         condition: service_started
       init-kafka:
         condition: service_completed_successfully
+      createbuckets:
+        condition: service_completed_successfully
     env_file:
       - ./workers/extraction-service/.env
     environment:
@@ -179,6 +187,7 @@ services:
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
+      - LANGEXTRACT_MODEL_URL=http://host.docker.internal:11434
     networks:
       - docxtractor-network
     volumes:

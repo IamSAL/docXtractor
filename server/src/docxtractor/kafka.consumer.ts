@@ -88,10 +88,54 @@ export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {
 
       const extractionRequest = {
         job_id: data.job_id,
+        extractionType: 'langextract',
+        model_id: 'gemma3:12b',
         content: {
           combined_markdown: data.markdown_content,
         },
-        schema: {}, // Empty schema for now as per plan
+        schema: {
+          prompt:
+            'Extract the invoice details including the invoice number, date, and total amount.',
+          fields: [
+            {
+              name: 'invoice_number',
+              type: 'string',
+              description: 'Invoice identifier',
+            },
+            {
+              name: 'date',
+              type: 'string',
+              description: 'Date of issue',
+            },
+            {
+              name: 'total_amount',
+              type: 'string',
+              description: 'The final total amount including tax',
+            },
+          ],
+        },
+        examples: [
+          {
+            text: 'Invoice #ABC-123 Date: 2024-01-01 Total: $100.00',
+            extractions: [
+              {
+                extraction_class: 'invoice_number',
+                extraction_text: 'ABC-123',
+                attributes: {},
+              },
+              {
+                extraction_class: 'date',
+                extraction_text: '2024-01-01',
+                attributes: {},
+              },
+              {
+                extraction_class: 'total_amount',
+                extraction_text: '$100.00',
+                attributes: {},
+              },
+            ],
+          },
+        ],
       };
 
       await this.kafkaProducer.sendMessage(
