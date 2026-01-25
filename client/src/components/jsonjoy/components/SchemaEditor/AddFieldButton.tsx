@@ -1,7 +1,7 @@
 import { CirclePlus, HelpCircle, Info } from "lucide-react";
 import { type FC, type FormEvent, useId, useState } from "react";
-import { Badge } from "../../components/ui/badge.tsx";
-import { Button } from "../../components/ui/button.tsx";
+
+
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,10 @@ import {
 import { useTranslation } from "../../hooks/use-translation.ts";
 import type { NewField, SchemaType } from "../../types/jsonSchema.ts";
 import SchemaTypeSelector from "./SchemaTypeSelector.tsx";
+import { Button } from "@/components/retroui/Button.tsx";
+import { Badge } from "@/components/retroui/Badge.tsx";
+import { Switch } from "@/components/retroui/Switch.tsx";
+
 
 interface AddFieldButtonProps {
   onAddField: (field: NewField) => void;
@@ -62,26 +66,18 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
 
   return (
     <>
-      <Button
-        type="button"
-        onClick={() => setDialogOpen(true)}
-        variant={variant === "primary" ? "default" : "outline"}
-        size="sm"
-        className="flex items-center gap-1.5 group"
-      >
-        <CirclePlus
-          size={16}
-          className="group-hover:scale-110 transition-transform"
-        />
-        <span>{t.fieldAddNewButton}</span>
+      <Button size="sm" onClick={() => setDialogOpen(true)}>
+        <span className="material-symbols-outlined text-lg mr-1">add</span>
+        Add Field
       </Button>
+
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="md:max-w-[1200px] max-h-[85vh] w-[95vw] p-4 sm:p-6 jsonjoy">
           <DialogHeader className="mb-4">
             <DialogTitle className="text-xl flex flex-wrap items-center gap-2">
               {t.fieldAddNewLabel}
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="text-xs">
                 {t.fieldAddNewBadge}
               </Badge>
             </DialogTitle>
@@ -150,18 +146,22 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                   />
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/50">
-                  <input
-                    type="checkbox"
+                <div className="flex items-center justify-between p-4 rounded-xl border-2 border-black bg-gray-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="flex flex-col gap-0.5">
+                    <label htmlFor={fieldRequiredId} className="text-sm font-bold uppercase tracking-tight">
+                      {t.fieldRequiredLabel}
+                    </label>
+                    <p className="text-[10px] text-text-secondary-light font-medium uppercase">
+                      Make this field mandatory
+                    </p>
+                  </div>
+                  <Switch
                     id={fieldRequiredId}
                     checked={fieldRequired}
-                    onChange={(e) => setFieldRequired(e.target.checked)}
-                    className="rounded border-gray-300 shrink-0"
+                    onCheckedChange={setFieldRequired}
                   />
-                  <label htmlFor={fieldRequiredId} className="text-sm">
-                    {t.fieldRequiredLabel}
-                  </label>
                 </div>
+
               </div>
 
               <div className="space-y-4 min-w-[280px]">

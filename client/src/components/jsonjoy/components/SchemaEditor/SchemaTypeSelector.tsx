@@ -53,28 +53,30 @@ const SchemaTypeSelector: FC<SchemaTypeSelectorProps> = ({
   return (
     <div
       id={id}
-      className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-2"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
     >
       {typeOptions.map((type) => (
         <button
           type="button"
           key={type.id}
           title={t[type.description]}
+          style={{ padding: '8px' }}
           className={cn(
-            "p-2.5 rounded-lg border-2 text-left transition-all duration-200",
+            "cursor-pointer rounded-xl border-2 text-left transition-all active:translate-y-0.5 active:shadow-none",
             value === type.id
-              ? "border-primary bg-primary/5 shadow-xs"
-              : "border-border hover:border-primary/30 hover:bg-secondary",
+              ? "border-black bg-primary/10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ring-2 ring-primary/20"
+              : "border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5",
           )}
           onClick={() => onChange(type.id)}
         >
-          <div className="font-medium text-sm">{t[type.label]}</div>
-          <div className="text-xs text-muted-foreground line-clamp-1">
+          <div className="font-black text-xs uppercase tracking-tight mb-1">{t[type.label]}</div>
+          <div className="text-[10px] text-text-secondary-light font-medium line-clamp-1 uppercase">
             {t[type.description]}
           </div>
         </button>
       ))}
     </div>
+
   );
 };
 

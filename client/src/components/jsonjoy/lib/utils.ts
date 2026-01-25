@@ -44,3 +44,25 @@ export const getTypeLabel = (t: Translation, type: SchemaType): string => {
       return t.schemaTypeNull;
   }
 };
+
+// Get type icon (Material Symbols)
+export const getTypeIcon = (type: SchemaType): string => {
+  switch (type) {
+    case "string":
+      return "abc";
+    case "number":
+    case "integer":
+      return "123";
+    case "boolean":
+      return "toggle_on";
+    case "object":
+      return "data_object";
+    case "array":
+      return "data_array";
+    case "null":
+      return "null_privileged";
+    default:
+      return "help";
+  }
+};
+

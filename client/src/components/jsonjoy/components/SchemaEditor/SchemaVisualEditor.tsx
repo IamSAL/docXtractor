@@ -10,6 +10,10 @@ import type { JSONSchema, NewField } from "../../types/jsonSchema.ts";
 import { asObjectSchema, isBooleanSchema } from "../../types/jsonSchema.ts";
 import AddFieldButton from "./AddFieldButton.tsx";
 import SchemaFieldList from "./SchemaFieldList.tsx";
+import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion.tsx";
+import { EmptyBlock } from "@/components/EmptyBlock.tsx";
+
+
 
 /** @public */
 export interface SchemaVisualEditorProps {
@@ -108,29 +112,64 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
     Object.keys(schema.properties).length > 0;
 
   return (
-    <div className="p-4 h-full flex flex-col overflow-auto jsonjoy">
-      {!readOnly && (
-        <div className="mb-6 shrink-0">
-          <AddFieldButton onAddField={handleAddField} />
-        </div>
-      )}
+    <div>
+      <AccordionItem value="schema" className="bg-white xdark:bg-surface-dark rounded-xl shadow-subtle border border-border-light xdark:border-border-dark overflow-hidden flex flex-col border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <AccordionTrigger className="px-6 py-5 border-b border-border-light xdark:border-border-dark hover:bg-gray-50  transition-colors hover:no-underline text-lg">
+          <div className="flex flex-1 items-center justify-between mr-4">
+            <div className="flex flex-col text-left">
+              <h3 className="font-bold flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">
+                  schema
+                </span>
+                Field Schema
+              </h3>
+              <p className="text-xs text-text-secondary-light xdark:text-text-secondary-dark mt-1 font-normal">
+                Define the data points to be extracted from the documents.
+              </p>
+            </div>
+            <div onClick={(e) => e.stopPropagation()}>
+              {!readOnly && (
+                <div className="mb-6 shrink-0">
+                  <AddFieldButton onAddField={handleAddField} />
+                </div>
+              )}
 
-      <div className="grow overflow-auto">
-        {!hasFields ? (
-          <div className="text-center py-10 text-muted-foreground">
-            <p className="mb-3">{t.visualEditorNoFieldsHint1}</p>
-            <p className="text-sm">{t.visualEditorNoFieldsHint2}</p>
+            </div>
           </div>
-        ) : (
-          <SchemaFieldList
-            schema={schema}
-            readOnly={readOnly}
-            onAddField={handleAddField}
-            onEditField={handleEditField}
-            onDeleteField={handleDeleteField}
-          />
-        )}
-      </div>
+        </AccordionTrigger>
+        <AccordionContent className="p-0">
+          <div className="min-h-[400px] max-h-[1600px] bg-white text-left xdark:bg-surface-dark border-b border-border-light xdark:border-border-dark">
+            <div className="jsonjoy h-full">
+              <div className="p-4 h-full flex flex-col overflow-auto jsonjoy">
+
+
+                <div className="grow overflow-auto">
+                  {!hasFields ? (
+                    <EmptyBlock
+                      className="border-0 pt-16"
+                      title={t.visualEditorNoFieldsHint1}
+                      description={t.visualEditorNoFieldsHint2}
+                    />
+
+                  ) : (
+                    <SchemaFieldList
+                      schema={schema}
+                      readOnly={readOnly}
+                      onAddField={handleAddField}
+                      onEditField={handleEditField}
+                      onDeleteField={handleDeleteField}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+
+
+
+
     </div>
   );
 };

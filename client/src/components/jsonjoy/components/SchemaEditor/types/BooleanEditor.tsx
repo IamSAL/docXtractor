@@ -87,13 +87,16 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
         </p>
       )}
       {(!readOnly || !allowsTrue || !allowsFalse) && (
-        <div className="space-y-2 pt-2">
+        <div className="space-y-4 pt-4 border-t-2 border-black/5">
           {(!readOnly || hasEnum) && (
             <>
-              <Label>{t.booleanAllowedValuesLabel}</Label>
+              <Label className="text-xs font-black uppercase tracking-tight">{t.booleanAllowedValuesLabel}</Label>
 
               <div className="space-y-3">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-between p-3 rounded-xl border-2 border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <Label htmlFor={allowTrueId} className="font-bold cursor-pointer uppercase text-xs">
+                    {t.booleanAllowTrueLabel}
+                  </Label>
                   <Switch
                     id={allowTrueId}
                     checked={allowsTrue}
@@ -102,12 +105,12 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
                       handleAllowedChange(true, checked)
                     }
                   />
-                  <Label htmlFor={allowTrueId} className="cursor-pointer">
-                    {t.booleanAllowTrueLabel}
-                  </Label>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-between p-3 rounded-xl border-2 border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <Label htmlFor={allowFalseId} className="font-bold cursor-pointer uppercase text-xs">
+                    {t.booleanAllowFalseLabel}
+                  </Label>
                   <Switch
                     id={allowFalseId}
                     checked={allowsFalse}
@@ -116,9 +119,6 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
                       handleAllowedChange(false, checked)
                     }
                   />
-                  <Label htmlFor={allowFalseId} className="cursor-pointer">
-                    {t.booleanAllowFalseLabel}
-                  </Label>
                 </div>
               </div>
             </>

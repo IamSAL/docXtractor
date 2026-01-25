@@ -136,7 +136,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
           ))}
         </div>
       ) : (
-        <div className="text-sm text-muted-foreground italic p-2 text-center border rounded-md">
+        <div className="text-sm text-text-secondary-light font-bold uppercase tracking-tight p-8 text-center border-2 border-dashed border-black bg-gray-50/50 rounded-xl">
           {t.objectPropertiesNone}
         </div>
       )}

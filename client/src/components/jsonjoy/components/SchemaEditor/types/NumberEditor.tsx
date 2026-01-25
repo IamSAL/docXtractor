@@ -253,11 +253,12 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
             <div className="space-y-2">
               <Label
                 htmlFor={minimumId}
-                className={
+                className={cn(
+                  "text-xs font-black uppercase tracking-tight",
                   minimum !== undefined &&
                   (!!minMaxError || !!redundantMinError) &&
                   "text-destructive"
-                }
+                )}
               >
                 {t.numberMinimumLabel}
               </Label>
@@ -273,10 +274,10 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
                 }}
                 placeholder={t.numberMinimumPlaceholder}
                 className={cn(
-                  "h-8",
+                  "h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all",
                   minimum !== undefined &&
-                    (!!minMaxError || !!redundantMinError) &&
-                    "border-destructive",
+                  (!!minMaxError || !!redundantMinError) &&
+                  "border-destructive shadow-destructive/20",
                 )}
                 step={integer ? 1 : "any"}
               />
@@ -287,11 +288,12 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
             <div className="space-y-2">
               <Label
                 htmlFor={maximumId}
-                className={
+                className={cn(
+                  "text-xs font-black uppercase tracking-tight",
                   maximum !== undefined &&
                   (!!minMaxError || !!redundantMaxError) &&
                   "text-destructive"
-                }
+                )}
               >
                 {t.numberMaximumLabel}
               </Label>
@@ -307,10 +309,10 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
                 }}
                 placeholder={t.numberMaximumPlaceholder}
                 className={cn(
-                  "h-8",
+                  "h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all",
                   maximum !== undefined &&
-                    (!!minMaxError || !!redundantMaxError) &&
-                    "border-destructive",
+                  (!!minMaxError || !!redundantMaxError) &&
+                  "border-destructive shadow-destructive/20",
                 )}
                 step={integer ? 1 : "any"}
               />
@@ -325,11 +327,12 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
             <div className="space-y-2">
               <Label
                 htmlFor={exclusiveMinimumId}
-                className={
+                className={cn(
+                  "text-xs font-black uppercase tracking-tight",
                   exclusiveMinimum !== undefined &&
                   (!!minMaxError || !!redundantMinError) &&
                   "text-destructive"
-                }
+                )}
               >
                 {t.numberExclusiveMinimumLabel}
               </Label>
@@ -345,10 +348,10 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
                 }}
                 placeholder={t.numberExclusiveMinimumPlaceholder}
                 className={cn(
-                  "h-8",
+                  "h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all",
                   exclusiveMinimum !== undefined &&
-                    (!!minMaxError || !!redundantMinError) &&
-                    "border-destructive",
+                  (!!minMaxError || !!redundantMinError) &&
+                  "border-destructive shadow-destructive/20",
                 )}
                 step={integer ? 1 : "any"}
               />
@@ -359,11 +362,12 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
             <div className="space-y-2">
               <Label
                 htmlFor={exclusiveMaximumId}
-                className={
+                className={cn(
+                  "text-xs font-black uppercase tracking-tight",
                   exclusiveMaximum !== undefined &&
                   (!!minMaxError || !!redundantMaxError) &&
                   "text-destructive"
-                }
+                )}
               >
                 {t.numberExclusiveMaximumLabel}
               </Label>
@@ -379,10 +383,10 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
                 }}
                 placeholder={t.numberExclusiveMaximumPlaceholder}
                 className={cn(
-                  "h-8",
+                  "h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all",
                   exclusiveMaximum !== undefined &&
-                    (!!minMaxError || !!redundantMaxError) &&
-                    "border-destructive",
+                  (!!minMaxError || !!redundantMaxError) &&
+                  "border-destructive shadow-destructive/20",
                 )}
                 step={integer ? 1 : "any"}
               />
@@ -395,7 +399,10 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
         <div className="space-y-2">
           <Label
             htmlFor={multipleOfId}
-            className={!!multipleOfError && "text-destructive"}
+            className={cn(
+              "text-xs font-black uppercase tracking-tight",
+              !!multipleOfError && "text-destructive"
+            )}
           >
             {t.numberMultipleOfLabel}
           </Label>
@@ -408,7 +415,7 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
               handleValidationChange("multipleOf", value);
             }}
             placeholder={t.numberMultipleOfPlaceholder}
-            className={cn("h-8", !!multipleOfError && "border-destructive")}
+            className={cn("h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all", !!multipleOfError && "border-destructive shadow-destructive/20")}
             min={0}
             step={integer ? 1 : "any"}
           />
@@ -421,8 +428,11 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
       )}
 
       {(!readOnly || enumValues.length > 0) && (
-        <div className="space-y-2 pt-2 border-t border-border/40">
-          <Label className={!!enumError && "text-destructive"}>
+        <div className="space-y-4 pt-4 border-t-2 border-black/5">
+          <Label className={cn(
+            "text-xs font-black uppercase tracking-tight",
+            !!enumError && "text-destructive"
+          )}>
             {t.numberAllowedValuesEnumLabel}
           </Label>
 
@@ -431,15 +441,15 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
               enumValues.map((value, index) => (
                 <div
                   key={`enum-number-${value}`}
-                  className="flex items-center bg-muted/40 border rounded-md px-2 py-1 text-xs"
+                  className="flex items-center bg-yellow-50/50 border-2 border-black rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] px-2 py-1 text-xs font-bold"
                 >
-                  <span className="mr-1">{value}</span>
+                  <span className="mr-2">{value}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveEnumValue(index)}
-                    className="text-muted-foreground hover:text-destructive"
+                    className="text-muted-foreground hover:text-red-500 transition-colors flex items-center justify-center translate-y-[0.5px]"
                   >
-                    <X size={12} />
+                    <X size={12} strokeWidth={3} />
                   </button>
                 </div>
               ))
@@ -450,20 +460,20 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Input
               type="number"
               value={enumValue}
               onChange={(e) => setEnumValue(e.target.value)}
               placeholder={t.numberAllowedValuesEnumAddPlaceholder}
-              className="h-8 text-xs flex-1"
+              className="h-10 text-xs flex-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all"
               onKeyDown={(e) => e.key === "Enter" && handleAddEnumValue()}
               step={integer ? 1 : "any"}
             />
             <button
               type="button"
               onClick={handleAddEnumValue}
-              className="px-3 py-1 h-8 rounded-md bg-secondary text-xs font-medium hover:bg-secondary/80"
+              className="px-4 py-2 h-10 rounded border-2 border-black bg-primary text-white text-xs font-black uppercase tracking-tight shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all whitespace-nowrap"
             >
               {t.numberAllowedValuesEnumAddLabel}
             </button>

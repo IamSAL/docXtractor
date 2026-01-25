@@ -109,23 +109,35 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   );
 
   return (
-    <div className="space-y-2 animate-in">
-      {properties.map((property) => (
-        <SchemaPropertyEditor
-          key={property.name}
-          name={property.name}
-          schema={property.schema}
-          required={property.required}
-          validationNode={validationTree.children[property.name] ?? undefined}
-          onDelete={() => onDeleteField(property.name)}
-          onNameChange={(newName) => handleNameChange(property.name, newName)}
-          onRequiredChange={(required) =>
-            handleRequiredChange(property.name, required)
-          }
-          onSchemaChange={(schema) => handleSchemaChange(property.name, schema)}
-          readOnly={readOnly}
-        />
-      ))}
+    <div className="flex flex-col animate-in">
+      {/* Header Row */}
+      <div className="grid grid-cols-[48px_1fr_120px_100px_48px_48px] items-center py-3 px-2 border-b-2 border-black bg-gray-50/50 text-[10px] font-bold uppercase tracking-widest text-text-secondary-light">
+        <div className="text-center">#</div>
+        <div className="px-3">Field / Property</div>
+        <div className="text-center">Type</div>
+        <div className="text-center">Required</div>
+        <div className="text-center">Action</div>
+        <div className="text-center">View</div>
+      </div>
+
+      <div className="overflow-visible divide-y divide-border-light xdark:divide-border-dark border-x border-b border-border-light xdark:border-border-dark overflow-hidden">
+        {properties.map((property) => (
+          <SchemaPropertyEditor
+            key={property.name}
+            name={property.name}
+            schema={property.schema}
+            required={property.required}
+            validationNode={validationTree.children[property.name] ?? undefined}
+            onDelete={() => onDeleteField(property.name)}
+            onNameChange={(newName) => handleNameChange(property.name, newName)}
+            onRequiredChange={(required) =>
+              handleRequiredChange(property.name, required)
+            }
+            onSchemaChange={(schema) => handleSchemaChange(property.name, schema)}
+            readOnly={readOnly}
+          />
+        ))}
+      </div>
     </div>
   );
 };

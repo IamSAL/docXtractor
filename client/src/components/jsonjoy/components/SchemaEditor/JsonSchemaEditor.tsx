@@ -146,24 +146,31 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
       <div
         ref={containerRef}
         className={cn(
-          "hidden lg:flex lg:flex-col w-full",
-          isFullscreen ? "h-screen" : "h-[600px]",
+          "hidden lg:flex lg:flex-col w-full bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden",
+          isFullscreen ? "h-screen fixed inset-0 z-50" : "h-[650px]",
         )}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b w-full shrink-0">
-          <h3 className="font-medium">{t.schemaEditorTitle}</h3>
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-black w-full shrink-0 bg-yellow-50/30">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg border-2 border-black bg-primary flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <span className="material-symbols-outlined text-white text-sm">settings_input_component</span>
+            </div>
+            <h3 className="font-black uppercase tracking-tight text-sm">{t.schemaEditorTitle}</h3>
+          </div>
           <button
             type="button"
             onClick={toggleFullscreen}
-            className="p-1.5 rounded-md hover:bg-secondary transition-colors"
+            className="p-1.5 rounded-lg border-2 border-transparent hover:border-black transition-all hover:bg-white active:translate-y-0.5"
             aria-label={t.schemaEditorToggleFullscreen}
           >
-            <Maximize2 size={16} />
+            <span className="material-symbols-outlined text-lg">
+              {isFullscreen ? "fullscreen_exit" : "fullscreen"}
+            </span>
           </button>
         </div>
         <div className="flex flex-row w-full grow min-h-0">
           <div
-            className="h-full min-h-0"
+            className="h-full min-h-0 overflow-hidden"
             style={{ width: `${leftPanelWidth}%` }}
           >
             <SchemaVisualEditor
@@ -175,11 +182,11 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
           {/** biome-ignore lint/a11y/noStaticElementInteractions: What exactly does this div do? */}
           <div
             ref={resizeRef}
-            className="w-1 bg-border hover:bg-primary cursor-col-resize shrink-0"
+            className="w-1.5 bg-black hover:bg-primary cursor-col-resize shrink-0 transition-colors"
             onMouseDown={handleMouseDown}
           />
           <div
-            className="h-full min-h-0"
+            className="h-full min-h-0 bg-gray-50/50"
             style={{ width: `${100 - leftPanelWidth}%` }}
           >
             <JsonSchemaVisualizer

@@ -139,9 +139,10 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
             <div className="space-y-2">
               <Label
                 htmlFor={minItemsId}
-                className={
+                className={cn(
+                  "text-xs font-black uppercase tracking-tight",
                   (!!minMaxError || !!minItemsError) && "text-destructive"
-                }
+                )}
               >
                 {t.arrayMinimumLabel}
               </Label>
@@ -159,7 +160,10 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
                 }}
                 onBlur={handleValidationChange}
                 placeholder={t.arrayMinimumPlaceholder}
-                className={cn("h-8", !!minMaxError && "border-destructive")}
+                className={cn(
+                  "h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all",
+                  !!minMaxError && "border-destructive shadow-destructive/20"
+                )}
               />
             </div>
           )}
@@ -168,9 +172,10 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
             <div className="space-y-2">
               <Label
                 htmlFor={maxItemsId}
-                className={
+                className={cn(
+                  "text-xs font-black uppercase tracking-tight",
                   (!!minMaxError || !!maxItemsError) && "text-destructive"
-                }
+                )}
               >
                 {t.arrayMaximumLabel}
               </Label>
@@ -188,7 +193,10 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
                 }}
                 onBlur={handleValidationChange}
                 placeholder={t.arrayMaximumPlaceholder}
-                className={cn("h-8", !!minMaxError && "border-destructive")}
+                className={cn(
+                  "h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all",
+                  !!minMaxError && "border-destructive shadow-destructive/20"
+                )}
               />
             </div>
           )}
@@ -203,7 +211,10 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
       )}
 
       {(!readOnly || !!uniqueItems) && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between p-3 rounded-xl border-2 border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <Label htmlFor={uniqueItemsId} className="font-bold cursor-pointer uppercase text-xs">
+            {t.arrayForceUniqueItemsLabel}
+          </Label>
           <Switch
             id={uniqueItemsId}
             checked={uniqueItems}
@@ -212,23 +223,20 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
               onChange(buildValidationProps({ uniqueItems: checked }));
             }}
           />
-          <Label htmlFor={uniqueItemsId} className="cursor-pointer">
-            {t.arrayForceUniqueItemsLabel}
-          </Label>
         </div>
       )}
 
       {/* Array item type editor */}
       <div
         className={cn(
-          "space-y-2 pt-4 border-border/40",
+          "space-y-4 pt-4 border-t-2 border-black/5",
           !readOnly || !!minItems || !!maxItems || !!uniqueItems
-            ? "border-t"
+            ? "border-t-2 border-black/5"
             : null,
         )}
       >
         <div className="flex items-center justify-between mb-4">
-          <Label>{t.arrayItemTypeLabel}</Label>
+          <Label className="text-xs font-black uppercase tracking-tight">{t.arrayItemTypeLabel}</Label>
           <TypeDropdown
             readOnly={readOnly}
             value={itemType}

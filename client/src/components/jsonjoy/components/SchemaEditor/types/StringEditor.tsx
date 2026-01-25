@@ -163,9 +163,10 @@ const StringEditor: React.FC<TypeEditorProps> = ({
           <div className="space-y-2">
             <Label
               htmlFor={minLengthId}
-              className={
+              className={cn(
+                "text-xs font-black uppercase tracking-tight",
                 (!!minMaxError || !!minLengthError) && "text-destructive"
-              }
+              )}
             >
               {t.stringMinimumLengthLabel}
             </Label>
@@ -183,8 +184,8 @@ const StringEditor: React.FC<TypeEditorProps> = ({
               }}
               placeholder={t.stringMinimumLengthPlaceholder}
               className={cn(
-                "h-8",
-                (!!minMaxError || !!minLengthError) && "border-destructive",
+                "h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all",
+                (!!minMaxError || !!minLengthError) && "border-destructive shadow-destructive/20",
               )}
             />
           </div>
@@ -194,9 +195,10 @@ const StringEditor: React.FC<TypeEditorProps> = ({
           <div className="space-y-2">
             <Label
               htmlFor={maxLengthId}
-              className={
+              className={cn(
+                "text-xs font-black uppercase tracking-tight",
                 (!!minMaxError || !!maxLengthError) && "text-destructive"
-              }
+              )}
             >
               {t.stringMaximumLengthLabel}
             </Label>
@@ -214,8 +216,8 @@ const StringEditor: React.FC<TypeEditorProps> = ({
               }}
               placeholder={t.stringMaximumLengthPlaceholder}
               className={cn(
-                "h-8",
-                (!!minMaxError || !!maxLengthError) && "border-destructive",
+                "h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all",
+                (!!minMaxError || !!maxLengthError) && "border-destructive shadow-destructive/20",
               )}
             />
           </div>
@@ -233,7 +235,10 @@ const StringEditor: React.FC<TypeEditorProps> = ({
         <div className="space-y-2">
           <Label
             htmlFor={patternId}
-            className={!!patternError && "text-destructive"}
+            className={cn(
+              "text-xs font-black uppercase tracking-tight",
+              !!patternError && "text-destructive"
+            )}
           >
             {t.stringPatternLabel}
           </Label>
@@ -246,7 +251,7 @@ const StringEditor: React.FC<TypeEditorProps> = ({
               handleValidationChange("pattern", value);
             }}
             placeholder={t.stringPatternPlaceholder}
-            className="h-8"
+            className="h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all"
           />
         </div>
       )}
@@ -255,7 +260,10 @@ const StringEditor: React.FC<TypeEditorProps> = ({
         <div className="space-y-2">
           <Label
             htmlFor={formatId}
-            className={!!formatError && "text-destructive"}
+            className={cn(
+              "text-xs font-black uppercase tracking-tight",
+              !!formatError && "text-destructive"
+            )}
           >
             {t.stringFormatLabel}
           </Label>
@@ -268,7 +276,7 @@ const StringEditor: React.FC<TypeEditorProps> = ({
               );
             }}
           >
-            <SelectTrigger id={formatId} className="h-8">
+            <SelectTrigger id={formatId} className="h-9 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:ring-0 focus:shadow-none bg-white">
               <SelectValue placeholder={t.stringFormatSelectPlaceholder} />
             </SelectTrigger>
             <SelectContent>
@@ -291,24 +299,23 @@ const StringEditor: React.FC<TypeEditorProps> = ({
 
       {(!readOnly || enumValues.length > 0) && (
         <div className="space-y-2 pt-2 border-t border-border/40">
-          <Label>{t.stringAllowedValuesEnumLabel}</Label>
-
+          <Label className="text-xs font-black uppercase tracking-tight">{t.stringAllowedValuesEnumLabel}</Label>
           <div className="flex flex-wrap gap-2 mb-4">
             {enumValues.length > 0 ? (
               enumValues.map((value) => (
                 <div
                   key={`enum-string-${value}`}
-                  className="flex items-center bg-muted/40 border rounded-md px-2 py-1 text-xs"
+                  className="flex items-center bg-yellow-50/50 border-2 border-black rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] px-2 py-1 text-xs font-bold"
                 >
-                  <span className="mr-1">{value}</span>
+                  <span className="mr-2">{value}</span>
                   <button
                     type="button"
                     onClick={() =>
                       handleRemoveEnumValue(enumValues.indexOf(value))
                     }
-                    className="text-muted-foreground hover:text-destructive"
+                    className="text-muted-foreground hover:text-red-500 transition-colors flex items-center justify-center translate-y-[0.5px]"
                   >
-                    <X size={12} />
+                    <X size={12} strokeWidth={3} />
                   </button>
                 </div>
               ))
@@ -319,19 +326,19 @@ const StringEditor: React.FC<TypeEditorProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Input
               type="text"
               value={enumValue}
               onChange={(e) => setEnumValue(e.target.value)}
               placeholder={t.stringAllowedValuesEnumAddPlaceholder}
-              className="h-8 text-xs flex-1"
+              className="h-10 text-xs flex-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-none transition-all"
               onKeyDown={(e) => e.key === "Enter" && handleAddEnumValue()}
             />
             <button
               type="button"
               onClick={handleAddEnumValue}
-              className="px-3 py-1 h-8 rounded-md bg-secondary text-xs font-medium hover:bg-secondary/80"
+              className="px-4 py-2 h-10 rounded border-2 border-black bg-primary text-white text-xs font-black uppercase tracking-tight shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all whitespace-nowrap"
             >
               {t.stringAllowedValuesEnumAddLabel}
             </button>

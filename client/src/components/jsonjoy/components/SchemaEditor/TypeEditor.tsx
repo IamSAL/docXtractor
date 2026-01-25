@@ -38,7 +38,7 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
   );
 
   return (
-    <Suspense fallback={<div>{t.schemaEditorLoading}</div>}>
+    <Suspense fallback={<div className="py-4 text-center text-xs font-bold uppercase tracking-widest text-text-secondary-light">{t.schemaEditorLoading}</div>}>
       {type === "string" && (
         <StringEditor
           readOnly={readOnly}

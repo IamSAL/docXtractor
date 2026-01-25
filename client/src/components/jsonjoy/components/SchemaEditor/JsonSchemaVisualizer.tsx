@@ -1,5 +1,5 @@
 import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react";
-import { Download, FileJson, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { type FC, useRef } from "react";
 import { useMonacoTheme } from "../../hooks/use-monaco-theme.ts";
 import { useTranslation } from "../../hooks/use-translation.ts";
@@ -68,25 +68,26 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
   return (
     <div
       className={cn(
-        "relative overflow-hidden h-full flex flex-col",
+        "relative overflow-hidden h-full flex flex-col border-l border-black",
         className,
         "jsonjoy",
       )}
     >
-      <div className="flex items-center justify-between bg-secondary/80 backdrop-blur-xs px-4 py-2 border-b shrink-0">
+      <div className="flex items-center justify-between bg-gray-50 px-4 py-2 border-b-2 border-black shrink-0">
         <div className="flex items-center gap-2">
-          <FileJson size={18} />
-          <span className="font-medium text-sm">{t.visualizerSource}</span>
+          <span className="material-symbols-outlined text-lg">code</span>
+          <span className="font-bold text-xs uppercase tracking-tight">{t.visualizerSource}</span>
         </div>
         <button
           type="button"
           onClick={handleDownload}
-          className="p-1.5 hover:bg-secondary rounded-md transition-colors"
+          className="p-1.5 rounded-lg border-2 border-transparent hover:border-black hover:bg-white transition-all active:translate-y-0.5"
           title={t.visualizerDownloadTitle}
         >
-          <Download size={16} />
+          <span className="material-symbols-outlined text-lg text-black">download</span>
         </button>
       </div>
+
       <div className="grow flex min-h-0">
         <Editor
           height="100%"
