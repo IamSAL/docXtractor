@@ -1,5 +1,20 @@
-import { Body, Controller, Get, Ip, Post, Req, Res } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Ip,
+  Post,
+  Req,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import { Roles } from 'src/auth/decorators/roles.decorators';
 import { Role } from 'src/auth/enums/role.enum';
@@ -8,6 +23,7 @@ import { CreateChatDto } from './dto/create-chat.dto';
 import { RequestWithUser } from 'src/shared/types/request.types';
 import { Public } from 'src/auth/decorators/public.decorators';
 
+@ApiTags('Chat')
 @Controller('chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
@@ -15,6 +31,9 @@ export class ChatController {
   @Post()
   @ApiBearerAuth()
   @Roles(Role.DOCTOR, Role.PATIENT, Role.PHARMACIST, Role.ADMIN)
+  @ApiOperation({ summary: 'Send a message to the AI chat' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Streamed AI response' })
+  @ApiBody({ type: CreateChatDto })
   async create(
     @Body() createChatDto: CreateChatDto,
     @Ip() userIp: string,
@@ -36,6 +55,8 @@ export class ChatController {
 
   @Public()
   @Get()
+  @ApiOperation({ summary: 'Test the AI model connectivity' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Model test successful' })
   async test() {
     await this.chatService.testModel();
   }
