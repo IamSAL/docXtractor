@@ -6,13 +6,6 @@ import {
   otpEmailProps,
   ResetPasswordEmail,
 } from './templates/mail.templates';
-import {
-  appointmentCancelledEmail,
-  appointmentCreatedEmail,
-  appointmentReminderEmail,
-  prescriptionEmail,
-} from './templates/appointment.templates';
-import { orderEmail } from './templates/order-email';
 
 @Injectable()
 export class MailService {
@@ -57,102 +50,10 @@ export class MailService {
     html: string,
   ): Promise<nodemailer.SentMessageInfo> {
     return this.transporter.sendMail({
-      from: `"DocXtractor Medic - Your Health Our Pride" <${this.configService.get('MAIL_USER')}>`,
+      from: `"DocXtractor - AI Document Processing" <${this.configService.get('MAIL_USER')}>`,
       to,
       subject,
       html,
     });
-  }
-  async sendAppointmentCreated(
-    to: string,
-    props: {
-      patientName: string;
-      doctorName: string;
-      appointmentTime: string;
-      meetingLink?: string;
-    },
-  ): Promise<nodemailer.SentMessageInfo> {
-    const html = appointmentCreatedEmail(props);
-    return this.sendEmail(to, 'Your Appointment is Confirmed', html);
-  }
-
-  async sendAppointmentReminder(
-    to: string,
-    props: {
-      patientName: string;
-      doctorName: string;
-      appointmentTime: string;
-      meetingLink?: string;
-    },
-  ): Promise<nodemailer.SentMessageInfo> {
-    const html = appointmentReminderEmail(props);
-    return this.sendEmail(to, 'Appointment Reminder', html);
-  }
-
-  async sendAppointmentCancelled(
-    email: string,
-    data: {
-      patientName: string;
-      doctorName: string;
-      appointmentTime: string;
-      reason: string;
-      refundMessage?: string;
-      isDoctor?: boolean;
-    },
-  ): Promise<void> {
-    const html = appointmentCancelledEmail({
-      ...data,
-      companyName: 'DocXtractor Medic',
-    });
-
-    await this.sendEmail(
-      email,
-      data.isDoctor
-        ? 'Appointment Cancellation Notification'
-        : 'Your Appointment Has Been Cancelled',
-      html,
-    );
-  }
-  async sendPrescriptionEmail(
-    email: string,
-    data: {
-      patientName: string;
-      doctorName: string;
-      items: Array<{
-        name: string;
-        dosage: string;
-        frequency: string;
-        instructions?: string;
-      }>;
-      issueDate: string;
-      expiryDate: string;
-      action: 'created' | 'updated' | 'fulfilled';
-    },
-  ) {
-    const html = prescriptionEmail({
-      patientName: data.patientName,
-      doctorName: data.doctorName,
-      items: data.items,
-      issueDate: data.issueDate,
-      expiryDate: data.expiryDate,
-      action: data.action,
-    });
-
-    await this.sendEmail(
-      email,
-      `Prescription ${data.action === 'created' ? 'Created' : data.action === 'updated' ? 'Updated' : 'Fulfilled'}`,
-      html,
-    );
-  }
-  async sendOrderEmail(email: string, data: Parameters<typeof orderEmail>[0]) {
-    const html = orderEmail(data);
-
-    await this.sendEmail(
-      email,
-      data.action
-        ? `Order ${data.action.charAt(0).toUpperCase() + data.action.slice(1)}`
-        : 'Order Update',
-      html,
-    );
   }
 }

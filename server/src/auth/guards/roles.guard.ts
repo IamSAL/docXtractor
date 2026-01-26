@@ -6,14 +6,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorators';
-import { ContactHelper } from 'src/shared/helpers/contact.helper';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector,
-    private readonly contactHelper: ContactHelper,
-  ) {}
+  constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const acceptedRoles = this.reflector.getAllAndOverride<string[]>(
@@ -39,10 +35,7 @@ export class RolesGuard implements CanActivate {
     );
 
     if (!hasPermission) {
-      const contact = this.contactHelper.getContactInfo(acceptedRoles[0]);
-      throw new ForbiddenException(
-        `Contact ${contact} for access to this resource`,
-      );
+      throw new ForbiddenException('Access denied. Please contact support.');
     }
 
     return true;

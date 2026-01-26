@@ -257,7 +257,7 @@ function LandingPage() {
             </h2>
           </ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            <div className="hidden md:block absolute top-1/2 left-[30%] right-[30%] h-1 bg-black -translate-y-1/2 z-0"></div>
+            {/* <div className="hidden md:block absolute top-1/2 left-[30%] right-[30%] h-1 bg-black -translate-y-1/2 z-0"></div> */}
 
             <ScrollReveal delay="0.1s" className="z-10 h-full">
               <div className="flex flex-col items-center gap-6 bg-white border-[3px] border-black p-8 neo-shadow h-full">
