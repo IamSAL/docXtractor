@@ -114,8 +114,8 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   return (
     <div>
       <AccordionItem value="schema" className="bg-white xdark:bg-surface-dark rounded-xl shadow-subtle border border-border-light xdark:border-border-dark overflow-hidden flex flex-col border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <AccordionTrigger className="px-6 py-5 border-b border-border-light xdark:border-border-dark hover:bg-gray-50  transition-colors hover:no-underline text-lg">
-          <div className="flex flex-1 items-center justify-between mr-4">
+        <div className="flex items-center justify-between border-b border-border-light xdark:border-border-dark pr-4">
+          <AccordionTrigger className="flex-1 px-6 py-5 hover:bg-gray-50 transition-colors hover:no-underline text-lg border-none">
             <div className="flex flex-col text-left">
               <h3 className="font-bold flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">
@@ -127,16 +127,15 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
                 Define the data points to be extracted from the documents.
               </p>
             </div>
-            <div onClick={(e) => e.stopPropagation()}>
-              {!readOnly && (
-                <div className="mb-6 shrink-0">
-                  <AddFieldButton onAddField={handleAddField} />
-                </div>
-              )}
-
-            </div>
+          </AccordionTrigger>
+          <div onClick={(e) => e.stopPropagation()}>
+            {!readOnly && (
+              <div className="shrink-0 mb-0">
+                <AddFieldButton onAddField={handleAddField} />
+              </div>
+            )}
           </div>
-        </AccordionTrigger>
+        </div>
         <AccordionContent className="p-0">
           <div className="min-h-[400px] max-h-[1600px] bg-white text-left xdark:bg-surface-dark border-b border-border-light xdark:border-border-dark">
             <div className="jsonjoy h-full">

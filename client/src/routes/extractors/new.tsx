@@ -155,7 +155,7 @@ function NewExtractorComponent() {
                             {/* Basic Information Section */}
                             <AccordionItem
                                 value="basic"
-                                className="bg-white xdark:bg-surface-dark rounded-xl shadow-subtle border border-border-light xdark:border-border-dark overflow-hidden border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                                className="bg-white xdark:bg-surface-dark rounded-xl shadow-subtle border-border-light xdark:border-border-dark overflow-hidden border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                             >
                                 <AccordionTrigger className="px-6 py-5 border-b border-border-light xdark:border-border-dark hover:bg-gray-50 transition-colors hover:no-underline text-lg">
                                     <h3 className="font-bold flex items-center gap-2">
@@ -164,7 +164,7 @@ function NewExtractorComponent() {
                                     </h3>
                                 </AccordionTrigger>
                                 <AccordionContent className="p-0">
-                                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="p-6 grid grid-cols-1 gap-6">
                                         <div className="flex flex-col gap-2">
                                             <label className="text-sm font-semibold text-text-main-light xdark:text-text-secondary-dark">
                                                 Extractor Name
@@ -184,43 +184,75 @@ function NewExtractorComponent() {
                                                 )}
                                             />
                                         </div>
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-sm font-semibold text-text-main-light xdark:text-text-secondary-dark">
-                                                Document Type
-                                            </label>
-                                            <Controller
-                                                name="documentType"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <div className="relative">
-                                                        <select
+
+                                        <div className="grid grid-cols-2 gap-6 items-start">
+                                            <div className="flex flex-col gap-2">
+                                                <label className="text-sm font-semibold text-text-main-light xdark:text-text-secondary-dark">
+                                                    Description
+                                                </label>
+                                                <Controller
+                                                    name="description"
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <Textarea
                                                             {...field}
-                                                            className="w-full bg-white border-2 border-black rounded px-4 py-3 h-12 text-black font-medium placeholder-gray-500 focus:outline-none focus:ring-0 focus:bg-yellow-50 focus:border-black transition-all shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-hard focus:shadow-hard focus:-translate-x-0.5 focus:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
-                                                        >
-                                                            <option value="invoice">Invoice (PDF/Image)</option>
-                                                            <option value="receipt">Receipt</option>
-                                                            <option value="contract">Contract</option>
-                                                            <option value="bank_statement">Bank Statement</option>
-                                                        </select>
-                                                    </div>
-                                                )}
-                                            />
-                                        </div>
-                                        <div className="flex flex-col gap-2 md:col-span-2">
-                                            <label className="text-sm font-semibold text-text-main-light xdark:text-text-secondary-dark">
-                                                Description
-                                            </label>
-                                            <Controller
-                                                name="description"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Textarea
-                                                        {...field}
-                                                        rows={2}
-                                                        placeholder="Describe what this extractor extracts..."
-                                                    />
-                                                )}
-                                            />
+                                                            className="h-32 resize-none"
+                                                            placeholder="Describe what this extractor extracts..."
+                                                        />
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-2">
+                                                <label className="text-sm font-semibold text-text-main-light xdark:text-text-secondary-dark">
+                                                    Thumbnail
+                                                </label>
+                                                <Controller
+                                                    name="thumbnailUrl"
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <div className="relative group">
+                                                            <div
+                                                                onClick={() => document.getElementById('thumbnail-upload')?.click()}
+                                                                className="w-full h-32 border-2 border-black border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-yellow-50 transition-colors relative overflow-hidden"
+                                                            >
+                                                                {field.value ? (
+                                                                    <>
+                                                                        <img
+                                                                            src={field.value}
+                                                                            alt="Thumbnail preview"
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                                            <span className="text-white font-bold text-sm">Change Image</span>
+                                                                        </div>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <span className="material-symbols-outlined text-gray-400 text-3xl mb-1">add_a_photo</span>
+                                                                        <span className="text-xs font-bold text-gray-500 uppercase">Upload Thumbnail</span>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                            <input
+                                                                id="thumbnail-upload"
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                onChange={(e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (file) {
+                                                                        const reader = new FileReader();
+                                                                        reader.onloadend = () => {
+                                                                            field.onChange(reader.result as string);
+                                                                        };
+                                                                        reader.readAsDataURL(file);
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </AccordionContent>
@@ -236,7 +268,7 @@ function NewExtractorComponent() {
                             {/* Advanced Options Section */}
                             <AccordionItem
                                 value="advanced"
-                                className="bg-white xdark:bg-surface-dark rounded-xl shadow-subtle border border-border-light xdark:border-border-dark overflow-hidden border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                                className="bg-white xdark:bg-surface-dark rounded-xl shadow-subtle border-border-light xdark:border-border-dark overflow-hidden border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                             >
                                 <AccordionTrigger className="px-6 py-5 border-b border-border-light xdark:border-border-dark hover:bg-gray-50 transition-colors hover:no-underline text-lg">
                                     <div className="flex flex-1 items-center justify-between mr-4">

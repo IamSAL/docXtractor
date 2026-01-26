@@ -52,32 +52,60 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
         onChange(examples.filter(ex => ex.id !== id));
     };
 
+    const updateSource = (exampleId: string, sourceId: string, updates: Partial<Source>) => {
+        const example = examples.find(e => e.id === exampleId);
+        if (!example) return;
+        updateExample(exampleId, {
+            sources: example.sources.map(s => s.id === sourceId ? { ...s, ...updates } : s)
+        });
+    };
+
     const addSource = (exampleId: string, type: SourceType) => {
         const example = examples.find(e => e.id === exampleId);
         if (!example) return;
 
-        let newSource: Source;
         if (type === 'file') {
-            // Mock file upload
-            newSource = {
-                id: crypto.randomUUID(),
-                type: 'file',
-                name: 'New_Document.pdf',
-                description: '0 KB • Uploaded'
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.onchange = (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const newSource: Source = {
+                            id: crypto.randomUUID(),
+                            type: 'file',
+                            name: file.name,
+                            description: `${(file.size / 1024).toFixed(1)} KB`,
+                            content: reader.result as string
+                        };
+                        updateExample(exampleId, {
+                            sources: [...example.sources, newSource]
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
             };
-        } else if (type === 'url') {
+            input.click();
+            return;
+        }
+
+        let newSource: Source;
+        if (type === 'url') {
             newSource = {
                 id: crypto.randomUUID(),
                 type: 'url',
-                name: 'https://example.com',
-                description: 'URL • Validated'
+                name: '',
+                description: 'Enter URL',
+                content: ''
             };
         } else {
             newSource = {
                 id: crypto.randomUUID(),
                 type: 'text',
                 name: 'Text Snippet',
-                description: 'Raw text'
+                description: 'Enter text',
+                content: ''
             };
         }
 
@@ -95,7 +123,7 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
     }
 
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3" id="few-shot-examples">
             <div className="flex items-center justify-between">
                 <label className="text-sm font-semibold text-text-main-light xdark:text-text-secondary-dark">
                     Few-Shot Examples
@@ -105,20 +133,21 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
             <Accordion type="multiple" defaultValue={examples.map(e => e.id)} className="flex flex-col gap-4">
                 {examples.map((example) => (
                     <AccordionItem key={example.id} value={example.id} className="border-2 border-black rounded-lg overflow-hidden bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                        <AccordionTrigger className="px-6 py-4 font-bold hover:bg-yellow-50 hover:no-underline data-[state=open]:bg-yellow-50 data-[state=open]:border-b-2 data-[state=open]:border-black">
-                            <div className="flex flex-1 items-center justify-between mr-4">
+                        <div className="flex items-center justify-between bg-white data-[state=open]:bg-yellow-50 border-b-2 border-black transition-colors">
+                            <AccordionTrigger className="flex-1 px-6 py-4 font-bold hover:bg-yellow-50/50 hover:no-underline border-none data-[state=open]:border-none">
                                 <span>{example.name}</span>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeExample(example.id);
-                                    }}
-                                    className="text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded hover:bg-red-50"
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        </AccordionTrigger>
+                            </AccordionTrigger>
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeExample(example.id);
+                                }}
+                                className="text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded hover:bg-red-50 mr-8 z-10"
+                            >
+                                Remove
+                            </button>
+                        </div>
                         <AccordionContent className="p-0 bg-white">
                             <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {/* Left Side: Sources */}
@@ -146,33 +175,55 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
                                             No sources added. <br /> Add a file, URL, or text to provide context.
                                         </div>
                                     ) : (
-                                        <div className="border-2 border-black rounded bg-white overflow-hidden shadow-neobrutalism-sm flex flex-col">
+                                        <div className="flex flex-col gap-3">
                                             {example.sources.map((source) => (
-                                                <div key={source.id} className="flex items-center justify-between p-3 border-b-2 last:border-b-0 border-black bg-white hover:bg-primary/5 transition-colors group">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-9 h-9 rounded-sm border-2 border-black flex items-center justify-center ${source.type === 'file' ? 'bg-blue-50' :
-                                                            source.type === 'url' ? 'bg-purple-50' : 'bg-yellow-50'
-                                                            }`}>
-                                                            <span className="material-symbols-outlined text-lg">
-                                                                {source.type === 'file' ? 'description' :
-                                                                    source.type === 'url' ? 'link' : 'text_fields'}
-                                                            </span>
+                                                <div key={source.id} className="border-2 border-black rounded bg-white overflow-hidden shadow-neobrutalism-sm flex flex-col">
+                                                    <div className="flex items-center justify-between p-3 border-b-2 last:border-b-0 border-black bg-white hover:bg-primary/5 transition-colors group">
+                                                        <div className="flex items-center gap-3 w-full">
+                                                            <div className={`shrink-0 w-9 h-9 rounded-sm border-2 border-black flex items-center justify-center ${source.type === 'file' ? 'bg-blue-50' :
+                                                                source.type === 'url' ? 'bg-purple-50' : 'bg-yellow-50'
+                                                                }`}>
+                                                                <span className="material-symbols-outlined text-lg">
+                                                                    {source.type === 'file' ? 'description' :
+                                                                        source.type === 'url' ? 'link' : 'text_fields'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex flex-col w-full min-w-0">
+                                                                {source.type === 'url' ? (
+                                                                    <input
+                                                                        type="text"
+                                                                        value={source.name}
+                                                                        onChange={(e) => updateSource(example.id, source.id, { name: e.target.value })}
+                                                                        placeholder="https://example.com/doc.pdf"
+                                                                        className="w-full bg-transparent border-none p-0 font-bold text-sm leading-tight text-black focus:ring-0 placeholder:text-gray-400"
+                                                                    />
+                                                                ) : (
+                                                                    <span className="font-bold text-sm leading-tight text-black line-clamp-1 break-all">
+                                                                        {source.name}
+                                                                    </span>
+                                                                )}
+                                                                <span className="text-[10px] uppercase font-bold text-gray-400">
+                                                                    {source.description}
+                                                                </span>
+                                                            </div>
                                                         </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="font-bold text-sm leading-tight text-black line-clamp-1 break-all">
-                                                                {source.name}
-                                                            </span>
-                                                            <span className="text-[10px] uppercase font-bold text-gray-400">
-                                                                {source.description}
-                                                            </span>
-                                                        </div>
+                                                        <button
+                                                            onClick={() => removeSource(example.id, source.id)}
+                                                            className="opacity-0 group-hover:opacity-100 w-8 h-8 flex items-center justify-center hover:bg-black hover:text-white rounded border border-transparent transition-all shrink-0 ml-2"
+                                                        >
+                                                            <span className="material-symbols-outlined text-lg">delete</span>
+                                                        </button>
                                                     </div>
-                                                    <button
-                                                        onClick={() => removeSource(example.id, source.id)}
-                                                        className="opacity-0 group-hover:opacity-100 w-8 h-8 flex items-center justify-center hover:bg-black hover:text-white rounded border border-transparent transition-all"
-                                                    >
-                                                        <span className="material-symbols-outlined text-lg">delete</span>
-                                                    </button>
+                                                    {source.type === 'text' && (
+                                                        <div className="p-3 bg-gray-50 border-t-2 border-black">
+                                                            <Textarea
+                                                                value={source.content}
+                                                                onChange={(e) => updateSource(example.id, source.id, { content: e.target.value })}
+                                                                placeholder="Paste context text here..."
+                                                                className="text-xs min-h-[100px] bg-white border-2 border-black focus:border-primary"
+                                                            />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>

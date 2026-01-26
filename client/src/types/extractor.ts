@@ -4,7 +4,7 @@ import type { FewShotExample } from '@/components/extractors/FewShotExamples'
 export interface ExtractorFormData {
   // Basic Information
   name: string
-  documentType: string
+  thumbnailUrl?: string
   description: string
 
   // Field Schema
@@ -32,7 +32,7 @@ export interface ExtractorFormData {
 
 export const defaultExtractorFormValues: ExtractorFormData = {
   name: 'Standard Invoice Processor',
-  documentType: 'invoice',
+  thumbnailUrl: '',
   description: 'Extracts total, date, vendor address, and line items from standard PDF invoices.',
   schema: {
     type: 'object',
