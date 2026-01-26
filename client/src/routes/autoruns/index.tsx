@@ -18,7 +18,7 @@ function AutoRunsComponent() {
                 <PageHeader
                     heading="AutoRuns"
                     description="Manage and monitor your extraction workflows."
-                    breadcrumb="/ HOME / PIPELINES"
+                    breadcrumb="/ HOME / EXTRACTORS"
                 >
 
                     <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide bg-white">
@@ -54,7 +54,7 @@ function AutoRunsComponent() {
                             <option>Paused</option>
                             <option>Draft</option>
                         </select>
-                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+
                     </div>
                 </div>
 

@@ -13,19 +13,19 @@ import { Tooltip, TooltipProvider } from '@/components/retroui/Tooltip'
 import { useState } from 'react'
 import SchemaVisualEditor from '@/components/jsonjoy/components/SchemaEditor/SchemaVisualEditor'
 import '@/components/jsonjoy/index.css'
-import { FewShotExamples } from '@/components/pipelines/FewShotExamples'
-import { ExtractionSettings } from '@/components/pipelines/ExtractionSettings'
+import { FewShotExamples } from '@/components/extractors/FewShotExamples'
+import { ExtractionSettings } from '@/components/extractors/ExtractionSettings'
 import { useForm, Controller } from 'react-hook-form'
-import type { PipelineFormData } from '@/types/pipeline'
-import { defaultPipelineFormValues } from '@/types/pipeline'
-import { createPipeline, testPipeline } from '@/api/pipelines'
+import type { ExtractorFormData } from '@/types/extractor'
+import { defaultExtractorFormValues } from '@/types/extractor'
+import { createExtractor, testExtractor } from '@/api/extractors'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute('/pipelines/new')({
-    component: NewPipelineComponent,
+export const Route = createFileRoute('/extractors/new')({
+    component: NewExtractorComponent,
 })
 
-function NewPipelineComponent() {
+function NewExtractorComponent() {
     const navigate = useNavigate()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isTesting, setIsTesting] = useState(false)
@@ -37,8 +37,8 @@ function NewPipelineComponent() {
         watch,
         setValue,
         formState: { errors, isDirty },
-    } = useForm<PipelineFormData>({
-        defaultValues: defaultPipelineFormValues,
+    } = useForm<ExtractorFormData>({
+        defaultValues: defaultExtractorFormValues,
     })
 
     // Watch schema and fewShotExamples for the visual editors
@@ -46,19 +46,19 @@ function NewPipelineComponent() {
     const fewShotExamples = watch('fewShotExamples')
 
     // Form submission handler
-    const onSubmit = async (data: PipelineFormData) => {
+    const onSubmit = async (data: ExtractorFormData) => {
         setIsSubmitting(true)
         try {
-            const response = await createPipeline(data)
-            toast.success('Pipeline created successfully!', {
-                description: `Pipeline ID: ${response.id}`,
+            const response = await createExtractor(data)
+            toast.success('Extractor created successfully!', {
+                description: `Extractor ID: ${response.id}`,
                 duration: 5000,
             })
             console.log('✅ Form submitted successfully:', response)
-            // Navigate to pipelines list or detail page
-            // navigate({ to: '/pipelines' })
+            // Navigate to extractors list or detail page
+            // navigate({ to: '/extractors' })
         } catch (error) {
-            toast.error('Failed to create pipeline', {
+            toast.error('Failed to create extractor', {
                 description: error instanceof Error ? error.message : 'Unknown error occurred',
             })
             console.error('❌ Form submission error:', error)
@@ -72,7 +72,7 @@ function NewPipelineComponent() {
         setIsTesting(true)
         try {
             const formData = watch()
-            const result = await testPipeline(formData)
+            const result = await testExtractor(formData)
             toast.success('Test run completed!', {
                 description: `Processing time: ${result.processingTime}s`,
                 duration: 5000,
@@ -90,7 +90,7 @@ function NewPipelineComponent() {
 
     // Reset to default system prompt
     const handleResetPrompt = () => {
-        setValue('systemPrompt', defaultPipelineFormValues.systemPrompt, { shouldDirty: true })
+        setValue('systemPrompt', defaultExtractorFormValues.systemPrompt, { shouldDirty: true })
         toast.info('System prompt reset to default')
     }
 
@@ -104,11 +104,11 @@ function NewPipelineComponent() {
                     <div className="flex flex-wrap justify-between items-end gap-4">
                         <div className="flex flex-col gap-1">
                             <h2 className="text-3xl font-black tracking-tight text-text-main-light xdark:text-white leading-none">
-                                New Pipeline
+                                New Extractor
                             </h2>
                             <p className="text-sm text-text-secondary-light xdark:text-text-secondary-dark flex items-center gap-1">
                                 <span className="material-symbols-outlined text-[16px]">add_circle</span>
-                                Create a new extraction pipeline
+                                Create a new extraction extractor
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
@@ -116,7 +116,7 @@ function NewPipelineComponent() {
                                 type="button"
                                 variant="link"
                                 className="text-text-secondary-light hover:text-red-500"
-                                onClick={() => navigate({ to: '/pipelines' })}
+                                onClick={() => navigate({ to: '/extractors' })}
                             >
                                 Cancel
                             </Button>
@@ -139,7 +139,7 @@ function NewPipelineComponent() {
                                 <span className="material-symbols-outlined text-[18px] filled mr-2">
                                     {isSubmitting ? 'hourglass_empty' : 'save'}
                                 </span>
-                                {isSubmitting ? 'Saving...' : 'Save Pipeline'}
+                                {isSubmitting ? 'Saving...' : 'Save Extractor'}
                             </Button>
                         </div>
                     </div>
@@ -167,13 +167,13 @@ function NewPipelineComponent() {
                                     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="flex flex-col gap-2">
                                             <label className="text-sm font-semibold text-text-main-light xdark:text-text-secondary-dark">
-                                                Pipeline Name
+                                                Extractor Name
                                                 <span className="text-red-500 ml-1">*</span>
                                             </label>
                                             <Controller
                                                 name="name"
                                                 control={control}
-                                                rules={{ required: 'Pipeline name is required' }}
+                                                rules={{ required: 'Extractor name is required' }}
                                                 render={({ field }) => (
                                                     <>
                                                         <Input {...field} placeholder="e.g., Invoice Processor" />
@@ -217,7 +217,7 @@ function NewPipelineComponent() {
                                                     <Textarea
                                                         {...field}
                                                         rows={2}
-                                                        placeholder="Describe what this pipeline extracts..."
+                                                        placeholder="Describe what this extractor extracts..."
                                                     />
                                                 )}
                                             />
@@ -287,7 +287,7 @@ function NewPipelineComponent() {
                                                     Extraction Settings
                                                 </label>
                                                 <span className="text-xs text-text-sub italic">
-                                                    Override global defaults for this pipeline
+                                                    Override global defaults for this extractor
                                                 </span>
                                             </div>
                                             <ExtractionSettings showHeader={false} control={control} />
@@ -308,7 +308,7 @@ function NewPipelineComponent() {
                                 className="text-accent-red hover:text-red-700 hover:bg-red-50"
                             >
                                 <span className="material-symbols-outlined text-[18px] mr-1">delete</span>
-                                Delete Pipeline
+                                Delete Extractor
                             </Button>
                         </div>
                         <div className="flex items-center gap-4">
@@ -321,7 +321,7 @@ function NewPipelineComponent() {
                                 <span className="material-symbols-outlined text-[20px] filled mr-2">
                                     {isSubmitting ? 'hourglass_empty' : 'save'}
                                 </span>
-                                {isSubmitting ? 'SAVING...' : 'SAVE PIPELINE'}
+                                {isSubmitting ? 'SAVING...' : 'SAVE EXTRACTOR'}
                             </Button>
                         </div>
                     </div>

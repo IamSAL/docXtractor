@@ -35,7 +35,7 @@ import {
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Roles(Role.ADMIN, Role.PATIENT, Role.PHARMACIST, Role.DOCTOR)
+  @Roles(Role.ADMIN, Role.USER)
   @Post('push/test')
   @ApiOperation({
     summary: 'Send a test push notification to the current user',
@@ -90,7 +90,7 @@ export class NotificationController {
     return this.notificationService.unsubscribeFromPush(userId, endpoint);
   }
 
-  @Roles(Role.ADMIN, Role.PATIENT, Role.PHARMACIST, Role.DOCTOR)
+  @Roles(Role.ADMIN, Role.USER)
   @Post('whatsapp')
   @ApiOperation({ summary: 'Send a WhatsApp notification' })
   @ApiResponse({
@@ -110,7 +110,7 @@ export class NotificationController {
     );
   }
 
-  @Roles(Role.ADMIN, Role.PATIENT, Role.PHARMACIST, Role.DOCTOR)
+  @Roles(Role.ADMIN, Role.USER)
   @Post('bulk')
   @ApiOperation({ summary: 'Send bulk notifications via Pusher' })
   @ApiResponse({
@@ -134,7 +134,7 @@ export class NotificationController {
     return this.notificationService.triggerPusherEvents(userIds, dto);
   }
 
-  @Roles(Role.ADMIN, Role.PATIENT, Role.PHARMACIST, Role.DOCTOR)
+  @Roles(Role.ADMIN, Role.USER)
   @Get()
   @ApiOperation({ summary: 'Get current user notifications with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
@@ -152,7 +152,7 @@ export class NotificationController {
     );
   }
 
-  @Roles(Role.ADMIN, Role.PATIENT, Role.PHARMACIST, Role.DOCTOR)
+  @Roles(Role.ADMIN, Role.USER)
   @Patch('mark-all-read')
   @ApiOperation({ summary: 'Mark all notifications as read for current user' })
   @ApiResponse({
@@ -163,7 +163,7 @@ export class NotificationController {
     return this.notificationService.markAllAsRead(req.user.sub);
   }
 
-  @Roles(Role.ADMIN, Role.PATIENT, Role.PHARMACIST, Role.DOCTOR)
+  @Roles(Role.ADMIN, Role.USER)
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark a specific notification as read' })
   @ApiParam({ name: 'id', description: 'Notification ID' })
@@ -175,7 +175,7 @@ export class NotificationController {
     return await this.notificationService.markAsRead(id, req.user.sub);
   }
 
-  @Roles(Role.ADMIN, Role.PATIENT, Role.PHARMACIST, Role.DOCTOR)
+  @Roles(Role.ADMIN, Role.USER)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a specific notification' })
   @ApiParam({ name: 'id', description: 'Notification ID' })

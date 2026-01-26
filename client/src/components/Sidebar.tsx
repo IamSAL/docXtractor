@@ -53,13 +53,13 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                         <span className="font-bold">Dashboard</span>
                     </Link>
                     <Link
-                        to="/pipelines"
+                        to="/extractors"
                         className="neobrutal-sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-black no-underline"
                         activeProps={{ className: 'active' }}
                         onClick={onClose}
                     >
                         <span className="material-symbols-outlined">fork_right</span>
-                        <span className="font-bold">Pipelines</span>
+                        <span className="font-bold">Extractors</span>
                     </Link>
                     <Link
                         to="/jobs"

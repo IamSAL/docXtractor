@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { AppLayout } from '../../components/AppLayout'
 
-export const Route = createFileRoute('/pipelines/$id')({
-  component: PipelineDetailComponent,
+export const Route = createFileRoute('/extractors/$id')({
+  component: ExtractorDetailComponent,
 })
 
-function PipelineDetailComponent() {
+function ExtractorDetailComponent() {
   const { id } = Route.useParams()
 
   return (
@@ -13,9 +13,9 @@ function PipelineDetailComponent() {
       <div className="flex flex-col h-full bg-[#f8f9fa]">
         <header className="mb-8 flex flex-col gap-4">
           <div className="flex items-center gap-2 text-sm font-bold">
-            <Link to="/pipelines" className="text-gray-500 hover:text-black transition-colors no-underline uppercase tracking-widest">Pipelines</Link>
+            <Link to="/extractors" className="text-gray-500 hover:text-black transition-colors no-underline uppercase tracking-widest">Extractors</Link>
             <span className="text-gray-500">/</span>
-            <span className="text-black font-black uppercase tracking-widest leading-none">View Pipeline</span>
+            <span className="text-black font-black uppercase tracking-widest leading-none">View Extractor</span>
           </div>
           <div className="flex flex-wrap justify-between items-end gap-4">
             <div className="flex flex-col gap-1">
@@ -30,7 +30,7 @@ function PipelineDetailComponent() {
             </div>
             <div className="flex items-center gap-3">
               <Link
-                to="/pipelines/edit/$id"
+                to="/extractors/edit/$id"
                 params={{ id }}
                 className="bg-white border-3 border-black text-black font-black h-12 px-6 flex items-center gap-2 rounded-sm shadow-[4px_4px_0px_#000000] hover:bg-gray-50 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all no-underline uppercase tracking-widest text-xs"
               >
@@ -55,7 +55,7 @@ function PipelineDetailComponent() {
               <div className="px-6 py-4 border-b-3 border-black flex items-center justify-between bg-gray-50">
                 <h3 className="font-black text-xl uppercase tracking-tighter italic flex items-center gap-2">
                   <span className="material-symbols-outlined text-[#d4c04a] font-black">info</span>
-                  Pipeline Details
+                  Extractor Details
                 </h3>
               </div>
               <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -125,7 +125,7 @@ function PipelineDetailComponent() {
               <div className="w-full h-1 bg-white/20 rounded-full mb-6">
                 <div className="w-[94%] h-full bg-[#00FF99]"></div>
               </div>
-              <p className="text-[10px] font-medium leading-relaxed opacity-60">This pipeline is utilizing GPT-4 with a confidence threshold of 85%. Multi-source validation is enabled.</p>
+              <p className="text-[10px] font-medium leading-relaxed opacity-60">This extractor is utilizing GPT-4 with a confidence threshold of 85%. Multi-source validation is enabled.</p>
             </section>
 
             <section className="bg-white p-6 border-3 border-black shadow-[6px_6px_0px_0px_#000000] rounded-sm">

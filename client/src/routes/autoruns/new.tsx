@@ -19,7 +19,7 @@ function RouteComponent() {
             <div className="flex flex-col gap-1">
               <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter text-black leading-none border-b-4 border-[#ffdd00]">New AutoRun Flow</h2>
               <p className="text-xs text-gray-500 flex items-center gap-1 font-black mt-4 tracking-widest uppercase">
-                Automate document extraction by linking sources to pipelines.
+                Automate document extraction by linking sources to extractors.
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -63,7 +63,7 @@ function RouteComponent() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 italic">TARGET PIPELINE</label>
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 italic">TARGET EXTRACTOR</label>
                   <div className="relative">
                     <select className="w-full px-5 py-4 bg-gray-50 border-3 border-black rounded-sm text-sm font-black uppercase tracking-widest focus:bg-white focus:outline-none flex items-center shadow-[inset_4px_4px_10px_rgba(0,0,0,0.05)] appearance-none">
                       <option>INVOICE PROCESSOR V2</option>

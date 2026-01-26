@@ -55,12 +55,12 @@ async function bootstrap() {
       name: 'jwt-access-token',
     })
 
-    .setTitle('Starter System')
+    .setTitle('docXtractor')
     .setDescription(
-      'A comprehensive Starter System to manage patient records, appointments, and medical services effectively.',
+      'A comprehensive docXtractor System to extract text from documents.',
     )
     .setVersion('1.0')
-    .addTag('Starter System')
+    .addTag('docXtractor')
     .build();
 
   const swaggerUser = configService.get<string>('SWAGGER_USER') || 'admin';

@@ -1,38 +1,38 @@
-# Pipeline Form Implementation with React Hook Form
+# Extractor Form Implementation with React Hook Form
 
 ## Overview
 
-This implementation adds full React Hook Form integration to the pipeline creation form (`/pipelines/new`) with proper type safety, validation, and mock API submission.
+This implementation adds full React Hook Form integration to the extractor creation form (`/extractors/new`) with proper type safety, validation, and mock API submission.
 
 ## What Was Implemented
 
-### 1. **Type Definitions** (`/client/src/types/pipeline.ts`)
+### 1. **Type Definitions** (`/client/src/types/extractor.ts`)
 - Created comprehensive TypeScript types for all form fields
-- Defined `PipelineFormData` interface covering:
+- Defined `ExtractorFormData` interface covering:
   - Basic Information (name, documentType, description)
   - Field Schema (JSON Schema)
   - Advanced Options (systemPrompt, fewShotExamples)
   - Extraction Settings (consensus voting, citation tracking, model parameters)
-- Exported `defaultPipelineFormValues` with sensible defaults
+- Exported `defaultExtractorFormValues` with sensible defaults
 
-### 2. **Mock API Service** (`/client/src/api/pipelines.ts`)
-- `createPipeline()` - Simulates creating a new pipeline with 1.5s delay
-- `updatePipeline()` - Simulates updating an existing pipeline
-- `testPipeline()` - Simulates testing a pipeline with sample data
+### 2. **Mock API Service** (`/client/src/api/extractors.ts`)
+- `createExtractor()` - Simulates creating a new extractor with 1.5s delay
+- `updateExtractor()` - Simulates updating an existing extractor
+- `testExtractor()` - Simulates testing a extractor with sample data
 - All functions include realistic delays and console logging for debugging
 
 ### 3. **Updated Components**
 
-#### ExtractionSettings Component (`/client/src/components/pipelines/ExtractionSettings.tsx`)
+#### ExtractionSettings Component (`/client/src/components/extractors/ExtractionSettings.tsx`)
 - Refactored to accept `control` prop from React Hook Form
 - All form fields now use `Controller` component for proper integration
-- Supports both standalone usage (settings page) and embedded usage (pipeline form)
+- Supports both standalone usage (settings page) and embedded usage (extractor form)
 - Fields integrated:
   - Consensus Voting (enabled, threshold, conflict resolution)
   - Citation Tracking (enabled, metadata options)
   - Model Parameters (context window, default model)
 
-#### New Pipeline Route (`/client/src/routes/pipelines/new.tsx`)
+#### New Extractor Route (`/client/src/routes/extractors/new.tsx`)
 - Full React Hook Form integration with `useForm` hook
 - Form state management with `watch`, `setValue`, `formState`
 - Proper form submission with `handleSubmit`
@@ -41,7 +41,7 @@ This implementation adds full React Hook Form integration to the pipeline creati
   - **Loading States**: Disabled buttons and loading indicators during submission
   - **Toast Notifications**: Success/error feedback using Sonner
   - **Dirty State Tracking**: Shows "Unsaved changes" indicator
-  - **Test Run**: Separate handler for testing pipeline without saving
+  - **Test Run**: Separate handler for testing extractor without saving
   - **Reset Functionality**: Reset system prompt to default
   - **Controlled Inputs**: All inputs properly connected to form state
 
@@ -53,7 +53,7 @@ This implementation adds full React Hook Form integration to the pipeline creati
 ## Form Fields Covered
 
 ### Basic Information
-- ✅ Pipeline Name (required, with validation)
+- ✅ Extractor Name (required, with validation)
 - ✅ Document Type (select dropdown)
 - ✅ Description (textarea)
 
@@ -89,12 +89,12 @@ This implementation adds full React Hook Form integration to the pipeline creati
 
 ## How to Test
 
-1. Navigate to `/pipelines/new`
+1. Navigate to `/extractors/new`
 2. Fill out the form fields
 3. Click "Test Run" to simulate testing (check console for output)
-4. Click "Save Pipeline" to submit the form (check console for output)
+4. Click "Save Extractor" to submit the form (check console for output)
 5. Check browser console for detailed logs with emojis:
-   - 📤 Pipeline Created
+   - 📤 Extractor Created
    - 🧪 Test results
    - ✅ Success messages
    - ❌ Error messages
@@ -103,8 +103,8 @@ This implementation adds full React Hook Form integration to the pipeline creati
 
 ```javascript
 // On successful save:
-📤 Pipeline Created: {
-  id: "pipeline_1737830000000",
+📤 Extractor Created: {
+  id: "extractor_1737830000000",
   createdAt: "2026-01-25T16:53:20.000Z",
   updatedAt: "2026-01-25T16:53:20.000Z",
   data: { /* full form data */ }
@@ -137,7 +137,7 @@ This implementation adds full React Hook Form integration to the pipeline creati
 ## Business Context Alignment
 
 This implementation aligns with the DocXTractor PRD requirements:
-- ✅ Pipeline Configuration (Section 2)
+- ✅ Extractor Configuration (Section 2)
 - ✅ Field Schema Table with extraction modes
 - ✅ Validation on save
 - ✅ Few-shot examples UI
@@ -148,9 +148,9 @@ This implementation aligns with the DocXTractor PRD requirements:
 ## Next Steps
 
 To connect to real backend:
-1. Replace mock API calls in `/api/pipelines.ts` with actual API endpoints
+1. Replace mock API calls in `/api/extractors.ts` with actual API endpoints
 2. Add proper error handling for network failures
 3. Implement navigation after successful save
 4. Add file upload handling for few-shot examples
-5. Implement pipeline duplication functionality
-6. Add delete pipeline confirmation dialog
+5. Implement extractor duplication functionality
+6. Add delete extractor confirmation dialog

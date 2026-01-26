@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ExtractionSettings } from '@/components/pipelines/ExtractionSettings'
+import { ExtractionSettings } from '@/components/extractors/ExtractionSettings'
 import { useForm } from 'react-hook-form'
-import type { PipelineFormData } from '@/types/pipeline'
-import { defaultPipelineFormValues } from '@/types/pipeline'
+import type { ExtractorFormData } from '@/types/extractor'
+import { defaultExtractorFormValues } from '@/types/extractor'
 import { Button } from '@/components/retroui/Button'
 import { toast } from 'sonner'
 
@@ -12,11 +12,11 @@ export const Route = createFileRoute('/settings/extraction')({
 
 function RouteComponent() {
   // Initialize form with default values for global settings
-  const { control, handleSubmit, formState: { isDirty } } = useForm<PipelineFormData>({
-    defaultValues: defaultPipelineFormValues,
+  const { control, handleSubmit, formState: { isDirty } } = useForm<ExtractorFormData>({
+    defaultValues: defaultExtractorFormValues,
   })
 
-  const onSubmit = async (data: PipelineFormData) => {
+  const onSubmit = async (data: ExtractorFormData) => {
     // Mock save global settings
     console.log('💾 Saving global extraction settings:', data)
     toast.success('Global extraction settings saved!')

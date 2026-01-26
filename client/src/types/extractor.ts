@@ -1,7 +1,7 @@
 import type { JSONSchema } from '@/components/jsonjoy/types/jsonSchema'
-import type { FewShotExample } from '@/components/pipelines/FewShotExamples'
+import type { FewShotExample } from '@/components/extractors/FewShotExamples'
 
-export interface PipelineFormData {
+export interface ExtractorFormData {
   // Basic Information
   name: string
   documentType: string
@@ -30,7 +30,7 @@ export interface PipelineFormData {
   defaultModel: string
 }
 
-export const defaultPipelineFormValues: PipelineFormData = {
+export const defaultExtractorFormValues: ExtractorFormData = {
   name: 'Standard Invoice Processor',
   documentType: 'invoice',
   description: 'Extracts total, date, vendor address, and line items from standard PDF invoices.',

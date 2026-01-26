@@ -6,10 +6,10 @@ routes:
 
 /dashboard
 
-/pipelines
-/pipelines/new
-/pipelines/$id
-/pipelines/edit/$id
+/extractors
+/extractors/new
+/extractors/$id
+/extractors/edit/$id
 
 /jobs
 /jobs/$id

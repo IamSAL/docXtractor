@@ -19,7 +19,7 @@ import { UserRole } from 'src/user/entities/user.entity';
 interface UserContext {
   userId: string;
   role: UserRole;
-  patientId?: string;
+
   doctorId?: string;
 }
 
@@ -241,9 +241,9 @@ export class ChatService {
 
         default: {
           this.logger.warn(
-            `Unknown role: ${role as string}, defaulting to patient`,
+            `Unknown role: ${role as string}, defaulting to user`,
           );
-          context.role = UserRole.PATIENT;
+          context.role = UserRole.USER;
           break;
         }
       }
@@ -521,7 +521,7 @@ DOCTORS can:
 - View their appointments
 - View prescriptions they wrote
 - Check their schedule
-- Cannot book appointments for patients
+- Cannot book appointments for users
 
 PHARMACISTS can:
 - Manage prescriptions

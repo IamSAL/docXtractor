@@ -30,7 +30,7 @@ export class ChatController {
 
   @Post()
   @ApiBearerAuth()
-  @Roles(Role.DOCTOR, Role.PATIENT, Role.PHARMACIST, Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @ApiOperation({ summary: 'Send a message to the AI chat' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Streamed AI response' })
   @ApiBody({ type: CreateChatDto })

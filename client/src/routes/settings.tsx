@@ -14,9 +14,9 @@ function SettingsLayout() {
                 <PageHeader
                     heading="Settings"
                     description="Configure your extraction engine. Tweak consensus algorithms and manage output formats."
-                    breadcrumb="/ HOME / PIPELINES"
+                    breadcrumb="/ HOME / EXTRACTORS"
                 >
-                    <Link to="/pipelines/new">
+                    <Link to="/extractors/new">
                         <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide bg-white">
                             <span className="material-symbols-outlined text-[20px]">logout</span>
                             <span>Logout</span>

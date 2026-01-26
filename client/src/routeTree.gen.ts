@@ -15,8 +15,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
-import { Route as PipelinesIndexRouteImport } from './routes/pipelines/index'
 import { Route as JobsIndexRouteImport } from './routes/jobs/index'
+import { Route as ExtractorsIndexRouteImport } from './routes/extractors/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AutorunsIndexRouteImport } from './routes/autoruns/index'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
@@ -24,9 +24,9 @@ import { Route as SettingsNotificationsRouteImport } from './routes/settings/not
 import { Route as SettingsExtractionRouteImport } from './routes/settings/extraction'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings/appearance'
 import { Route as SettingsApiKeysRouteImport } from './routes/settings/api-keys'
-import { Route as PipelinesNewRouteImport } from './routes/pipelines/new'
-import { Route as PipelinesIdRouteImport } from './routes/pipelines/$id'
 import { Route as JobsIdRouteImport } from './routes/jobs/$id'
+import { Route as ExtractorsNewRouteImport } from './routes/extractors/new'
+import { Route as ExtractorsIdRouteImport } from './routes/extractors/$id'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTableRouteImport } from './routes/demo/table'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
@@ -35,8 +35,8 @@ import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
 import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
 import { Route as AutorunsNewRouteImport } from './routes/autoruns/new'
 import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
-import { Route as PipelinesEditIdRouteImport } from './routes/pipelines/edit.$id'
 import { Route as JobsReviewIdRouteImport } from './routes/jobs/review.$id'
+import { Route as ExtractorsEditIdRouteImport } from './routes/extractors/edit.$id'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
@@ -85,14 +85,14 @@ const SettingsIndexRoute = SettingsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SettingsRoute,
 } as any)
-const PipelinesIndexRoute = PipelinesIndexRouteImport.update({
-  id: '/pipelines/',
-  path: '/pipelines/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const JobsIndexRoute = JobsIndexRouteImport.update({
   id: '/jobs/',
   path: '/jobs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtractorsIndexRoute = ExtractorsIndexRouteImport.update({
+  id: '/extractors/',
+  path: '/extractors/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -130,19 +130,19 @@ const SettingsApiKeysRoute = SettingsApiKeysRouteImport.update({
   path: '/api-keys',
   getParentRoute: () => SettingsRoute,
 } as any)
-const PipelinesNewRoute = PipelinesNewRouteImport.update({
-  id: '/pipelines/new',
-  path: '/pipelines/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PipelinesIdRoute = PipelinesIdRouteImport.update({
-  id: '/pipelines/$id',
-  path: '/pipelines/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const JobsIdRoute = JobsIdRouteImport.update({
   id: '/jobs/$id',
   path: '/jobs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtractorsNewRoute = ExtractorsNewRouteImport.update({
+  id: '/extractors/new',
+  path: '/extractors/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtractorsIdRoute = ExtractorsIdRouteImport.update({
+  id: '/extractors/$id',
+  path: '/extractors/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
@@ -185,14 +185,14 @@ const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
   path: '/guitars/',
   getParentRoute: () => DemoRoute,
 } as any)
-const PipelinesEditIdRoute = PipelinesEditIdRouteImport.update({
-  id: '/pipelines/edit/$id',
-  path: '/pipelines/edit/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const JobsReviewIdRoute = JobsReviewIdRouteImport.update({
   id: '/jobs/review/$id',
   path: '/jobs/review/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtractorsEditIdRoute = ExtractorsEditIdRouteImport.update({
+  id: '/extractors/edit/$id',
+  path: '/extractors/edit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -294,9 +294,9 @@ export interface FileRoutesByFullPath {
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/extractors/$id': typeof ExtractorsIdRoute
+  '/extractors/new': typeof ExtractorsNewRoute
   '/jobs/$id': typeof JobsIdRoute
-  '/pipelines/$id': typeof PipelinesIdRoute
-  '/pipelines/new': typeof PipelinesNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
@@ -304,8 +304,8 @@ export interface FileRoutesByFullPath {
   '/settings/profile': typeof SettingsProfileRoute
   '/autoruns/': typeof AutorunsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/extractors/': typeof ExtractorsIndexRoute
   '/jobs/': typeof JobsIndexRoute
-  '/pipelines/': typeof PipelinesIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
@@ -315,8 +315,8 @@ export interface FileRoutesByFullPath {
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/extractors/edit/$id': typeof ExtractorsEditIdRoute
   '/jobs/review/$id': typeof JobsReviewIdRoute
-  '/pipelines/edit/$id': typeof PipelinesEditIdRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
@@ -340,9 +340,9 @@ export interface FileRoutesByTo {
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/extractors/$id': typeof ExtractorsIdRoute
+  '/extractors/new': typeof ExtractorsNewRoute
   '/jobs/$id': typeof JobsIdRoute
-  '/pipelines/$id': typeof PipelinesIdRoute
-  '/pipelines/new': typeof PipelinesNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
@@ -350,8 +350,8 @@ export interface FileRoutesByTo {
   '/settings/profile': typeof SettingsProfileRoute
   '/autoruns': typeof AutorunsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/extractors': typeof ExtractorsIndexRoute
   '/jobs': typeof JobsIndexRoute
-  '/pipelines': typeof PipelinesIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
@@ -361,8 +361,8 @@ export interface FileRoutesByTo {
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/extractors/edit/$id': typeof ExtractorsEditIdRoute
   '/jobs/review/$id': typeof JobsReviewIdRoute
-  '/pipelines/edit/$id': typeof PipelinesEditIdRoute
   '/demo/guitars': typeof DemoGuitarsIndexRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
@@ -388,9 +388,9 @@ export interface FileRoutesById {
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/extractors/$id': typeof ExtractorsIdRoute
+  '/extractors/new': typeof ExtractorsNewRoute
   '/jobs/$id': typeof JobsIdRoute
-  '/pipelines/$id': typeof PipelinesIdRoute
-  '/pipelines/new': typeof PipelinesNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
@@ -398,8 +398,8 @@ export interface FileRoutesById {
   '/settings/profile': typeof SettingsProfileRoute
   '/autoruns/': typeof AutorunsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/extractors/': typeof ExtractorsIndexRoute
   '/jobs/': typeof JobsIndexRoute
-  '/pipelines/': typeof PipelinesIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
@@ -409,8 +409,8 @@ export interface FileRoutesById {
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/extractors/edit/$id': typeof ExtractorsEditIdRoute
   '/jobs/review/$id': typeof JobsReviewIdRoute
-  '/pipelines/edit/$id': typeof PipelinesEditIdRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
@@ -437,9 +437,9 @@ export interface FileRouteTypes {
     | '/demo/store'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/extractors/$id'
+    | '/extractors/new'
     | '/jobs/$id'
-    | '/pipelines/$id'
-    | '/pipelines/new'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
@@ -447,8 +447,8 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/autoruns/'
     | '/dashboard/'
+    | '/extractors/'
     | '/jobs/'
-    | '/pipelines/'
     | '/settings/'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
@@ -458,8 +458,8 @@ export interface FileRouteTypes {
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/extractors/edit/$id'
     | '/jobs/review/$id'
-    | '/pipelines/edit/$id'
     | '/demo/guitars/'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
@@ -483,9 +483,9 @@ export interface FileRouteTypes {
     | '/demo/store'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/extractors/$id'
+    | '/extractors/new'
     | '/jobs/$id'
-    | '/pipelines/$id'
-    | '/pipelines/new'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
@@ -493,8 +493,8 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/autoruns'
     | '/dashboard'
+    | '/extractors'
     | '/jobs'
-    | '/pipelines'
     | '/settings'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
@@ -504,8 +504,8 @@ export interface FileRouteTypes {
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/extractors/edit/$id'
     | '/jobs/review/$id'
-    | '/pipelines/edit/$id'
     | '/demo/guitars'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
@@ -530,9 +530,9 @@ export interface FileRouteTypes {
     | '/demo/store'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/extractors/$id'
+    | '/extractors/new'
     | '/jobs/$id'
-    | '/pipelines/$id'
-    | '/pipelines/new'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
@@ -540,8 +540,8 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/autoruns/'
     | '/dashboard/'
+    | '/extractors/'
     | '/jobs/'
-    | '/pipelines/'
     | '/settings/'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
@@ -551,8 +551,8 @@ export interface FileRouteTypes {
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/extractors/edit/$id'
     | '/jobs/review/$id'
-    | '/pipelines/edit/$id'
     | '/demo/guitars/'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
@@ -572,17 +572,17 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
   AutorunsNewRoute: typeof AutorunsNewRoute
+  ExtractorsIdRoute: typeof ExtractorsIdRoute
+  ExtractorsNewRoute: typeof ExtractorsNewRoute
   JobsIdRoute: typeof JobsIdRoute
-  PipelinesIdRoute: typeof PipelinesIdRoute
-  PipelinesNewRoute: typeof PipelinesNewRoute
   AutorunsIndexRoute: typeof AutorunsIndexRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  ExtractorsIndexRoute: typeof ExtractorsIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
-  PipelinesIndexRoute: typeof PipelinesIndexRoute
   AutorunsEditIdRoute: typeof AutorunsEditIdRoute
   AutorunsRunsIdRoute: typeof AutorunsRunsIdRoute
+  ExtractorsEditIdRoute: typeof ExtractorsEditIdRoute
   JobsReviewIdRoute: typeof JobsReviewIdRoute
-  PipelinesEditIdRoute: typeof PipelinesEditIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -629,18 +629,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof SettingsRoute
     }
-    '/pipelines/': {
-      id: '/pipelines/'
-      path: '/pipelines'
-      fullPath: '/pipelines/'
-      preLoaderRoute: typeof PipelinesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/jobs/': {
       id: '/jobs/'
       path: '/jobs'
       fullPath: '/jobs/'
       preLoaderRoute: typeof JobsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extractors/': {
+      id: '/extractors/'
+      path: '/extractors'
+      fullPath: '/extractors/'
+      preLoaderRoute: typeof ExtractorsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -692,25 +692,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsApiKeysRouteImport
       parentRoute: typeof SettingsRoute
     }
-    '/pipelines/new': {
-      id: '/pipelines/new'
-      path: '/pipelines/new'
-      fullPath: '/pipelines/new'
-      preLoaderRoute: typeof PipelinesNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pipelines/$id': {
-      id: '/pipelines/$id'
-      path: '/pipelines/$id'
-      fullPath: '/pipelines/$id'
-      preLoaderRoute: typeof PipelinesIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/jobs/$id': {
       id: '/jobs/$id'
       path: '/jobs/$id'
       fullPath: '/jobs/$id'
       preLoaderRoute: typeof JobsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extractors/new': {
+      id: '/extractors/new'
+      path: '/extractors/new'
+      fullPath: '/extractors/new'
+      preLoaderRoute: typeof ExtractorsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extractors/$id': {
+      id: '/extractors/$id'
+      path: '/extractors/$id'
+      fullPath: '/extractors/$id'
+      preLoaderRoute: typeof ExtractorsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -769,18 +769,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoGuitarsIndexRouteImport
       parentRoute: typeof DemoRoute
     }
-    '/pipelines/edit/$id': {
-      id: '/pipelines/edit/$id'
-      path: '/pipelines/edit/$id'
-      fullPath: '/pipelines/edit/$id'
-      preLoaderRoute: typeof PipelinesEditIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/jobs/review/$id': {
       id: '/jobs/review/$id'
       path: '/jobs/review/$id'
       fullPath: '/jobs/review/$id'
       preLoaderRoute: typeof JobsReviewIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extractors/edit/$id': {
+      id: '/extractors/edit/$id'
+      path: '/extractors/edit/$id'
+      fullPath: '/extractors/edit/$id'
+      preLoaderRoute: typeof ExtractorsEditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -986,17 +986,17 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
   AutorunsNewRoute: AutorunsNewRoute,
+  ExtractorsIdRoute: ExtractorsIdRoute,
+  ExtractorsNewRoute: ExtractorsNewRoute,
   JobsIdRoute: JobsIdRoute,
-  PipelinesIdRoute: PipelinesIdRoute,
-  PipelinesNewRoute: PipelinesNewRoute,
   AutorunsIndexRoute: AutorunsIndexRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  ExtractorsIndexRoute: ExtractorsIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
-  PipelinesIndexRoute: PipelinesIndexRoute,
   AutorunsEditIdRoute: AutorunsEditIdRoute,
   AutorunsRunsIdRoute: AutorunsRunsIdRoute,
+  ExtractorsEditIdRoute: ExtractorsEditIdRoute,
   JobsReviewIdRoute: JobsReviewIdRoute,
-  PipelinesEditIdRoute: PipelinesEditIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

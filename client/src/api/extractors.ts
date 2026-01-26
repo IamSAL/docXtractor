@@ -1,55 +1,55 @@
-import type { PipelineFormData } from '@/types/pipeline'
+import type { ExtractorFormData } from '@/types/extractor'
 
 /**
- * Mock API service for pipeline operations
+ * Mock API service for extractor operations
  * This simulates backend API calls with realistic delays and responses
  */
 
-export interface PipelineResponse {
+export interface ExtractorResponse {
   id: string
   createdAt: string
   updatedAt: string
-  data: PipelineFormData
+  data: ExtractorFormData
 }
 
 /**
- * Simulates creating a new pipeline
- * @param data - Pipeline form data
- * @returns Promise with created pipeline response
+ * Simulates creating a new extractor
+ * @param data - Extractor form data
+ * @returns Promise with created extractor response
  */
-export async function createPipeline(data: PipelineFormData): Promise<PipelineResponse> {
+export async function createExtractor(data: ExtractorFormData): Promise<ExtractorResponse> {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 1500))
 
   // Mock successful response
-  const response: PipelineResponse = {
-    id: `pipeline_${Date.now()}`,
+  const response: ExtractorResponse = {
+    id: `extractor_${Date.now()}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     data,
   }
 
   // Log the submission for debugging
-  console.log('📤 Pipeline Created:', response)
+  console.log('📤 Extractor Created:', response)
 
   return response
 }
 
 /**
- * Simulates updating an existing pipeline
- * @param id - Pipeline ID
- * @param data - Updated pipeline form data
- * @returns Promise with updated pipeline response
+ * Simulates updating an existing extractor
+ * @param id - Extractor ID
+ * @param data - Updated extractor form data
+ * @returns Promise with updated extractor response
  */
-export async function updatePipeline(
+export async function updateExtractor(
   id: string,
-  data: PipelineFormData
-): Promise<PipelineResponse> {
+  data: ExtractorFormData
+): Promise<ExtractorResponse> {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 1500))
 
   // Mock successful response
-  const response: PipelineResponse = {
+  const response: ExtractorResponse = {
     id,
     createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
     updatedAt: new Date().toISOString(),
@@ -57,17 +57,17 @@ export async function updatePipeline(
   }
 
   // Log the submission for debugging
-  console.log('📤 Pipeline Updated:', response)
+  console.log('📤 Extractor Updated:', response)
 
   return response
 }
 
 /**
- * Simulates testing a pipeline with sample data
- * @param data - Pipeline form data
+ * Simulates testing a extractor with sample data
+ * @param data - Extractor form data
  * @returns Promise with test results
  */
-export async function testPipeline(data: PipelineFormData): Promise<{
+export async function testExtractor(data: ExtractorFormData): Promise<{
   success: boolean
   extractedData: Record<string, unknown>
   processingTime: number
@@ -86,7 +86,7 @@ export async function testPipeline(data: PipelineFormData): Promise<{
     processingTime: 1.8,
   }
 
-  console.log('🧪 Pipeline Test Result:', result)
+  console.log('🧪 Extractor Test Result:', result)
 
   return result
 }

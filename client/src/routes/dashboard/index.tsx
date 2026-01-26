@@ -29,7 +29,7 @@ function RouteComponent() {
                 >
                     <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
                         <span className="material-symbols-outlined text-[20px]">add</span>
-                        <span>New Pipeline</span>
+                        <span>New Extractor</span>
                     </Button>
                 </PageHeader>
 
@@ -61,7 +61,7 @@ function RouteComponent() {
                     <Card className="p-6 flex flex-col justify-between h-40">
                         <div className="flex justify-between items-start">
                             <p className="font-bold text-sm uppercase text-gray-600">
-                                Active Pipelines
+                                Active Extractors
                             </p>
                             <div className="p-1.5 bg-accent-purple/20 border-2 border-black rounded-md text-purple-800">
                                 <span className="material-symbols-outlined text-[20px]">hub</span>
@@ -128,11 +128,11 @@ function RouteComponent() {
 
                 {/* Main Content Grid Area */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
-                    {/* Left Column: Recent Pipelines */}
+                    {/* Left Column: Recent Extractors */}
                     <div className="xl:col-span-2 flex flex-col gap-6">
                         <div className="flex items-center justify-between">
                             <h3 className="text-2xl font-extrabold border-b-4 border-primary inline-block pr-2">
-                                Recent Pipelines
+                                Recent Extractors
                             </h3>
                             <a
                                 className="text-sm font-bold hover:underline flex items-center gap-1"
@@ -145,7 +145,7 @@ function RouteComponent() {
                             </a>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                            {/* Pipeline Card 1 */}
+                            {/* Extractor Card 1 */}
                             <Card className="p-5 group cursor-pointer hover:-translate-y-[2px] hover:shadow-hard-lg transition-all">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="bg-gray-100 p-2 rounded border-2 border-black">
@@ -173,7 +173,7 @@ function RouteComponent() {
                                     </Button>
                                 </div>
                             </Card>
-                            {/* Pipeline Card 2 */}
+                            {/* Extractor Card 2 */}
                             <Card className="p-5 group cursor-pointer hover:-translate-y-[2px] hover:shadow-hard-lg transition-all">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="bg-gray-100 p-2 rounded border-2 border-black">
@@ -201,7 +201,7 @@ function RouteComponent() {
                                     </Button>
                                 </div>
                             </Card>
-                            {/* Pipeline Card 3 */}
+                            {/* Extractor Card 3 */}
                             <Card className="p-5 group cursor-pointer hover:-translate-y-[2px] hover:shadow-hard-lg transition-all">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="bg-gray-100 p-2 rounded border-2 border-black">
@@ -336,7 +336,7 @@ function RouteComponent() {
                                                 Job ID
                                             </th>
                                             <th className="p-4 font-bold text-sm uppercase tracking-wide border-r-2 border-black/10">
-                                                Pipeline
+                                                Extractor
                                             </th>
                                             <th className="p-4 font-bold text-sm uppercase tracking-wide border-r-2 border-black/10">
                                                 Date

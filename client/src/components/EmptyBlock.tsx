@@ -14,7 +14,7 @@ interface EmptyBlockProps {
 }
 
 export const EmptyBlock = ({
-    title = "No Pipelines Detected",
+    title = "No Extractors Detected",
     description = "Your workspace is strictly empty. Initiate your first extraction protocol to begin processing logic.",
     icon = "find_in_page",
     tag = "NULL",

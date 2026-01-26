@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { AppLayout } from '../../components/AppLayout'
 
-export const Route = createFileRoute('/pipelines/edit/$id')({
-    component: EditPipelineComponent,
+export const Route = createFileRoute('/extractors/edit/$id')({
+    component: EditExtractorComponent,
 })
 
-function EditPipelineComponent() {
+function EditExtractorComponent() {
     const { id } = Route.useParams()
 
     return (
@@ -13,9 +13,9 @@ function EditPipelineComponent() {
             <div className="flex flex-col h-full bg-[#f8f9fa] selection:bg-[#e5d161] selection:text-black">
                 <header className="mb-8 flex flex-col gap-4 border-b-3 border-black pb-6">
                     <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-gray-500">
-                        <Link to="/pipelines" className="hover:text-black transition-colors no-underline">PIPELINES</Link>
+                        <Link to="/extractors" className="hover:text-black transition-colors no-underline">EXTRACTORS</Link>
                         <span>/</span>
-                        <span className="text-black">EDIT PIPELINE {id}</span>
+                        <span className="text-black">EDIT EXTRACTOR {id}</span>
                     </div>
                     <div className="flex flex-wrap justify-between items-end gap-6 uppercase tracking-tighter">
                         <div className="flex flex-col gap-1">
@@ -34,7 +34,7 @@ function EditPipelineComponent() {
                             </button>
                             <button className="px-8 h-12 rounded-sm border-3 border-black bg-[#e5d161] hover:bg-[#d4c04a] text-black text-xs font-black shadow-[4px_4px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex items-center gap-2 uppercase tracking-[0.2em] italic" type="button">
                                 <span className="material-symbols-outlined font-black">save</span>
-                                SAVE PIPELINE
+                                SAVE EXTRACTOR
                             </button>
                         </div>
                     </div>

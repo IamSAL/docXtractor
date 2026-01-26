@@ -103,7 +103,7 @@ export class AuthService {
     const createdUser = await this.userService.create({
       ...createUserDto,
       password: createUserDto.password,
-      role: 'patient' as UserRole,
+      role: 'user' as UserRole,
     });
 
     await this.initiateEmailVerification(createdUser.email);

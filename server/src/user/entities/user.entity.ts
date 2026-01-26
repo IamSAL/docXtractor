@@ -13,10 +13,8 @@ import * as bcrypt from 'bcrypt';
 import { Admin } from 'src/admin/entities/admin.entity';
 import { Notification } from 'src/notification/entities/notification.entity';
 export enum UserRole {
-  PATIENT = 'patient',
-  DOCTOR = 'doctor',
+  USER = 'user',
   ADMIN = 'admin',
-  PHARMACIST = 'pharmacist',
 }
 
 @Entity()
@@ -48,8 +46,8 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: ['patient', 'doctor', 'admin', 'pharmacist'],
-    default: 'patient',
+    enum: ['user', 'admin'],
+    default: 'user',
   })
   role: string;
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

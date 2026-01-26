@@ -13,7 +13,7 @@ DocXTractor is an open source self hostable AI-powered web application for extra
    invoice details, dates, names) from documents. They want an
    intuitive UI and quick results with minimal configuration. Pain
    points include time-consuming manual entry and repetitive data
-   checks. DocXTractor addresses these by providing simple pipelines
+   checks. DocXTractor addresses these by providing simple extractors
    and clear results (JSON/CSV) so they can work faster and reduce
    errors[\[2\]](https://www.docsumo.com/blogs/data-extraction/document-parsing#:~:text=,with%20sensitive%20information%20and%20regulatory).
 2. **Operations Team (e.g. Data Engineer, IT Specialist):** Technical
@@ -38,7 +38,7 @@ DocXTractor uses a **split-service architecture** where responsibilities are cle
 **1. Core Backend (NestJS/TypeScript)**
 
 - Main application server handling all user-facing operations
-- Manages authentication, pipelines, jobs, and user data
+- Manages authentication, extractors, jobs, and user data
 - Provides REST API for the frontend
 - Orchestrates document processing jobs
 - Sends real-time updates to users via WebSocket
@@ -78,7 +78,7 @@ development[\[6\]](https://www.perforce.com/blog/alm/how-write-product-requireme
 
 - **Must:**
 - **Authentication:** Email/password login. Single-user (Personal).
-- **Pipeline Management:** Create/edit pipelines (templates) with
+- **Extractor Management:** Create/edit extractors (templates) with
   fields (name, type, extraction mode). Choose AI (OpenAI/LangExtract)
   or deterministic (regex, XPath) per field. Define output format
   (JSON or CSV).
@@ -87,7 +87,7 @@ development[\[6\]](https://www.perforce.com/blog/alm/how-write-product-requireme
   and parse its content. Perform initial text extraction/OCR as
   needed[\[7\]](https://www.docsumo.com/blogs/data-extraction/document-parsing#:~:text=,other%20text%20extraction%20methods%2C%20too).
 - **Executor Agents:** Launch and run parsing jobs. Agents take
-  pipeline + inputs and process documents concurrently. Control each
+  extractor + inputs and process documents concurrently. Control each
   job: start, pause, resume, retry. Provide real-time status (pending,
   running, failed, done).
 - **Execution Monitoring:** Show per-job logs and progress bars. Track
@@ -103,19 +103,19 @@ development[\[6\]](https://www.perforce.com/blog/alm/how-write-product-requireme
 - **Human Validation (HITL):** Interface for users to review low-confidence extractions side-by-side with the document to ensure data quality.
 - **Few-Shot Examples UI:** When defining an AI field, allow uploading
   or entering example text-output pairs to improve model accuracy.
-- **Pipeline Templates:** Save and list pipelines. Duplicate or
-  version pipelines. Provide sample templates (e.g. "Invoice Parser")
+- **Extractor Templates:** Save and list extractors. Duplicate or
+  version extractors. Provide sample templates (e.g. "Invoice Parser")
   to help new users.
 - **Advanced Fields:** Support data-type hints (number, date, email)
   and validation rules.
 - **Notifications:** Email or in-app notifications on job completion
   or failure.
-- **Search & Filter:** Filter pipelines and jobs by name, date,
+- **Search & Filter:** Filter extractors and jobs by name, date,
   status.
 - **API Endpoints:** (For future) Documented REST API for all
-  functions (pipeline, jobs, logs).
+  functions (extractor, jobs, logs).
 - **Could:**
-- **Scheduling/Queueing:** Schedule recurring pipeline runs or manage
+- **Scheduling/Queueing:** Schedule recurring extractor runs or manage
   job queue priorities.
 - **Cloud Storage Integration:** Import documents from/drop output to
   cloud drives (e.g. Google Drive).
@@ -123,7 +123,7 @@ development[\[6\]](https://www.perforce.com/blog/alm/how-write-product-requireme
   database.
 - **Additional AI Providers:** Support new LLM services (e.g.
   Anthropic) or on-premise models.
-- **Team Collaboration:** Share pipelines across users; role-based
+- **Team Collaboration:** Share extractors across users; role-based
   access control.
 
 *(Features prioritized with MoSCoW ensure focus on core functionality
@@ -140,9 +140,9 @@ first[\[6\]](https://www.perforce.com/blog/alm/how-write-product-requirements-do
   Standard "Forgot password" flow.
 - *No external SSO in v1 (no integration constraints).*
 
-### 2. Pipeline Configuration
+### 2. Extractor Configuration
 
-- **Pipeline Editor:** Form-based UI to define a pipeline. Fields
+- **Extractor Editor:** Form-based UI to define a extractor. Fields
   include: Name (string), Description (text), Output Format
   (JSON/CSV).
 - **Field Schema Table:** Each row is a field: *Field Name*, *Data
@@ -156,12 +156,12 @@ first[\[6\]](https://www.perforce.com/blog/alm/how-write-product-requirements-do
   path string.
 - **Validation:** On save, validate that required fields (e.g. field
   name and mode) are set. For regex fields, test syntax.
-- **Configuration Storage:** Saved in a database (each pipeline record
-  with its fields as JSON). Assign a unique Pipeline ID.
+- **Configuration Storage:** Saved in a database (each extractor record
+  with its fields as JSON). Assign a unique Extractor ID.
 
-*Behaviors:* Pipelines act as extraction templates. Users can return
+*Behaviors:* Extractors act as extraction templates. Users can return
 later to edit or reuse them. The UI will also allow previewing a
-pipeline on a sample document (client-side simulation using the current
+extractor on a sample document (client-side simulation using the current
 config).
 
 ### 3. Inputs (Documents/URLs) , Multi-Source Document Processing
@@ -215,7 +215,7 @@ A core capability of DocXTractor is processing **multiple source documents** (PD
 ```json
 {
   "jobId": "job_123",
-  "pipelineId": "pipe_456",
+  "extractorId": "pipe_456",
   "sources": [
     { "type": "file", "name": "invoice.pdf", "status": "parsed" },
     { "type": "file", "name": "contract.docx", "status": "parsing" },
@@ -260,7 +260,7 @@ A core capability of DocXTractor is processing **multiple source documents** (PD
 3. *Content Combination:* Parsed content is combined based on processing mode:
    - **Unified**: All sources merged into single context with source markers
    - **Per-Document**: Each source processed separately
-4. *Field Extraction:* For each defined field in the pipeline:
+4. *Field Extraction:* For each defined field in the extractor:
    - **AI mode:** Uses `langextract` with the defined schema and source-aware prompt
    - **Regex mode:** Applies the specified pattern across all sources
    - **XPath mode:** Extracts from structured content (HTML sources)
@@ -344,7 +344,7 @@ Track exactly where each extracted value came from in the source document.
 
 ### 6. Execution Monitoring & Logs
 
-- **Dashboard View:** A table of recent executions (pipeline name, run
+- **Dashboard View:** A table of recent executions (extractor name, run
   date, #docs, status). Filterable by status (e.g. Failed, Done).
 - **Job Details Page:** Clicking a job shows: list of documents with
   individual status. For each document: show extracted JSON result or
@@ -355,7 +355,7 @@ Track exactly where each extracted value came from in the source document.
   **Cancel** to stop execution. After failure, a **Retry** button
   requeues the documents.
 - **History:** Keep a history of all runs (timestamp, who ran it,
-  pipeline version) for auditing. Allow downloading results per run.
+  extractor version) for auditing. Allow downloading results per run.
 
 ### 7. Output Formats
 
@@ -430,7 +430,7 @@ DocXTractor must meet high standards for performance, security, and UX. Non-func
 
 **Security:**
 
-- **Authentication & Authorization:** Secure login (bcrypt hashes, SSL). Each API endpoint checks user permissions (users see only their pipelines/jobs).
+- **Authentication & Authorization:** Secure login (bcrypt hashes, SSL). Each API endpoint checks user permissions (users see only their extractors/jobs).
 - **Data Protection:** All traffic via HTTPS. Secrets/API keys encrypted at rest[\[8\]](https://www.perforce.com/blog/alm/what-are-non-functional-requirements-examples#:~:text=%3E%20Non,security%2C%20usability%2C%20reliability%2C%20and%20scalability). Sensitive logs scrubbed of secrets.
 - **Vulnerability Resistance:** Follow OWASP best practices (e.g. prevent injection attacks on regex/XPath inputs). Rate-limit uploads to prevent DoS. Use CORS properly since it's API-first.
 - **Inter-Service Security:** Message queue communications are secured and encrypted
@@ -487,10 +487,10 @@ The overall layout uses a fixed sidebar (or top bar) for navigation and a main c
 
 - **Dashboard (Home):**
 
-  - Sidebar with main menu items (Pipelines, Runs, Secrets, Settings). The background is a light neutral gray.
-  - **Pipeline Cards:** In the main panel, each pipeline appears as a rounded-corner card (neumorphic effect: subtle inner/outer shadows giving a "lifted" look) containing the pipeline name, description, and a colored icon.
-  - **Primary Buttons:** "New Pipeline", "Upload & Run" buttons use neobrutalist cues -- bold outlines or accent color fills (e.g. vibrant teal) against the soft background, providing clear CTAs.
-- **Pipeline Editor:**
+  - Sidebar with main menu items (Extractors, Runs, Secrets, Settings). The background is a light neutral gray.
+  - **Extractor Cards:** In the main panel, each extractor appears as a rounded-corner card (neumorphic effect: subtle inner/outer shadows giving a "lifted" look) containing the extractor name, description, and a colored icon.
+  - **Primary Buttons:** "New Extractor", "Upload & Run" buttons use neobrutalist cues -- bold outlines or accent color fills (e.g. vibrant teal) against the soft background, providing clear CTAs.
+- **Extractor Editor:**
 
   - A form in a centered container with soft shadow edges. Field inputs (text, dropdowns) appear as indent/sunken elements in the background (neumorphic style) to suggest depth[\[9\]](https://www.uxdesigninstitute.com/blog/neumorphism-in-ui-design/#:~:text=Neumorphism%20is%20all%20about%20creating,help%20to%20create%20this%20effect).
   - The Fields table uses alternating light panels. For each field row, the selected extraction mode shows either a multi-line AI prompt box (light gray, elevated slightly) or a regex input (monospace font).
@@ -519,14 +519,14 @@ The overall layout uses a fixed sidebar (or top bar) for navigation and a main c
 
 User interactions follow clear step-by-step flows[\[11\]](https://www.perforce.com/blog/alm/how-write-product-requirements-document-prd#:~:text=Could,will%20interact%20with%20the%20product). Key flows include:
 
-- **Sign-In & Onboarding:** User registers or logs in (Email/Password). After login, they land on the Dashboard (list of pipelines).
-- **Create Pipeline Flow:** From Dashboard, user clicks **"New Pipeline"** → **Pipeline Editor** opens → User enters name/description → Adds fields one by one (specifying name, type, mode) → For critical fields, user enables **Consensus Voting** (selects number of runs) and/or **Citation Tracking** → For AI fields, user enters example pairs → User clicks **"Save"** → Pipeline appears on Dashboard.
-- **Run Pipeline Flow:** User selects a pipeline (or clicks **"Upload & Run"**) → In a run dialog, user uploads one or more documents (or pastes a URL) → Click **"Start Run"** → System creates an Execution Job and routes to an Executor → User is taken to the **Run Monitor** page. They see progress (e.g. "Document 3 of 10 being processed").
+- **Sign-In & Onboarding:** User registers or logs in (Email/Password). After login, they land on the Dashboard (list of extractors).
+- **Create Extractor Flow:** From Dashboard, user clicks **"New Extractor"** → **Extractor Editor** opens → User enters name/description → Adds fields one by one (specifying name, type, mode) → For critical fields, user enables **Consensus Voting** (selects number of runs) and/or **Citation Tracking** → For AI fields, user enters example pairs → User clicks **"Save"** → Extractor appears on Dashboard.
+- **Run Extractor Flow:** User selects a extractor (or clicks **"Upload & Run"**) → In a run dialog, user uploads one or more documents (or pastes a URL) → Click **"Start Run"** → System creates an Execution Job and routes to an Executor → User is taken to the **Run Monitor** page. They see progress (e.g. "Document 3 of 10 being processed").
 - **Monitor & Output Flow:** While running, user may click **"Logs"** to view real-time logs (frontend polls the API). After completion, the page shows final status with **confidence badges** for each document. User clicks **"Download JSON"** or **"Download CSV"** to retrieve extracted data. If any docs failed or have low confidence, user clicks **"Review"** to verify extractions.
 - **Review Citations Flow:** User clicks on a low-confidence or flagged extraction → **Citation Viewer** opens with split-view (data on left, document on right) → User hovers over extracted fields to see highlighted source lines → User can approve, correct, or flag for re-extraction → Changes are saved and confidence is updated.
-- **Manage Secrets Flow:** Admin user opens **Settings → Secrets** → Clicks **"Add API Key"** → Enters key label and value → Clicks Save. The new key appears in the list, ready to be used by pipelines.
+- **Manage Secrets Flow:** Admin user opens **Settings → Secrets** → Clicks **"Add API Key"** → Enters key label and value → Clicks Save. The new key appears in the list, ready to be used by extractors.
 
-*(Diagrams illustrating these flows would depict screens like Login → Dashboard → Pipeline Editor → Run Monitor → Citation Viewer. These flows ensure users move logically from creating a pipeline to executing, verifying, and retrieving results[\[11\]](https://www.perforce.com/blog/alm/how-write-product-requirements-document-prd#:~:text=Could,will%20interact%20with%20the%20product).)*
+*(Diagrams illustrating these flows would depict screens like Login → Dashboard → Extractor Editor → Run Monitor → Citation Viewer. These flows ensure users move logically from creating a extractor to executing, verifying, and retrieving results[\[11\]](https://www.perforce.com/blog/alm/how-write-product-requirements-document-prd#:~:text=Could,will%20interact%20with%20the%20product).)*
 
 ### Inspirations & Market Landscape
 
@@ -540,8 +540,8 @@ DocXTractor draws inspiration from leading **commercial IDP platforms** and **op
 | Feature              | Commercial IDP Platforms            | DocXTractor Differentiation                       |
 | :--------------------- | :------------------------------------ | :-------------------------------------------------- |
 | **Document Support** | Document-type or domain specific    | Document-agnostic (PDF, DOCX, HTML, URL)          |
-| **Extraction Logic** | Black-box extraction logic          | User-defined, transparent pipelines (rules + AI)  |
-| **Schema Control**   | Limited schema and pipeline control | Schema-first extraction with versioning           |
+| **Extraction Logic** | Black-box extraction logic          | User-defined, transparent extractors (rules + AI)  |
+| **Schema Control**   | Limited schema and extractor control | Schema-first extraction with versioning           |
 | **Cost & Scaling**   | Costs scale poorly with usage       | Strong cost enforcement and efficient job control |
 | **Observability**    | Weak observability and debugging    | Detailed logs, real-time tracking, and retries    |
 | **Target Audience**  | General enterprise users            | Built for developers and operations teams         |
@@ -555,7 +555,7 @@ DocXTractor draws inspiration from leading **commercial IDP platforms** and **op
 | Feature            | Cloud AI APIs (Google, AWS, Azure)                         | DocXTractor Differentiation                 |
 | :------------------- | :----------------------------------------------------------- | :-------------------------------------------- |
 | **Core Strengths** | Best-in-class OCR and layout detection; Global scalability | Productized extraction workflows            |
-| **Workflow & UX**  | Low-level building blocks; No pipeline abstraction or UX   | Pipeline abstraction with UI                |
+| **Workflow & UX**  | Low-level building blocks; No extractor abstraction or UX   | Extractor abstraction with UI                |
 | **Governance**     | No cost safeguards                                         | Built-in cost tracking and human validation |
 
 #### Open source self hostable alternatives
@@ -580,7 +580,7 @@ FOllow doclo(https://docs.doclo.ai/) for the SDK/API first requirement.
 
 DocXTractor is positioned as:
 
-* **Pipeline-first** , not document-type-first
+* **Extractor-first** , not document-type-first
 * **Transparent** , not black-box, its self-hostable, free and open source
 * **Hybrid deterministic + AI** , not AI-only
 * **Developer and ops friendly** , not just no-code
@@ -596,21 +596,21 @@ We adopt an **agile, milestone-based** plan[\[12\]](https://www.wrike.com/agile-
 - Set up Core Backend (NestJS) with authentication and database
 - Set up Worker Service (Python) with basic `docling` and `langextract` integration
 - Establish message queue communication between services
-- Create basic pipeline management functionality
-- Build auth system, DB schema, Pipeline Editor (JSON Schema)
+- Create basic extractor management functionality
+- Build auth system, DB schema, Extractor Editor (JSON Schema)
 - Set up Job Worker infrastructure
 - **Deliverable:** Both services can communicate, and basic document parsing works
 
 **Milestone 2 (Weeks 3-4): "End-to-End Processing"**
 
 - Complete job orchestration in Core Backend
-- Implement full extraction pipeline in Worker (AI and deterministic modes)
+- Implement full extraction extractor in Worker (AI and deterministic modes)
 - Add file upload and storage handling
 - Build real-time monitoring with WebSocket
-- Create Pipeline Editor and Run Monitor UI
+- Create Extractor Editor and Run Monitor UI
 - Implement Deterministic Extraction + OpenAI Integration
 - Add basic usage counting
-- **Deliverable:** Users can create pipelines, upload documents, and see extraction results
+- **Deliverable:** Users can create extractors, upload documents, and see extraction results
 
 **Milestone 3 (Weeks 5-6): "Cost Control & Scaling"**
 

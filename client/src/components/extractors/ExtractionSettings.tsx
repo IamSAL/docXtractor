@@ -1,9 +1,9 @@
 import { type Control, Controller } from 'react-hook-form'
-import type { PipelineFormData } from '@/types/pipeline'
+import type { ExtractorFormData } from '@/types/extractor'
 
 interface ExtractionSettingsProps {
     showHeader?: boolean
-    control: Control<PipelineFormData>
+    control: Control<ExtractorFormData>
 }
 
 export function ExtractionSettings({ showHeader = true, control }: ExtractionSettingsProps) {
@@ -106,9 +106,7 @@ export function ExtractionSettings({ showHeader = true, control }: ExtractionSet
                                         </select>
                                     )}
                                 />
-                                <span className="material-symbols-outlined absolute right-3 top-3 pointer-events-none text-text-sub">
-                                    expand_more
-                                </span>
+
                             </div>
                         </div>
                     </div>
@@ -303,9 +301,6 @@ export function ExtractionSettings({ showHeader = true, control }: ExtractionSet
                                     </select>
                                 )}
                             />
-                            <span className="material-symbols-outlined absolute right-3 top-3 pointer-events-none text-text-sub">
-                                expand_more
-                            </span>
                         </div>
                     </div>
                 </div>
