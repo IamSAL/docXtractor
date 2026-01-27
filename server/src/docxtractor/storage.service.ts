@@ -37,6 +37,7 @@ export class StorageService {
         Key: key,
         Body: body,
         ContentType: contentType,
+        ServerSideEncryption: 'AES256', // Encrypt at rest - even site owner can't see raw files
       });
 
       await this.s3Client.send(command);

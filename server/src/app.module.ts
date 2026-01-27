@@ -18,6 +18,7 @@ import { AppController } from './app.controller';
 
 import { DocxtractorModule } from './docxtractor/docxtractor.module';
 import { ExtractorsModule } from './extractors/extractors.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -57,6 +58,8 @@ import { ExtractorsModule } from './extractors/extractors.module';
     DocxtractorModule,
 
     ExtractorsModule,
+
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [
