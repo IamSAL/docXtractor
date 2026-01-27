@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { HttpClient } from '@/lib/axios'
 
 /**
  * Hook for recording audio and transcribing it via the transcription API.
@@ -57,17 +58,11 @@ export function useAudioRecorder() {
           )
           formData.append('model', 'whisper-1')
 
-          const response = await fetch('/demo/api/transcription', {
+          const result = await HttpClient<{ text: string }>('/demo/api/transcription', {
             method: 'POST',
             body: formData,
           })
 
-          if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.error || 'Transcription failed')
-          }
-
-          const result = await response.json()
           setIsTranscribing(false)
           resolve(result.text || null)
         } catch (error) {

@@ -31,4 +31,3 @@ export class CreateNotificationDto {
   @ApiPropertyOptional({ description: 'User phone number for WhatsApp' })
   userPhone?: string;
 }
-

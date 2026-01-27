@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation } from '@tanstack/react-query'
+import { HttpClient } from '@/lib/axios'
 
 export const Route = createFileRoute('/demo/tanstack-query')({
   component: TanStackQueryDemo,
@@ -14,16 +15,17 @@ type Todo = {
 function TanStackQueryDemo() {
   const { data, refetch } = useQuery<Todo[]>({
     queryKey: ['todos'],
-    queryFn: () => fetch('/demo/api/tq-todos').then((res) => res.json()),
+    queryFn: () => HttpClient<Todo[]>('/demo/api/tq-todos'),
     initialData: [],
   })
 
   const { mutate: addTodo } = useMutation({
     mutationFn: (todo: string) =>
-      fetch('/demo/api/tq-todos', {
+      HttpClient<Todo>('/demo/api/tq-todos', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(todo),
-      }).then((res) => res.json()),
+      }),
     onSuccess: () => refetch(),
   })
 

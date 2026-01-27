@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateExtractorDto } from './dto/create-extractor.dto';
 import { UpdateExtractorDto } from './dto/update-extractor.dto';
+import { Extractor } from './entities/extractor.entity';
 
 @Injectable()
 export class ExtractorsService {
-  create(createExtractorDto: CreateExtractorDto) {
-    return 'This action adds a new extractor';
+  constructor(
+    @InjectRepository(Extractor)
+    private readonly extractorRepository: Repository<Extractor>,
+  ) {}
+
+  async create(createExtractorDto: CreateExtractorDto): Promise<Extractor> {
+    const extractor = this.extractorRepository.create(createExtractorDto);
+    return await this.extractorRepository.save(extractor);
   }
 
-  findAll() {
-    return `This action returns all extractors`;
+  async findAll(): Promise<Extractor[]> {
+    return await this.extractorRepository.find({
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} extractor`;
+  async findOne(id: string): Promise<Extractor> {
+    const extractor = await this.extractorRepository.findOne({ where: { id } });
+    if (!extractor) {
+      throw new NotFoundException(`Extractor with ID ${id} not found`);
+    }
+    return extractor;
   }
 
-  update(id: number, updateExtractorDto: UpdateExtractorDto) {
-    return `This action updates a #${id} extractor`;
+  async update(
+    id: string,
+    updateExtractorDto: UpdateExtractorDto,
+  ): Promise<Extractor> {
+    const extractor = await this.findOne(id);
+    this.extractorRepository.merge(extractor, updateExtractorDto);
+    return await this.extractorRepository.save(extractor);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} extractor`;
+  async remove(id: string): Promise<void> {
+    const result = await this.extractorRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Extractor with ID ${id} not found`);
+    }
   }
 }

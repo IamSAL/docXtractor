@@ -2,7 +2,7 @@ import { defineConfig } from 'orval';
 
 export default defineConfig({
   api: {
-    input: './swagger.json',
+    input: 'http://localhost:3000/api/swagger.json',
     output: {
       mode: 'tags-split',
       target: 'src/api/endpoints',
@@ -22,7 +22,7 @@ export default defineConfig({
   },
    schema: {
     input: {
-      target: './swagger.json',
+      target: 'http://localhost:3000/api/swagger.json',
     },
     output: {
       mode: 'tags-split',

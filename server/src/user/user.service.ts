@@ -7,7 +7,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FindUsersFilterDto } from './dto/find-users-filter.dto';
 
-
 @Injectable()
 export class UserService {
   constructor(
@@ -42,7 +41,6 @@ export class UserService {
     >
   > {
     const query = this.userRepository.createQueryBuilder('user');
-
 
     // Apply filters from DTO
     if (filterDto) {

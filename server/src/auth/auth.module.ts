@@ -29,7 +29,6 @@ import { MailService } from 'src/shared/mail/mail.service';
 
     UserService,
     MailService,
-
   ],
 })
 export class AuthModule {}

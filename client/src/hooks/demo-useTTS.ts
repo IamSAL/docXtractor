@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { HttpClient } from '@/lib/axios'
 
 /**
  * Hook for text-to-speech playback via the TTS API.
@@ -17,7 +18,7 @@ export function useTTS() {
     setPlayingId(id)
 
     try {
-      const response = await fetch('/demo/api/tts', {
+      const result = await HttpClient<{ audio: string; contentType: string }>('/demo/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -27,13 +28,6 @@ export function useTTS() {
           format: 'mp3',
         }),
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'TTS failed')
-      }
-
-      const result = await response.json()
 
       // Convert base64 to audio and play
       const audioData = atob(result.audio)
@@ -60,8 +54,12 @@ export function useTTS() {
       }
 
       await audio.play()
-    } catch (error) {
+    } catch (error: any) {
       console.error('TTS error:', error)
+      const errorMessage = error.response?.data?.error || error.message || 'TTS failed'
+      console.error('TTS Detailed Error:', errorMessage)
+      // We might want to expose this error to the UI, but existing code just consoles it.
+      // Keeping consistent with existing behavior but improving logging.
       setPlayingId(null)
     }
   }, [])

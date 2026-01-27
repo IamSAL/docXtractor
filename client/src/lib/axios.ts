@@ -41,15 +41,23 @@ AXIOS_INSTANCE.interceptors.response.use(
 );
 
 export const HttpClient = <T>(
-  config: AxiosRequestConfig,
-  options?: AxiosRequestConfig,
+  url: string,
+  options: (RequestInit & { params?: any; responseType?: any }) = {},
 ): Promise<T> => {
+  const { body, ...rest } = options;
   const source = axios.CancelToken.source();
-  const promise = AXIOS_INSTANCE({
-    ...config,
-    ...options,
+  
+  const config: AxiosRequestConfig = {
+    url,
+    data: body,
+    ...rest,
+    headers: rest.headers as any,
+    signal: rest.signal || undefined,
+    // Provide a way to pass axios-specific config if needed via custom property or casting
     cancelToken: source.token,
-  });
+  };
+
+  const promise = AXIOS_INSTANCE(config);
 
   // @ts-ignore
   promise.cancel = () => {

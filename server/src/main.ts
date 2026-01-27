@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './http-exception.filter';
@@ -48,12 +50,7 @@ async function bootstrap() {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-      name: 'jwt-access-token',
-    })
+    .addBearerAuth()
 
     .setTitle('docXtractor')
     .setDescription(
@@ -89,6 +86,11 @@ async function bootstrap() {
 
     customSiteTitle: 'CRM System API Documentation',
     customCss: '.topbar { display: none; }',
+  });
+
+  // Serve swagger.json
+  app.getHttpAdapter().get('/api/swagger.json', (req, res) => {
+    res.json(document);
   });
 
   const PORT = configService.get<number>('PORT') || 8800;

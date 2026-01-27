@@ -46,7 +46,8 @@ export class FilesController {
         },
         userId: {
           type: 'string',
-          description: 'User ID (will be extracted from JWT token in production)',
+          description:
+            'User ID (will be extracted from JWT token in production)',
           example: 'user-123',
         },
         metadata: {
@@ -71,7 +72,8 @@ export class FilesController {
         url: {
           type: 'string',
           description: 'Direct URL to access the file',
-          example: 'http://minio:9000/docxtractor-documents/user-123/1706345678_abc123_invoice.pdf',
+          example:
+            'http://minio:9000/docxtractor-documents/user-123/1706345678_abc123_invoice.pdf',
         },
         storageKey: {
           type: 'string',
@@ -81,7 +83,10 @@ export class FilesController {
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'Bad request - invalid file or missing userId' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - invalid file or missing userId',
+  })
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Body('userId') userId: string,
@@ -115,7 +120,8 @@ export class FilesController {
         },
         userId: {
           type: 'string',
-          description: 'User ID (will be extracted from JWT token in production)',
+          description:
+            'User ID (will be extracted from JWT token in production)',
           example: 'user-123',
         },
         metadata: {
@@ -134,15 +140,28 @@ export class FilesController {
       items: {
         type: 'object',
         properties: {
-          id: { type: 'string', example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' },
-          url: { type: 'string', example: 'http://minio:9000/docxtractor-documents/user-123/1706345678_abc123_file1.pdf' },
-          storageKey: { type: 'string', example: 'user-123/1706345678_abc123_file1.pdf' },
+          id: {
+            type: 'string',
+            example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+          },
+          url: {
+            type: 'string',
+            example:
+              'http://minio:9000/docxtractor-documents/user-123/1706345678_abc123_file1.pdf',
+          },
+          storageKey: {
+            type: 'string',
+            example: 'user-123/1706345678_abc123_file1.pdf',
+          },
           originalName: { type: 'string', example: 'invoice.pdf' },
         },
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'Bad request - invalid files or missing userId' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - invalid files or missing userId',
+  })
   async uploadMultipleFiles(
     @UploadedFiles() files: Express.Multer.File[],
     @Body('userId') userId: string,
@@ -185,10 +204,7 @@ export class FilesController {
     },
   })
   @ApiResponse({ status: 404, description: 'File not found or access denied' })
-  async getFile(
-    @Param('id') fileId: string,
-    @Body('userId') userId: string,
-  ) {
+  async getFile(@Param('id') fileId: string, @Body('userId') userId: string) {
     return this.filesService.getFile(userId, fileId);
   }
 

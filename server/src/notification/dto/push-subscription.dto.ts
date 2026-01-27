@@ -23,4 +23,3 @@ export class PushSubscriptionDto {
   @ApiProperty({ type: PushSubscriptionContent })
   subscription: PushSubscriptionContent;
 }
-

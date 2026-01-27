@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ChefHat, Clock, Users, Gauge } from 'lucide-react'
 import { Streamdown } from 'streamdown'
+import { HttpClient } from '@/lib/axios'
 
 import type { Recipe } from './api.ai.structured'
 
@@ -48,9 +49,8 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
           <span className="text-sm">{recipe.servings} servings</span>
         </div>
         <div
-          className={`flex items-center gap-2 px-2 py-1 rounded-full ${
-            difficultyColors[recipe.difficulty]
-          }`}
+          className={`flex items-center gap-2 px-2 py-1 rounded-full ${difficultyColors[recipe.difficulty]
+            }`}
         >
           <Gauge className="w-4 h-4" />
           <span className="text-sm capitalize">{recipe.difficulty}</span>
@@ -159,21 +159,21 @@ function StructuredPage() {
     setResult(null)
 
     try {
-      const response = await fetch('/demo/api/ai/structured', {
+      const data = await HttpClient<{
+        mode: Mode
+        recipe?: Recipe
+        markdown?: string
+        provider: string
+        model: string
+      }>('/demo/api/ai/structured', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recipeName, mode }),
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate recipe')
-      }
-
       setResult(data)
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message || 'Failed to generate recipe')
     } finally {
       setIsLoading(false)
     }
@@ -237,18 +237,16 @@ function StructuredPage() {
               <button
                 onClick={() => handleGenerate('oneshot')}
                 disabled={!canExecute}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors text-white ${
-                  !canExecute ? 'bg-gray-600' : 'bg-orange-500'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors text-white ${!canExecute ? 'bg-gray-600' : 'bg-orange-500'
+                  }`}
               >
                 One-Shot (Markdown)
               </button>
               <button
                 onClick={() => handleGenerate('structured')}
                 disabled={!canExecute}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors  text-white ${
-                  !canExecute ? 'bg-gray-600' : 'bg-blue-500'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors  text-white ${!canExecute ? 'bg-gray-600' : 'bg-blue-500'
+                  }`}
               >
                 Structured (JSON)
               </button>
@@ -264,11 +262,10 @@ function StructuredPage() {
             </h2>
             {result && (
               <span
-                className={`px-2 py-1 rounded text-xs font-medium ${
-                  result.mode === 'structured'
-                    ? 'bg-purple-500/20 text-purple-400'
-                    : 'bg-blue-500/20 text-blue-400'
-                }`}
+                className={`px-2 py-1 rounded text-xs font-medium ${result.mode === 'structured'
+                  ? 'bg-purple-500/20 text-purple-400'
+                  : 'bg-blue-500/20 text-blue-400'
+                  }`}
               >
                 {result.mode === 'structured' ? 'Structured JSON' : 'Markdown'}
               </span>

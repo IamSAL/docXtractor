@@ -4,7 +4,8 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { File } from './entities/file.entity';
 import { FileStatus } from './enums/file-status.enum';
-import { StorageService } from '../docxtractor/storage.service';
+import { StorageService } from './storage.service';
+
 
 @Injectable()
 export class FilesService {
@@ -66,8 +67,12 @@ export class FilesService {
     userId: string,
     files: Express.Multer.File[],
     metadata?: Record<string, any>,
-  ): Promise<Array<{ id: string; url: string; storageKey: string; originalName: string }>> {
-    const uploadPromises = files.map((file) => this.uploadFile(userId, file, metadata));
+  ): Promise<
+    Array<{ id: string; url: string; storageKey: string; originalName: string }>
+  > {
+    const uploadPromises = files.map((file) =>
+      this.uploadFile(userId, file, metadata),
+    );
     const results = await Promise.all(uploadPromises);
 
     // Add original names to results

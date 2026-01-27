@@ -14,8 +14,6 @@ import { CreateChatDto, MessageDto } from './dto/create-chat.dto';
 
 import { UserRole } from 'src/user/entities/user.entity';
 
-
-
 interface UserContext {
   userId: string;
   role: UserRole;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ImageIcon, Loader2, Download } from 'lucide-react'
+import { HttpClient } from '@/lib/axios'
 
 const SIZES = ['1024x1024', '1536x1024', '1024x1536', 'auto']
 
@@ -26,21 +27,15 @@ function ImagePage() {
     setImages([])
 
     try {
-      const response = await fetch('/demo/api/ai/image', {
+      const data = await HttpClient<{ images: Array<GeneratedImage> }>('/demo/api/ai/image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, size, numberOfImages }),
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate image')
-      }
-
       setImages(data.images)
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message || 'Failed to generate image')
     } finally {
       setIsLoading(false)
     }
@@ -57,8 +52,9 @@ function ImagePage() {
     if (!src) return
 
     try {
-      const response = await fetch(src)
-      const blob = await response.blob()
+      const blob = await HttpClient<Blob>(src, {
+        responseType: 'blob',
+      })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
