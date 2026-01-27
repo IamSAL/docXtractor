@@ -22,6 +22,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+	FilesControllerConfirmFilesBody,
 	FilesControllerGetFile200,
 	FilesControllerListFiles200Item,
 	FilesControllerUploadFile201,
@@ -283,6 +284,115 @@ export const useFilesControllerUploadMultipleFiles = <
 > => {
 	return useMutation(
 		getFilesControllerUploadMultipleFilesMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * Mark a list of files as completed/committed.
+ * @summary Confirm files (mark as completed)
+ */
+export type filesControllerConfirmFilesResponse200 = {
+	data: void;
+	status: 200;
+};
+
+export type filesControllerConfirmFilesResponseSuccess =
+	filesControllerConfirmFilesResponse200 & {
+		headers: Headers;
+	};
+
+export type filesControllerConfirmFilesResponse =
+	filesControllerConfirmFilesResponseSuccess;
+
+export const getFilesControllerConfirmFilesUrl = () => {
+	return `/files/confirm`;
+};
+
+export const filesControllerConfirmFiles = async (
+	filesControllerConfirmFilesBody: FilesControllerConfirmFilesBody,
+	options?: RequestInit,
+): Promise<filesControllerConfirmFilesResponse> => {
+	return HttpClient<filesControllerConfirmFilesResponse>(
+		getFilesControllerConfirmFilesUrl(),
+		{
+			...options,
+			method: "POST",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(filesControllerConfirmFilesBody),
+		},
+	);
+};
+
+export const getFilesControllerConfirmFilesMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof filesControllerConfirmFiles>>,
+		TError,
+		{ data: FilesControllerConfirmFilesBody },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof filesControllerConfirmFiles>>,
+	TError,
+	{ data: FilesControllerConfirmFilesBody },
+	TContext
+> => {
+	const mutationKey = ["filesControllerConfirmFiles"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof filesControllerConfirmFiles>>,
+		{ data: FilesControllerConfirmFilesBody }
+	> = (props) => {
+		const { data } = props ?? {};
+
+		return filesControllerConfirmFiles(data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type FilesControllerConfirmFilesMutationResult = NonNullable<
+	Awaited<ReturnType<typeof filesControllerConfirmFiles>>
+>;
+export type FilesControllerConfirmFilesMutationBody =
+	FilesControllerConfirmFilesBody;
+export type FilesControllerConfirmFilesMutationError = unknown;
+
+/**
+ * @summary Confirm files (mark as completed)
+ */
+export const useFilesControllerConfirmFiles = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof filesControllerConfirmFiles>>,
+			TError,
+			{ data: FilesControllerConfirmFilesBody },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof filesControllerConfirmFiles>>,
+	TError,
+	{ data: FilesControllerConfirmFilesBody },
+	TContext
+> => {
+	return useMutation(
+		getFilesControllerConfirmFilesMutationOptions(options),
 		queryClient,
 	);
 };

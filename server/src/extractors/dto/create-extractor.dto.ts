@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsEnum,
@@ -8,8 +9,55 @@ import {
   IsString,
   Min,
   Max,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+import { IsJsonSchema } from '../../shared/decorators/is-json-schema.decorator';
+
+export class FewShotExampleSourceDto {
+  @ApiProperty()
+  @IsString()
+  id: string;
+
+  @ApiProperty({ enum: ['file', 'url', 'text'] })
+  @IsEnum(['file', 'url', 'text'])
+  type: 'file' | 'url' | 'text';
+
+  @ApiProperty()
+  @IsString()
+  name: string;
+
+  @ApiProperty()
+  @IsString()
+  description: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  content?: string;
+}
+
+export class FewShotExampleDto {
+  @ApiProperty()
+  @IsString()
+  id: string;
+
+  @ApiProperty()
+  @IsString()
+  name: string;
+
+  @ApiProperty({ type: [FewShotExampleSourceDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FewShotExampleSourceDto)
+  sources: FewShotExampleSourceDto[];
+
+  @ApiProperty()
+  @IsString()
+  output: string;
+}
 
 export class CreateExtractorDto {
   @ApiProperty({ example: 'Invoice Processor' })
@@ -29,8 +77,9 @@ export class CreateExtractorDto {
 
   @ApiProperty({ example: { type: 'object', properties: {} } })
   @IsObject()
+  @IsJsonSchema()
   @IsNotEmpty()
-  schema: any;
+  schema: Record<string, any>;
 
   @ApiProperty({ example: 'Extract data accurately' })
   @IsString()
@@ -38,13 +87,14 @@ export class CreateExtractorDto {
   systemPrompt: string;
 
   @ApiPropertyOptional({
-    type: 'array',
-    items: { type: 'object' },
+    type: [FewShotExampleDto],
     example: [{ id: '1', name: 'Ex', sources: [], output: '{}' }],
   })
-  @IsObject({ each: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FewShotExampleDto)
   @IsOptional()
-  fewShotExamples: any[];
+  fewShotExamples: FewShotExampleDto[];
 
   @ApiPropertyOptional({ default: false })
   @IsBoolean()

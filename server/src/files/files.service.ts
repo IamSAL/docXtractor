@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { File } from './entities/file.entity';
 import { FileStatus } from './enums/file-status.enum';
@@ -45,19 +45,34 @@ export class FilesService {
       size: file.size,
       storageKey,
       bucket: 'docxtractor-documents',
-      status: FileStatus.UPLOADED,
+      status: FileStatus.PENDING, // Start as PENDING
       userId, // User-scoped
       metadata: metadata || {},
     });
 
-    this.logger.log(`File uploaded: ${fileRecord.id} by user ${userId}`);
+    this.logger.log(`File uploaded (pending): ${fileRecord.id} by user ${userId}`);
 
     // Return file reference
+    // Note: In a real app, the URL might be a signed URL or a proxy URL
     return {
       id: fileRecord.id,
-      url: `http://minio:9000/docxtractor-documents/${storageKey}`,
+      url: `http://localhost:9000/docxtractor-documents/${storageKey}`,
       storageKey,
     };
+  }
+
+  /**
+   * Mark files as completed (committed)
+   */
+  async completeFiles(userId: string, fileIds: string[]): Promise<void> {
+    if (!fileIds || fileIds.length === 0) return;
+
+    await this.fileRepository.update(
+      { id: In(fileIds), userId },
+      { status: FileStatus.COMPLETED },
+    );
+
+    this.logger.log(`Files completed: ${fileIds.join(', ')} for user ${userId}`);
   }
 
   /**

@@ -114,8 +114,8 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   return (
     <div>
       <AccordionItem value="schema" className="bg-white xdark:bg-surface-dark rounded-xl shadow-subtle border border-border-light xdark:border-border-dark overflow-hidden flex flex-col border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <div className="flex items-center justify-between border-b border-border-light xdark:border-border-dark pr-4">
-          <AccordionTrigger className="flex-1 px-6 py-5 hover:bg-gray-50 transition-colors hover:no-underline text-lg border-none">
+        <AccordionTrigger className="flex hover:bg-gray-50 transition-colors hover:no-underline items-center justify-between border-b border-border-light xdark:border-border-dark pr-4">
+          <div className="flex-1 px-6 py-5  text-lg border-none">
             <div className="flex flex-col text-left">
               <h3 className="font-bold flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">
@@ -127,7 +127,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
                 Define the data points to be extracted from the documents.
               </p>
             </div>
-          </AccordionTrigger>
+          </div>
           <div onClick={(e) => e.stopPropagation()}>
             {!readOnly && (
               <div className="shrink-0 mb-0">
@@ -135,9 +135,9 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
               </div>
             )}
           </div>
-        </div>
+        </AccordionTrigger>
         <AccordionContent className="p-0">
-          <div className="min-h-[400px] max-h-[1600px] bg-white text-left xdark:bg-surface-dark border-b border-border-light xdark:border-border-dark">
+          <div className="min-h-[400px] overflow-auto max-h-[1600px] bg-white text-left xdark:bg-surface-dark  border-border-light xdark:border-border-dark">
             <div className="jsonjoy h-full">
               <div className="p-4 h-full flex flex-col overflow-auto jsonjoy">
 

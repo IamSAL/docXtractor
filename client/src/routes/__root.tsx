@@ -17,6 +17,7 @@ import StoreDevtools from '../lib/demo-store-devtools'
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import { Toaster } from '@/components/retroui/Sonner'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -76,6 +77,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           ]}
         />
         <Scripts />
+        <Toaster />
       </body>
     </html>
   )

@@ -56,6 +56,7 @@ export const Button = React.forwardRef<HTMLButtonElement, IButtonProps>(
       <Comp
         ref={forwardedRef}
         className={cn(buttonVariants({ variant, size }), className)}
+        type="button"
         {...props}
       >
         {children}

@@ -37,7 +37,8 @@ export class StorageService {
         Key: key,
         Body: body,
         ContentType: contentType,
-        ServerSideEncryption: 'AES256', // Encrypt at rest - even site owner can't see raw files
+        ACL: 'public-read', // Allow direct URL access for previews
+        // ServerSideEncryption: 'AES256', // Disabled to avoid KMS configuration errors in local MinIO
       });
 
       await this.s3Client.send(command);

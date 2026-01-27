@@ -18,7 +18,7 @@ import { CreateExtractorDto } from './dto/create-extractor.dto';
 import { UpdateExtractorDto } from './dto/update-extractor.dto';
 import { Extractor } from './entities/extractor.entity';
 
-@ApiTags('extractors')
+@ApiTags('Extractors')
 @ApiBearerAuth()
 @Controller('extractors')
 export class ExtractorsController {

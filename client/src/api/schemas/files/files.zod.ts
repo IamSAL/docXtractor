@@ -29,6 +29,15 @@ export const FilesControllerUploadMultipleFilesBody = zod.object({
 })
 
 /**
+ * Mark a list of files as completed/committed.
+ * @summary Confirm files (mark as completed)
+ */
+export const FilesControllerConfirmFilesBody = zod.object({
+  "fileIds": zod.array(zod.string()),
+  "userId": zod.string()
+})
+
+/**
  * Retrieve file metadata for a specific file. User-scoped - users can only access their own files.
  * @summary Get file metadata by ID
  */

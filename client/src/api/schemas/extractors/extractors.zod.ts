@@ -26,7 +26,16 @@ export const ExtractorsControllerCreateBody = zod.object({
 }),
   "systemPrompt": zod.string(),
   "fewShotExamples": zod.array(zod.object({
-
+  "id": zod.string(),
+  "name": zod.string(),
+  "sources": zod.array(zod.object({
+  "id": zod.string(),
+  "type": zod.enum(['file', 'url', 'text']),
+  "name": zod.string(),
+  "description": zod.string(),
+  "content": zod.string()
+})),
+  "output": zod.string()
 })).optional(),
   "consensusEnabled": zod.boolean().default(extractorsControllerCreateBodyConsensusEnabledDefault),
   "confidenceThreshold": zod.number().min(extractorsControllerCreateBodyConfidenceThresholdMin).max(extractorsControllerCreateBodyConfidenceThresholdMax).default(extractorsControllerCreateBodyConfidenceThresholdDefault),
@@ -126,7 +135,16 @@ export const ExtractorsControllerUpdateBody = zod.object({
 }).optional(),
   "systemPrompt": zod.string().optional(),
   "fewShotExamples": zod.array(zod.object({
-
+  "id": zod.string(),
+  "name": zod.string(),
+  "sources": zod.array(zod.object({
+  "id": zod.string(),
+  "type": zod.enum(['file', 'url', 'text']),
+  "name": zod.string(),
+  "description": zod.string(),
+  "content": zod.string()
+})),
+  "output": zod.string()
 })).optional(),
   "consensusEnabled": zod.boolean().default(extractorsControllerUpdateBodyConsensusEnabledDefault),
   "confidenceThreshold": zod.number().min(extractorsControllerUpdateBodyConfidenceThresholdMin).max(extractorsControllerUpdateBodyConfidenceThresholdMax).default(extractorsControllerUpdateBodyConfidenceThresholdDefault),

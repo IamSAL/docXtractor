@@ -7,6 +7,21 @@ import {
 } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+export interface FewShotExampleSource {
+  id: string;
+  type: 'file' | 'url' | 'text';
+  name: string;
+  description: string;
+  content: string;
+}
+
+export interface FewShotExample {
+  id: string;
+  name: string;
+  sources: FewShotExampleSource[];
+  output: string;
+}
+
 @Entity()
 export class Extractor {
   @ApiProperty({ example: '3fa85f64-5717-4562-b3fc-2c963f66afa6' })
@@ -27,7 +42,7 @@ export class Extractor {
 
   @ApiProperty({ example: { type: 'object', properties: {} } })
   @Column('jsonb')
-  schema: any;
+  schema: Record<string, any>;
 
   @ApiProperty({ example: 'Extract data accurately' })
   @Column('text')
@@ -39,7 +54,7 @@ export class Extractor {
     example: [{ id: '1', name: 'Ex', sources: [], output: '{}' }],
   })
   @Column('jsonb', { default: [] })
-  fewShotExamples: any[];
+  fewShotExamples: FewShotExample[];
 
   @ApiPropertyOptional({ default: false })
   @Column({ default: false })

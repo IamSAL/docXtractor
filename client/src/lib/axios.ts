@@ -57,7 +57,11 @@ export const HttpClient = <T>(
     cancelToken: source.token,
   };
 
-  const promise = AXIOS_INSTANCE(config);
+  const promise = AXIOS_INSTANCE(config).then((res) => ({
+    data: res.data,
+    status: res.status,
+    headers: res.headers,
+  }));
 
   // @ts-ignore
   promise.cancel = () => {

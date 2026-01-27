@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 import type { CreateExtractorDtoConflictResolution } from "./createExtractorDtoConflictResolution";
-import type { CreateExtractorDtoFewShotExamplesItem } from "./createExtractorDtoFewShotExamplesItem";
 import type { CreateExtractorDtoSchema } from "./createExtractorDtoSchema";
+import type { FewShotExampleDto } from "./fewShotExampleDto";
 
 export interface CreateExtractorDto {
 	name: string;
@@ -15,7 +15,7 @@ export interface CreateExtractorDto {
 	thumbnailUrl?: string;
 	schema: CreateExtractorDtoSchema;
 	systemPrompt: string;
-	fewShotExamples?: CreateExtractorDtoFewShotExamplesItem[];
+	fewShotExamples?: FewShotExampleDto[];
 	consensusEnabled?: boolean;
 	/**
 	 * @minimum 0

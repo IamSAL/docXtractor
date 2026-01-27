@@ -5,8 +5,8 @@
  * A comprehensive docXtractor System to extract text from documents.
  * OpenAPI spec version: 1.0
  */
+import type { FewShotExampleDto } from "./fewShotExampleDto";
 import type { UpdateExtractorDtoConflictResolution } from "./updateExtractorDtoConflictResolution";
-import type { UpdateExtractorDtoFewShotExamplesItem } from "./updateExtractorDtoFewShotExamplesItem";
 import type { UpdateExtractorDtoSchema } from "./updateExtractorDtoSchema";
 
 export interface UpdateExtractorDto {
@@ -15,7 +15,7 @@ export interface UpdateExtractorDto {
 	thumbnailUrl?: string;
 	schema?: UpdateExtractorDtoSchema;
 	systemPrompt?: string;
-	fewShotExamples?: UpdateExtractorDtoFewShotExamplesItem[];
+	fewShotExamples?: FewShotExampleDto[];
 	consensusEnabled?: boolean;
 	/**
 	 * @minimum 0

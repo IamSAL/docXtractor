@@ -66,7 +66,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
 
   return (
     <>
-      <Button size="sm" onClick={() => setDialogOpen(true)}>
+      <Button size="sm" type="button" onClick={() => setDialogOpen(true)}>
         <span className="material-symbols-outlined text-lg mr-1">add</span>
         Add Field
       </Button>

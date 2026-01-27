@@ -40,6 +40,8 @@
     "@types/bcrypt": "^5.0.2",
     "@types/nodemailer": "^6.4.17",
     "ai": "^4.3.19",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "cache-manager": "^7.0.1",

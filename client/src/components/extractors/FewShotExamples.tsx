@@ -26,10 +26,11 @@ export interface FewShotExample {
 
 interface FewShotExamplesProps {
     examples: FewShotExample[];
-    onChange: (examples: FewShotExample[]) => void;
+    onChange: (examples: FewShotExample[] | ((prev: FewShotExample[]) => FewShotExample[])) => void;
+    onUploadFile?: (file: File) => Promise<{ url: string; id: string }>;
 }
 
-export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
+export function FewShotExamples({ examples, onChange, onUploadFile }: FewShotExamplesProps) {
 
     const updateExample = (id: string, updates: Partial<FewShotExample>) => {
         const newExamples = examples.map(ex =>
@@ -67,23 +68,57 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
         if (type === 'file') {
             const input = document.createElement('input');
             input.type = 'file';
-            input.onchange = (e) => {
+            input.onchange = async (e) => {
                 const file = (e.target as HTMLInputElement).files?.[0];
                 if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        const newSource: Source = {
-                            id: crypto.randomUUID(),
-                            type: 'file',
-                            name: file.name,
-                            description: `${(file.size / 1024).toFixed(1)} KB`,
-                            content: reader.result as string
-                        };
-                        updateExample(exampleId, {
-                            sources: [...example.sources, newSource]
-                        });
+                    // Create a placeholder source while uploading
+                    const sourceId = crypto.randomUUID();
+                    const placeholderSource: Source = {
+                        id: sourceId,
+                        type: 'file',
+                        name: file.name,
+                        description: 'Uploading...',
+                        content: '' // Empty for now
                     };
-                    reader.readAsDataURL(file);
+
+                    updateExample(exampleId, {
+                        sources: [...example.sources, placeholderSource]
+                    });
+
+                    try {
+                        let content = '';
+                        if (onUploadFile) {
+                            const result = await onUploadFile(file);
+                            content = result.url;
+                        } else {
+                            // Fallback to local reader if no upload handler provided
+                            const reader = new FileReader();
+                            content = await new Promise((resolve) => {
+                                reader.onloadend = () => resolve(reader.result as string);
+                                reader.readAsDataURL(file);
+                            });
+                        }
+
+                        // Re-fetch the example from the latest state to avoid stale closure issues
+                        onChange((prevExamples: FewShotExample[]) => {
+                            return prevExamples.map(ex => {
+                                if (ex.id === exampleId) {
+                                    return {
+                                        ...ex,
+                                        sources: ex.sources.map(s =>
+                                            s.id === sourceId ? { ...s, content, description: `${(file.size / 1024).toFixed(1)} KB` } : s
+                                        )
+                                    };
+                                }
+                                return ex;
+                            });
+                        });
+                    } catch (error) {
+                        updateSource(exampleId, sourceId, {
+                            description: 'Upload failed',
+                        });
+                        console.error('File upload error:', error);
+                    }
                 }
             };
             input.click();
@@ -95,8 +130,8 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
             newSource = {
                 id: crypto.randomUUID(),
                 type: 'url',
-                name: '',
-                description: 'Enter URL',
+                name: 'External URL',
+                description: 'Enter document/webpage URL',
                 content: ''
             };
         } else {
@@ -158,13 +193,13 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
                                         </p>
                                         <div className="flex gap-2">
                                             {/* Add Source Buttons */}
-                                            <button onClick={() => addSource(example.id, 'text')} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
+                                            <button type="button" onClick={() => addSource(example.id, 'text')} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
                                                 + Text
                                             </button>
-                                            <button onClick={() => addSource(example.id, 'url')} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
+                                            <button type="button" onClick={() => addSource(example.id, 'url')} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
                                                 + URL
                                             </button>
-                                            <button onClick={() => addSource(example.id, 'file')} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
+                                            <button type="button" onClick={() => addSource(example.id, 'file')} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
                                                 + File
                                             </button>
                                         </div>
@@ -192,8 +227,8 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
                                                                 {source.type === 'url' ? (
                                                                     <input
                                                                         type="text"
-                                                                        value={source.name}
-                                                                        onChange={(e) => updateSource(example.id, source.id, { name: e.target.value })}
+                                                                        value={source.content}
+                                                                        onChange={(e) => updateSource(example.id, source.id, { content: e.target.value })}
                                                                         placeholder="https://example.com/doc.pdf"
                                                                         className="w-full bg-transparent border-none p-0 font-bold text-sm leading-tight text-black focus:ring-0 placeholder:text-gray-400"
                                                                     />
@@ -208,12 +243,35 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
                                                             </div>
                                                         </div>
                                                         <button
+                                                            type="button"
                                                             onClick={() => removeSource(example.id, source.id)}
                                                             className="opacity-0 group-hover:opacity-100 w-8 h-8 flex items-center justify-center hover:bg-black hover:text-white rounded border border-transparent transition-all shrink-0 ml-2"
                                                         >
                                                             <span className="material-symbols-outlined text-lg">delete</span>
                                                         </button>
                                                     </div>
+                                                    {source.content && (source.content.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|tiff|avif)/i) || source.content.startsWith('data:image')) ? (
+                                                        <div className="p-3 bg-gray-50 border-t-2 border-black">
+                                                            <img
+                                                                src={source.content}
+                                                                alt={source.name}
+                                                                className="max-h-40 rounded border-2 border-black object-contain mx-auto bg-white"
+                                                                onError={(e) => {
+                                                                    (e.target as HTMLImageElement).parentElement!.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    ) : source.content?.match(/\.pdf/i) ? (
+                                                        <div className="p-4 bg-red-50 border-t-2 border-black flex items-center justify-center gap-3">
+                                                            <span className="material-symbols-outlined text-red-500 text-3xl">picture_as_pdf</span>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-red-700">PDF Document</span>
+                                                                <a href={source.content} target="_blank" rel="noopener noreferrer" className="text-[10px] text-red-500 hover:underline break-all">
+                                                                    View Original
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    ) : null}
                                                     {source.type === 'text' && (
                                                         <div className="p-3 bg-gray-50 border-t-2 border-black">
                                                             <Textarea
@@ -250,6 +308,7 @@ export function FewShotExamples({ examples, onChange }: FewShotExamplesProps) {
 
             <div className="p-4 bg-background-light/30 xdark:bg-background-dark/30 border-2 border-dashed border-border-light xdark:border-border-dark rounded-lg flex justify-center">
                 <Button
+                    type="button"
                     variant="ghost"
                     onClick={addExample}
                     className="text-text-secondary-light hover:text-primary hover:bg-transparent"

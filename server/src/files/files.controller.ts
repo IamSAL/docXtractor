@@ -171,6 +171,34 @@ export class FilesController {
     return this.filesService.uploadMultipleFiles(userId, files, metadata);
   }
 
+  @Post('confirm')
+  @Public()
+  @ApiOperation({
+    summary: 'Confirm files (mark as completed)',
+    description: 'Mark a list of files as completed/committed.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['fileIds', 'userId'],
+      properties: {
+        fileIds: {
+          type: 'array',
+          items: { type: 'string' },
+          example: ['f47ac10b-58cc-4372-a567-0e02b2c3d479'],
+        },
+        userId: { type: 'string', example: 'user-123' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Files confirmed successfully' })
+  async confirmFiles(
+    @Body('fileIds') fileIds: string[],
+    @Body('userId') userId: string,
+  ) {
+    return this.filesService.completeFiles(userId, fileIds);
+  }
+
   @Get(':id')
   @Public()
   @ApiOperation({

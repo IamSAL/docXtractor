@@ -139,7 +139,7 @@ services:
     entrypoint: >
       /bin/sh -c " echo 'Waiting for MinIO...'; while ! /usr/bin/mc alias set local http://minio:9000 minioadmin minioadmin > /dev/null 2>&1; do
         sleep 2;
-      done; /usr/bin/mc mb -p local/docxtractor-documents; exit 0; "
+      done; /usr/bin/mc mb -p local/docxtractor-documents; /usr/bin/mc anonymous set public local/docxtractor-documents; exit 0; "
     networks:
       - docxtractor-network
 
