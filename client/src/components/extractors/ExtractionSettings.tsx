@@ -1,12 +1,13 @@
-import { type Control, Controller } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 import type { ExtractorFormData } from '@/types/extractor'
+import { FormErrorMessage } from '@/components/FormErrorMessage'
 
 interface ExtractionSettingsProps {
     showHeader?: boolean
-    control: Control<ExtractorFormData>
 }
 
-export function ExtractionSettings({ showHeader = true, control }: ExtractionSettingsProps) {
+export function ExtractionSettings({ showHeader = true }: ExtractionSettingsProps) {
+    const { control, formState: { errors } } = useFormContext<ExtractorFormData>()
     return (
         <div className="flex flex-col gap-6">
             {/* Consensus Voting */}
@@ -81,6 +82,7 @@ export function ExtractionSettings({ showHeader = true, control }: ExtractionSet
                                 />
                                 <span className="absolute right-4 top-3 text-text-sub text-sm font-mono">%</span>
                             </div>
+                            <FormErrorMessage message={errors.confidenceThreshold?.message} />
                             <p className="text-[11px] text-text-sub flex items-center gap-1">
                                 <span className="material-symbols-outlined text-[12px]">info</span>
                                 Recommended: &gt;80% for finance docs
@@ -281,6 +283,7 @@ export function ExtractionSettings({ showHeader = true, control }: ExtractionSet
                                 )}
                             />
                         </div>
+                        <FormErrorMessage message={errors.contextWindow?.message} />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-bold text-text-main xdark:text-gray-300">

@@ -1,16 +1,21 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { AppLayout } from '../../components/AppLayout'
 import { Button } from '../../components/retroui/Button'
 import { Card } from '../../components/retroui/Card'
 import { Badge } from '../../components/retroui/Badge'
 import { Input } from '../../components/retroui/Input'
 import { PageHeader } from '../../components/retroui/PageHeader'
+import { useExtractorsControllerFindAll } from '../../api/endpoints/extractors/extractors'
+import { formatDistanceToNow } from 'date-fns'
 
 export const Route = createFileRoute('/dashboard/')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
+    const { data: extractorsData, isLoading } = useExtractorsControllerFindAll()
+    const extractors = extractorsData?.data || []
+
     return (
         <AppLayout>
             <div className='p-4 lg:p-12 '>
@@ -27,10 +32,12 @@ function RouteComponent() {
                     heading="Dashboard"
                     description="Welcome back! Here is your extraction overview."
                 >
-                    <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
-                        <span className="material-symbols-outlined text-[20px]">add</span>
-                        <span>New Extractor</span>
-                    </Button>
+                    <Link to="/extractors/new">
+                        <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
+                            <span className="material-symbols-outlined text-[20px]">add</span>
+                            <span>New Extractor</span>
+                        </Button>
+                    </Link>
                 </PageHeader>
 
                 {/* Stats Grid */}
@@ -68,7 +75,7 @@ function RouteComponent() {
                             </div>
                         </div>
                         <div>
-                            <h3 className="text-4xl font-black">8</h3>
+                            <h3 className="text-4xl font-black">{extractors.length}</h3>
                             <p className="text-sm font-medium text-gray-500 mt-1">
                                 Running smoothly
                             </p>
@@ -134,103 +141,75 @@ function RouteComponent() {
                             <h3 className="text-2xl font-extrabold border-b-4 border-primary inline-block pr-2">
                                 Recent Extractors
                             </h3>
-                            <a
+                            <Link
                                 className="text-sm font-bold hover:underline flex items-center gap-1"
-                                href="#"
+                                to="/extractors"
                             >
                                 View All{" "}
                                 <span className="material-symbols-outlined text-base">
                                     arrow_forward
                                 </span>
-                            </a>
+                            </Link>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                            {/* Extractor Card 1 */}
-                            <Card className="p-5 group cursor-pointer hover:-translate-y-[2px] hover:shadow-hard-lg transition-all">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="bg-gray-100 p-2 rounded border-2 border-black">
-                                        <span className="material-symbols-outlined">receipt_long</span>
-                                    </div>
-                                    <span className="bg-primary px-2 py-0.5 rounded text-xs font-bold border border-black">
-                                        v1.2
+                            {isLoading ? (
+                                Array.from({ length: 3 }).map((_, i) => (
+                                    <Card key={i} className="p-5 h-48 animate-pulse bg-gray-50 border-gray-200">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="bg-gray-200 w-10 h-10 rounded border-2 border-gray-300" />
+                                            <div className="bg-gray-200 w-12 h-5 rounded border border-gray-300" />
+                                        </div>
+                                        <div className="bg-gray-200 h-6 w-3/4 rounded mb-2" />
+                                        <div className="bg-gray-200 h-4 w-1/2 rounded mb-4" />
+                                        <div className="border-t-2 border-dashed border-gray-200 my-3" />
+                                        <div className="bg-gray-200 h-4 w-1/3 rounded" />
+                                    </Card>
+                                ))
+                            ) : extractors.length === 0 ? (
+                                <Card className="p-5 flex flex-col items-center justify-center col-span-full h-48 text-center bg-gray-50/50 border-dashed border-2">
+                                    <span className="material-symbols-outlined text-4xl text-gray-400 mb-2">
+                                        inventory_2
                                     </span>
-                                </div>
-                                <h4 className="font-bold text-lg leading-tight mb-1">
-                                    Invoice Processor
-                                </h4>
-                                <p className="text-xs text-gray-500 font-mono mb-4">
-                                    ID: INV-2023-X
-                                </p>
-                                <div className="border-t-2 border-dashed border-gray-300 my-3" />
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-gray-600">
-                                        Last run: 2h ago
-                                    </span>
-                                    <Button size="icon" variant="outline" className="rounded-full border-2 border-black hover:bg-black hover:text-white transition-colors bg-transparent shadow-none w-8 h-8 p-0">
-                                        <span className="material-symbols-outlined text-lg">
-                                            play_arrow
-                                        </span>
-                                    </Button>
-                                </div>
-                            </Card>
-                            {/* Extractor Card 2 */}
-                            <Card className="p-5 group cursor-pointer hover:-translate-y-[2px] hover:shadow-hard-lg transition-all">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="bg-gray-100 p-2 rounded border-2 border-black">
-                                        <span className="material-symbols-outlined">gavel</span>
-                                    </div>
-                                    <span className="bg-white px-2 py-0.5 rounded text-xs font-bold border border-black">
-                                        v2.0
-                                    </span>
-                                </div>
-                                <h4 className="font-bold text-lg leading-tight mb-1">
-                                    Contract Analyzer
-                                </h4>
-                                <p className="text-xs text-gray-500 font-mono mb-4">
-                                    ID: LEG-2023-A
-                                </p>
-                                <div className="border-t-2 border-dashed border-gray-300 my-3" />
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-gray-600">
-                                        Last run: 1d ago
-                                    </span>
-                                    <Button size="icon" variant="outline" className="rounded-full border-2 border-black hover:bg-black hover:text-white transition-colors bg-transparent shadow-none w-8 h-8 p-0">
-                                        <span className="material-symbols-outlined text-lg">
-                                            play_arrow
-                                        </span>
-                                    </Button>
-                                </div>
-                            </Card>
-                            {/* Extractor Card 3 */}
-                            <Card className="p-5 group cursor-pointer hover:-translate-y-[2px] hover:shadow-hard-lg transition-all">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="bg-gray-100 p-2 rounded border-2 border-black">
-                                        <span className="material-symbols-outlined">
-                                            qr_code_scanner
-                                        </span>
-                                    </div>
-                                    <span className="bg-white px-2 py-0.5 rounded text-xs font-bold border border-black">
-                                        v1.0
-                                    </span>
-                                </div>
-                                <h4 className="font-bold text-lg leading-tight mb-1">
-                                    Receipt Scanner
-                                </h4>
-                                <p className="text-xs text-gray-500 font-mono mb-4">
-                                    ID: RCP-2023-B
-                                </p>
-                                <div className="border-t-2 border-dashed border-gray-300 my-3" />
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-gray-600">
-                                        Last run: 5m ago
-                                    </span>
-                                    <Button size="icon" variant="outline" className="rounded-full border-2 border-black hover:bg-black hover:text-white transition-colors bg-transparent shadow-none w-8 h-8 p-0">
-                                        <span className="material-symbols-outlined text-lg">
-                                            play_arrow
-                                        </span>
-                                    </Button>
-                                </div>
-                            </Card>
+                                    <p className="text-gray-500 font-bold">No extractors found</p>
+                                    <Link to="/extractors/new" className="mt-2 text-primary hover:underline font-bold text-sm">
+                                        Create your first extractor
+                                    </Link>
+                                </Card>
+                            ) : (
+                                extractors.slice(0, 3).map((extractor) => (
+                                    <Link key={extractor.id} to="/extractors/$id" params={{ id: extractor.id }} className="block">
+                                        <Card className="p-5 group cursor-pointer hover:-translate-y-[2px] hover:shadow-hard-lg transition-all h-full">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="bg-gray-100 p-2 rounded border-2 border-black">
+                                                    <span className="material-symbols-outlined">
+                                                        {extractor.thumbnailUrl ? 'branding_watermark' : 'receipt_long'}
+                                                    </span>
+                                                </div>
+                                                <span className="bg-primary px-2 py-0.5 rounded text-xs font-bold border border-black">
+                                                    v1.0
+                                                </span>
+                                            </div>
+                                            <h4 className="font-bold text-lg leading-tight mb-1 line-clamp-1">
+                                                {extractor.name}
+                                            </h4>
+                                            <p className="text-xs text-gray-500 font-mono mb-4 truncate">
+                                                ID: {extractor.id.split('-')[0].toUpperCase()}
+                                            </p>
+                                            <div className="border-t-2 border-dashed border-gray-300 my-3" />
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs font-bold text-gray-600">
+                                                    Updated {formatDistanceToNow(new Date(extractor.updatedAt))} ago
+                                                </span>
+                                                <Button size="icon" variant="outline" className="rounded-full border-2 border-black hover:bg-black hover:text-white transition-colors bg-transparent shadow-none w-8 h-8 p-0">
+                                                    <span className="material-symbols-outlined text-lg">
+                                                        play_arrow
+                                                    </span>
+                                                </Button>
+                                            </div>
+                                        </Card>
+                                    </Link>
+                                ))
+                            )}
                         </div>
                     </div>
                     {/* Right Column: Recent Activity / Jobs (as a taller panel on XL screens) */}
@@ -452,9 +431,11 @@ function RouteComponent() {
                     </Card>
                 </section>
                 {/* Floating Action Button (Mobile) */}
-                <Button className="fixed bottom-6 right-6 w-16 h-16 bg-primary rounded-full border-[3px] border-black shadow-hard flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-30 group md:hidden p-0">
-                    <span className="material-symbols-outlined text-black text-4xl font-bold group-hover:rotate-90 transition-transform">add</span>
-                </Button>
+                <Link to="/extractors/new">
+                    <Button className="fixed bottom-6 right-6 w-16 h-16 bg-primary rounded-full border-[3px] border-black shadow-hard flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-30 group md:hidden p-0">
+                        <span className="material-symbols-outlined text-black text-4xl font-bold group-hover:rotate-90 transition-transform">add</span>
+                    </Button>
+                </Link>
             </div>
         </AppLayout>
     )

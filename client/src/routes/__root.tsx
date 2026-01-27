@@ -18,6 +18,7 @@ import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 import { Toaster } from '@/components/retroui/Sonner'
+import NiceModal from '@ebay/nice-modal-react'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -60,8 +61,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script> */}
       </head>
       <body className='bg-background-cream min-h-screen  flex text-black light'>
-
-        {children}
+        <NiceModal.Provider>
+          {children}
+        </NiceModal.Provider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',

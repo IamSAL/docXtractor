@@ -265,8 +265,8 @@ export function FewShotExamples({ examples, onChange, onUploadFile }: FewShotExa
                                                         <div className="p-4 bg-red-50 border-t-2 border-black flex items-center justify-center gap-3">
                                                             <span className="material-symbols-outlined text-red-500 text-3xl">picture_as_pdf</span>
                                                             <div className="flex flex-col">
-                                                                <span className="text-xs font-bold text-red-700">PDF Document</span>
-                                                                <a href={source.content} target="_blank" rel="noopener noreferrer" className="text-[10px] text-red-500 hover:underline break-all">
+                                                                <span className="text-xs font-bold text-muted-700">PDF Document</span>
+                                                                <a href={source.content} target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-500 hover:underline break-all">
                                                                     View Original
                                                                 </a>
                                                             </div>
