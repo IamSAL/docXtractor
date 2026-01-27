@@ -23,11 +23,8 @@ import type {
 
 import type {
 	AuthControllerInitiateEmailVerificationBody,
-	AuthControllerSignUp201,
-	AuthResponse,
 	LoginDto,
 	RefreshTokenDto,
-	RefreshTokenResponse,
 	ResetPasswordConfirmDto,
 	ResetPasswordInitiateDto,
 	SignUpDto,
@@ -44,7 +41,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Register a new user
  */
 export type authControllerSignUpResponse201 = {
-	data: AuthControllerSignUp201;
+	data: void;
 	status: 201;
 };
 
@@ -158,7 +155,7 @@ export const useAuthControllerSignUp = <TError = void, TContext = unknown>(
  * @summary Authenticate user
  */
 export type authControllerLoginResponse200 = {
-	data: AuthResponse;
+	data: void;
 	status: 200;
 };
 
@@ -269,7 +266,7 @@ export const useAuthControllerLogin = <TError = void, TContext = unknown>(
  * @summary Refresh access token
  */
 export type authControllerRefreshTokenResponse200 = {
-	data: RefreshTokenResponse;
+	data: void;
 	status: 200;
 };
 
@@ -953,7 +950,7 @@ export const useAuthControllerUpdateEmail = <TError = void, TContext = unknown>(
  * @summary Verify email address
  */
 export type authControllerVerifyEmailResponse200 = {
-	data: AuthResponse;
+	data: void;
 	status: 200;
 };
 

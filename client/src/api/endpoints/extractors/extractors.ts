@@ -21,14 +21,21 @@ import type {
 	UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { CreateExtractorDto, UpdateExtractorDto } from "../../models";
+import type {
+	CreateExtractorDto,
+	Extractor,
+	UpdateExtractorDto,
+} from "../../models";
 
 import { HttpClient } from "../../../lib/axios";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
+/**
+ * @summary Create a new extractor
+ */
 export type extractorsControllerCreateResponse201 = {
-	data: void;
+	data: Extractor;
 	status: 201;
 };
 
@@ -103,6 +110,9 @@ export type ExtractorsControllerCreateMutationResult = NonNullable<
 export type ExtractorsControllerCreateMutationBody = CreateExtractorDto;
 export type ExtractorsControllerCreateMutationError = unknown;
 
+/**
+ * @summary Create a new extractor
+ */
 export const useExtractorsControllerCreate = <
 	TError = unknown,
 	TContext = unknown,
@@ -128,8 +138,11 @@ export const useExtractorsControllerCreate = <
 		queryClient,
 	);
 };
+/**
+ * @summary Get all extractors
+ */
 export type extractorsControllerFindAllResponse200 = {
-	data: void;
+	data: Extractor[];
 	status: 200;
 };
 
@@ -266,6 +279,9 @@ export function useExtractorsControllerFindAll<
 ): UseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 };
+/**
+ * @summary Get all extractors
+ */
 
 export function useExtractorsControllerFindAll<
 	TData = Awaited<ReturnType<typeof extractorsControllerFindAll>>,
@@ -295,8 +311,11 @@ export function useExtractorsControllerFindAll<
 	return { ...query, queryKey: queryOptions.queryKey };
 }
 
+/**
+ * @summary Get an extractor by id
+ */
 export type extractorsControllerFindOneResponse200 = {
-	data: void;
+	data: Extractor;
 	status: 200;
 };
 
@@ -445,6 +464,9 @@ export function useExtractorsControllerFindOne<
 ): UseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 };
+/**
+ * @summary Get an extractor by id
+ */
 
 export function useExtractorsControllerFindOne<
 	TData = Awaited<ReturnType<typeof extractorsControllerFindOne>>,
@@ -475,8 +497,11 @@ export function useExtractorsControllerFindOne<
 	return { ...query, queryKey: queryOptions.queryKey };
 }
 
+/**
+ * @summary Update an extractor by id
+ */
 export type extractorsControllerUpdateResponse200 = {
-	data: void;
+	data: Extractor;
 	status: 200;
 };
 
@@ -552,6 +577,9 @@ export type ExtractorsControllerUpdateMutationResult = NonNullable<
 export type ExtractorsControllerUpdateMutationBody = UpdateExtractorDto;
 export type ExtractorsControllerUpdateMutationError = unknown;
 
+/**
+ * @summary Update an extractor by id
+ */
 export const useExtractorsControllerUpdate = <
 	TError = unknown,
 	TContext = unknown,
@@ -577,6 +605,9 @@ export const useExtractorsControllerUpdate = <
 		queryClient,
 	);
 };
+/**
+ * @summary Delete an extractor by id
+ */
 export type extractorsControllerRemoveResponse200 = {
 	data: void;
 	status: 200;
@@ -651,6 +682,9 @@ export type ExtractorsControllerRemoveMutationResult = NonNullable<
 
 export type ExtractorsControllerRemoveMutationError = unknown;
 
+/**
+ * @summary Delete an extractor by id
+ */
 export const useExtractorsControllerRemove = <
 	TError = unknown,
 	TContext = unknown,

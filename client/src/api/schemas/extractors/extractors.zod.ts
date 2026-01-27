@@ -8,22 +8,167 @@
 import * as zod from 'zod';
 
 
-export const ExtractorsControllerCreateBody = zod.object({
+/**
+ * @summary Create a new extractor
+ */
+export const extractorsControllerCreateBodyConsensusEnabledDefault = false;export const extractorsControllerCreateBodyConfidenceThresholdDefault = 85;
+export const extractorsControllerCreateBodyConfidenceThresholdMin = 0;
+export const extractorsControllerCreateBodyConfidenceThresholdMax = 100;
 
+export const extractorsControllerCreateBodyConflictResolutionDefault = `majority`;export const extractorsControllerCreateBodyCitationEnabledDefault = false;export const extractorsControllerCreateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerCreateBodyCitationIncludeBboxDefault = false;export const extractorsControllerCreateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerCreateBodyContextWindowDefault = `128k`;export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o`;
+
+export const ExtractorsControllerCreateBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerCreateBodyConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().min(extractorsControllerCreateBodyConfidenceThresholdMin).max(extractorsControllerCreateBodyConfidenceThresholdMax).default(extractorsControllerCreateBodyConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerCreateBodyConflictResolutionDefault),
+  "citationEnabled": zod.boolean().default(extractorsControllerCreateBodyCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerCreateBodyCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerCreateBodyCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerCreateBodyCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerCreateBodyContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerCreateBodyDefaultModelDefault)
 })
 
+/**
+ * @summary Get all extractors
+ */
+export const extractorsControllerFindAllResponseConsensusEnabledDefault = false;export const extractorsControllerFindAllResponseConfidenceThresholdDefault = 85;export const extractorsControllerFindAllResponseConflictResolutionDefault = `majority`;export const extractorsControllerFindAllResponseCitationEnabledDefault = false;export const extractorsControllerFindAllResponseCitationIncludePdfPageDefault = false;export const extractorsControllerFindAllResponseCitationIncludeBboxDefault = false;export const extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerFindAllResponseContextWindowDefault = `128k`;export const extractorsControllerFindAllResponseDefaultModelDefault = `gpt-4o`;
+
+export const ExtractorsControllerFindAllResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerFindAllResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerFindAllResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerFindAllResponseConflictResolutionDefault),
+  "citationEnabled": zod.boolean().default(extractorsControllerFindAllResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerFindAllResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerFindAllResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerFindAllResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerFindAllResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
+export const ExtractorsControllerFindAllResponse = zod.array(ExtractorsControllerFindAllResponseItem)
+
+/**
+ * @summary Get an extractor by id
+ */
 export const ExtractorsControllerFindOneParams = zod.object({
   "id": zod.string()
 })
 
+export const extractorsControllerFindOneResponseConsensusEnabledDefault = false;export const extractorsControllerFindOneResponseConfidenceThresholdDefault = 85;export const extractorsControllerFindOneResponseConflictResolutionDefault = `majority`;export const extractorsControllerFindOneResponseCitationEnabledDefault = false;export const extractorsControllerFindOneResponseCitationIncludePdfPageDefault = false;export const extractorsControllerFindOneResponseCitationIncludeBboxDefault = false;export const extractorsControllerFindOneResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerFindOneResponseContextWindowDefault = `128k`;export const extractorsControllerFindOneResponseDefaultModelDefault = `gpt-4o`;
+
+export const ExtractorsControllerFindOneResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerFindOneResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerFindOneResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerFindOneResponseConflictResolutionDefault),
+  "citationEnabled": zod.boolean().default(extractorsControllerFindOneResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerFindOneResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerFindOneResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerFindOneResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerFindOneResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerFindOneResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
+
+/**
+ * @summary Update an extractor by id
+ */
 export const ExtractorsControllerUpdateParams = zod.object({
   "id": zod.string()
 })
 
-export const ExtractorsControllerUpdateBody = zod.object({
+export const extractorsControllerUpdateBodyConsensusEnabledDefault = false;export const extractorsControllerUpdateBodyConfidenceThresholdDefault = 85;
+export const extractorsControllerUpdateBodyConfidenceThresholdMin = 0;
+export const extractorsControllerUpdateBodyConfidenceThresholdMax = 100;
 
+export const extractorsControllerUpdateBodyConflictResolutionDefault = `majority`;export const extractorsControllerUpdateBodyCitationEnabledDefault = false;export const extractorsControllerUpdateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateBodyCitationIncludeBboxDefault = false;export const extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateBodyContextWindowDefault = `128k`;export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o`;
+
+export const ExtractorsControllerUpdateBody = zod.object({
+  "name": zod.string().optional(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "schema": zod.object({
+
+}).optional(),
+  "systemPrompt": zod.string().optional(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerUpdateBodyConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().min(extractorsControllerUpdateBodyConfidenceThresholdMin).max(extractorsControllerUpdateBodyConfidenceThresholdMax).default(extractorsControllerUpdateBodyConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateBodyConflictResolutionDefault),
+  "citationEnabled": zod.boolean().default(extractorsControllerUpdateBodyCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerUpdateBodyContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerUpdateBodyDefaultModelDefault)
 })
 
+export const extractorsControllerUpdateResponseConsensusEnabledDefault = false;export const extractorsControllerUpdateResponseConfidenceThresholdDefault = 85;export const extractorsControllerUpdateResponseConflictResolutionDefault = `majority`;export const extractorsControllerUpdateResponseCitationEnabledDefault = false;export const extractorsControllerUpdateResponseCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateResponseCitationIncludeBboxDefault = false;export const extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateResponseContextWindowDefault = `128k`;export const extractorsControllerUpdateResponseDefaultModelDefault = `gpt-4o`;
+
+export const ExtractorsControllerUpdateResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerUpdateResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerUpdateResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateResponseConflictResolutionDefault),
+  "citationEnabled": zod.boolean().default(extractorsControllerUpdateResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerUpdateResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerUpdateResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerUpdateResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
+
+/**
+ * @summary Delete an extractor by id
+ */
 export const ExtractorsControllerRemoveParams = zod.object({
   "id": zod.string()
 })

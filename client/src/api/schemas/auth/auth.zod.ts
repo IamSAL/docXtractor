@@ -24,29 +24,11 @@ export const AuthControllerLoginBody = zod.object({
   "password": zod.string().describe('The password of the user')
 })
 
-export const AuthControllerLoginResponse = zod.object({
-  "accessToken": zod.string(),
-  "refreshToken": zod.string(),
-  "user": zod.object({
-  "id": zod.string().describe('Unique identifier for the user'),
-  "email": zod.string().describe('User email address'),
-  "profilePicture": zod.string().describe('User profile picture url'),
-  "role": zod.string().describe('User role'),
-  "isEmailVerified": zod.boolean().describe('Email verification status'),
-  "createdAt": zod.iso.datetime({}).describe('Account creation date')
-})
-})
-
 /**
  * @summary Refresh access token
  */
 export const AuthControllerRefreshTokenBody = zod.object({
   "refreshToken": zod.string().describe('The refresh token string used to obtain a new access token.')
-})
-
-export const AuthControllerRefreshTokenResponse = zod.object({
-  "accessToken": zod.string(),
-  "refreshToken": zod.string()
 })
 
 /**
@@ -84,19 +66,6 @@ export const AuthControllerUpdateEmailBody = zod.object({
 export const AuthControllerVerifyEmailBody = zod.object({
   "email": zod.string().describe('The email address to be verified.'),
   "otp": zod.string().describe('The one-time password (OTP) sent to the email for verification.')
-})
-
-export const AuthControllerVerifyEmailResponse = zod.object({
-  "accessToken": zod.string(),
-  "refreshToken": zod.string(),
-  "user": zod.object({
-  "id": zod.string().describe('Unique identifier for the user'),
-  "email": zod.string().describe('User email address'),
-  "profilePicture": zod.string().describe('User profile picture url'),
-  "role": zod.string().describe('User role'),
-  "isEmailVerified": zod.boolean().describe('Email verification status'),
-  "createdAt": zod.iso.datetime({}).describe('Account creation date')
-})
 })
 
 /**

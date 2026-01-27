@@ -5,7 +5,28 @@
  * A comprehensive docXtractor System to extract text from documents.
  * OpenAPI spec version: 1.0
  */
+import type { CreateExtractorDtoConflictResolution } from "./createExtractorDtoConflictResolution";
+import type { CreateExtractorDtoFewShotExamplesItem } from "./createExtractorDtoFewShotExamplesItem";
+import type { CreateExtractorDtoSchema } from "./createExtractorDtoSchema";
 
 export interface CreateExtractorDto {
-	[key: string]: unknown;
+	name: string;
+	description?: string;
+	thumbnailUrl?: string;
+	schema: CreateExtractorDtoSchema;
+	systemPrompt: string;
+	fewShotExamples?: CreateExtractorDtoFewShotExamplesItem[];
+	consensusEnabled?: boolean;
+	/**
+	 * @minimum 0
+	 * @maximum 100
+	 */
+	confidenceThreshold?: number;
+	conflictResolution?: CreateExtractorDtoConflictResolution;
+	citationEnabled?: boolean;
+	citationIncludePdfPage?: boolean;
+	citationIncludeBbox?: boolean;
+	citationIncludeParagraphId?: boolean;
+	contextWindow?: string;
+	defaultModel?: string;
 }
