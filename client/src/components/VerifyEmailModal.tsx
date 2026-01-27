@@ -3,7 +3,7 @@ import { Button } from './retroui/Button'
 import { Input } from './retroui/Input'
 import { Card } from './retroui/Card'
 import { useAuth } from '@/hooks/useAuth'
-import { resendVerificationEmail } from '@/api/auth'
+import { authControllerInitiateEmailVerification } from '@/api/endpoints/auth/auth'
 
 interface VerifyEmailModalProps {
     email: string
@@ -31,7 +31,7 @@ export function VerifyEmailModal({ email, onSuccess, onCancel }: VerifyEmailModa
         setIsResending(true)
         setResendMessage('')
         try {
-            await resendVerificationEmail(email)
+            await authControllerInitiateEmailVerification({ email })
             setResendMessage('Verification code sent! Check your email.')
         } catch (err) {
             setResendMessage('Failed to resend code. Please try again.')
@@ -83,8 +83,8 @@ export function VerifyEmailModal({ email, onSuccess, onCancel }: VerifyEmailModa
 
                     {resendMessage && (
                         <div className={`border-2 p-3 text-sm font-bold ${resendMessage.includes('sent')
-                                ? 'bg-green-100 border-green-500 text-green-700'
-                                : 'bg-red-100 border-red-500 text-red-700'
+                            ? 'bg-green-100 border-green-500 text-green-700'
+                            : 'bg-red-100 border-red-500 text-red-700'
                             }`}>
                             {resendMessage}
                         </div>

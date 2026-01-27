@@ -16,7 +16,6 @@ import { RolesGuard } from './auth/guards/roles.guard';
 
 import { AppController } from './app.controller';
 
-import { DocxtractorModule } from './docxtractor/docxtractor.module';
 import { ExtractorsModule } from './extractors/extractors.module';
 import { FilesModule } from './files/files.module';
 
@@ -54,8 +53,6 @@ import { FilesModule } from './files/files.module';
         },
       ],
     }),
-
-    DocxtractorModule,
 
     ExtractorsModule,
 

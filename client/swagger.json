@@ -1,0 +1,1375 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "head": {
+        "operationId": "AppController_handleHeadRequest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Health check (HEAD)",
+        "tags": [
+          "App"
+        ]
+      },
+      "get": {
+        "operationId": "AppController_handleGetRequest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Health check (GET)",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/user": {
+      "post": {
+        "operationId": "UserController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new user",
+        "tags": [
+          "Users"
+        ]
+      },
+      "get": {
+        "operationId": "UserController_findAll",
+        "parameters": [
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "description": "Filter users by their role",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "user",
+                "admin"
+              ]
+            }
+          },
+          {
+            "name": "email",
+            "required": false,
+            "in": "query",
+            "description": "Filter users by their email address",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isEmailVerified",
+            "required": false,
+            "in": "query",
+            "description": "Filter users by their email verification status",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search for users by a keyword",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all users",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "operationId": "UserController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user by ID",
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "operationId": "UserController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user details",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UserController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "operationId": "AuthController_signUp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User successfully registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already exists"
+          }
+        },
+        "summary": "Register a new user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User authenticated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        },
+        "summary": "Authenticate user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refreshToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Access token refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshTokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid refresh token"
+          }
+        },
+        "summary": "Refresh access token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/verify-tokens": {
+      "post": {
+        "operationId": "AuthController_verifyTokens",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Tokens are valid"
+          },
+          "401": {
+            "description": "Invalid tokens"
+          }
+        },
+        "summary": "Verify access and refresh tokens",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/password/forgot": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordInitiateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Password reset email sent if account exists"
+          }
+        },
+        "summary": "Initiate password reset",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/password/reset": {
+      "post": {
+        "operationId": "AuthController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordConfirmDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password successfully reset"
+          },
+          "401": {
+            "description": "Invalid or expired token"
+          }
+        },
+        "summary": "Confirm password reset",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/password/update": {
+      "post": {
+        "operationId": "AuthController_updatePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated successfully"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        },
+        "summary": "Update password (authenticated users)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/email/update": {
+      "post": {
+        "operationId": "AuthController_updateEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email updated successfully"
+          },
+          "409": {
+            "description": "Email already in use"
+          }
+        },
+        "summary": "Update email address",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/email/verify": {
+      "post": {
+        "operationId": "AuthController_verifyEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid verification token"
+          }
+        },
+        "summary": "Verify email address",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/email/verify/initiate": {
+      "post": {
+        "operationId": "AuthController_initiateEmailVerification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification email sent successfully"
+          },
+          "400": {
+            "description": "Invalid email address"
+          }
+        },
+        "summary": "Initiate email verification",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "operationId": "AuthController_googleAuth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Redirects to Google login"
+          }
+        },
+        "summary": "Initiate Google OAuth login",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "operationId": "AuthController_googleAuthRedirect",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/chat": {
+      "post": {
+        "operationId": "ChatController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChatDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Streamed AI response"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send a message to the AI chat",
+        "tags": [
+          "Chat"
+        ]
+      },
+      "get": {
+        "operationId": "ChatController_test",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Model test successful"
+          }
+        },
+        "summary": "Test the AI model connectivity",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/extractors": {
+      "post": {
+        "operationId": "ExtractorsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExtractorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extractors"
+        ]
+      },
+      "get": {
+        "operationId": "ExtractorsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extractors"
+        ]
+      }
+    },
+    "/extractors/{id}": {
+      "get": {
+        "operationId": "ExtractorsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extractors"
+        ]
+      },
+      "patch": {
+        "operationId": "ExtractorsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExtractorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extractors"
+        ]
+      },
+      "delete": {
+        "operationId": "ExtractorsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extractors"
+        ]
+      }
+    },
+    "/files/upload": {
+      "post": {
+        "description": "Upload a file with user-scoped security. Files are encrypted at rest (SSE-S3) and isolated per user. Returns file ID, URL, and storage key for referencing in other CRUD operations.",
+        "operationId": "FilesController_uploadFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "userId"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The file to upload"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID (will be extracted from JWT token in production)",
+                    "example": "user-123"
+                  },
+                  "metadata": {
+                    "type": "string",
+                    "description": "Optional JSON metadata (e.g., {\"jobId\": \"job-456\"})",
+                    "example": "{\"jobId\": \"job-456\", \"documentType\": \"invoice\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique file ID",
+                      "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                    },
+                    "url": {
+                      "type": "string",
+                      "description": "Direct URL to access the file",
+                      "example": "http://minio:9000/docxtractor-documents/user-123/1706345678_abc123_invoice.pdf"
+                    },
+                    "storageKey": {
+                      "type": "string",
+                      "description": "S3 storage key for the file",
+                      "example": "user-123/1706345678_abc123_invoice.pdf"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid file or missing userId"
+          }
+        },
+        "summary": "Upload a single file",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/files/upload-multiple": {
+      "post": {
+        "description": "Upload up to 10 files in a single request. All files are user-scoped and encrypted at rest. Returns an array of file references.",
+        "operationId": "FilesController_uploadMultipleFiles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "files",
+                  "userId"
+                ],
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Array of files to upload (max 10)"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID (will be extracted from JWT token in production)",
+                    "example": "user-123"
+                  },
+                  "metadata": {
+                    "type": "string",
+                    "description": "Optional JSON metadata applied to all files",
+                    "example": "{\"batchId\": \"batch-789\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Files uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                      },
+                      "url": {
+                        "type": "string",
+                        "example": "http://minio:9000/docxtractor-documents/user-123/1706345678_abc123_file1.pdf"
+                      },
+                      "storageKey": {
+                        "type": "string",
+                        "example": "user-123/1706345678_abc123_file1.pdf"
+                      },
+                      "originalName": {
+                        "type": "string",
+                        "example": "invoice.pdf"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid files or missing userId"
+          }
+        },
+        "summary": "Upload multiple files at once",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/files/{id}": {
+      "get": {
+        "description": "Retrieve file metadata for a specific file. User-scoped - users can only access their own files.",
+        "operationId": "FilesController_getFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "File ID",
+            "schema": {
+              "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File metadata retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "originalName": {
+                      "type": "string",
+                      "example": "invoice.pdf"
+                    },
+                    "mimeType": {
+                      "type": "string",
+                      "example": "application/pdf"
+                    },
+                    "size": {
+                      "type": "number",
+                      "example": 1024000
+                    },
+                    "storageKey": {
+                      "type": "string"
+                    },
+                    "bucket": {
+                      "type": "string",
+                      "example": "docxtractor-documents"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "uploaded"
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "metadata": {
+                      "type": "object"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found or access denied"
+          }
+        },
+        "summary": "Get file metadata by ID",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/files": {
+      "get": {
+        "description": "Retrieve all files uploaded by the authenticated user, ordered by creation date (newest first).",
+        "operationId": "FilesController_listFiles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Files retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "originalName": {
+                        "type": "string"
+                      },
+                      "mimeType": {
+                        "type": "string"
+                      },
+                      "size": {
+                        "type": "number"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List all files for a user",
+        "tags": [
+          "Files"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "docXtractor",
+    "description": "A comprehensive docXtractor System to extract text from documents.",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "docXtractor",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "profilePicture": {
+            "type": "string",
+            "example": "https://example.com/profile.jpg"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          },
+          "googleId": {
+            "type": "string",
+            "example": "google_oauth_id"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "default": "user"
+          }
+        },
+        "required": [
+          "email",
+          "role"
+        ]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            "description": "Unique identifier for the user"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "User email address"
+          },
+          "profilePicture": {
+            "type": "string",
+            "example": "https://example.com/profile.jpg",
+            "description": "User profile picture url"
+          },
+          "role": {
+            "type": "string",
+            "example": "admin",
+            "description": "User role"
+          },
+          "isEmailVerified": {
+            "type": "boolean",
+            "example": true,
+            "description": "Email verification status"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2023-08-10T08:00:00.000Z",
+            "description": "Account creation date"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "profilePicture",
+          "role",
+          "isEmailVerified",
+          "createdAt"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "profilePicture": {
+            "type": "string",
+            "example": "https://example.com/profile.jpg"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          },
+          "googleId": {
+            "type": "string",
+            "example": "google_oauth_id"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "default": "user"
+          },
+          "isEmailVerified": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "SignUpDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address of the user",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "The password of the user. Must be at least 8 characters long.",
+            "example": "strongPassword123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address of the user",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "The password of the user",
+            "example": "strongPassword123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "The refresh token string used to obtain a new access token.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "ResetPasswordInitiateDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address of the user requesting a password reset",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordConfirmDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JWT token for password reset"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "New password for the user"
+          }
+        },
+        "required": [
+          "token",
+          "newPassword"
+        ]
+      },
+      "UpdatePasswordDto": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "description": "The new password for the user"
+          }
+        },
+        "required": [
+          "newPassword"
+        ]
+      },
+      "UpdateEmailDto": {
+        "type": "object",
+        "properties": {
+          "newEmail": {
+            "type": "string",
+            "description": "The new email address of the user",
+            "example": "example@example.com"
+          }
+        },
+        "required": [
+          "newEmail"
+        ]
+      },
+      "VerifyEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address to be verified.",
+            "example": "user@example.com"
+          },
+          "otp": {
+            "type": "string",
+            "description": "The one-time password (OTP) sent to the email for verification.",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "email",
+          "otp"
+        ]
+      },
+      "MessageDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "The role of the sender, e.g., \"user\" or \"assistant\"",
+            "example": "user"
+          },
+          "content": {
+            "type": "string",
+            "description": "The actual message content",
+            "example": "Hello, how can I help you today?"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ]
+      },
+      "CreateChatDto": {
+        "type": "object",
+        "properties": {
+          "messages": {
+            "description": "Array of messages between user and assistant",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageDto"
+            }
+          }
+        },
+        "required": [
+          "messages"
+        ]
+      },
+      "CreateExtractorDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateExtractorDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponseDto"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "user"
+        ]
+      },
+      "RefreshTokenResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken"
+        ]
+      }
+    }
+  }
+}

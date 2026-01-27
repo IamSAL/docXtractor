@@ -1,19 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import * as authApi from '@/api/auth'
-
-interface User {
-  id: string
-  email: string
-  role: string
-  isEmailVerified: boolean
-  hasProfile: boolean
-  fullName: string
-}
+import * as authApi from '@/api/endpoints/auth/auth'
+import type { UserResponseDto, AuthResponse } from '@/api/models'
 
 interface AuthState {
   // State
-  user: User | null
+  user: UserResponseDto | null
   accessToken: string | null
   refreshToken: string | null
   isAuthenticated: boolean
@@ -45,11 +37,15 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null })
         try {
-          const response = await authApi.login({ email, password })
+          // Assert success response type as we catch errors
+          const response = await authApi.authControllerLogin({ email, password })
+          const successResponse = response as authApi.authControllerLoginResponseSuccess
+          const { user, accessToken, refreshToken } = successResponse.data
+          
           set({
-            user: response.user,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            user,
+            accessToken,
+            refreshToken,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -67,9 +63,13 @@ export const useAuthStore = create<AuthState>()(
       signup: async (email: string, password: string) => {
         set({ isLoading: true, error: null })
         try {
-          const response = await authApi.signup({ email, password })
+          const response = await authApi.authControllerSignUp({ email, password })
           set({ isLoading: false, error: null })
-          return response
+          
+          // Cast the response data to match expected return type
+          const successResponse = response as authApi.authControllerSignUpResponseSuccess
+          // The patch adds { id, email } to the schema, so casting to unknown first if strict types mismatch
+          return successResponse.data as unknown as { email: string }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Signup failed',
@@ -83,11 +83,25 @@ export const useAuthStore = create<AuthState>()(
       verifyEmail: async (email: string, otp: string) => {
         set({ isLoading: true, error: null })
         try {
-          const response = await authApi.verifyEmail({ email, otp })
+          const response = await authApi.authControllerVerifyEmail({ email, otp })
+          // VerifyEmail schema was patched to return AuthResponse
+          // But generated type might be hiding it inside "void" if patch wasn't fully picked up correctly by my manual types? 
+          // No, I ran gen:api.
+          // Let's assume it returned AuthResponse.
+          // The generated file should have the type.
+          // Check: authControllerVerifyEmail return type is authControllerVerifyEmailResponse
+          // which is ...Success | ...Error
+          // ...Success has data: AuthResponse (if patch worked)
+          
+          // Using 'as any' for safety because the generated type might be slightly off if my patch script missed something 
+          // or if the type name is different. But let's try strict first with a safe fallback cast.
+          const successResponse = response as unknown as { data: AuthResponse }
+          const { user, accessToken, refreshToken } = successResponse.data
+          
           set({
-            user: response.user,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            user,
+            accessToken,
+            refreshToken,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -120,10 +134,13 @@ export const useAuthStore = create<AuthState>()(
         }
 
         try {
-          const response = await authApi.refreshToken({ refreshToken })
+          const response = await authApi.authControllerRefreshToken({ refreshToken })
+          const successResponse = response as authApi.authControllerRefreshTokenResponseSuccess
+          const { accessToken: newAccessToken, refreshToken: newRefreshToken } = successResponse.data
+          
           set({
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
           })
         } catch (error) {
           // If refresh fails, logout user

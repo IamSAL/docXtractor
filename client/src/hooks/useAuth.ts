@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/lib/auth-store'
+import { AXIOS_INSTANCE } from '@/lib/axios'
 import { useEffect, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -99,41 +100,27 @@ export function useTokenRefresh() {
  * Hook to make authenticated API requests with automatic token refresh
  */
 export function useAuthenticatedFetch() {
-  const { accessToken, refreshAccessToken, logout } = useAuthStore()
-
   const authenticatedFetch = useCallback(
     async (url: string, options: RequestInit = {}) => {
-      if (!accessToken) {
-        throw new Error('No access token available')
+      // Create axios config from fetch options
+      const config = {
+        url,
+        method: options.method || 'GET',
+        headers: options.headers as any,
+        data: options.body,
       }
 
-      // Add authorization header
-      const headers = {
-        ...options.headers,
-        Authorization: `Bearer ${accessToken}`,
-      }
-
-      let response = await fetch(url, { ...options, headers })
-
-      // If unauthorized, try to refresh token and retry
-      if (response.status === 401) {
-        try {
-          await refreshAccessToken()
-          const newAccessToken = useAuthStore.getState().accessToken
-          
-          if (newAccessToken) {
-            headers.Authorization = `Bearer ${newAccessToken}`
-            response = await fetch(url, { ...options, headers })
-          }
-        } catch (error) {
-          logout()
-          throw new Error('Session expired. Please login again.')
-        }
-      }
-
-      return response
+      // We return the full response to mimic fetch's behavior somewhat,
+      // but Axios response structure is different.
+      // However, since this hook was returning `await fetch(...)` which returns a Response object,
+      // switching to axios means we return `AxiosResponse`.
+      // Callers calling `.json()` on it will fail if we return AxiosResponse directly.
+      // BUT, checking the usage, it seems unused.
+      // To be safe and aligned with "use axios", we simply return the axios promise.
+      // If callers expect `response.json()`, they will need to change to `response.data`.
+      return AXIOS_INSTANCE(config)
     },
-    [accessToken, refreshAccessToken, logout]
+    []
   )
 
   return authenticatedFetch
