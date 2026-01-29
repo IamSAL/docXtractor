@@ -52,8 +52,8 @@ export class FilesController {
         },
         metadata: {
           type: 'string',
-          description: 'Optional JSON metadata (e.g., {"jobId": "job-456"})',
-          example: '{"jobId": "job-456", "documentType": "invoice"}',
+          description: 'Optional JSON metadata (e.g., {"runId": "run-456"})',
+          example: '{"runId": "run-456", "documentType": "invoice"}',
         },
       },
     },

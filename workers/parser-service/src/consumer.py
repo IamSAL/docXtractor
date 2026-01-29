@@ -26,10 +26,10 @@ async def consume():
         async for msg in consumer:
             try:
                 data = msg.value
-                logger.info(f"Received job: {data.get('job_id')} doc: {data.get('document_id')}")
+                logger.info(f"Received run: {data.get('run_id')} doc: {data.get('document_id')}")
                 
                 # 1. Parse Input
-                # Expected event structure: { "job_id": "...", "document_id": "...", "file_key": "...", ... }
+                # Expected event structure: { "run_id": "...", "document_id": "...", "file_key": "...", ... }
                 # We assume 'file_key' is the path in the bucket. If 's3://...' is sent, we'd need to parse it.
                 # For now, let's look for 'file_key' or 'file_url'
                 file_key = data.get("file_key") or data.get("file_url", "").replace("s3://docxtractor-documents/", "")
@@ -48,7 +48,7 @@ async def consume():
                 
                 # 3. Produce Result
                 event = {
-                    "job_id": data.get("job_id"),
+                    "run_id": data.get("run_id"),
                     "document_id": data.get("document_id"),
                     "status": "success",
                     "markdown_content": result["markdown_content"],

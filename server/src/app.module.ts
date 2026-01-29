@@ -18,6 +18,7 @@ import { AppController } from './app.controller';
 
 import { ExtractorsModule } from './extractors/extractors.module';
 import { FilesModule } from './files/files.module';
+import { RunsModule } from './runs/runs.module';
 
 @Module({
   imports: [
@@ -57,6 +58,8 @@ import { FilesModule } from './files/files.module';
     ExtractorsModule,
 
     FilesModule,
+
+    RunsModule,
   ],
   controllers: [AppController],
   providers: [

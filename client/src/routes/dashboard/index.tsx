@@ -128,7 +128,7 @@ function RouteComponent() {
                     </div>
                     <Input
                         className="w-full pl-10 pr-4 py-3 bg-white border-2 border-black rounded-lg text-black placeholder-gray-500 font-medium focus:ring-0 focus:border-black shadow-none focus:shadow-hard transition-all h-auto"
-                        placeholder="Filter recent jobs..."
+                        placeholder="Filter recent runs..."
                         type="text"
                     />
                 </div>
@@ -212,7 +212,7 @@ function RouteComponent() {
                             )}
                         </div>
                     </div>
-                    {/* Right Column: Recent Activity / Jobs (as a taller panel on XL screens) */}
+                    {/* Right Column: Recent Activity / Runs (as a taller panel on XL screens) */}
                     <div className="xl:col-span-1 flex flex-col gap-6">
                         <h3 className="text-2xl font-extrabold border-b-4 border-primary inline-block pr-2">
                             Activity Feed
@@ -221,7 +221,7 @@ function RouteComponent() {
                             <div className="border-2 border-black rounded-lg overflow-hidden h-full flex flex-col">
                                 {/* List Header */}
                                 <div className="bg-primary/20 p-4 border-b-2 border-black flex items-center justify-between">
-                                    <span className="font-bold uppercase text-sm">Latest Jobs</span>
+                                    <span className="font-bold uppercase text-sm">Latest Runs</span>
                                     <span className="material-symbols-outlined">history</span>
                                 </div>
                                 {/* List Items */}
@@ -229,7 +229,7 @@ function RouteComponent() {
                                     {/* Item 1 */}
                                     <div className="p-4 hover:bg-gray-50 transition-colors">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="font-bold text-sm">#JOB-8823</span>
+                                            <span className="font-bold text-sm">#RUN-8823</span>
                                             <Badge className="bg-green-200 text-green-900 border-green-900 shadow-none hover:shadow-none font-bold">
                                                 Success
                                             </Badge>
@@ -243,7 +243,7 @@ function RouteComponent() {
                                     {/* Item 2 */}
                                     <div className="p-4 hover:bg-gray-50 transition-colors">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="font-bold text-sm">#JOB-8822</span>
+                                            <span className="font-bold text-sm">#RUN-8822</span>
                                             <Badge className="bg-yellow-200 text-yellow-900 border-yellow-900 shadow-none hover:shadow-none flex items-center gap-1 font-bold">
                                                 <span className="animate-spin material-symbols-outlined text-[10px]">
                                                     progress_activity
@@ -260,7 +260,7 @@ function RouteComponent() {
                                     {/* Item 3 */}
                                     <div className="p-4 hover:bg-gray-50 transition-colors">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="font-bold text-sm">#JOB-8821</span>
+                                            <span className="font-bold text-sm">#RUN-8821</span>
                                             <Badge className="bg-red-200 text-red-900 border-red-900 shadow-none hover:shadow-none font-bold">
                                                 Failed
                                             </Badge>
@@ -274,7 +274,7 @@ function RouteComponent() {
                                     {/* Item 4 */}
                                     <div className="p-4 hover:bg-gray-50 transition-colors">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="font-bold text-sm">#JOB-8820</span>
+                                            <span className="font-bold text-sm">#RUN-8820</span>
                                             <Badge className="bg-green-200 text-green-900 border-green-900 shadow-none hover:shadow-none font-bold">
                                                 Success
                                             </Badge>
@@ -290,7 +290,7 @@ function RouteComponent() {
                         </Card>
                     </div>
                 </div>
-                {/* Full Width Jobs Table Section */}
+                {/* Full Width Runs Table Section */}
                 <section className="mb-12">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-2xl font-extrabold border-b-4 border-primary inline-block pr-2">
@@ -312,7 +312,7 @@ function RouteComponent() {
                                     <thead>
                                         <tr className="bg-gray-50 border-b-2 border-black">
                                             <th className="p-4 font-bold text-sm uppercase tracking-wide border-r-2 border-black/10">
-                                                Job ID
+                                                Run ID
                                             </th>
                                             <th className="p-4 font-bold text-sm uppercase tracking-wide border-r-2 border-black/10">
                                                 Extractor
@@ -334,7 +334,7 @@ function RouteComponent() {
                                     <tbody className="divide-y-2 divide-gray-100 bg-white">
                                         {/* Row 1 */}
                                         <tr className="hover:bg-yellow-50 transition-colors group">
-                                            <td className="p-4 font-mono font-bold text-sm">#JOB-8823</td>
+                                            <td className="p-4 font-mono font-bold text-sm">#RUN-8823</td>
                                             <td className="p-4 font-medium text-sm">Invoice Processor</td>
                                             <td className="p-4 text-sm text-gray-600">
                                                 Oct 24, 2023 10:42 AM
@@ -355,7 +355,7 @@ function RouteComponent() {
                                         </tr>
                                         {/* Row 2 */}
                                         <tr className="hover:bg-yellow-50 transition-colors group">
-                                            <td className="p-4 font-mono font-bold text-sm">#JOB-8822</td>
+                                            <td className="p-4 font-mono font-bold text-sm">#RUN-8822</td>
                                             <td className="p-4 font-medium text-sm">Contract Analyzer</td>
                                             <td className="p-4 text-sm text-gray-600">
                                                 Oct 24, 2023 10:35 AM
@@ -379,7 +379,7 @@ function RouteComponent() {
                                         </tr>
                                         {/* Row 3 */}
                                         <tr className="hover:bg-yellow-50 transition-colors group">
-                                            <td className="p-4 font-mono font-bold text-sm">#JOB-8821</td>
+                                            <td className="p-4 font-mono font-bold text-sm">#RUN-8821</td>
                                             <td className="p-4 font-medium text-sm">Receipt Scanner</td>
                                             <td className="p-4 text-sm text-gray-600">
                                                 Oct 23, 2023 04:15 PM
@@ -400,7 +400,7 @@ function RouteComponent() {
                                         </tr>
                                         {/* Row 4 */}
                                         <tr className="hover:bg-yellow-50 transition-colors group">
-                                            <td className="p-4 font-mono font-bold text-sm">#JOB-8820</td>
+                                            <td className="p-4 font-mono font-bold text-sm">#RUN-8820</td>
                                             <td className="p-4 font-medium text-sm">Invoice Processor</td>
                                             <td className="p-4 text-sm text-gray-600">
                                                 Oct 23, 2023 02:00 PM

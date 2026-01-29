@@ -19,7 +19,7 @@ async def consume():
         async for msg in consumer:
             try:
                 data = msg.value
-                logger.info(f"Received extraction request for job: {data.get('job_id')}")
+                logger.info(f"Received extraction request for run: {data.get('run_id')}")
                 
                 content_block = data.get("content", {})
                 markdown_text = content_block.get("combined_markdown") or content_block.get("markdown", "")
@@ -50,14 +50,14 @@ async def consume():
                 
                 # Produce Request
                 event = {
-                    "job_id": data.get("job_id"),
+                    "run_id": data.get("run_id"),
                     "status": "success",
                     "data": result["data"],
                     "usage": result["usage"]
                 }
                 
                 await kafka_client.send_message(TOPIC_COMPLETED, event)
-                logger.info(f"Completed extraction for {data.get('job_id')}")
+                logger.info(f"Completed extraction for {data.get('run_id')}")
 
             except Exception as e:
                 logger.error(f"Error extracting: {e}")

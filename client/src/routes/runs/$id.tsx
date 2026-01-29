@@ -2,18 +2,18 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { AppLayout } from '../../components/AppLayout'
 import { PageHeader } from '../../components/retroui/PageHeader'
 
-export const Route = createFileRoute('/jobs/$id')({
-    component: JobDetailComponent,
+export const Route = createFileRoute('/runs/$id')({
+    component: RunDetailComponent,
 })
 
-function JobDetailComponent() {
+function RunDetailComponent() {
     const { id } = Route.useParams()
 
     return (
         <AppLayout>
             <div className="flex flex-col h-full overflow-hidden relative p-4 lg:p-12">
                 <PageHeader
-                    breadcrumb={`Jobs / Job #${id}`}
+                    breadcrumb={`Runs / Run #${id}`}
                     heading="Invoice Processing Q3"
                 >
                     <div className="flex items-center gap-4">
@@ -147,7 +147,7 @@ function JobDetailComponent() {
                             </div>
                         </div>
                         <div className="mt-auto flex flex-col gap-3">
-                            <Link to="/jobs/review/$id" params={{ id }} className="bg-black text-white hover:bg-gray-800 w-full py-4 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none no-underline">
+                            <Link to="/runs/review/$id" params={{ id }} className="bg-black text-white hover:bg-gray-800 w-full py-4 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none no-underline">
                                 <span className="material-symbols-outlined text-sm">rate_review</span>
                                 HUMAN REVIEW
                             </Link>

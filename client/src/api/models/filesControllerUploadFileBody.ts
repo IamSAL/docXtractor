@@ -11,6 +11,6 @@ export type FilesControllerUploadFileBody = {
 	file: Blob;
 	/** User ID (will be extracted from JWT token in production) */
 	userId: string;
-	/** Optional JSON metadata (e.g., {"jobId": "job-456"}) */
+	/** Optional JSON metadata (e.g., {"runId": "run-456"}) */
 	metadata?: string;
 };

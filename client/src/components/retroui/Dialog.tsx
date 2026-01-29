@@ -20,7 +20,7 @@ const overlayVariants = cva(
   {
     variants: {
       variant: {
-        default: "inset-0 z-50 bg-black/85",
+        default: "inset-0 z-50 bg-black/60",
         none: "fixed bg-transparent",
       },
     },
@@ -32,7 +32,7 @@ const overlayVariants = cva(
 
 interface IDialogBackgroupProps
   extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof overlayVariants> {}
+  VariantProps<typeof overlayVariants> { }
 
 const DialogBackdrop = React.forwardRef<HTMLDivElement, IDialogBackgroupProps>(
   function DialogBackdrop(inputProps: IDialogBackgroupProps, forwardedRef) {
@@ -40,7 +40,7 @@ const DialogBackdrop = React.forwardRef<HTMLDivElement, IDialogBackgroupProps>(
 
     return (
       <ReactDialog.Overlay
-        className={cn(overlayVariants({ variant }), className)}
+        className={cn(overlayVariants({ variant }), className, "backdrop-blur-sm")}
         ref={forwardedRef}
         {...props}
       />
@@ -79,7 +79,7 @@ const dialogVariants = cva(
 
 interface IDialogContentProps
   extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof dialogVariants> {
+  VariantProps<typeof dialogVariants> {
   overlay?: IDialogBackgroupProps;
 }
 
@@ -112,7 +112,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, IDialogContentProps>(
 );
 DialogContent.displayName = "DialogContent";
 
-interface IDialogDescriptionProps extends HTMLAttributes<HTMLDivElement> {}
+interface IDialogDescriptionProps extends HTMLAttributes<HTMLDivElement> { }
 const DialogDescription = ({
   children,
   className,
@@ -145,7 +145,7 @@ const dialogFooterVariants = cva(
 
 export interface IDialogFooterProps
   extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof dialogFooterVariants> {}
+  VariantProps<typeof dialogFooterVariants> { }
 
 const DialogFooter = ({
   children,
@@ -196,8 +196,8 @@ const DialogHeaderDefaultLayout = ({ children }: { children: ReactNode }) => {
 
 interface IDialogHeaderProps
   extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof dialogHeaderVariants>,
-    ReactDialog.DialogTitleProps {}
+  VariantProps<typeof dialogHeaderVariants>,
+  ReactDialog.DialogTitleProps { }
 
 const DialogHeader = ({
   children,

@@ -15,7 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
-import { Route as JobsIndexRouteImport } from './routes/jobs/index'
+import { Route as RunsIndexRouteImport } from './routes/runs/index'
 import { Route as ExtractorsIndexRouteImport } from './routes/extractors/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AutorunsIndexRouteImport } from './routes/autoruns/index'
@@ -24,7 +24,7 @@ import { Route as SettingsNotificationsRouteImport } from './routes/settings/not
 import { Route as SettingsExtractionRouteImport } from './routes/settings/extraction'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings/appearance'
 import { Route as SettingsApiKeysRouteImport } from './routes/settings/api-keys'
-import { Route as JobsIdRouteImport } from './routes/jobs/$id'
+import { Route as RunsIdRouteImport } from './routes/runs/$id'
 import { Route as ExtractorsNewRouteImport } from './routes/extractors/new'
 import { Route as ExtractorsIdRouteImport } from './routes/extractors/$id'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
@@ -35,7 +35,7 @@ import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
 import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
 import { Route as AutorunsNewRouteImport } from './routes/autoruns/new'
 import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
-import { Route as JobsReviewIdRouteImport } from './routes/jobs/review.$id'
+import { Route as RunsReviewIdRouteImport } from './routes/runs/review.$id'
 import { Route as ExtractorsEditIdRouteImport } from './routes/extractors/edit.$id'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
@@ -85,9 +85,9 @@ const SettingsIndexRoute = SettingsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SettingsRoute,
 } as any)
-const JobsIndexRoute = JobsIndexRouteImport.update({
-  id: '/jobs/',
-  path: '/jobs/',
+const RunsIndexRoute = RunsIndexRouteImport.update({
+  id: '/runs/',
+  path: '/runs/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExtractorsIndexRoute = ExtractorsIndexRouteImport.update({
@@ -130,9 +130,9 @@ const SettingsApiKeysRoute = SettingsApiKeysRouteImport.update({
   path: '/api-keys',
   getParentRoute: () => SettingsRoute,
 } as any)
-const JobsIdRoute = JobsIdRouteImport.update({
-  id: '/jobs/$id',
-  path: '/jobs/$id',
+const RunsIdRoute = RunsIdRouteImport.update({
+  id: '/runs/$id',
+  path: '/runs/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExtractorsNewRoute = ExtractorsNewRouteImport.update({
@@ -185,9 +185,9 @@ const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
   path: '/guitars/',
   getParentRoute: () => DemoRoute,
 } as any)
-const JobsReviewIdRoute = JobsReviewIdRouteImport.update({
-  id: '/jobs/review/$id',
-  path: '/jobs/review/$id',
+const RunsReviewIdRoute = RunsReviewIdRouteImport.update({
+  id: '/runs/review/$id',
+  path: '/runs/review/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExtractorsEditIdRoute = ExtractorsEditIdRouteImport.update({
@@ -296,7 +296,7 @@ export interface FileRoutesByFullPath {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
-  '/jobs/$id': typeof JobsIdRoute
+  '/runs/$id': typeof RunsIdRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
@@ -305,7 +305,7 @@ export interface FileRoutesByFullPath {
   '/autoruns/': typeof AutorunsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/extractors/': typeof ExtractorsIndexRoute
-  '/jobs/': typeof JobsIndexRoute
+  '/runs/': typeof RunsIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
@@ -316,7 +316,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/extractors/edit/$id': typeof ExtractorsEditIdRoute
-  '/jobs/review/$id': typeof JobsReviewIdRoute
+  '/runs/review/$id': typeof RunsReviewIdRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
@@ -342,7 +342,7 @@ export interface FileRoutesByTo {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
-  '/jobs/$id': typeof JobsIdRoute
+  '/runs/$id': typeof RunsIdRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
@@ -351,7 +351,7 @@ export interface FileRoutesByTo {
   '/autoruns': typeof AutorunsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/extractors': typeof ExtractorsIndexRoute
-  '/jobs': typeof JobsIndexRoute
+  '/runs': typeof RunsIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
@@ -362,7 +362,7 @@ export interface FileRoutesByTo {
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/extractors/edit/$id': typeof ExtractorsEditIdRoute
-  '/jobs/review/$id': typeof JobsReviewIdRoute
+  '/runs/review/$id': typeof RunsReviewIdRoute
   '/demo/guitars': typeof DemoGuitarsIndexRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
@@ -390,7 +390,7 @@ export interface FileRoutesById {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
-  '/jobs/$id': typeof JobsIdRoute
+  '/runs/$id': typeof RunsIdRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
@@ -399,7 +399,7 @@ export interface FileRoutesById {
   '/autoruns/': typeof AutorunsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/extractors/': typeof ExtractorsIndexRoute
-  '/jobs/': typeof JobsIndexRoute
+  '/runs/': typeof RunsIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
@@ -410,7 +410,7 @@ export interface FileRoutesById {
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/extractors/edit/$id': typeof ExtractorsEditIdRoute
-  '/jobs/review/$id': typeof JobsReviewIdRoute
+  '/runs/review/$id': typeof RunsReviewIdRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
@@ -439,7 +439,7 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/extractors/$id'
     | '/extractors/new'
-    | '/jobs/$id'
+    | '/runs/$id'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
@@ -448,7 +448,7 @@ export interface FileRouteTypes {
     | '/autoruns/'
     | '/dashboard/'
     | '/extractors/'
-    | '/jobs/'
+    | '/runs/'
     | '/settings/'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
@@ -459,7 +459,7 @@ export interface FileRouteTypes {
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/extractors/edit/$id'
-    | '/jobs/review/$id'
+    | '/runs/review/$id'
     | '/demo/guitars/'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
@@ -485,7 +485,7 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/extractors/$id'
     | '/extractors/new'
-    | '/jobs/$id'
+    | '/runs/$id'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
@@ -494,7 +494,7 @@ export interface FileRouteTypes {
     | '/autoruns'
     | '/dashboard'
     | '/extractors'
-    | '/jobs'
+    | '/runs'
     | '/settings'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
@@ -505,7 +505,7 @@ export interface FileRouteTypes {
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/extractors/edit/$id'
-    | '/jobs/review/$id'
+    | '/runs/review/$id'
     | '/demo/guitars'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
@@ -532,7 +532,7 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/extractors/$id'
     | '/extractors/new'
-    | '/jobs/$id'
+    | '/runs/$id'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
@@ -541,7 +541,7 @@ export interface FileRouteTypes {
     | '/autoruns/'
     | '/dashboard/'
     | '/extractors/'
-    | '/jobs/'
+    | '/runs/'
     | '/settings/'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
@@ -552,7 +552,7 @@ export interface FileRouteTypes {
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/extractors/edit/$id'
-    | '/jobs/review/$id'
+    | '/runs/review/$id'
     | '/demo/guitars/'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
@@ -574,15 +574,15 @@ export interface RootRouteChildren {
   AutorunsNewRoute: typeof AutorunsNewRoute
   ExtractorsIdRoute: typeof ExtractorsIdRoute
   ExtractorsNewRoute: typeof ExtractorsNewRoute
-  JobsIdRoute: typeof JobsIdRoute
+  RunsIdRoute: typeof RunsIdRoute
   AutorunsIndexRoute: typeof AutorunsIndexRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   ExtractorsIndexRoute: typeof ExtractorsIndexRoute
-  JobsIndexRoute: typeof JobsIndexRoute
+  RunsIndexRoute: typeof RunsIndexRoute
   AutorunsEditIdRoute: typeof AutorunsEditIdRoute
   AutorunsRunsIdRoute: typeof AutorunsRunsIdRoute
   ExtractorsEditIdRoute: typeof ExtractorsEditIdRoute
-  JobsReviewIdRoute: typeof JobsReviewIdRoute
+  RunsReviewIdRoute: typeof RunsReviewIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -629,11 +629,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof SettingsRoute
     }
-    '/jobs/': {
-      id: '/jobs/'
-      path: '/jobs'
-      fullPath: '/jobs/'
-      preLoaderRoute: typeof JobsIndexRouteImport
+    '/runs/': {
+      id: '/runs/'
+      path: '/runs'
+      fullPath: '/runs/'
+      preLoaderRoute: typeof RunsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/extractors/': {
@@ -692,11 +692,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsApiKeysRouteImport
       parentRoute: typeof SettingsRoute
     }
-    '/jobs/$id': {
-      id: '/jobs/$id'
-      path: '/jobs/$id'
-      fullPath: '/jobs/$id'
-      preLoaderRoute: typeof JobsIdRouteImport
+    '/runs/$id': {
+      id: '/runs/$id'
+      path: '/runs/$id'
+      fullPath: '/runs/$id'
+      preLoaderRoute: typeof RunsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/extractors/new': {
@@ -769,11 +769,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoGuitarsIndexRouteImport
       parentRoute: typeof DemoRoute
     }
-    '/jobs/review/$id': {
-      id: '/jobs/review/$id'
-      path: '/jobs/review/$id'
-      fullPath: '/jobs/review/$id'
-      preLoaderRoute: typeof JobsReviewIdRouteImport
+    '/runs/review/$id': {
+      id: '/runs/review/$id'
+      path: '/runs/review/$id'
+      fullPath: '/runs/review/$id'
+      preLoaderRoute: typeof RunsReviewIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/extractors/edit/$id': {
@@ -988,15 +988,15 @@ const rootRouteChildren: RootRouteChildren = {
   AutorunsNewRoute: AutorunsNewRoute,
   ExtractorsIdRoute: ExtractorsIdRoute,
   ExtractorsNewRoute: ExtractorsNewRoute,
-  JobsIdRoute: JobsIdRoute,
+  RunsIdRoute: RunsIdRoute,
   AutorunsIndexRoute: AutorunsIndexRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   ExtractorsIndexRoute: ExtractorsIndexRoute,
-  JobsIndexRoute: JobsIndexRoute,
+  RunsIndexRoute: RunsIndexRoute,
   AutorunsEditIdRoute: AutorunsEditIdRoute,
   AutorunsRunsIdRoute: AutorunsRunsIdRoute,
   ExtractorsEditIdRoute: ExtractorsEditIdRoute,
-  JobsReviewIdRoute: JobsReviewIdRoute,
+  RunsReviewIdRoute: RunsReviewIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

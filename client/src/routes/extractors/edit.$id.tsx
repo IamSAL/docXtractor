@@ -8,6 +8,7 @@ import {
 } from '@/api/endpoints/extractors/extractors'
 import { toast } from 'sonner'
 import type { ExtractorFormData } from '@/types/extractor'
+import { EmptyBlock } from '@/components/EmptyBlock'
 
 export const Route = createFileRoute('/extractors/edit/$id')({
     component: EditExtractorComponent,
@@ -71,21 +72,18 @@ function EditExtractorComponent() {
     if (!extractor) {
         return (
             <AppLayout>
-                <div className="flex-1 flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-4">
-                        <span className="material-symbols-outlined text-6xl text-red-500">
-                            error
-                        </span>
-                        <p className="font-bold text-gray-500 uppercase tracking-widest">
-                            Extractor not found
-                        </p>
-                        <button
-                            onClick={() => navigate({ to: '/extractors' })}
-                            className="text-primary font-bold underline"
-                        >
-                            Back to Extractors
-                        </button>
-                    </div>
+                <div className="flex-1 flex items-center justify-center p-8">
+                    <EmptyBlock
+                        title="Extractor Not Found"
+                        description={`The extractor with ID "${id}" could not be located. It may have been deleted or the ID might be incorrect.`}
+                        icon="search_off"
+                        tag="404"
+                        action={{
+                            label: "Back to Extractors",
+                            icon: "arrow_back",
+                            onClick: () => navigate({ to: '/extractors' })
+                        }}
+                    />
                 </div>
             </AppLayout>
         )

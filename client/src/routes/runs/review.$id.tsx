@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/jobs/review/$id')({
-  component: JobReviewComponent,
+export const Route = createFileRoute('/runs/review/$id')({
+  component: RunReviewComponent,
 })
 
-function JobReviewComponent() {
+function RunReviewComponent() {
   const { id } = Route.useParams()
 
   return (
