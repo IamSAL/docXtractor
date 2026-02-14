@@ -1,8 +1,8 @@
-import axios, { AxiosRequestConfig } from 'axios';
-import { useAuthStore } from '@/lib/auth-store';
+import axios, { AxiosRequestConfig } from "axios";
+import { useAuthStore } from "@/lib/auth-store";
 
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
 });
 
 AXIOS_INSTANCE.interceptors.request.use((config) => {
@@ -18,35 +18,56 @@ AXIOS_INSTANCE.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Prevent infinite loops
+    // Handle 401 errors (Unauthorized)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
+        // Attempt to refresh the access token
         await useAuthStore.getState().refreshAccessToken();
         const newToken = useAuthStore.getState().accessToken;
 
         if (newToken) {
+          // Update the authorization header with the new token
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          // Retry the original request
           return AXIOS_INSTANCE(originalRequest);
         }
-      } catch (refreshError) {
-        useAuthStore.getState().logout();
+      } catch (refreshError: any) {
+        // Only logout if refresh token is also invalid
+        // This prevents logout on network errors
+        if (
+          refreshError?.response?.status === 401 ||
+          refreshError?.response?.status === 403
+        ) {
+          console.error("Refresh token expired or invalid. Logging out...");
+          useAuthStore.getState().logout();
+
+          // Redirect to login page
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
+        } else {
+          console.error(
+            "Token refresh failed due to network or server error:",
+            refreshError,
+          );
+        }
         return Promise.reject(refreshError);
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export const HttpClient = <T>(
   url: string,
-  options: (RequestInit & { params?: any; responseType?: any }) = {},
+  options: RequestInit & { params?: any; responseType?: any } = {},
 ): Promise<T> => {
   const { body, ...rest } = options;
   const source = axios.CancelToken.source();
-  
+
   const config: AxiosRequestConfig = {
     url,
     data: body,
@@ -65,7 +86,7 @@ export const HttpClient = <T>(
 
   // @ts-ignore
   promise.cancel = () => {
-    source.cancel('Query was cancelled');
+    source.cancel("Query was cancelled");
   };
 
   return promise as Promise<T>;
