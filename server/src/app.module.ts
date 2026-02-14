@@ -19,6 +19,7 @@ import { AppController } from './app.controller';
 import { ExtractorsModule } from './extractors/extractors.module';
 import { FilesModule } from './files/files.module';
 import { RunsModule } from './runs/runs.module';
+import { QueueModule } from './shared/queue/queue.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RunsModule } from './runs/runs.module';
     DatabaseModule,
     AuthModule,
     ChatModule,
+    QueueModule,
 
     // CacheModule.registerAsync({
     //   imports: [ConfigModule],

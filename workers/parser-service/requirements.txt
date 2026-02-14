@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-aiokafka
+bullmq
 docling
 python-dotenv
 boto3

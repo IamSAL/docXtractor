@@ -1,69 +1,72 @@
 import asyncio
-import json
 import logging
-from .kafka_client import kafka_client
+from .bullmq_client import bullmq_client
 from .docling_processor import process_document
+from bullmq import Job
 
 logger = logging.getLogger(__name__)
 
-TOPIC_UPLOADED = "docxtractor.documents.uploaded"
-TOPIC_PARSED = "docxtractor.documents.parsed"
-CONSUMER_GROUP = "parser-group"
+QUEUE_UPLOADED = "uploaded-documents"
+QUEUE_PARSED = "parsed-documents"
+
+async def process_job(job: Job):
+    """
+    Process a single job from BullMQ.
+    """
+    data = job.data
+    try:
+        logger.info(f"Received job {job.id} for run: {data.get('run_id')} doc: {data.get('document_id')}")
+        
+        file_key = data.get("file_key") or data.get("file_url", "").replace("s3://docxtractor-documents/", "")
+        
+        if not file_key:
+            logger.error("No file_key found in event")
+            return {"status": "error", "message": "No file_key found"}
+
+        # 2. Process (Blocking Call run in ThreadPool)
+        result = await asyncio.to_thread(
+            process_document, 
+            data.get("document_id"), 
+            file_key
+        )
+        
+        # 3. Produce Result
+        event = {
+            "run_id": data.get("run_id"),
+            "document_id": data.get("document_id"),
+            "status": "success",
+            "markdown_content": result["markdown_content"],
+            "token_count": result["token_count"]
+        }
+        
+        await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+        logger.info(f"Processed and produced result for {data.get('document_id')}")
+        return {"status": "success"}
+
+    except Exception as e:
+        logger.error(f"Error processing job {job.id}: {e}")
+        # Produce failure event
+        event = {
+            "run_id": data.get("run_id"),
+            "document_id": data.get("document_id"),
+            "status": "failed",
+            "error": str(e)
+        }
+        await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+        raise e
 
 async def consume():
     """
-    Main consumer loop.
+    Main entry point for starting the worker.
     """
-    # ensure producer is started
-    await kafka_client.start_producer()
-    
-    consumer = kafka_client.get_consumer(TOPIC_UPLOADED, CONSUMER_GROUP)
-    await consumer.start()
-    
-    logger.info(f"Started consumer for topic {TOPIC_UPLOADED}")
+    logger.info(f"Starting BullMQ worker for queue {QUEUE_UPLOADED}")
+    worker = bullmq_client.create_worker(QUEUE_UPLOADED, process_job)
     
     try:
-        async for msg in consumer:
-            try:
-                data = msg.value
-                logger.info(f"Received run: {data.get('run_id')} doc: {data.get('document_id')}")
-                
-                # 1. Parse Input
-                # Expected event structure: { "run_id": "...", "document_id": "...", "file_key": "...", ... }
-                # We assume 'file_key' is the path in the bucket. If 's3://...' is sent, we'd need to parse it.
-                # For now, let's look for 'file_key' or 'file_url'
-                file_key = data.get("file_key") or data.get("file_url", "").replace("s3://docxtractor-documents/", "")
-                
-                if not file_key:
-                    logger.error("No file_key found in event")
-                    continue
-
-                # 2. Process (Blocking Call run in ThreadPool)
-                # docling might be cpu bound, so running in executor is safer for asyncio loop
-                result = await asyncio.to_thread(
-                    process_document, 
-                    data.get("document_id"), 
-                    file_key
-                )
-                
-                # 3. Produce Result
-                event = {
-                    "run_id": data.get("run_id"),
-                    "document_id": data.get("document_id"),
-                    "status": "success",
-                    "markdown_content": result["markdown_content"],
-                    "token_count": result["token_count"]
-                }
-                
-                await kafka_client.send_message(TOPIC_PARSED, event)
-                logger.info(f"Processed and produced result for {data.get('document_id')}")
-
-            except Exception as e:
-                logger.error(f"Error processing message: {e}")
-                # TODO: Produce failure event
-                
+        # Keep the coroutine alive while the worker runs
+        while True:
+            await asyncio.sleep(1)
     except asyncio.CancelledError:
-        logger.info("Consumer loop cancelled")
+        logger.info("Worker cancelled")
     finally:
-        await consumer.stop()
-        await kafka_client.stop_producer()
+        await worker.close()

@@ -14,7 +14,7 @@ services:
     networks:
       - docxtractor-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,7 +28,7 @@ services:
     networks:
       - docxtractor-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -62,10 +62,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      kafka:
-        condition: service_started
-      init-kafka:
-        condition: service_completed_successfully
       createbuckets:
         condition: service_completed_successfully
     networks:
@@ -93,30 +89,6 @@ services:
       - docxtractor-network
     command: pnpm run dev
 
-  kafka:
-    image: apache/kafka:3.7.0
-    container_name: docxtractor-kafka
-    ports:
-      - "9092:9092"
-    environment:
-      # KRaft settings
-      - KAFKA_NODE_ID=0
-      - KAFKA_PROCESS_ROLES=controller,broker
-      - KAFKA_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      # Listeners
-      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      # Single-node configuration
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
-      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
-      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
-    networks:
-      - docxtractor-network
-
   minio:
     image: minio/minio
     container_name: docxtractor-minio
@@ -143,30 +115,19 @@ services:
     networks:
       - docxtractor-network
 
-  init-kafka:
-    image: apache/kafka:3.7.0
-    container_name: docxtractor-kafka-init
-    depends_on:
-      - kafka
-    entrypoint: [ "sh", "-c", "echo 'Waiting for Kafka...'; while ! /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list > /dev/null 2>&1; do sleep 2; done; /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic docxtractor.documents.uploaded --partitions 1 --replication-factor 1 && /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic docxtractor.documents.parsed --partitions 1 --replication-factor 1 && /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic docxtractor.extraction.requests --partitions 1 --replication-factor 1 && /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic docxtractor.extraction.completed --partitions 1 --replication-factor 1" ]
-    networks:
-      - docxtractor-network
-
   parser-service:
     build:
       context: ./workers/parser-service
     container_name: docxtractor-parser
     depends_on:
-      kafka:
-        condition: service_started
+      redis:
+        condition: service_healthy
       minio:
         condition: service_started
-      init-kafka:
-        condition: service_completed_successfully
       createbuckets:
         condition: service_completed_successfully
     environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS_URL=redis://redis:6379
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
@@ -182,18 +143,16 @@ services:
       context: ./workers/extraction-service
     container_name: docxtractor-extractor
     depends_on:
-      kafka:
-        condition: service_started
+      redis:
+        condition: service_healthy
       minio:
         condition: service_started
-      init-kafka:
-        condition: service_completed_successfully
       createbuckets:
         condition: service_completed_successfully
     env_file:
       - ./workers/extraction-service/.env
     environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS_URL=redis://redis:6379
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
@@ -207,7 +166,6 @@ services:
 volumes:
   postgres_data:
   minio_data:
-
 
 networks:
   docxtractor-network:

@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-aiokafka
+bullmq
 langextract
 google-generativeai
 python-dotenv
