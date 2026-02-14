@@ -100,11 +100,33 @@ export class RunsService {
     return run;
   }
 
-  async findAll(userId: string): Promise<Run[]> {
-    return this.runRepo.find({
-      where: { userId },
+  async findAll(
+    userId: string,
+    options?: {
+      page?: number;
+      limit?: number;
+      status?: RunStatus;
+      extractorId?: string;
+      search?: string;
+    },
+  ): Promise<{ data: Run[]; total: number; page: number; limit: number }> {
+    const page = options?.page || 1;
+    const limit = options?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const where: any = { userId };
+    if (options?.status) where.status = options.status;
+    if (options?.extractorId) where.extractorId = options.extractorId;
+
+    const [data, total] = await this.runRepo.findAndCount({
+      where,
       order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
+      relations: ['extractor'],
     });
+
+    return { data, total, page, limit };
   }
 
   async findOne(id: string, userId: string): Promise<Run> {
@@ -206,6 +228,61 @@ export class RunsService {
     const run = await this.findOne(id, userId);
     Object.assign(run, updateRunDto);
     return this.runRepo.save(run);
+  }
+
+  async retry(id: string, userId: string): Promise<Run> {
+    const run = await this.findOne(id, userId);
+
+    // Reset run state
+    run.status = RunStatus.QUEUED;
+    run.error = null;
+    run.results = null;
+    run.startedAt = new Date();
+    run.finishedAt = null;
+    run.progress = {
+      parsed: 0,
+      total: run.sources.length,
+      currentStep: 'queued',
+    };
+
+    // Reset sources
+    run.sources.forEach((source) => {
+      source.status = 'pending';
+      source.error = undefined;
+      source.parsedContent = undefined;
+      source.tokenCount = undefined;
+    });
+
+    run.logs.push({
+      timestamp: new Date().toISOString(),
+      level: 'info',
+      message: 'Run restarted',
+    });
+
+    await this.runRepo.save(run);
+
+    // Re-queue documents
+    for (const source of run.sources) {
+      source.status = 'parsing';
+      await this.queueService.addJob(
+        QueueName.UPLOADED_DOCUMENTS,
+        'parse-document',
+        {
+          run_id: run.id,
+          document_id: source.id,
+          type: source.type,
+          file_key: source.fileKey,
+          url: source.url,
+          name: source.name,
+        },
+      );
+    }
+
+    run.status = RunStatus.PARSING;
+    run.progress!.currentStep = 'parsing';
+    await this.runRepo.save(run);
+
+    return run;
   }
 
   async remove(id: string, userId: string) {

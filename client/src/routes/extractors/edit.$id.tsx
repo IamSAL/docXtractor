@@ -110,7 +110,7 @@ function EditExtractorComponent() {
   return (
     <AppLayout>
       <ExtractorForm
-        title={`Edit: ${extractor.name}`}
+        title={`${extractor.name}`}
         initialData={extractor as unknown as ExtractorFormData}
         onSubmit={onSubmit}
         onDelete={handleDelete}

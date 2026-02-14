@@ -15,7 +15,7 @@ import * as zod from 'zod';
 export const FilesControllerUploadFileBody = zod.object({
   "file": zod.instanceof(File),
   "userId": zod.string().describe('User ID (will be extracted from JWT token in production)'),
-  "metadata": zod.string().optional().describe('Optional JSON metadata (e.g., {\"jobId\": \"job-456\"})')
+  "metadata": zod.string().optional().describe('Optional JSON metadata (e.g., {\"runId\": \"run-456\"})')
 })
 
 /**

@@ -20,6 +20,7 @@ import { ExtractorsModule } from './extractors/extractors.module';
 import { FilesModule } from './files/files.module';
 import { RunsModule } from './runs/runs.module';
 import { QueueModule } from './shared/queue/queue.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -62,6 +63,8 @@ import { QueueModule } from './shared/queue/queue.module';
     FilesModule,
 
     RunsModule,
+
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [
