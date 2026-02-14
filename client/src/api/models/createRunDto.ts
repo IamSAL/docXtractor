@@ -10,9 +10,9 @@ import type { CreateRunDtoProcessingMode } from "./createRunDtoProcessingMode";
 import type { RunSourceDto } from "./runSourceDto";
 
 export interface CreateRunDto {
-	/** Extractor to use for this run */
+	/** The ID of the extractor to use for this run */
 	extractorId: string;
-	/** Documents to process */
+	/** List of documents to process */
 	sources: RunSourceDto[];
 	processingMode?: CreateRunDtoProcessingMode;
 	extractionProvider?: CreateRunDtoExtractionProvider;

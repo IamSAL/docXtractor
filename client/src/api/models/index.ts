@@ -21,6 +21,7 @@ export * from "./createRunDtoProcessingMode";
 export * from "./createUserDto";
 export * from "./createUserDtoRole";
 export * from "./dashboardStatsDto";
+export * from "./dashboardStatsDtoSystemStats";
 export * from "./extractor";
 export * from "./extractorConflictResolution";
 export * from "./extractorFewShotExamplesItem";

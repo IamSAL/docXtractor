@@ -30,7 +30,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Show loading state while checking authentication or hydrating
   if (isLoading || !isHydrated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f0f0f0]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f0f0f0] w-screen!">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-black border-t-primary mx-auto"></div>
           <p className="mt-4 text-black font-bold">Loading...</p>

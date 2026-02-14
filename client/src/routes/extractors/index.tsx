@@ -10,10 +10,10 @@ import {
 } from "@/api/endpoints/extractors/extractors";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { TemplateWizardModal } from "@/components/modals/TemplateWizardModal";
+import NiceModal from "@ebay/nice-modal-react";
 import { useState } from "react";
 import { RunExtractorModal } from "@/components/modals/RunExtractorModal";
-import NiceModal from "@ebay/nice-modal-react";
-import { watch } from "fs";
 
 export const Route = createFileRoute("/extractors/")({
   component: ExtractorsComponent,
@@ -28,6 +28,10 @@ function ExtractorsComponent() {
     refetch,
   } = useExtractorsControllerFindAll();
   const deleteMutation = useExtractorsControllerRemove();
+
+  const openTemplateWizard = () => {
+    NiceModal.show(TemplateWizardModal);
+  };
 
   const extractorsList = response?.data || [];
 
@@ -83,16 +87,17 @@ function ExtractorsComponent() {
           description="Manage your AI extraction workflows. Create, test, and deploy data parsers."
           breadcrumb="/ HOME / EXTRACTORS"
         >
-          <Link to="/extractors/new">
-            <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
-              <span className="material-symbols-outlined text-[20px]">add</span>
-              <span>New Extractor</span>
-            </Button>
-          </Link>
+          <Button
+            onClick={openTemplateWizard}
+            className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide"
+          >
+            <span className="material-symbols-outlined text-[20px]">add</span>
+            <span>New Extractor</span>
+          </Button>
         </PageHeader>
 
         {/* Filter & Search Toolbar */}
-        <div className="bg-gray-100 border-2 border-black p-4 mb-8">
+        <div className="bg-white border-2 border-black p-4 mb-8">
           <div className="w-full flex flex-col lg:flex-row gap-4">
             {/* Search Input */}
             <div className="flex-1 relative group">
@@ -150,9 +155,7 @@ function ExtractorsComponent() {
               key={extractor.id}
               className="flex flex-col bg-white border-2 border-black rounded-sm overflow-hidden h-full hover:shadow-hard-lg transition-all duration-200 p-0 cursor-pointer"
               shadowsize="sm"
-              onClick={() =>
-                navigate({ to: `/extractors/edit/${extractor.id}` })
-              }
+              onClick={() => navigate({ to: `/extractors/${extractor.id}` })}
             >
               {/* Card Header */}
               <div className="h-32 border-b-2 border-black relative overflow-hidden bg-gray-100">
@@ -241,14 +244,14 @@ function ExtractorsComponent() {
                   Edit
                 </Link>
                 <button
-                  className="py-3 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 group bg-primary/20 hover:bg-primary text-black"
                   onClick={(e) => {
                     e.stopPropagation();
                     NiceModal.show(RunExtractorModal, {
-                      extractorName: extractor.name || "Unnamed Extractor",
-                      extractorId: extractor.id || "NEW-EXTRACTOR",
+                      extractorName: extractor.name,
+                      extractorId: extractor.id,
                     });
                   }}
+                  className="py-3 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 group bg-primary/20 hover:bg-primary text-black no-underline"
                 >
                   <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">
                     play_arrow
@@ -272,9 +275,10 @@ function ExtractorsComponent() {
           ))}
 
           {/* Placeholder for New */}
-          <Link
-            to="/extractors/new"
-            className="flex flex-col items-center justify-center p-8 bg-transparent border-3 border-dashed border-gray-400 rounded-sm h-full min-h-[300px] hover:border-[#e5d161] hover:bg-[#e5d161]/5 transition-all group no-underline"
+          {/* Placeholder for New */}
+          <div
+            onClick={openTemplateWizard}
+            className="flex flex-col items-center justify-center p-8 bg-transparent border-3 border-dashed border-gray-300 rounded-sm h-full min-h-[300px] hover:border-[#e5d161] hover:bg-[#e5d161]/5 transition-all group cursor-pointer"
           >
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4 border-2 border-gray-400 group-hover:border-[#e5d161] group-hover:scale-110 transition-all">
               <span className="material-symbols-outlined text-3xl text-gray-400 group-hover:text-[#e5d161]">
@@ -287,7 +291,7 @@ function ExtractorsComponent() {
             <p className="text-sm text-gray-400 text-center font-medium">
               Start from scratch or use a template
             </p>
-          </Link>
+          </div>
         </div>
       </div>
     </AppLayout>

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppLayout } from "../../components/AppLayout";
+import { Popover } from "../../components/retroui/Popover";
 import { Button } from "../../components/retroui/Button";
 import { Card } from "../../components/retroui/Card";
 import { Badge } from "../../components/retroui/Badge";
@@ -8,22 +9,26 @@ import { PageHeader } from "../../components/retroui/PageHeader";
 import { useDashboardControllerGetStats } from "../../api/endpoints/dashboard/dashboard";
 import { useExtractorsControllerFindAll } from "../../api/endpoints/extractors/extractors";
 import { formatDistanceToNow, format } from "date-fns";
+import { useLogout } from "../../hooks/useAuth";
+import NiceModal from "@ebay/nice-modal-react";
+import { TemplateWizardModal } from "@/components/modals/TemplateWizardModal";
+import { RunExtractorModal } from "@/components/modals/RunExtractorModal";
 
 export const Route = createFileRoute("/dashboard/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const {
-    data: statsData,
-    isLoading: statsLoading,
-    error,
-  } = useDashboardControllerGetStats();
+  const { data: statsData, isLoading: statsLoading } =
+    useDashboardControllerGetStats();
   const { data: extractorsData, isLoading: extractorsLoading } =
     useExtractorsControllerFindAll();
 
+  const logout = useLogout();
   const stats = (statsData as any)?.data;
   const extractors = extractorsData?.data || [];
+
+  const systemStats = stats?.systemStats || { ram: 0, cpu: 0, storage: 0 };
 
   const getStatusBadge = (status: string) => {
     const statusLower = status?.toLowerCase() || "";
@@ -61,9 +66,7 @@ function RouteComponent() {
       <div className="p-4 lg:p-12 ">
         <div className="mt-2 mb-8 md:hidden">
           <h2 className="text-3xl font-black text-black tracking-tight leading-tight mb-2">
-            Good morning,
-            <br />
-            Alex.
+            Hey there,
           </h2>
           <p className="text-gray-600 font-medium">
             Here's your extraction summary.
@@ -76,12 +79,93 @@ function RouteComponent() {
           heading="Dashboard"
           description="Welcome back! Here is your extraction overview."
         >
-          <Link to="/extractors/new">
-            <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
-              <span className="material-symbols-outlined text-[20px]">add</span>
-              <span>New Extractor</span>
-            </Button>
-          </Link>
+          <div className="relative">
+            <Popover>
+              <Popover.Trigger asChild>
+                <button className="flex items-center gap-3 bg-white border-2 border-black px-3 py-2 shadow-hard cursor-pointer hover:translate-x-px hover:translate-y-px hover:shadow-hard-sm transition-all w-64 justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="size-8 rounded-full bg-gray-200 border-2 border-black overflow-hidden">
+                      <img
+                        alt="User Avatar"
+                        className="w-full h-full object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPRa7B_KjGMFnt-GCzDzmllIlNq0fMO_xCTH4d0fYwyc_IJKp07LtB5AGrmYPqvi9hQpkmohkTuz4ITA5l8veRzLJIst8FCZ6JPuEIUyzfNOVqVDJ1r8TExfdcEd0vCZU3M6S7whm5PgsSteLx_VGKtH5_JEgneb4f2k4FIayqvDPhFQOoV-YoAqES6kkjrTaU2jiPWONvx9Kpqh3dTRM214SvdixEShPXEKGqztGfTcplP7gJINAIrgZgR3n8KluuAr_zfjH5mcq8"
+                      />
+                    </div>
+                    <span className="font-bold text-sm">Alex Designer</span>
+                  </div>
+                  <span className="material-symbols-outlined">expand_more</span>
+                </button>
+              </Popover.Trigger>
+              <Popover.Content
+                className="w-64 p-0 border-2 border-black shadow-hard rounded-none mt-2"
+                align="end"
+                sideOffset={0}
+              >
+                <div className="border-b-2 border-black bg-gray-50 p-4">
+                  <p className="text-xs font-black uppercase mb-3">
+                    System Status
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span>RAM</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-2 bg-gray-200 border border-black rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-green-500 transition-all duration-500"
+                            style={{ width: `${systemStats.ram}%` }}
+                          ></div>
+                        </div>
+                        <span>{systemStats.ram}%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span>CPU</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-2 bg-gray-200 border border-black rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-green-500 transition-all duration-500"
+                            style={{ width: `${systemStats.cpu}%` }}
+                          ></div>
+                        </div>
+                        <span>{systemStats.cpu}%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span>SSD</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-2 bg-gray-200 border border-black rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-yellow-400 transition-all duration-500"
+                            style={{ width: `${systemStats.storage}%` }}
+                          ></div>
+                        </div>
+                        <span>{systemStats.storage}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-2 flex flex-col gap-1 bg-white">
+                  <Link to="/settings">
+                    <button className="flex items-center gap-2 w-full text-left px-3 py-2 font-bold text-sm hover:bg-yellow-100 border border-transparent hover:border-black transition-all">
+                      <span className="material-symbols-outlined text-[20px]">
+                        settings
+                      </span>
+                      Settings
+                    </button>
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="flex items-center gap-2 w-full text-left px-3 py-2 font-bold text-sm bg-red-100 text-red-900 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all mt-1"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      logout
+                    </span>
+                    Log Out
+                  </button>
+                </div>
+              </Popover.Content>
+            </Popover>
+          </div>
         </PageHeader>
 
         {/* Stats Grid */}
@@ -243,12 +327,12 @@ function RouteComponent() {
                     inventory_2
                   </span>
                   <p className="text-gray-500 font-bold">No extractors found</p>
-                  <Link
-                    to="/extractors/new"
+                  <button
+                    onClick={() => NiceModal.show(TemplateWizardModal)}
                     className="mt-2 text-primary hover:underline font-bold text-sm"
                   >
                     Create your first extractor
-                  </Link>
+                  </button>
                 </Card>
               ) : (
                 extractors.slice(0, 3).map((extractor) => (
@@ -286,10 +370,18 @@ function RouteComponent() {
                         </span>
                         <Button
                           size="icon"
-                          variant="outline"
-                          className="rounded-full border-2 border-black hover:bg-black hover:text-white transition-colors bg-transparent shadow-none w-8 h-8 p-0"
+                          variant="default"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            NiceModal.show(RunExtractorModal, {
+                              extractorName: extractor.name,
+                              extractorId: extractor.id,
+                            });
+                          }}
+                          className="rounded-full border-2 border-black bg-white hover:bg-black hover:text-white text-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] w-10 h-10 p-0 flex items-center justify-center"
                         >
-                          <span className="material-symbols-outlined text-lg">
+                          <span className="material-symbols-outlined text-xl">
                             play_arrow
                           </span>
                         </Button>
@@ -474,9 +566,9 @@ function RouteComponent() {
                               <Button
                                 size="icon"
                                 variant="outline"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-black hover:bg-black hover:text-white p-1 rounded border-2 border-black w-8 h-8 shadow-none bg-transparent"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-black hover:bg-black hover:text-white p-1 rounded border-2 border-black w-8 h-8 shadow-none bg-transparent flex items-center justify-center"
                               >
-                                <span className="material-symbols-outlined text-sm block">
+                                <span className="material-symbols-outlined text-lg">
                                   visibility
                                 </span>
                               </Button>

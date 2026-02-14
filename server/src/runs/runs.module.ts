@@ -10,6 +10,7 @@ import {
   ParsedDocumentsConsumer,
   ExtractionCompletedConsumer,
 } from '../shared/queue/queue-consumers';
+import { RunsGateway } from './runs.gateway';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import {
     RunsService,
     ParsedDocumentsConsumer,
     ExtractionCompletedConsumer,
+    RunsGateway,
   ],
   exports: [RunsService],
 })

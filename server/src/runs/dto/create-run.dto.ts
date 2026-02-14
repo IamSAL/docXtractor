@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
@@ -31,14 +32,24 @@ export class RunSourceDto {
 }
 
 export class CreateRunDto {
-  @IsUUID()
-  @ApiProperty({ description: 'Extractor to use for this run' })
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    description: 'The ID of the extractor to use for this run',
+  })
+  @IsString()
+  @IsNotEmpty()
   extractorId: string;
 
+  @ApiProperty({
+    type: [RunSourceDto],
+    description: 'List of documents to process',
+    example: [
+      { type: 'url', name: 'Invoice', url: 'https://example.com/invoice.pdf' },
+    ],
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => RunSourceDto)
-  @ApiProperty({ type: [RunSourceDto], description: 'Documents to process' })
   sources: RunSourceDto[];
 
   @IsOptional()

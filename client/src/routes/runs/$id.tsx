@@ -1,7 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppLayout } from "../../components/AppLayout";
 import { Button } from "../../components/retroui/Button";
-import { useRunsControllerFindOne } from "@/api/endpoints/runs/runs";
+import {
+  useRunsControllerFindOne,
+  getRunsControllerFindOneQueryKey,
+} from "@/api/endpoints/runs/runs";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { getSocket } from "@/lib/socket";
 
 export const Route = createFileRoute("/runs/$id")({
   component: RunDetailComponent,
@@ -10,6 +16,47 @@ export const Route = createFileRoute("/runs/$id")({
 function RunDetailComponent() {
   const { id } = Route.useParams();
   const { data, isLoading, error } = useRunsControllerFindOne(id);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const socket = getSocket();
+
+    socket.emit("joinRun", { runId: id });
+
+    const handleRunUpdated = (updatedRun: any) => {
+      queryClient.setQueryData(
+        getRunsControllerFindOneQueryKey(id),
+        (oldData: any) => {
+          if (!oldData) return oldData;
+          return { ...oldData, data: updatedRun };
+        },
+      );
+    };
+
+    const handleSourceUpdated = (updatedSource: any) => {
+      queryClient.setQueryData(
+        getRunsControllerFindOneQueryKey(id),
+        (oldData: any) => {
+          if (!oldData || !oldData.data) return oldData;
+          const run = oldData.data;
+          const sources = run.sources?.map((s: any) =>
+            s.id === updatedSource.id ? updatedSource : s,
+          );
+          // If source not found (e.g. new source), you might want to add it, but here we assume it exists
+          return { ...oldData, data: { ...run, sources } };
+        },
+      );
+    };
+
+    socket.on("run:updated", handleRunUpdated);
+    socket.on("run:source:updated", handleSourceUpdated);
+
+    return () => {
+      socket.emit("leaveRun", { runId: id });
+      socket.off("run:updated", handleRunUpdated);
+      socket.off("run:source:updated", handleSourceUpdated);
+    };
+  }, [id, queryClient]);
 
   const run = (data as any)?.data;
 

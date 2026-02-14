@@ -10,7 +10,9 @@ import type { CreateExtractorDtoSchema } from "./createExtractorDtoSchema";
 import type { FewShotExampleDto } from "./fewShotExampleDto";
 
 export interface CreateExtractorDto {
+	/** The name of the extractor */
 	name: string;
+	/** The description of the extractor */
 	description?: string;
 	thumbnailUrl?: string;
 	schema: CreateExtractorDtoSchema;

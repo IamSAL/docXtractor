@@ -11,6 +11,7 @@ import { UpdateRunDto } from './dto/update-run.dto';
 import { QueueService } from '../shared/queue/queue.service';
 import { QueueName } from '../shared/queue/queue-names';
 import { FilesService } from '../files/files.service';
+import { RunsGateway } from './runs.gateway';
 
 @Injectable()
 export class RunsService {
@@ -21,6 +22,7 @@ export class RunsService {
     @InjectRepository(Extractor) private extractorRepo: Repository<Extractor>,
     private queueService: QueueService,
     private filesService: FilesService,
+    private runsGateway: RunsGateway,
   ) {}
 
   /**
@@ -97,6 +99,8 @@ export class RunsService {
     run.progress!.currentStep = 'parsing';
     await this.runRepo.save(run);
 
+    this.runsGateway.emitRunUpdated(run.id, run);
+
     return run;
   }
 
@@ -162,6 +166,8 @@ export class RunsService {
       source.error = data.error || 'Parsing failed';
     }
 
+    this.runsGateway.emitRunSourceUpdated(run.id, source);
+
     run.progress!.parsed += 1;
 
     // Check if all sources are parsed
@@ -195,6 +201,7 @@ export class RunsService {
     }
 
     await this.runRepo.save(run);
+    this.runsGateway.emitRunUpdated(run.id, run);
   }
 
   /**
@@ -222,6 +229,7 @@ export class RunsService {
 
     run.finishedAt = new Date();
     await this.runRepo.save(run);
+    this.runsGateway.emitRunUpdated(run.id, run);
   }
 
   async update(id: string, userId: string, updateRunDto: UpdateRunDto) {
@@ -281,6 +289,7 @@ export class RunsService {
     run.status = RunStatus.PARSING;
     run.progress!.currentStep = 'parsing';
     await this.runRepo.save(run);
+    this.runsGateway.emitRunUpdated(run.id, run);
 
     return run;
   }

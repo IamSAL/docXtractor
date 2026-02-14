@@ -8,10 +8,12 @@ import { useFilesControllerUploadFile } from "@/api/endpoints/files/files";
 import {
   useRunsControllerCreate,
   getRunsControllerFindAllQueryKey,
-  ProcessingMode,
-  RunSourceDto,
-  CreateRunDto,
 } from "@/api/endpoints/runs/runs";
+import {
+  CreateRunDto,
+  CreateRunDtoProcessingMode as ProcessingMode,
+  RunSourceDto,
+} from "@/api/models";
 import { useExtractorsControllerFindAll } from "@/api/endpoints/extractors/extractors";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -24,6 +26,7 @@ import { RunExtractorSettings } from "./RunExtractorSettings";
 import { toast } from "sonner";
 
 import { Dialog } from "@/components/retroui/Dialog";
+import { Select } from "@/components/retroui/Select";
 
 interface RunExtractorModalProps {
   extractorName?: string;
@@ -71,7 +74,6 @@ export const RunExtractorModal = NiceModal.create(
 
     const { handleSubmit, watch } = methods;
     const processingMode = watch("processingMode");
-    const sources = watch("sources");
 
     const handleUploadFile = async (file: File) => {
       if (!user?.id) throw new Error("User not authenticated");
@@ -163,11 +165,9 @@ export const RunExtractorModal = NiceModal.create(
                       <h3 className="text-black tracking-tight text-xl font-bold uppercase flex items-center gap-2">
                         Run Extractor:
                         {!propId ? (
-                          <select
-                            className="bg-primary/20 px-2 py-0.5 border-b-2 border-black text-sm font-bold uppercase cursor-pointer focus:outline-none max-w-[200px] truncate"
+                          <Select
                             value={selectedExtractorId || ""}
-                            onChange={(e) => {
-                              const id = e.target.value;
+                            onValueChange={(id) => {
                               setSelectedExtractorId(id);
                               const name = extractorsData?.data?.find(
                                 (ex: any) => ex.id === id,
@@ -175,15 +175,19 @@ export const RunExtractorModal = NiceModal.create(
                               if (name) setSelectedExtractorName(name);
                             }}
                           >
-                            <option value="" disabled>
-                              Select Extractor...
-                            </option>
-                            {extractorsData?.data?.map((ex: any) => (
-                              <option key={ex.id} value={ex.id}>
-                                {ex.name}
-                              </option>
-                            ))}
-                          </select>
+                            <Select.Trigger className="bg-primary/20 h-auto px-2 py-0.5 border-0 border-b-2 border-black text-sm font-bold uppercase cursor-pointer focus:ring-0 shadow-none rounded-none min-w-0 max-w-[500px] truncate">
+                              <Select.Value placeholder="Select Extractor..." />
+                            </Select.Trigger>
+                            <Select.Content>
+                              <Select.Group>
+                                {extractorsData?.data?.map((ex: any) => (
+                                  <Select.Item key={ex.id} value={ex.id}>
+                                    {ex.name}
+                                  </Select.Item>
+                                ))}
+                              </Select.Group>
+                            </Select.Content>
+                          </Select>
                         ) : (
                           <span className="bg-primary/20 px-2 py-0.5 border-b-2 border-black">
                             {selectedExtractorName}
@@ -234,33 +238,6 @@ export const RunExtractorModal = NiceModal.create(
                 position="static"
                 className="p-6 border-t-4 border-black bg-gray-50 shrink-0 flex flex-col gap-4"
               >
-                <div className="w-full bg-primary/40 border-2 border-black rounded p-4 flex items-center justify-between shadow-hard-sm">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-primary border-2 border-black flex items-center justify-center rounded-full">
-                      <span className="material-symbols-outlined text-black">
-                        analytics
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold uppercase leading-none mb-1">
-                        Ready to Extract
-                      </span>
-                      <span className="text-[10px] font-mono text-gray-600">
-                        {sources.length} SOURCES •{" "}
-                        {processingMode.toUpperCase()} • ~{sources.length * 5}K
-                        TOKENS
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right hidden sm:block">
-                    <span className="block text-xs font-bold leading-none mb-1">
-                      EST. COST: ${(sources.length * 0.04).toFixed(2)}
-                    </span>
-                    <span className="block text-[10px] text-gray-600 uppercase font-bold">
-                      ~{sources.length * 15}s Processing Delay
-                    </span>
-                  </div>
-                </div>
                 <Button
                   type="submit"
                   disabled={createRunMutation.isPending || !activeExtractorId}
@@ -275,7 +252,7 @@ export const RunExtractorModal = NiceModal.create(
                     </>
                   ) : (
                     <>
-                      <span>Start Extraction Run</span>
+                      <span>Run Extraction</span>
                       <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform font-black">
                         arrow_forward
                       </span>

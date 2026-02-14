@@ -1,4 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useLocation,
+} from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { AppLayout } from "../../components/AppLayout";
 import { ExtractorForm } from "@/components/extractors/ExtractorForm";
@@ -15,8 +19,10 @@ export const Route = createFileRoute("/extractors/new")({
 
 function NewExtractorComponent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const createMutation = useExtractorsControllerCreate();
+  const initialData = (location.state as any)?.initialData;
 
   const onSubmit = async (data: ExtractorFormData) => {
     try {
@@ -46,6 +52,7 @@ function NewExtractorComponent() {
         title="New Extractor"
         onSubmit={onSubmit}
         isSubmitting={createMutation.isPending}
+        initialData={initialData}
       />
     </AppLayout>
   );

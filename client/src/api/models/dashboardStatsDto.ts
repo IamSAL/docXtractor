@@ -5,19 +5,15 @@
  * A comprehensive docXtractor System to extract text from documents.
  * OpenAPI spec version: 1.0
  */
+import type { DashboardStatsDtoSystemStats } from "./dashboardStatsDtoSystemStats";
 import type { RunSummaryDto } from "./runSummaryDto";
 
 export interface DashboardStatsDto {
-	/** Total number of documents processed */
 	totalDocuments: number;
-	/** Number of active extractors */
 	activeExtractors: number;
-	/** Total pages processed */
 	pagesProcessed: number;
-	/** Success rate percentage */
 	successRate: number;
-	/** Recent runs */
 	recentRuns: RunSummaryDto[];
-	/** Extraction history */
 	extractionHistory: RunSummaryDto[];
+	systemStats: DashboardStatsDtoSystemStats;
 }

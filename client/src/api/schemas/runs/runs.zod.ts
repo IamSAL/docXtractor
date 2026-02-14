@@ -14,13 +14,13 @@ import * as zod from 'zod';
 export const runsControllerCreateBodyProcessingModeDefault = `unified`;export const runsControllerCreateBodyExtractionProviderDefault = `doclo`;
 
 export const RunsControllerCreateBody = zod.object({
-  "extractorId": zod.string().describe('Extractor to use for this run'),
+  "extractorId": zod.string().describe('The ID of the extractor to use for this run'),
   "sources": zod.array(zod.object({
   "type": zod.enum(['file', 'url']),
   "name": zod.string().describe('Display name for the source'),
   "url": zod.string().optional().describe('URL if type is url'),
   "fileId": zod.string().optional().describe('File ID if type is file')
-})).describe('Documents to process'),
+})).describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerCreateBodyProcessingModeDefault),
   "extractionProvider": zod.enum(['doclo', 'langextract']).default(runsControllerCreateBodyExtractionProviderDefault)
 })
@@ -36,11 +36,11 @@ export const runsControllerFindAllQueryLimitMax = 100;
 
 
 export const RunsControllerFindAllQueryParams = zod.object({
-  "page": zod.number().min(1).default(runsControllerFindAllQueryPageDefault).describe('Page number'),
-  "limit": zod.number().min(1).max(runsControllerFindAllQueryLimitMax).default(runsControllerFindAllQueryLimitDefault).describe('Items per page'),
-  "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']).optional().describe('Filter by run status'),
-  "extractorId": zod.string().optional().describe('Filter by extractor ID'),
-  "search": zod.string().optional().describe('Search by run ID or name')
+  "page": zod.number().min(1).default(runsControllerFindAllQueryPageDefault).describe('Page number for pagination'),
+  "limit": zod.number().min(1).max(runsControllerFindAllQueryLimitMax).default(runsControllerFindAllQueryLimitDefault).describe('Number of items per page'),
+  "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']).optional().describe('Filter runs by their current status'),
+  "extractorId": zod.string().optional().describe('Filter runs by the extractor ID used'),
+  "search": zod.string().optional().describe('Search term for run ID or name')
 })
 
 /**
@@ -60,13 +60,13 @@ export const RunsControllerUpdateParams = zod.object({
 export const runsControllerUpdateBodyProcessingModeDefault = `unified`;export const runsControllerUpdateBodyExtractionProviderDefault = `doclo`;
 
 export const RunsControllerUpdateBody = zod.object({
-  "extractorId": zod.string().optional().describe('Extractor to use for this run'),
+  "extractorId": zod.string().optional().describe('The ID of the extractor to use for this run'),
   "sources": zod.array(zod.object({
   "type": zod.enum(['file', 'url']),
   "name": zod.string().describe('Display name for the source'),
   "url": zod.string().optional().describe('URL if type is url'),
   "fileId": zod.string().optional().describe('File ID if type is file')
-})).optional().describe('Documents to process'),
+})).optional().describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerUpdateBodyProcessingModeDefault),
   "extractionProvider": zod.enum(['doclo', 'langextract']).default(runsControllerUpdateBodyExtractionProviderDefault)
 })

@@ -60,12 +60,18 @@ export class FewShotExampleDto {
 }
 
 export class CreateExtractorDto {
-  @ApiProperty({ example: 'Invoice Processor' })
+  @ApiProperty({
+    example: 'Invoice Extractor',
+    description: 'The name of the extractor',
+  })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiPropertyOptional({ example: 'Extracts data from invoices' })
+  @ApiPropertyOptional({
+    example: 'Extracts data from invoices',
+    description: 'The description of the extractor',
+  })
   @IsString()
   @IsOptional()
   description?: string;

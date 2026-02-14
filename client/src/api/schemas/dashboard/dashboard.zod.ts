@@ -12,10 +12,10 @@ import * as zod from 'zod';
  * @summary Get dashboard statistics
  */
 export const DashboardControllerGetStatsResponse = zod.object({
-  "totalDocuments": zod.number().describe('Total number of documents processed'),
-  "activeExtractors": zod.number().describe('Number of active extractors'),
-  "pagesProcessed": zod.number().describe('Total pages processed'),
-  "successRate": zod.number().describe('Success rate percentage'),
+  "totalDocuments": zod.number(),
+  "activeExtractors": zod.number(),
+  "pagesProcessed": zod.number(),
+  "successRate": zod.number(),
   "recentRuns": zod.array(zod.object({
   "id": zod.string().describe('Run ID'),
   "extractorId": zod.string().describe('Extractor ID'),
@@ -26,7 +26,7 @@ export const DashboardControllerGetStatsResponse = zod.object({
   "completedAt": zod.object({
 
 }).nullish().describe('Completed at timestamp')
-})).describe('Recent runs'),
+})),
   "extractionHistory": zod.array(zod.object({
   "id": zod.string().describe('Run ID'),
   "extractorId": zod.string().describe('Extractor ID'),
@@ -37,6 +37,9 @@ export const DashboardControllerGetStatsResponse = zod.object({
   "completedAt": zod.object({
 
 }).nullish().describe('Completed at timestamp')
-})).describe('Extraction history')
+})),
+  "systemStats": zod.object({
+
+})
 })
 

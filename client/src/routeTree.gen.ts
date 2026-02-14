@@ -24,6 +24,7 @@ import { Route as SettingsNotificationsRouteImport } from './routes/settings/not
 import { Route as SettingsExtractionRouteImport } from './routes/settings/extraction'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings/appearance'
 import { Route as SettingsApiKeysRouteImport } from './routes/settings/api-keys'
+import { Route as RunsNewRouteImport } from './routes/runs/new'
 import { Route as RunsIdRouteImport } from './routes/runs/$id'
 import { Route as ExtractorsNewRouteImport } from './routes/extractors/new'
 import { Route as ExtractorsIdRouteImport } from './routes/extractors/$id'
@@ -129,6 +130,11 @@ const SettingsApiKeysRoute = SettingsApiKeysRouteImport.update({
   id: '/api-keys',
   path: '/api-keys',
   getParentRoute: () => SettingsRoute,
+} as any)
+const RunsNewRoute = RunsNewRouteImport.update({
+  id: '/runs/new',
+  path: '/runs/new',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RunsIdRoute = RunsIdRouteImport.update({
   id: '/runs/$id',
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
   '/runs/$id': typeof RunsIdRoute
+  '/runs/new': typeof RunsNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
@@ -343,6 +350,7 @@ export interface FileRoutesByTo {
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
   '/runs/$id': typeof RunsIdRoute
+  '/runs/new': typeof RunsNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
@@ -391,6 +399,7 @@ export interface FileRoutesById {
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
   '/runs/$id': typeof RunsIdRoute
+  '/runs/new': typeof RunsNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
@@ -440,6 +449,7 @@ export interface FileRouteTypes {
     | '/extractors/$id'
     | '/extractors/new'
     | '/runs/$id'
+    | '/runs/new'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
@@ -486,6 +496,7 @@ export interface FileRouteTypes {
     | '/extractors/$id'
     | '/extractors/new'
     | '/runs/$id'
+    | '/runs/new'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
@@ -533,6 +544,7 @@ export interface FileRouteTypes {
     | '/extractors/$id'
     | '/extractors/new'
     | '/runs/$id'
+    | '/runs/new'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
@@ -575,6 +587,7 @@ export interface RootRouteChildren {
   ExtractorsIdRoute: typeof ExtractorsIdRoute
   ExtractorsNewRoute: typeof ExtractorsNewRoute
   RunsIdRoute: typeof RunsIdRoute
+  RunsNewRoute: typeof RunsNewRoute
   AutorunsIndexRoute: typeof AutorunsIndexRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   ExtractorsIndexRoute: typeof ExtractorsIndexRoute
@@ -691,6 +704,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/api-keys'
       preLoaderRoute: typeof SettingsApiKeysRouteImport
       parentRoute: typeof SettingsRoute
+    }
+    '/runs/new': {
+      id: '/runs/new'
+      path: '/runs/new'
+      fullPath: '/runs/new'
+      preLoaderRoute: typeof RunsNewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/runs/$id': {
       id: '/runs/$id'
@@ -989,6 +1009,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExtractorsIdRoute: ExtractorsIdRoute,
   ExtractorsNewRoute: ExtractorsNewRoute,
   RunsIdRoute: RunsIdRoute,
+  RunsNewRoute: RunsNewRoute,
   AutorunsIndexRoute: AutorunsIndexRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   ExtractorsIndexRoute: ExtractorsIndexRoute,

@@ -10,9 +10,9 @@ import type { UpdateRunDtoExtractionProvider } from "./updateRunDtoExtractionPro
 import type { UpdateRunDtoProcessingMode } from "./updateRunDtoProcessingMode";
 
 export interface UpdateRunDto {
-	/** Extractor to use for this run */
+	/** The ID of the extractor to use for this run */
 	extractorId?: string;
-	/** Documents to process */
+	/** List of documents to process */
 	sources?: RunSourceDto[];
 	processingMode?: UpdateRunDtoProcessingMode;
 	extractionProvider?: UpdateRunDtoExtractionProvider;

@@ -8,7 +8,12 @@ export class FindRunsDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @ApiPropertyOptional({ description: 'Page number', default: 1, minimum: 1 })
+  @ApiPropertyOptional({
+    description: 'Page number for pagination',
+    default: 1,
+    minimum: 1,
+    example: 1,
+  })
   page?: number = 1;
 
   @IsOptional()
@@ -17,10 +22,11 @@ export class FindRunsDto {
   @Min(1)
   @Max(100)
   @ApiPropertyOptional({
-    description: 'Items per page',
+    description: 'Number of items per page',
     default: 10,
     minimum: 1,
     maximum: 100,
+    example: 10,
   })
   limit?: number = 10;
 
@@ -28,16 +34,23 @@ export class FindRunsDto {
   @IsEnum(RunStatus)
   @ApiPropertyOptional({
     enum: RunStatus,
-    description: 'Filter by run status',
+    description: 'Filter runs by their current status',
+    example: RunStatus.DONE,
   })
   status?: RunStatus;
 
   @IsOptional()
   @IsUUID()
-  @ApiPropertyOptional({ description: 'Filter by extractor ID' })
+  @ApiPropertyOptional({
+    description: 'Filter runs by the extractor ID used',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
   extractorId?: string;
 
   @IsOptional()
-  @ApiPropertyOptional({ description: 'Search by run ID or name' })
+  @ApiPropertyOptional({
+    description: 'Search term for run ID or name',
+    example: 'invoice',
+  })
   search?: string;
 }

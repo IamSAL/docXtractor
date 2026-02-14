@@ -18,8 +18,8 @@ export const extractorsControllerCreateBodyConfidenceThresholdMax = 100;
 export const extractorsControllerCreateBodyConflictResolutionDefault = `majority`;export const extractorsControllerCreateBodyCitationEnabledDefault = false;export const extractorsControllerCreateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerCreateBodyCitationIncludeBboxDefault = false;export const extractorsControllerCreateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerCreateBodyContextWindowDefault = `128k`;export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerCreateBody = zod.object({
-  "name": zod.string(),
-  "description": zod.string().optional(),
+  "name": zod.string().describe('The name of the extractor'),
+  "description": zod.string().optional().describe('The description of the extractor'),
   "thumbnailUrl": zod.string().optional(),
   "schema": zod.object({
 
@@ -127,8 +127,8 @@ export const extractorsControllerUpdateBodyConfidenceThresholdMax = 100;
 export const extractorsControllerUpdateBodyConflictResolutionDefault = `majority`;export const extractorsControllerUpdateBodyCitationEnabledDefault = false;export const extractorsControllerUpdateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateBodyCitationIncludeBboxDefault = false;export const extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateBodyContextWindowDefault = `128k`;export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerUpdateBody = zod.object({
-  "name": zod.string().optional(),
-  "description": zod.string().optional(),
+  "name": zod.string().optional().describe('The name of the extractor'),
+  "description": zod.string().optional().describe('The description of the extractor'),
   "thumbnailUrl": zod.string().optional(),
   "schema": zod.object({
 

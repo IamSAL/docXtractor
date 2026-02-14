@@ -9,26 +9,26 @@ import type { RunsControllerFindAllStatus } from "./runsControllerFindAllStatus"
 
 export type RunsControllerFindAllParams = {
 	/**
-	 * Page number
+	 * Page number for pagination
 	 * @minimum 1
 	 */
 	page?: number;
 	/**
-	 * Items per page
+	 * Number of items per page
 	 * @minimum 1
 	 * @maximum 100
 	 */
 	limit?: number;
 	/**
-	 * Filter by run status
+	 * Filter runs by their current status
 	 */
 	status?: RunsControllerFindAllStatus;
 	/**
-	 * Filter by extractor ID
+	 * Filter runs by the extractor ID used
 	 */
 	extractorId?: string;
 	/**
-	 * Search by run ID or name
+	 * Search term for run ID or name
 	 */
 	search?: string;
 };

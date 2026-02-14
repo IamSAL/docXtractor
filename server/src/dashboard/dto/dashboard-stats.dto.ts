@@ -28,21 +28,28 @@ export class RunSummaryDto {
 }
 
 export class DashboardStatsDto {
-  @ApiProperty({ description: 'Total number of documents processed' })
+  @ApiProperty({ example: 1250 })
   totalDocuments: number;
 
-  @ApiProperty({ description: 'Number of active extractors' })
+  @ApiProperty({ example: 8 })
   activeExtractors: number;
 
-  @ApiProperty({ description: 'Total pages processed' })
+  @ApiProperty({ example: 45000 })
   pagesProcessed: number;
 
-  @ApiProperty({ description: 'Success rate percentage' })
+  @ApiProperty({ example: 98.5 })
   successRate: number;
 
-  @ApiProperty({ description: 'Recent runs', type: [RunSummaryDto] })
+  @ApiProperty({ type: [RunSummaryDto] })
   recentRuns: RunSummaryDto[];
 
-  @ApiProperty({ description: 'Extraction history', type: [RunSummaryDto] })
+  @ApiProperty({ type: [RunSummaryDto] })
   extractionHistory: RunSummaryDto[];
+
+  @ApiProperty({ example: { cpu: 45, ram: 60, storage: 30 } })
+  systemStats: {
+    cpu: number;
+    ram: number;
+    storage: number;
+  };
 }

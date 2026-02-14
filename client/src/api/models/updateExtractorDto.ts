@@ -10,7 +10,9 @@ import type { UpdateExtractorDtoConflictResolution } from "./updateExtractorDtoC
 import type { UpdateExtractorDtoSchema } from "./updateExtractorDtoSchema";
 
 export interface UpdateExtractorDto {
+	/** The name of the extractor */
 	name?: string;
+	/** The description of the extractor */
 	description?: string;
 	thumbnailUrl?: string;
 	schema?: UpdateExtractorDtoSchema;

@@ -6,28 +6,54 @@ import { Table } from "../../components/retroui/Table";
 import { Badge } from "../../components/retroui/Badge";
 import { Input } from "../../components/retroui/Input";
 import { PageHeader } from "../../components/retroui/PageHeader";
-import NiceModal from "@ebay/nice-modal-react";
-import { RunExtractorModal } from "@/components/modals/RunExtractorModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useRunsControllerFindAll,
   useRunsControllerRemove,
   useRunsControllerRetry,
   getRunsControllerFindAllQueryKey,
 } from "@/api/endpoints/runs/runs";
+import { useExtractorsControllerFindAll } from "@/api/endpoints/extractors/extractors";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+// Define search params schema
+type RunsSearch = {
+  extractorId?: string;
+  status?: string;
+};
+
 export const Route = createFileRoute("/runs/")({
   component: RunsComponent,
+  validateSearch: (search: Record<string, unknown>): RunsSearch => {
+    return {
+      extractorId: search.extractorId as string | undefined,
+      status: search.status as string | undefined,
+    };
+  },
 });
 
 function RunsComponent() {
+  const searchParams = Route.useSearch();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState<string | undefined>();
-  const [extractorId, setExtractorId] = useState<string | undefined>();
+  const [status, setStatus] = useState<string | undefined>(searchParams.status);
+  const [extractorId, setExtractorId] = useState<string | undefined>(
+    searchParams.extractorId,
+  );
   const [search, setSearch] = useState("");
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [showExtractorDropdown, setShowExtractorDropdown] = useState(false);
+
+  // Fetch extractors for filter dropdown
+  const { data: extractorsData } = useExtractorsControllerFindAll();
+  const extractors = extractorsData?.data || [];
+
+  // Update state when URL params change
+  useEffect(() => {
+    if (searchParams.extractorId) setExtractorId(searchParams.extractorId);
+    if (searchParams.status) setStatus(searchParams.status);
+  }, [searchParams.extractorId, searchParams.status]);
 
   const { data, isLoading, error } = useRunsControllerFindAll(
     {
@@ -101,18 +127,12 @@ function RunsComponent() {
           description="Monitor and manage your AI extraction extractors with precision."
           breadcrumb="/ HOME / RUNS"
         >
-          <Button
-            className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide"
-            onClick={() => {
-              NiceModal.show(RunExtractorModal, {
-                extractorName: "",
-                extractorId: "",
-              });
-            }}
-          >
-            <span className="material-symbols-outlined">add_circle</span>
-            Run New Run
-          </Button>
+          <Link to="/runs/new">
+            <Button className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide">
+              <span className="material-symbols-outlined">add_circle</span>
+              New Run
+            </Button>
+          </Link>
         </PageHeader>
 
         {/* Filter & Search Toolbar */}
@@ -127,31 +147,90 @@ function RunsComponent() {
                 placeholder="Search by Run ID..."
                 type="text"
                 icon="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <div className="flex w-full flex-col gap-1 md:w-auto">
+            <div className="flex w-full flex-col gap-1 md:w-auto relative">
               <label className="text-xs font-bold uppercase tracking-wider">
                 Extractor
               </label>
               <Button
                 variant="outline"
                 className="flex h-12 min-w-[160px] items-center justify-between border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none hover:bg-white"
+                onClick={() => setShowExtractorDropdown(!showExtractorDropdown)}
               >
-                <span>All Extractors</span>
+                <span>
+                  {extractorId
+                    ? extractors.find((e: any) => e.id === extractorId)?.name ||
+                      "All Extractors"
+                    : "All Extractors"}
+                </span>
                 <span className="material-symbols-outlined">expand_more</span>
               </Button>
+              {showExtractorDropdown && (
+                <div className="absolute top-full mt-2 w-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] z-10 max-h-60 overflow-y-auto">
+                  <button
+                    className="w-full px-4 py-2 text-left hover:bg-primary transition-colors font-bold"
+                    onClick={() => {
+                      setExtractorId(undefined);
+                      setShowExtractorDropdown(false);
+                    }}
+                  >
+                    All Extractors
+                  </button>
+                  {extractors.map((extractor: any) => (
+                    <button
+                      key={extractor.id}
+                      className="w-full px-4 py-2 text-left hover:bg-primary transition-colors font-bold"
+                      onClick={() => {
+                        setExtractorId(extractor.id);
+                        setShowExtractorDropdown(false);
+                      }}
+                    >
+                      {extractor.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="flex w-full flex-col gap-1 md:w-auto">
+            <div className="flex w-full flex-col gap-1 md:w-auto relative">
               <label className="text-xs font-bold uppercase tracking-wider">
                 Status
               </label>
               <Button
                 variant="outline"
                 className="flex h-12 min-w-[140px] items-center justify-between border-2 border-black bg-white px-4 py-2 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none hover:bg-white"
+                onClick={() => setShowStatusDropdown(!showStatusDropdown)}
               >
-                <span>Any Status</span>
+                <span>{status || "Any Status"}</span>
                 <span className="material-symbols-outlined">expand_more</span>
               </Button>
+              {showStatusDropdown && (
+                <div className="absolute top-full mt-2 w-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] z-10">
+                  <button
+                    className="w-full px-4 py-2 text-left hover:bg-primary transition-colors font-bold"
+                    onClick={() => {
+                      setStatus(undefined);
+                      setShowStatusDropdown(false);
+                    }}
+                  >
+                    Any Status
+                  </button>
+                  {["done", "failed", "processing", "review"].map((s) => (
+                    <button
+                      key={s}
+                      className="w-full px-4 py-2 text-left hover:bg-primary transition-colors font-bold uppercase"
+                      onClick={() => {
+                        setStatus(s);
+                        setShowStatusDropdown(false);
+                      }}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
