@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { cookieStorage } from "./cookie-storage";
 import * as authApi from "@/api/endpoints/auth/auth";
 import type { UserResponseDto } from "@/api/models";
 
@@ -142,6 +143,35 @@ export const useAuthStore = create<AuthState>()(
 
       // Refresh access token
       refreshAccessToken: async () => {
+        // First check if another tab already refreshed the token
+        // Use cookieStorage directly for the freshest possible data
+        const storedValue = cookieStorage.getItem("auth-storage");
+
+        // Handle potential Promise from getItem (though our implementation is sync)
+        const resolvedValue =
+          storedValue instanceof Promise ? await storedValue : storedValue;
+
+        if (resolvedValue) {
+          try {
+            const parsed = JSON.parse(resolvedValue);
+            if (
+              parsed.state?.refreshToken &&
+              parsed.state.refreshToken !== get().refreshToken
+            ) {
+              set({
+                accessToken: parsed.state.accessToken,
+                refreshToken: parsed.state.refreshToken,
+                user: parsed.state.user || get().user,
+                isAuthenticated:
+                  parsed.state.isAuthenticated ?? get().isAuthenticated,
+              });
+              return;
+            }
+          } catch (e) {
+            console.error("Failed to parse auth storage during refresh", e);
+          }
+        }
+
         const { refreshToken } = get();
         if (!refreshToken) {
           throw new Error("No refresh token available");
@@ -162,6 +192,27 @@ export const useAuthStore = create<AuthState>()(
             refreshToken: newRefreshToken,
           });
         } catch (error) {
+          // Double check if it's already refreshed by another tab even if we failed
+          const latestValue = cookieStorage.getItem("auth-storage");
+          const resolvedLatest =
+            latestValue instanceof Promise ? await latestValue : latestValue;
+
+          if (resolvedLatest) {
+            try {
+              const parsed = JSON.parse(resolvedLatest);
+              if (
+                parsed.state?.refreshToken &&
+                parsed.state.refreshToken !== refreshToken
+              ) {
+                set({
+                  accessToken: parsed.state.accessToken,
+                  refreshToken: parsed.state.refreshToken,
+                });
+                return;
+              }
+            } catch (e) {}
+          }
+
           get().logout();
           throw error;
         }
@@ -179,6 +230,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
+      storage: createJSONStorage(() => cookieStorage),
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,

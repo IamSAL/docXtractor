@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/lib/auth-store";
+import { cookieStorage } from "./cookie-storage";
 
 export const AXIOS_INSTANCE = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
@@ -41,6 +42,25 @@ AXIOS_INSTANCE.interceptors.response.use(
           refreshError?.response?.status === 403
         ) {
           console.error("Refresh token expired or invalid. Logging out...");
+
+          // Final check: did another tab refresh it while we were trying?
+          const storedValue = cookieStorage.getItem("auth-storage");
+          const resolvedValue =
+            storedValue instanceof Promise ? await storedValue : storedValue;
+          if (resolvedValue) {
+            try {
+              const parsed = JSON.parse(resolvedValue);
+              if (
+                parsed.state?.accessToken &&
+                parsed.state.accessToken !== useAuthStore.getState().accessToken
+              ) {
+                // Yes! Someone else fixed it. Don't logout.
+                originalRequest.headers.Authorization = `Bearer ${parsed.state.accessToken}`;
+                return AXIOS_INSTANCE(originalRequest);
+              }
+            } catch (e) {}
+          }
+
           useAuthStore.getState().logout();
 
           // Redirect to login page

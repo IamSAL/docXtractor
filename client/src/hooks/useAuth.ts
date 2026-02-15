@@ -106,8 +106,9 @@ export function useTokenRefresh() {
         try {
           await refreshAccessToken();
         } catch (error) {
-          console.error("Failed to refresh token:", error);
-          logout();
+          console.error("Failed to refresh token in background:", error);
+          // Don't logout here, let the axios interceptor handle it if a real request fails
+          // This prevents background tabs from logging out the user due to race conditions
         }
       },
       14 * 60 * 1000,
