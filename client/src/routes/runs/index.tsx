@@ -16,6 +16,7 @@ import {
 import { useExtractorsControllerFindAll } from "@/api/endpoints/extractors/extractors";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { getSocket } from "@/lib/socket";
 
 // Define search params schema
 type RunsSearch = {
@@ -55,6 +56,26 @@ function RunsComponent() {
     if (searchParams.status) setStatus(searchParams.status);
   }, [searchParams.extractorId, searchParams.status]);
 
+  // WebSocket: auto-refresh runs list on updates
+  useEffect(() => {
+    const socket = getSocket();
+
+    socket.emit("joinRunsList");
+
+    const handleRunsListUpdated = () => {
+      queryClient.invalidateQueries({
+        queryKey: getRunsControllerFindAllQueryKey(),
+      });
+    };
+
+    socket.on("runs:list:updated", handleRunsListUpdated);
+
+    return () => {
+      socket.emit("leaveRunsList");
+      socket.off("runs:list:updated", handleRunsListUpdated);
+    };
+  }, [queryClient]);
+
   const { data, isLoading, error } = useRunsControllerFindAll(
     {
       page,
@@ -76,6 +97,10 @@ function RunsComponent() {
   const runs = (data as any)?.data?.data || [];
   const total = (data as any)?.data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+  const statusCounts = (data as any)?.data?.statusCounts || {
+    done: 0,
+    failed: 0,
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this run?")) return;
@@ -246,7 +271,9 @@ function RunsComponent() {
                 history
               </span>
             </div>
-            <p className="text-4xl font-black tracking-tight">1,240</p>
+            <p className="text-4xl font-black tracking-tight">
+              {total.toLocaleString()}
+            </p>
           </div>
           <div className="bg-primary border-2 border-black p-6 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-300 rounded-sm">
             <div className="flex justify-between items-start mb-4">
@@ -257,7 +284,9 @@ function RunsComponent() {
                 check_circle
               </span>
             </div>
-            <p className="text-4xl font-black tracking-tight">1,202</p>
+            <p className="text-4xl font-black tracking-tight">
+              {statusCounts.done.toLocaleString()}
+            </p>
           </div>
           <div className="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_#FF4d4d] flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-300 rounded-sm">
             <div className="flex justify-between items-start mb-4">
@@ -269,7 +298,7 @@ function RunsComponent() {
               </span>
             </div>
             <p className="text-4xl font-black tracking-tight text-red-500">
-              38
+              {statusCounts.failed.toLocaleString()}
             </p>
           </div>
         </section>

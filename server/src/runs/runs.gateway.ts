@@ -52,6 +52,20 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { event: 'leftRun', data: { runId } };
   }
 
+  @SubscribeMessage('joinRunsList')
+  handleJoinRunsList(@ConnectedSocket() client: Socket) {
+    this.logger.log(`Client ${client.id} joining runs list room`);
+    client.join('runs:list');
+    return { event: 'joinedRunsList' };
+  }
+
+  @SubscribeMessage('leaveRunsList')
+  handleLeaveRunsList(@ConnectedSocket() client: Socket) {
+    this.logger.log(`Client ${client.id} leaving runs list room`);
+    client.leave('runs:list');
+    return { event: 'leftRunsList' };
+  }
+
   // Helper methods to emit events to room
   emitRunUpdated(runId: string, payload: any) {
     this.server.to(`run:${runId}`).emit('run:updated', payload);
@@ -59,5 +73,13 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   emitRunSourceUpdated(runId: string, payload: any) {
     this.server.to(`run:${runId}`).emit('run:source:updated', payload);
+  }
+
+  emitRunsListUpdated(payload: {
+    runId: string;
+    status: string;
+    progress?: any;
+  }) {
+    this.server.to('runs:list').emit('runs:list:updated', payload);
   }
 }

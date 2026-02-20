@@ -109,6 +109,11 @@ export class RunsService {
     await this.runRepo.save(run);
 
     this.runsGateway.emitRunUpdated(run.id, run);
+    this.runsGateway.emitRunsListUpdated({
+      runId: run.id,
+      status: run.status,
+      progress: run.progress,
+    });
 
     return run;
   }
@@ -122,7 +127,13 @@ export class RunsService {
       extractorId?: string;
       search?: string;
     },
-  ): Promise<{ data: Run[]; total: number; page: number; limit: number }> {
+  ): Promise<{
+    data: Run[];
+    total: number;
+    page: number;
+    limit: number;
+    statusCounts: { done: number; failed: number };
+  }> {
     const page = options?.page || 1;
     const limit = options?.limit || 10;
     const skip = (page - 1) * limit;
@@ -139,7 +150,19 @@ export class RunsService {
       relations: ['extractor'],
     });
 
-    return { data, total, page, limit };
+    // Get status counts (always unfiltered for the user)
+    const [doneCount, failedCount] = await Promise.all([
+      this.runRepo.count({ where: { userId, status: RunStatus.DONE } }),
+      this.runRepo.count({ where: { userId, status: RunStatus.FAILED } }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      statusCounts: { done: doneCount, failed: failedCount },
+    };
   }
 
   async findOne(id: string, userId: string): Promise<Run> {
@@ -274,6 +297,11 @@ export class RunsService {
 
     await this.runRepo.save(run);
     this.runsGateway.emitRunUpdated(run.id, run);
+    this.runsGateway.emitRunsListUpdated({
+      runId: run.id,
+      status: run.status,
+      progress: run.progress,
+    });
   }
 
   /**
@@ -308,6 +336,11 @@ export class RunsService {
     run.finishedAt = new Date();
     await this.runRepo.save(run);
     this.runsGateway.emitRunUpdated(run.id, run);
+    this.runsGateway.emitRunsListUpdated({
+      runId: run.id,
+      status: run.status,
+      progress: run.progress,
+    });
   }
 
   async update(id: string, userId: string, updateRunDto: UpdateRunDto) {
@@ -368,6 +401,11 @@ export class RunsService {
     run.progress.currentStep = 'parsing';
     await this.runRepo.save(run);
     this.runsGateway.emitRunUpdated(run.id, run);
+    this.runsGateway.emitRunsListUpdated({
+      runId: run.id,
+      status: run.status,
+      progress: run.progress,
+    });
 
     return run;
   }
