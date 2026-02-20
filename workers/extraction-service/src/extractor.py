@@ -23,7 +23,14 @@ LANGEXTRACT_API_KEY = os.getenv("LANGEXTRACT_API_KEY")
 if GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
 
-def run_extraction(content: str, schema_config: dict, model_id: str = "gemini-2.5-flash", extraction_type: str = "llm", examples: list = None) -> dict:
+def run_extraction(
+    content: str,
+    schema_config: dict,
+    system_prompt: str = "",
+    model_id: str = "gemini-2.0-flash-exp",
+    extraction_type: str = "llm",
+    examples: list = None
+) -> dict:
     """
     Main entry point for extraction.
     """
@@ -32,9 +39,14 @@ def run_extraction(content: str, schema_config: dict, model_id: str = "gemini-2.
     if extraction_type == "langextract":
         return run_langextract_extraction(content, schema_config, model_id, examples)
     else:
-        return run_llm_extraction(content, schema_config, model_id)
+        return run_llm_extraction(content, schema_config, system_prompt, model_id)
 
-def run_llm_extraction(content: str, schema_config: dict, model_id: str) -> dict:
+def run_llm_extraction(
+    content: str,
+    schema_config: dict,
+    system_prompt: str = "",
+    model_id: str = "gemini-2.0-flash-exp"
+) -> dict:
     """
     Uses direct Gemini API for extraction.
     """
@@ -45,15 +57,19 @@ def run_llm_extraction(content: str, schema_config: dict, model_id: str) -> dict
         # 1. Build Prompt from Schema Fields
         fields_desc = "\n".join([f"- {f['name']} ({f['type']}): {f.get('description', '')}" for f in schema_config.get('fields', [])])
         
-        prompt_instruction = textwrap.dedent(f"""\
-            Extract the following fields from the document text.
-            Reference the exact text where possible.
-            
-            Fields to extract:
-            {fields_desc}
-            
-            Return a valid JSON object matching this structure.
-        """)
+        # Use system_prompt if provided, otherwise use default
+        if system_prompt:
+            prompt_instruction = f"{system_prompt}\n\nFields to extract:\n{fields_desc}\n\nReturn a valid JSON object matching this structure."
+        else:
+            prompt_instruction = textwrap.dedent(f"""\
+                Extract the following fields from the document text.
+                Reference the exact text where possible.
+                
+                Fields to extract:
+                {fields_desc}
+                
+                Return a valid JSON object matching this structure.
+            """)
 
         model = genai.GenerativeModel(model_id)
         

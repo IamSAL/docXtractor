@@ -14,6 +14,7 @@ import {
 import {
   CreateRunDto,
   CreateRunDtoProcessingMode as ProcessingMode,
+  CreateRunDtoExtractionProvider as ExtractionProvider,
   RunSourceDto,
 } from "../../api/models";
 import {
@@ -136,6 +137,7 @@ function RunsNewComponent() {
       const dto: CreateRunDto = {
         extractorId: activeExtractorId,
         processingMode: data.processingMode as ProcessingMode,
+        extractionProvider: data.extractionProvider as ExtractionProvider,
         sources: sourcesDto,
       };
 

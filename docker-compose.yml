@@ -53,6 +53,8 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
+      - OLLAMA_HOST=http://host.docker.internal:11434
+      - OLLAMA_DEFAULT_MODEL=nuextract
     env_file:
       - ./server/.env
     volumes:

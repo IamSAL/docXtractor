@@ -7,3 +7,4 @@ boto3
 rapidocr-onnxruntime
 onnxruntime
 watchfiles
+requests

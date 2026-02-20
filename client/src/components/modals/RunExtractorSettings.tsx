@@ -7,6 +7,83 @@ export function RunExtractorSettings() {
 
     return (
         <div className="lg:col-span-5 flex flex-col gap-6">
+            {/* Extraction Provider */}
+            <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 ml-1">Extraction Provider</label>
+                <div className="bg-gray-50 border-2 border-black p-4 rounded flex flex-col gap-3">
+                    <Controller
+                        name="extractionProvider"
+                        control={control}
+                        render={({ field }) => (
+                            <>
+                                <label className="cursor-pointer relative group">
+                                    <input
+                                        type="radio"
+                                        className="peer sr-only"
+                                        checked={field.value === 'doclo'}
+                                        onChange={() => field.onChange('doclo')}
+                                    />
+                                    <div className="bg-white border-2 border-black p-3 pr-4 flex gap-3 shadow-sm peer-checked:shadow-hard-sm peer-checked:border-black transition-all">
+                                        <div className={`absolute left-0 top-0 bottom-0 w-2 bg-primary border-r-2 border-black ${field.value === 'doclo' ? 'block' : 'hidden'}`}></div>
+                                        <div className="pl-2 flex-1">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="font-bold text-sm">Doclo (Cloud LLM)</span>
+                                                <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center ${field.value === 'doclo' ? 'bg-black' : ''}`}>
+                                                    <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                                </div>
+                                            </div>
+                                            <p className="text-xs text-gray-500 leading-tight">Use cloud-based LLM (Gemini) for extraction via external worker.</p>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label className="cursor-pointer relative group">
+                                    <input
+                                        type="radio"
+                                        className="peer sr-only"
+                                        checked={field.value === 'ollama'}
+                                        onChange={() => field.onChange('ollama')}
+                                    />
+                                    <div className={`bg-white border-2 border-black p-3 pr-4 flex gap-3 transition-all ${field.value === 'ollama' ? 'shadow-hard-sm' : 'opacity-60 hover:opacity-100'}`}>
+                                        <div className={`absolute left-0 top-0 bottom-0 w-2 bg-primary border-r-2 border-black ${field.value === 'ollama' ? 'block' : 'hidden'}`}></div>
+                                        <div className="pl-2 flex-1">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="font-bold text-sm">Ollama (Local Model)</span>
+                                                <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center ${field.value === 'ollama' ? 'bg-black' : ''}`}>
+                                                    <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                                </div>
+                                            </div>
+                                            <p className="text-xs text-gray-500 leading-tight">Use a local Ollama model (NuExtract) for private, on-device extraction.</p>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label className="cursor-pointer relative group">
+                                    <input
+                                        type="radio"
+                                        className="peer sr-only"
+                                        checked={field.value === 'langextract'}
+                                        onChange={() => field.onChange('langextract')}
+                                    />
+                                    <div className={`bg-white border-2 border-black border-dashed p-3 pr-4 flex gap-3 transition-all ${field.value === 'langextract' ? 'shadow-hard-sm opacity-100' : 'opacity-60 hover:opacity-100'}`}>
+                                        <div className={`absolute left-0 top-0 bottom-0 w-2 bg-primary border-r-2 border-black ${field.value === 'langextract' ? 'block' : 'hidden'}`}></div>
+                                        <div className="pl-2 flex-1">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="font-bold text-sm">LangExtract (Few-Shot)</span>
+                                                <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center ${field.value === 'langextract' ? 'bg-black' : ''}`}>
+                                                    <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                                </div>
+                                            </div>
+                                            <p className="text-xs text-gray-500 leading-tight">Use LangExtract with few-shot examples for structured extraction.</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </>
+                        )}
+                    />
+                </div>
+            </div>
+
             {/* Processing Mode */}
             <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-gray-500 ml-1">Processing Mode</label>

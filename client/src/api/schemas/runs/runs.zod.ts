@@ -22,7 +22,7 @@ export const RunsControllerCreateBody = zod.object({
   "fileId": zod.string().optional().describe('File ID if type is file')
 })).describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerCreateBodyProcessingModeDefault),
-  "extractionProvider": zod.enum(['doclo', 'langextract']).default(runsControllerCreateBodyExtractionProviderDefault)
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerCreateBodyExtractionProviderDefault)
 })
 
 /**
@@ -68,7 +68,7 @@ export const RunsControllerUpdateBody = zod.object({
   "fileId": zod.string().optional().describe('File ID if type is file')
 })).optional().describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerUpdateBodyProcessingModeDefault),
-  "extractionProvider": zod.enum(['doclo', 'langextract']).default(runsControllerUpdateBodyExtractionProviderDefault)
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerUpdateBodyExtractionProviderDefault)
 })
 
 /**

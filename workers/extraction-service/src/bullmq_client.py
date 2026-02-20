@@ -14,7 +14,7 @@ class BullMQClient:
 
     def get_queue(self, name: str) -> Queue:
         if name not in self._queues:
-            self._queues[name] = Queue(name, connection=REDIS_URL)
+            self._queues[name] = Queue(name, opts={"connection": REDIS_URL})
         return self._queues[name]
 
     async def add_job(self, queue_name: str, name: str, data: dict):
@@ -29,6 +29,7 @@ class BullMQClient:
             logger.error(f"Failed to add job to {queue_name}: {e}")
 
     def create_worker(self, queue_name: str, processor: Callable[[Job], Awaitable[Any]]):
-        return Worker(queue_name, processor, connection=REDIS_URL)
+        return Worker(queue_name, processor, opts={"connection": REDIS_URL})
 
 bullmq_client = BullMQClient()
+

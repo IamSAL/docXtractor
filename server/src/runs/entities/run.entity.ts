@@ -32,6 +32,7 @@ export enum ProcessingMode {
 export enum ExtractionProvider {
   DOCLO = 'doclo', // Default: internal @doclo/flows
   LANGEXTRACT = 'langextract', // Future: external Python worker
+  OLLAMA = 'ollama', // Local Ollama model (runs in NestJS server)
 }
 
 // JSONB Interfaces

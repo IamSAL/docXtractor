@@ -12,6 +12,7 @@ import {
 import {
   CreateRunDto,
   CreateRunDtoProcessingMode as ProcessingMode,
+  CreateRunDtoExtractionProvider as ExtractionProvider,
   RunSourceDto,
 } from "@/api/models";
 import { useExtractorsControllerFindAll } from "@/api/endpoints/extractors/extractors";
@@ -115,6 +116,7 @@ export const RunExtractorModal = NiceModal.create(
         const dto: CreateRunDto = {
           extractorId: activeExtractorId,
           processingMode: data.processingMode as ProcessingMode,
+          extractionProvider: data.extractionProvider as ExtractionProvider,
           sources: sourcesDto,
         };
 

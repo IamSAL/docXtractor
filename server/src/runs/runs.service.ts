@@ -4,7 +4,12 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { Run, RunStatus, RunSource } from './entities/run.entity';
+import {
+  Run,
+  RunStatus,
+  RunSource,
+  ExtractionProvider,
+} from './entities/run.entity';
 import { Extractor } from '../extractors/entities/extractor.entity';
 import { CreateRunDto } from './dto/create-run.dto';
 import { UpdateRunDto } from './dto/update-run.dto';
@@ -12,6 +17,7 @@ import { QueueService } from '../shared/queue/queue.service';
 import { QueueName } from '../shared/queue/queue-names';
 import { FilesService } from '../files/files.service';
 import { RunsGateway } from './runs.gateway';
+import { OllamaService } from '../shared/ollama/ollama.service';
 
 @Injectable()
 export class RunsService {
@@ -23,6 +29,7 @@ export class RunsService {
     private queueService: QueueService,
     private filesService: FilesService,
     private runsGateway: RunsGateway,
+    private ollamaService: OllamaService,
   ) {}
 
   /**
@@ -93,6 +100,8 @@ export class RunsService {
           name: source.name,
         },
       );
+
+      this.logger.log(`Parse Requested for document ${source.name}`);
     }
 
     run.status = RunStatus.PARSING;
@@ -148,7 +157,13 @@ export class RunsService {
   async handleDocumentParsed(data: any) {
     const { run_id, document_id, status, markdown_content, token_count } = data;
     this.logger.log(
-      `Handling parsed document for run ${run_id}, doc ${document_id}`,
+      `📥 Received parsed document event: run=${run_id}, doc=${document_id}, status=${status}`,
+    );
+    this.logger.debug(
+      `Parsed document data: ${JSON.stringify({ run_id, document_id, status, token_count })}`,
+    );
+    this.logger.log(
+      `Processing parsed document for run ${run_id}, doc ${document_id}`,
     );
 
     const run = await this.runRepo.findOne({ where: { id: run_id } });
@@ -175,29 +190,86 @@ export class RunsService {
       (s) => s.status === 'parsed' || s.status === 'failed',
     );
     if (allParsed) {
+      this.logger.log(
+        `🎯 All documents parsed for run ${run.id}, starting extraction`,
+      );
       run.status = RunStatus.EXTRACTING;
       run.progress!.currentStep = 'extracting';
 
-      // Trigger extraction
-      await this.queueService.addJob(
-        QueueName.EXTRACTION_REQUESTS,
-        'extract-data',
-        {
+      // Get extractor configuration
+      const extractor = await this.extractorRepo.findOne({
+        where: { id: run.extractorId },
+      });
+
+      const combinedMarkdown = run.sources
+        .map((s) => s.parsedContent)
+        .filter(Boolean)
+        .join('\n\n');
+
+      if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+        // Run extraction in-process using Ollama
+        this.logger.log(`🦙 Running Ollama extraction for run ${run.id}`);
+        try {
+          const result = await this.ollamaService.extract(
+            combinedMarkdown,
+            extractor?.schema || {},
+            extractor?.systemPrompt || '',
+            'nuextract',
+          );
+
+          run.status = RunStatus.DONE;
+          run.results = result.data;
+          run.metrics = {
+            totalInputTokens: result.usage.totalTokens,
+            totalOutputTokens: 0,
+          };
+          run.progress!.currentStep = 'complete';
+          run.finishedAt = new Date();
+          this.logger.log(`✅ Ollama extraction complete for run ${run.id}`);
+        } catch (error) {
+          this.logger.error(
+            `Ollama extraction failed for run ${run.id}: ${error.message}`,
+          );
+          run.status = RunStatus.FAILED;
+          run.error = error.message || 'Ollama extraction failed';
+          run.finishedAt = new Date();
+        }
+      } else {
+        // Queue extraction to Python worker (doclo / langextract)
+        const extractionType =
+          run.extractionProvider === ExtractionProvider.LANGEXTRACT
+            ? 'langextract'
+            : 'llm';
+
+        const extractionPayload = {
           run_id: run.id,
           content: {
-            combined_markdown: run.sources
-              .map((s) => s.parsedContent)
-              .join('\n\n'),
+            combined_markdown: combinedMarkdown,
           },
-          schema:
-            (
-              await this.extractorRepo.findOne({
-                where: { id: run.extractorId },
-              })
-            )?.schema || {},
-          extractionType: 'llm', // Default
-        },
-      );
+          schema: extractor?.schema || {},
+          system_prompt: extractor?.systemPrompt || '',
+          extraction_type: extractionType,
+          model_id: 'nuextract', // extractor?.defaultModel || 'gemini-2.0-flash-exp',
+          examples: extractor?.fewShotExamples || [],
+        };
+
+        this.logger.log(
+          `📤 Sending extraction job: type=${extractionType}, model=${'nuextract'}`,
+        );
+        this.logger.debug(
+          `Extraction payload: ${JSON.stringify(extractionPayload)}`,
+        );
+
+        // Trigger extraction with full extractor configuration
+        await this.queueService.addJob(
+          QueueName.EXTRACTION_REQUESTS,
+          'extract-data',
+          extractionPayload,
+        );
+        this.logger.log(
+          `✅ Job added to ${QueueName.EXTRACTION_REQUESTS} queue`,
+        );
+      }
     }
 
     await this.runRepo.save(run);
@@ -209,7 +281,13 @@ export class RunsService {
    */
   async handleExtractionCompleted(data: any) {
     const { run_id, status, result, usage } = data;
-    this.logger.log(`Handling extraction completion for run ${run_id}`);
+    this.logger.log(
+      `📥 Received extraction completed event: run=${run_id}, status=${status}`,
+    );
+    this.logger.debug(
+      `Extraction result data: ${JSON.stringify({ run_id, status, usage })}`,
+    );
+    this.logger.log(`Processing extraction completion for run ${run_id}`);
 
     const run = await this.runRepo.findOne({ where: { id: run_id } });
     if (!run) return;
@@ -287,7 +365,7 @@ export class RunsService {
     }
 
     run.status = RunStatus.PARSING;
-    run.progress!.currentStep = 'parsing';
+    run.progress.currentStep = 'parsing';
     await this.runRepo.save(run);
     this.runsGateway.emitRunUpdated(run.id, run);
 
