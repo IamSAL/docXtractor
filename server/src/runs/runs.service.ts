@@ -76,7 +76,10 @@ export class RunsService {
         'text/plain',
       );
     } catch (error) {
-      this.logger.error(`Failed to flush logs to MinIO for run ${runId}`, error);
+      this.logger.error(
+        `Failed to flush logs to MinIO for run ${runId}`,
+        error,
+      );
     }
   }
 
@@ -458,11 +461,7 @@ export class RunsService {
     } else {
       run.status = RunStatus.FAILED;
       run.error = data.error || 'Extraction failed';
-      this.addLog(
-        run,
-        'error',
-        `Extraction failed: ${run.error}`,
-      );
+      this.addLog(run, 'error', `Extraction failed: ${run.error}`);
     }
 
     run.finishedAt = new Date();
@@ -525,11 +524,7 @@ export class RunsService {
     // Re-queue documents
     for (const source of run.sources) {
       source.status = 'parsing';
-      this.addLog(
-        run,
-        'info',
-        `Queuing document '${source.name}' for parsing`,
-      );
+      this.addLog(run, 'info', `Queuing document '${source.name}' for parsing`);
       await this.queueService.addJob(
         QueueName.UPLOADED_DOCUMENTS,
         'parse-document',

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from datetime import datetime, timezone
 from .bullmq_client import bullmq_client
 from .docling_processor import process_document
@@ -9,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 QUEUE_UPLOADED = "uploaded-documents"
 QUEUE_PARSED = "parsed-documents"
+PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "1"))
 
 
 def _make_log(level, message):
@@ -129,8 +131,8 @@ async def consume():
     """
     Main entry point for starting the worker.
     """
-    logger.info(f"Starting BullMQ worker for queue {QUEUE_UPLOADED}")
-    worker = bullmq_client.create_worker(QUEUE_UPLOADED, process_job)
+    logger.info(f"Starting BullMQ worker for queue {QUEUE_UPLOADED} (concurrency={PARSER_CONCURRENCY})")
+    worker = bullmq_client.create_worker(QUEUE_UPLOADED, process_job, concurrency=PARSER_CONCURRENCY)
     try:
         # Keep the coroutine alive while the worker runs
         while True:

@@ -134,6 +134,7 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=docxtractor-documents
+      - PARSER_CONCURRENCY=4
     networks:
       - docxtractor-network
     volumes:

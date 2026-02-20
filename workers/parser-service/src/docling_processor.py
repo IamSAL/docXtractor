@@ -1,4 +1,5 @@
 import os
+import threading
 import boto3
 import logging
 from docling.document_converter import DocumentConverter
@@ -18,7 +19,13 @@ s3_client = boto3.client(
     aws_secret_access_key=MINIO_SECRET_KEY
 )
 
-converter = DocumentConverter()
+_thread_local = threading.local()
+
+
+def _get_converter() -> DocumentConverter:
+    if not hasattr(_thread_local, "converter"):
+        _thread_local.converter = DocumentConverter()
+    return _thread_local.converter
 
 def process_document(document_id: str, file_key: str) -> dict:
     """
@@ -31,7 +38,7 @@ def process_document(document_id: str, file_key: str) -> dict:
         s3_client.download_file(MINIO_BUCKET, file_key, local_path)
         
         logger.info(f"Parsing {local_path} with Docling...")
-        result = converter.convert(local_path)
+        result = _get_converter().convert(local_path)
         markdown_content = result.document.export_to_markdown()
         
         # Cleanup

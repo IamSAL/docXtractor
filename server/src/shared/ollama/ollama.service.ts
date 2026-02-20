@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Ollama } from 'ollama';
+import { jsonrepair } from 'jsonrepair';
 
 export interface OllamaExtractionResult {
   data: Record<string, unknown>;
@@ -25,7 +26,9 @@ export class OllamaService {
       'nuextract',
     );
     this.client = new Ollama({ host });
-    this.logger.log(`Ollama client initialized: host=${host}, model=${this.defaultModel}`);
+    this.logger.log(
+      `Ollama client initialized: host=${host}, model=${this.defaultModel}`,
+    );
   }
 
   async extract(
@@ -55,15 +58,15 @@ export class OllamaService {
       messages: [{ role: 'user', content: fullPrompt }],
       format: 'json',
     });
-
-    const resultData = JSON.parse(response.message.content);
+    this.logger.debug(`Ollama response: ${response.message.content}`);
+    const resultData = JSON.parse(
+      jsonrepair(response.message.content),
+    ) as Record<string, unknown>;
 
     const totalTokens =
       (response.prompt_eval_count || 0) + (response.eval_count || 0);
 
-    this.logger.log(
-      `Ollama extraction complete: tokens=${totalTokens}`,
-    );
+    this.logger.log(`Ollama extraction complete: tokens=${totalTokens}`);
 
     return {
       data: resultData,
@@ -80,10 +83,7 @@ export class OllamaService {
     // Legacy format: { fields: [{ name, type, description }] }
     if (schema.fields && Array.isArray(schema.fields)) {
       return schema.fields
-        .map(
-          (f: any) =>
-            `- ${f.name} (${f.type}): ${f.description || ''}`,
-        )
+        .map((f: any) => `- ${f.name} (${f.type}): ${f.description || ''}`)
         .join('\n');
     }
 
