@@ -52,13 +52,29 @@ function RunDetailComponent() {
       );
     };
 
+    const handleRunLog = (data: { runId: string; log: any }) => {
+      queryClient.setQueryData(
+        getRunsControllerFindOneQueryKey(id),
+        (oldData: any) => {
+          if (!oldData?.data) return oldData;
+          const run = oldData.data;
+          return {
+            ...oldData,
+            data: { ...run, logs: [...(run.logs || []), data.log] },
+          };
+        },
+      );
+    };
+
     socket.on("run:updated", handleRunUpdated);
     socket.on("run:source:updated", handleSourceUpdated);
+    socket.on("run:log", handleRunLog);
 
     return () => {
       socket.emit("leaveRun", { runId: id });
       socket.off("run:updated", handleRunUpdated);
       socket.off("run:source:updated", handleSourceUpdated);
+      socket.off("run:log", handleRunLog);
     };
   }, [id, queryClient]);
 
@@ -133,6 +149,17 @@ function RunDetailComponent() {
         return "text-[#FFD700]";
       default:
         return "text-[#007AFF]";
+    }
+  };
+
+  const getLogSourceColor = (source: string) => {
+    switch (source) {
+      case "parser":
+        return "text-cyan-400";
+      case "extractor":
+        return "text-purple-400";
+      default:
+        return "text-gray-400";
     }
   };
 
@@ -513,6 +540,11 @@ function RunDetailComponent() {
                           <p key={idx} className="mb-2">
                             <span className="text-gray-500">
                               [{new Date(log.timestamp).toLocaleTimeString()}]
+                            </span>{" "}
+                            <span
+                              className={`font-black uppercase ${getLogSourceColor(log.source)}`}
+                            >
+                              [{log.source || "server"}]
                             </span>{" "}
                             <span
                               className={`font-black uppercase ${getLogLevelColor(log.level)}`}

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import datetime, timezone
 from .bullmq_client import bullmq_client
 from .extractor import run_extraction
 from bullmq import Job
@@ -9,15 +10,26 @@ logger = logging.getLogger(__name__)
 QUEUE_REQUESTS = "extraction-requests"
 QUEUE_COMPLETED = "extraction-completed"
 
+
+def _make_log(level, message):
+    return {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "level": level,
+        "message": message,
+        "source": "extractor",
+    }
+
+
 async def process_job(job: Job, token: str = None):
     """
     Process an extraction job from BullMQ.
     """
     data = job.data
+    logs = []
     try:
         logger.info(f"📥 Received extraction request job {job.id} for run: {data.get('run_id')}")
         logger.info(f"Job data keys: {list(data.keys())}")
-        
+
         content_block = data.get("content", {})
         markdown_text = content_block.get("combined_markdown") or content_block.get("markdown", "")
         schema = data.get("schema", {})
@@ -25,17 +37,30 @@ async def process_job(job: Job, token: str = None):
         extraction_type = data.get("extraction_type", "llm")
         examples = data.get("examples", [])
         model_id = data.get("model_id", "gemini-2.0-flash-exp")
-        
+
+        schema_fields = len(schema.get("fields", []))
+
         logger.info(f"Extraction parameters:")
         logger.info(f"  - Type: {extraction_type}")
         logger.info(f"  - Model: {model_id}")
         logger.info(f"  - System prompt length: {len(system_prompt)}")
         logger.info(f"  - Content length: {len(markdown_text)}")
-        logger.info(f"  - Schema fields: {len(schema.get('fields', []))}")
+        logger.info(f"  - Schema fields: {schema_fields}")
         logger.info(f"  - Examples: {len(examples)}")
-        
+
+        logs.append(_make_log("info", f"Starting {extraction_type} extraction with model {model_id}"))
+        logs.append(_make_log("info", f"Content length: {len(markdown_text)} chars, Schema fields: {schema_fields}"))
+
         if not markdown_text:
             logger.warning("❌ No markdown content provided")
+            logs.append(_make_log("error", "No markdown content provided"))
+            event = {
+                "run_id": data.get("run_id"),
+                "status": "failed",
+                "error": "No markdown content",
+                "logs": logs,
+            }
+            await bullmq_client.add_job(QUEUE_COMPLETED, "extraction-completed", event)
             return {"status": "error", "message": "No markdown content"}
 
         # Run Extraction (Blocking IO -> Thread)
@@ -50,15 +75,17 @@ async def process_job(job: Job, token: str = None):
             examples=examples
         )
         logger.info(f"✅ Extraction completed successfully")
-        
+        logs.append(_make_log("info", "Extraction completed, processing results"))
+
         # Produce Result
         event = {
             "run_id": data.get("run_id"),
             "status": "success",
             "result": result["data"],
-            "usage": result["usage"]
+            "usage": result["usage"],
+            "logs": logs,
         }
-        
+
         logger.info(f"📤 Sending extraction result to queue: {QUEUE_COMPLETED}")
         logger.info(f"Result usage: {result['usage']}")
         await bullmq_client.add_job(QUEUE_COMPLETED, "extraction-completed", event)
@@ -67,10 +94,12 @@ async def process_job(job: Job, token: str = None):
 
     except Exception as e:
         logger.error(f"❌ Error extracting in job {job.id}: {e}", exc_info=True)
+        logs.append(_make_log("error", f"Extraction failed: {e}"))
         event = {
             "run_id": data.get("run_id"),
             "status": "failed",
-            "error": str(e)
+            "error": str(e),
+            "logs": logs,
         }
         logger.info(f"📤 Sending failure event to queue: {QUEUE_COMPLETED}")
         await bullmq_client.add_job(QUEUE_COMPLETED, "extraction-completed", event)
@@ -82,7 +111,7 @@ async def consume():
     """
     logger.info(f"Starting BullMQ worker for queue {QUEUE_REQUESTS}")
     worker = bullmq_client.create_worker(QUEUE_REQUESTS, process_job)
-    
+
     try:
         while True:
             await asyncio.sleep(1)

@@ -75,6 +75,10 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(`run:${runId}`).emit('run:source:updated', payload);
   }
 
+  emitRunLog(runId: string, log: any) {
+    this.server.to(`run:${runId}`).emit('run:log', { runId, log });
+  }
+
   emitRunsListUpdated(payload: {
     runId: string;
     status: string;

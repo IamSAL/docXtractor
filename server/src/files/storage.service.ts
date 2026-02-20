@@ -1,6 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 
 @Injectable()
 export class StorageService {
@@ -48,6 +53,35 @@ export class StorageService {
       return key;
     } catch (error) {
       this.logger.error(`Failed to upload file ${key}`, error);
+      throw error;
+    }
+  }
+
+  async getObject(key: string): Promise<string | null> {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+      });
+      const response = await this.s3Client.send(command);
+      return (await response.Body?.transformToString()) ?? null;
+    } catch (error: any) {
+      if (error.name === 'NoSuchKey') return null;
+      this.logger.error(`Failed to get object ${key}`, error);
+      throw error;
+    }
+  }
+
+  async deleteObject(key: string): Promise<void> {
+    try {
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+      });
+      await this.s3Client.send(command);
+      this.logger.log(`Deleted object ${key} from bucket ${this.bucketName}`);
+    } catch (error) {
+      this.logger.error(`Failed to delete object ${key}`, error);
       throw error;
     }
   }

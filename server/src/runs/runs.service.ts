@@ -8,6 +8,7 @@ import {
   Run,
   RunStatus,
   RunSource,
+  RunLogEntry,
   ExtractionProvider,
 } from './entities/run.entity';
 import { Extractor } from '../extractors/entities/extractor.entity';
@@ -16,6 +17,7 @@ import { UpdateRunDto } from './dto/update-run.dto';
 import { QueueService } from '../shared/queue/queue.service';
 import { QueueName } from '../shared/queue/queue-names';
 import { FilesService } from '../files/files.service';
+import { StorageService } from '../files/storage.service';
 import { RunsGateway } from './runs.gateway';
 import { OllamaService } from '../shared/ollama/ollama.service';
 
@@ -28,9 +30,55 @@ export class RunsService {
     @InjectRepository(Extractor) private extractorRepo: Repository<Extractor>,
     private queueService: QueueService,
     private filesService: FilesService,
+    private storageService: StorageService,
     private runsGateway: RunsGateway,
     private ollamaService: OllamaService,
   ) {}
+
+  private pendingLogLines: Map<string, string[]> = new Map();
+
+  private addLog(
+    run: Run,
+    level: 'info' | 'warn' | 'error',
+    message: string,
+    source: 'server' | 'parser' | 'extractor' = 'server',
+  ) {
+    const log: RunLogEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      source,
+    };
+    run.logs.push(log);
+    this.runsGateway.emitRunLog(run.id, log);
+
+    // Buffer the line for MinIO flush
+    const line = `[${log.timestamp}] [${(source || 'server').toUpperCase()}] [${level.toUpperCase()}] ${message}`;
+    if (!this.pendingLogLines.has(run.id)) {
+      this.pendingLogLines.set(run.id, []);
+    }
+    this.pendingLogLines.get(run.id)!.push(line);
+  }
+
+  private async flushLogs(runId: string): Promise<void> {
+    const lines = this.pendingLogLines.get(runId);
+    if (!lines || lines.length === 0) return;
+    this.pendingLogLines.delete(runId);
+
+    const key = `logs/runs/${runId}.log`;
+    try {
+      // Read existing log content, then append
+      const existing = await this.storageService.getObject(key);
+      const content = (existing || '') + lines.join('\n') + '\n';
+      await this.storageService.uploadFile(
+        key,
+        Buffer.from(content, 'utf-8'),
+        'text/plain',
+      );
+    } catch (error) {
+      this.logger.error(`Failed to flush logs to MinIO for run ${runId}`, error);
+    }
+  }
 
   /**
    * Create a new run and start processing.
@@ -74,20 +122,17 @@ export class RunsService {
       status: RunStatus.QUEUED,
       progress: { parsed: 0, total: sources.length, currentStep: 'queued' },
       startedAt: new Date(),
-      logs: [
-        {
-          timestamp: new Date().toISOString(),
-          level: 'info',
-          message: `Run started with ${sources.length} document(s)`,
-        },
-      ],
+      logs: [],
     });
 
     await this.runRepo.save(run);
 
+    this.addLog(run, 'info', `Run started with ${sources.length} document(s)`);
+
     // Send each source to parser via BullMQ
     for (const source of run.sources) {
       source.status = 'parsing';
+      this.addLog(run, 'info', `Queuing document '${source.name}' for parsing`);
       await this.queueService.addJob(
         QueueName.UPLOADED_DOCUMENTS,
         'parse-document',
@@ -104,9 +149,12 @@ export class RunsService {
       this.logger.log(`Parse Requested for document ${source.name}`);
     }
 
+    this.addLog(run, 'info', 'All documents queued, parsing started');
+
     run.status = RunStatus.PARSING;
     run.progress!.currentStep = 'parsing';
     await this.runRepo.save(run);
+    await this.flushLogs(run.id);
 
     this.runsGateway.emitRunUpdated(run.id, run);
     this.runsGateway.emitRunsListUpdated({
@@ -195,13 +243,35 @@ export class RunsService {
     const source = run.sources.find((s) => s.id === document_id);
     if (!source) return;
 
+    // Process any logs sent by the parser worker
+    if (data.logs && Array.isArray(data.logs)) {
+      for (const workerLog of data.logs) {
+        this.addLog(
+          run,
+          workerLog.level || 'info',
+          workerLog.message,
+          workerLog.source || 'parser',
+        );
+      }
+    }
+
     if (status === 'success') {
       source.status = 'parsed';
       source.parsedContent = markdown_content;
       source.tokenCount = token_count;
+      this.addLog(
+        run,
+        'info',
+        `Document '${source.name}' parsed successfully (${token_count} tokens)`,
+      );
     } else {
       source.status = 'failed';
       source.error = data.error || 'Parsing failed';
+      this.addLog(
+        run,
+        'error',
+        `Document '${source.name}' parsing failed: ${source.error}`,
+      );
     }
 
     this.runsGateway.emitRunSourceUpdated(run.id, source);
@@ -216,6 +286,19 @@ export class RunsService {
       this.logger.log(
         `🎯 All documents parsed for run ${run.id}, starting extraction`,
       );
+
+      const successCount = run.sources.filter(
+        (s) => s.status === 'parsed',
+      ).length;
+      const failedCount = run.sources.filter(
+        (s) => s.status === 'failed',
+      ).length;
+      this.addLog(
+        run,
+        'info',
+        `All documents parsed (${successCount} success, ${failedCount} failed)`,
+      );
+
       run.status = RunStatus.EXTRACTING;
       run.progress!.currentStep = 'extracting';
 
@@ -232,6 +315,8 @@ export class RunsService {
       if (run.extractionProvider === ExtractionProvider.OLLAMA) {
         // Run extraction in-process using Ollama
         this.logger.log(`🦙 Running Ollama extraction for run ${run.id}`);
+        this.addLog(run, 'info', 'Starting extraction with ollama provider');
+        this.addLog(run, 'info', 'Running Ollama extraction...');
         try {
           const result = await this.ollamaService.extract(
             combinedMarkdown,
@@ -249,9 +334,26 @@ export class RunsService {
           run.progress!.currentStep = 'complete';
           run.finishedAt = new Date();
           this.logger.log(`✅ Ollama extraction complete for run ${run.id}`);
+          this.addLog(
+            run,
+            'info',
+            `Extraction completed successfully (${result.usage.totalTokens} input tokens)`,
+          );
+          const durationMs =
+            run.finishedAt.getTime() - (run.startedAt?.getTime() || 0);
+          this.addLog(
+            run,
+            'info',
+            `Run finished in ${Math.round(durationMs / 1000)}s`,
+          );
         } catch (error) {
           this.logger.error(
             `Ollama extraction failed for run ${run.id}: ${error.message}`,
+          );
+          this.addLog(
+            run,
+            'error',
+            `Ollama extraction failed: ${error.message}`,
           );
           run.status = RunStatus.FAILED;
           run.error = error.message || 'Ollama extraction failed';
@@ -263,6 +365,12 @@ export class RunsService {
           run.extractionProvider === ExtractionProvider.LANGEXTRACT
             ? 'langextract'
             : 'llm';
+
+        this.addLog(
+          run,
+          'info',
+          `Starting extraction with ${run.extractionProvider} provider`,
+        );
 
         const extractionPayload = {
           run_id: run.id,
@@ -292,10 +400,12 @@ export class RunsService {
         this.logger.log(
           `✅ Job added to ${QueueName.EXTRACTION_REQUESTS} queue`,
         );
+        this.addLog(run, 'info', 'Extraction job queued');
       }
     }
 
     await this.runRepo.save(run);
+    await this.flushLogs(run.id);
     this.runsGateway.emitRunUpdated(run.id, run);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
@@ -320,6 +430,18 @@ export class RunsService {
     const run = await this.runRepo.findOne({ where: { id: run_id } });
     if (!run) return;
 
+    // Process any logs sent by the extraction worker
+    if (data.logs && Array.isArray(data.logs)) {
+      for (const workerLog of data.logs) {
+        this.addLog(
+          run,
+          workerLog.level || 'info',
+          workerLog.message,
+          workerLog.source || 'extractor',
+        );
+      }
+    }
+
     if (status === 'success') {
       run.status = RunStatus.DONE;
       run.results = result;
@@ -328,13 +450,31 @@ export class RunsService {
         totalOutputTokens: usage?.output_tokens,
       };
       run.progress!.currentStep = 'complete';
+      this.addLog(
+        run,
+        'info',
+        `Extraction completed successfully (${usage?.input_tokens || 0} input tokens)`,
+      );
     } else {
       run.status = RunStatus.FAILED;
       run.error = data.error || 'Extraction failed';
+      this.addLog(
+        run,
+        'error',
+        `Extraction failed: ${run.error}`,
+      );
     }
 
     run.finishedAt = new Date();
+    const durationMs =
+      run.finishedAt.getTime() - (run.startedAt?.getTime() || 0);
+    this.addLog(
+      run,
+      'info',
+      `Run finished in ${Math.round(durationMs / 1000)}s`,
+    );
     await this.runRepo.save(run);
+    await this.flushLogs(run.id);
     this.runsGateway.emitRunUpdated(run.id, run);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
@@ -372,17 +512,24 @@ export class RunsService {
       source.tokenCount = undefined;
     });
 
-    run.logs.push({
-      timestamp: new Date().toISOString(),
-      level: 'info',
-      message: 'Run restarted',
-    });
+    this.addLog(run, 'info', 'Run restarted');
+    this.addLog(
+      run,
+      'info',
+      `Resetting ${run.sources.length} sources and re-queuing`,
+    );
 
     await this.runRepo.save(run);
+    await this.flushLogs(run.id);
 
     // Re-queue documents
     for (const source of run.sources) {
       source.status = 'parsing';
+      this.addLog(
+        run,
+        'info',
+        `Queuing document '${source.name}' for parsing`,
+      );
       await this.queueService.addJob(
         QueueName.UPLOADED_DOCUMENTS,
         'parse-document',
@@ -400,6 +547,7 @@ export class RunsService {
     run.status = RunStatus.PARSING;
     run.progress.currentStep = 'parsing';
     await this.runRepo.save(run);
+    await this.flushLogs(run.id);
     this.runsGateway.emitRunUpdated(run.id, run);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,

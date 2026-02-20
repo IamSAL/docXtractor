@@ -59,6 +59,7 @@ export interface RunLogEntry {
   timestamp: string;
   level: 'info' | 'warn' | 'error';
   message: string;
+  source?: 'server' | 'parser' | 'extractor';
 }
 
 export interface RunMetrics {
