@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import NiceModal, { useModal } from "@ebay/nice-modal-react";
 import { Dialog } from "@/components/retroui/Dialog";
 import { Button } from "@/components/retroui/Button";
 import { useNavigate } from "@tanstack/react-router";
 import { defaultExtractorFormValues } from "@/types/extractor";
 import { cn } from "@/lib/utils";
+import { generateExtractor } from "@/api/generate";
+import { toast } from "sonner";
 
 // Mock Data based on user request
 // Mock Data based on real-world IDP (Intelligent Document Processing) use cases
@@ -318,12 +320,46 @@ const TEMPLATES = [
 export const TemplateWizardModal = NiceModal.create(() => {
   const modal = useModal();
   const navigate = useNavigate();
-  const [view, setView] = useState<"list" | "detail">("list");
+  const [view, setView] = useState<"list" | "detail" | "ai-generate">("list");
   const [selectedTemplate, setSelectedTemplate] = useState<
     (typeof TEMPLATES)[0] | null
   >(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All Templates");
+  const [aiDescription, setAiDescription] = useState("");
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const aiInputRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleAiGenerate = async () => {
+    if (!aiDescription.trim()) return;
+    setAiGenerating(true);
+    try {
+      const result = await generateExtractor(aiDescription.trim());
+      navigate({
+        to: "/extractors/new",
+        state: {
+          initialData: {
+            ...defaultExtractorFormValues,
+            name: result.name,
+            description: result.description,
+            schema: result.schema,
+            systemPrompt: result.systemPrompt,
+          },
+        } as any,
+      });
+      modal.hide();
+      toast.success("Extractor generated successfully");
+    } catch (err: any) {
+      toast.error("Failed to generate extractor", {
+        description:
+          err?.response?.data?.message ||
+          err?.message ||
+          "Check that Ollama is running",
+      });
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   const filteredTemplates = TEMPLATES.filter((t) => {
     const matchesSearch =
@@ -490,6 +526,49 @@ export const TemplateWizardModal = NiceModal.create(() => {
                 </div>
                 {/* Scrollable List */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+                  {/* AI Generate Card */}
+                  <div
+                    onClick={() => {
+                      setView("ai-generate");
+                      setTimeout(() => aiInputRef.current?.focus(), 150);
+                    }}
+                    className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-400 p-4 shadow-hard-sm hover:-translate-y-0.5 transition-transform duration-200 group cursor-pointer flex justify-between items-center"
+                  >
+                    <div className="flex gap-4 items-start">
+                      <div className="w-12 h-12 bg-purple-100 border-2 border-purple-400 flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-purple-600">
+                          auto_awesome
+                        </span>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-bold text-lg text-black">
+                            Generate with AI
+                          </h3>
+                          <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-purple-400 bg-purple-100 text-purple-700">
+                            Ollama
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">
+                          Describe your extraction use case and AI will generate
+                          a complete extractor configuration.
+                        </p>
+                        <div className="flex items-center gap-3 text-xs font-mono text-purple-500">
+                          <span className="flex items-center gap-1">
+                            Schema
+                          </span>
+                          <span className="w-1 h-1 bg-purple-300 rounded-full" />
+                          <span>System Prompt</span>
+                          <span className="w-1 h-1 bg-purple-300 rounded-full" />
+                          <span>Auto-configured</span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="material-symbols-outlined text-purple-400 group-hover:text-purple-600 transition-colors">
+                      chevron_right
+                    </span>
+                  </div>
+
                   {filteredTemplates.map((template) => (
                     <div
                       key={template.id}
@@ -561,6 +640,87 @@ export const TemplateWizardModal = NiceModal.create(() => {
                 </div>
               </section>
             </>
+          ) : view === "ai-generate" ? (
+            /* AI Generation View */
+            <div className="flex-1 overflow-y-auto p-6 bg-cream min-h-0">
+              <div className="max-w-2xl mx-auto flex flex-col gap-6">
+                <div className="bg-white border-2 border-black p-6 shadow-hard-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-purple-100 border-2 border-purple-400 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-purple-600 text-2xl">
+                        auto_awesome
+                      </span>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">Generate with AI</h2>
+                      <p className="text-xs text-gray-500">Powered by Ollama</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Describe what kind of documents you want to process and what
+                    data to extract. AI will generate the extractor name,
+                    description, JSON schema, and system prompt.
+                  </p>
+                  <textarea
+                    ref={aiInputRef}
+                    value={aiDescription}
+                    onChange={(e) => setAiDescription(e.target.value)}
+                    placeholder="e.g. I need to extract data from medical prescriptions including patient name, doctor name, medications with dosage and frequency, diagnosis, and prescription date"
+                    className="w-full border-2 border-black rounded-sm p-4 text-sm font-medium resize-none focus:outline-none focus:ring-2 focus:ring-purple-400 bg-gray-50 min-h-[150px]"
+                    disabled={aiGenerating}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                        e.preventDefault();
+                        handleAiGenerate();
+                      }
+                    }}
+                  />
+                  <div className="flex items-center justify-between mt-3">
+                    <span className="text-[10px] text-gray-400 font-mono">
+                      {aiGenerating
+                        ? "Generating... this may take a moment"
+                        : "Ctrl+Enter to generate"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Tips */}
+                <div className="bg-purple-50 border-2 border-purple-200 p-4">
+                  <h3 className="font-bold text-xs uppercase tracking-wider text-purple-700 mb-2">
+                    Tips for better results
+                  </h3>
+                  <ul className="text-xs text-purple-800 space-y-1.5">
+                    <li className="flex items-start gap-2">
+                      <span className="material-symbols-outlined text-[14px] mt-0.5 text-purple-500">
+                        check
+                      </span>
+                      Mention the document type (invoice, receipt, contract,
+                      etc.)
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="material-symbols-outlined text-[14px] mt-0.5 text-purple-500">
+                        check
+                      </span>
+                      List specific fields you want extracted
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="material-symbols-outlined text-[14px] mt-0.5 text-purple-500">
+                        check
+                      </span>
+                      Mention if there are repeating items (line items,
+                      transactions)
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="material-symbols-outlined text-[14px] mt-0.5 text-purple-500">
+                        check
+                      </span>
+                      Include data types if important (dates, amounts,
+                      percentages)
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           ) : (
             /* Detail View */
             <div className="flex-1 overflow-y-auto p-6 bg-cream min-h-0">

@@ -15,6 +15,7 @@ export class OllamaService {
   private readonly logger = new Logger(OllamaService.name);
   private readonly client: Ollama;
   private readonly defaultModel: string;
+  private readonly generationModel: string;
 
   constructor(private configService: ConfigService) {
     const host = this.configService.get<string>(
@@ -25,9 +26,13 @@ export class OllamaService {
       'OLLAMA_DEFAULT_MODEL',
       'nuextract',
     );
+    this.generationModel = this.configService.get<string>(
+      'OLLAMA_GENERATION_MODEL',
+      'qwen3:14b',
+    );
     this.client = new Ollama({ host });
     this.logger.log(
-      `Ollama client initialized: host=${host}, model=${this.defaultModel}`,
+      `Ollama client initialized: host=${host}, extractionModel=${this.defaultModel}, generationModel=${this.generationModel}`,
     );
   }
 
@@ -72,6 +77,43 @@ export class OllamaService {
       data: resultData,
       usage: { totalTokens },
     };
+  }
+
+  /**
+   * General-purpose JSON generation using Ollama.
+   * Uses the generation model (configurable via OLLAMA_GENERATION_MODEL).
+   */
+  async generate(
+    prompt: string,
+    model?: string,
+  ): Promise<Record<string, unknown>> {
+    const modelId = model || this.generationModel;
+
+    this.logger.log(
+      `Running Ollama generation: model=${modelId}, prompt_length=${prompt.length}`,
+    );
+
+    const response = await this.client.chat({
+      model: modelId,
+      messages: [{ role: 'user', content: prompt }],
+      format: 'json',
+    });
+
+    this.logger.debug(
+      `Ollama generation response: ${response.message.content}`,
+    );
+
+    const result = JSON.parse(jsonrepair(response.message.content)) as Record<
+      string,
+      unknown
+    >;
+
+    const totalTokens =
+      (response.prompt_eval_count || 0) + (response.eval_count || 0);
+
+    this.logger.log(`Ollama generation complete: tokens=${totalTokens}`);
+
+    return result;
   }
 
   /**

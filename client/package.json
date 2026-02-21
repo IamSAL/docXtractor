@@ -61,6 +61,7 @@
     "highlight.js": "^11.11.1",
     "jsonjoy-builder": "^0.3.2",
     "lucide-react": "^0.544.0",
+    "monaco-editor": "^0.55.1",
     "nitro": "npm:nitro-nightly@latest",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

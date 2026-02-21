@@ -16,6 +16,10 @@ import {
 import { ExtractorsService } from './extractors.service';
 import { CreateExtractorDto } from './dto/create-extractor.dto';
 import { UpdateExtractorDto } from './dto/update-extractor.dto';
+import {
+  GenerateSchemaDto,
+  GenerateExtractorDto,
+} from './dto/generate-extractor.dto';
 import { Extractor } from './entities/extractor.entity';
 
 @ApiTags('Extractors')
@@ -33,6 +37,31 @@ export class ExtractorsController {
   })
   create(@Body() createExtractorDto: CreateExtractorDto) {
     return this.extractorsService.create(createExtractorDto);
+  }
+
+  @Post('generate-schema')
+  @ApiOperation({
+    summary: 'Generate a JSON schema from a description using AI',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The JSON schema has been generated.',
+  })
+  generateSchema(@Body() dto: GenerateSchemaDto) {
+    return this.extractorsService.generateSchema(dto.description);
+  }
+
+  @Post('generate-extractor')
+  @ApiOperation({
+    summary:
+      'Generate a full extractor configuration from a description using AI',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The extractor configuration has been generated.',
+  })
+  generateExtractor(@Body() dto: GenerateExtractorDto) {
+    return this.extractorsService.generateExtractor(dto.description);
   }
 
   @Get()

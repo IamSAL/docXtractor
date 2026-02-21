@@ -7,18 +7,17 @@ import {
   useRunsControllerRetry,
   getRunsControllerFindAllQueryKey,
 } from "@/api/endpoints/runs/runs";
-import { useEffect, useRef, useMemo, useState, useCallback } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/lib/socket";
 import { toast } from "sonner";
-import Spreadsheet from "react-spreadsheet";
+import { SpreadsheetView } from "@/components/SpreadsheetView";
 import {
   Tabs,
   TabsList,
   TabsTrigger,
   TabsContent,
 } from "@/components/retroui/Tabs";
-import { jsonToSpreadsheetData } from "@/lib/utils";
 
 export const Route = createFileRoute("/runs/$id")({
   component: RunDetailComponent,
@@ -269,7 +268,7 @@ function RunDetailComponent() {
         </header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-4 lg:p-8">
+        <div className="flex-1  p-4 lg:p-8">
           <div className="max-w-[1600px] mx-auto flex flex-col xl:flex-row gap-8 pb-12">
             <div className="flex-1 flex flex-col gap-8">
               {/* Unified Monitor Section */}
@@ -406,21 +405,28 @@ function RunDetailComponent() {
                       </div>
                     </div>
                   ) : run.status === "done" ? (
-                    <div className="bg-green-50 border-l-4 border-green-500 p-4 flex gap-4 items-start">
-                      <span className="material-symbols-outlined text-green-600 mt-0.5">
-                        check_circle
-                      </span>
-                      <div>
-                        <p className="font-black text-sm uppercase tracking-tight text-green-700">
-                          Extraction Complete
-                        </p>
-                        <p className="text-xs mt-1 text-green-600 font-medium">
-                          All documents processed and data extracted
-                          successfully.
-                          {run.finishedAt &&
-                            run.startedAt &&
-                            ` Duration: ${Math.round((new Date(run.finishedAt).getTime() - new Date(run.startedAt).getTime()) / 1000)}s`}
-                        </p>
+                    <div>
+                      <div className="bg-green-50 border-l-4 border-green-500 p-4 flex gap-4 items-start">
+                        <span className="material-symbols-outlined text-green-600 mt-0.5">
+                          check_circle
+                        </span>
+                        <div>
+                          <p className="font-black text-sm uppercase tracking-tight text-green-700">
+                            Extraction Complete
+                          </p>
+                          <p className="text-xs mt-1 text-green-600 font-medium">
+                            All documents processed and data extracted
+                            successfully.
+                            {run.finishedAt &&
+                              run.startedAt &&
+                              ` Duration: ${Math.round((new Date(run.finishedAt).getTime() - new Date(run.startedAt).getTime()) / 1000)}s`}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        {run.status === "done" && run.results && (
+                          <ResultsSection results={run.results} />
+                        )}
                       </div>
                     </div>
                   ) : isProcessing ? (
@@ -449,7 +455,7 @@ function RunDetailComponent() {
                 </div>
               </section>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="">
                 {/* Sources List */}
                 <section className="flex flex-col gap-4">
                   <h3 className="text-lg font-black uppercase flex items-center gap-2 tracking-tighter">
@@ -458,7 +464,7 @@ function RunDetailComponent() {
                     </span>
                     Active Sources
                   </h3>
-                  <div className="flex flex-col gap-3">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {run.sources?.map((source: any, idx: number) => (
                       <div
                         key={source.id || idx}
@@ -518,61 +524,54 @@ function RunDetailComponent() {
                     ))}
                   </div>
                 </section>
-
-                {/* Logs */}
-                <section className="flex flex-col gap-4">
-                  <h3 className="text-lg font-black uppercase flex items-center gap-2 tracking-tighter">
-                    <span className="material-symbols-outlined font-black">
+              </div>
+              {/* Logs */}
+              <section className="flex flex-col gap-4">
+                <h3 className="text-lg font-black uppercase flex items-center gap-2 tracking-tighter">
+                  <span className="material-symbols-outlined font-black">
+                    terminal
+                  </span>
+                  Run Logs
+                </h3>
+                <div className="bg-black text-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] rounded-sm overflow-hidden flex flex-col h-full min-h-[300px]">
+                  <div className="bg-gray-800 border-b-2 border-black p-2 flex items-center justify-between px-4">
+                    <span className="text-[10px] font-mono text-[#00FF99] font-black uppercase tracking-widest">
+                      LIVE_LOG ({run.logs?.length || 0} entries)
+                    </span>
+                    <span className="material-symbols-outlined text-sm text-gray-400">
                       terminal
                     </span>
-                    Run Logs
-                  </h3>
-                  <div className="bg-black text-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] rounded-sm overflow-hidden flex flex-col h-full min-h-[300px]">
-                    <div className="bg-gray-800 border-b-2 border-black p-2 flex items-center justify-between px-4">
-                      <span className="text-[10px] font-mono text-[#00FF99] font-black uppercase tracking-widest">
-                        LIVE_LOG ({run.logs?.length || 0} entries)
-                      </span>
-                      <span className="material-symbols-outlined text-sm text-gray-400">
-                        terminal
-                      </span>
-                    </div>
-                    <div className="p-4 font-mono text-[11px] leading-relaxed overflow-y-auto font-medium max-h-[400px]">
-                      {run.logs && run.logs.length > 0 ? (
-                        run.logs.map((log: any, idx: number) => (
-                          <p key={idx} className="mb-2">
-                            <span className="text-gray-500">
-                              [{new Date(log.timestamp).toLocaleTimeString()}]
-                            </span>{" "}
-                            <span
-                              className={`font-black uppercase ${getLogSourceColor(log.source)}`}
-                            >
-                              [{log.source || "server"}]
-                            </span>{" "}
-                            <span
-                              className={`font-black uppercase ${getLogLevelColor(log.level)}`}
-                            >
-                              [{log.level}]
-                            </span>{" "}
-                            <span className="text-white">{log.message}</span>
-                          </p>
-                        ))
-                      ) : (
-                        <p className="text-gray-500">No log entries yet...</p>
-                      )}
-                      {isProcessing && (
-                        <p className="animate-pulse text-[#00FF99]">_</p>
-                      )}
-                      <div ref={logsEndRef} />
-                    </div>
                   </div>
-                </section>
-              </div>
-
-              {/* Results Section */}
-              {run.status === "done" && run.results && (
-                <ResultsSection results={run.results} />
-              )}
-
+                  <div className="p-4 font-mono text-[11px] leading-relaxed overflow-y-auto font-medium max-h-[400px]">
+                    {run.logs && run.logs.length > 0 ? (
+                      run.logs.map((log: any, idx: number) => (
+                        <p key={idx} className="mb-2">
+                          <span className="text-gray-500">
+                            [{new Date(log.timestamp).toLocaleTimeString()}]
+                          </span>{" "}
+                          <span
+                            className={`font-black uppercase ${getLogSourceColor(log.source)}`}
+                          >
+                            [{log.source || "server"}]
+                          </span>{" "}
+                          <span
+                            className={`font-black uppercase ${getLogLevelColor(log.level)}`}
+                          >
+                            [{log.level}]
+                          </span>{" "}
+                          <span className="text-white">{log.message}</span>
+                        </p>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No log entries yet...</p>
+                    )}
+                    {isProcessing && (
+                      <p className="animate-pulse text-[#00FF99]">_</p>
+                    )}
+                    <div ref={logsEndRef} />
+                  </div>
+                </div>
+              </section>
               {/* Error Section */}
               {run.status === "failed" && run.error && (
                 <section className="flex flex-col gap-4">
@@ -592,11 +591,56 @@ function RunDetailComponent() {
             </div>
 
             {/* Sidebar Stats */}
-            <aside className="w-full xl:w-80 flex flex-col gap-6 shrink-0">
-              <h3 className="text-lg font-black uppercase border-b-4 border-black pb-2 tracking-tighter">
+            <aside className="w-full xl:w-80  gap-6 shrink-0">
+              {/* Needs Review Badge - only show when there are failed sources or status is review */}
+              {(failedSources > 0 || run.status === "review") && (
+                <div className="bg-[#FF6B00] border-2 my-4 border-black shadow-[4px_4px_0px_0px_#000000] p-4 flex items-center justify-between cursor-pointer hover:bg-[#e66000] transition-colors rounded-sm">
+                  <div className="flex flex-col text-white drop-shadow-md">
+                    <span className="font-black text-xl italic tracking-tighter leading-none">
+                      {failedSources} ISSUE{failedSources !== 1 ? "S" : ""}
+                    </span>
+                    <span className="text-[10px] font-black uppercase tracking-widest mt-1">
+                      Needs Review
+                    </span>
+                  </div>
+                  <span className="material-symbols-outlined text-white text-3xl drop-shadow-md">
+                    rate_review
+                  </span>
+                </div>
+              )}
+
+              <div className="mt-auto flex flex-col gap-3">
+                {run.status === "done" && (
+                  <Link to="/runs/review/$id" params={{ id: run.id }}>
+                    <button
+                      className="bg-white hover:bg-gray-50 text-black w-full py-3 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_#000000] transition-all"
+                      type="button"
+                    >
+                      <span className="material-symbols-outlined text-sm">
+                        description
+                      </span>
+                      View Full Report
+                    </button>
+                  </Link>
+                )}
+                {(run.status === "failed" || run.status === "done") && (
+                  <button
+                    className="bg-blue-50 hover:bg-blue-100 text-blue-700 w-full py-3 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_#000000] transition-all"
+                    type="button"
+                    onClick={handleRetry}
+                    disabled={retryMutation.isPending}
+                  >
+                    <span className="material-symbols-outlined text-sm">
+                      replay
+                    </span>
+                    Retry Run
+                  </button>
+                )}
+              </div>
+              <h3 className="text-lg font-black uppercase border-b-4 border-black pb-2 tracking-tighter mt-4">
                 Job Statistics
               </h3>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 mt-4">
                 {/* Completed */}
                 <div className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 rounded-sm relative overflow-hidden">
                   <div className="flex justify-between items-start">
@@ -647,26 +691,9 @@ function RunDetailComponent() {
                 </div>
               </div>
 
-              {/* Needs Review Badge - only show when there are failed sources or status is review */}
-              {(failedSources > 0 || run.status === "review") && (
-                <div className="bg-[#FF6B00] border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 flex items-center justify-between cursor-pointer hover:bg-[#e66000] transition-colors rounded-sm">
-                  <div className="flex flex-col text-white drop-shadow-md">
-                    <span className="font-black text-xl italic tracking-tighter leading-none">
-                      {failedSources} ISSUE{failedSources !== 1 ? "S" : ""}
-                    </span>
-                    <span className="text-[10px] font-black uppercase tracking-widest mt-1">
-                      Needs Review
-                    </span>
-                  </div>
-                  <span className="material-symbols-outlined text-white text-3xl drop-shadow-md">
-                    rate_review
-                  </span>
-                </div>
-              )}
-
               {/* Metrics */}
               {run.metrics && (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 mt-4">
                   <h4 className="text-xs font-black uppercase tracking-widest text-gray-500 border-b-2 border-gray-200 pb-2">
                     Token Usage
                   </h4>
@@ -734,35 +761,6 @@ function RunDetailComponent() {
                   </div>
                 )}
               </div>
-
-              <div className="mt-auto flex flex-col gap-3">
-                {run.status === "done" && (
-                  <Link to="/runs/review/$id" params={{ id: run.id }}>
-                    <button
-                      className="bg-white hover:bg-gray-50 text-black w-full py-3 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_#000000] transition-all"
-                      type="button"
-                    >
-                      <span className="material-symbols-outlined text-sm">
-                        description
-                      </span>
-                      View Full Report
-                    </button>
-                  </Link>
-                )}
-                {(run.status === "failed" || run.status === "done") && (
-                  <button
-                    className="bg-blue-50 hover:bg-blue-100 text-blue-700 w-full py-3 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_#000000] transition-all"
-                    type="button"
-                    onClick={handleRetry}
-                    disabled={retryMutation.isPending}
-                  >
-                    <span className="material-symbols-outlined text-sm">
-                      replay
-                    </span>
-                    Retry Run
-                  </button>
-                )}
-              </div>
             </aside>
           </div>
         </div>
@@ -772,38 +770,8 @@ function RunDetailComponent() {
 }
 
 function ResultsSection({ results }: { results: Record<string, unknown> }) {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const fullscreenRef = useRef<HTMLDivElement>(null);
-
-  const { data: spreadsheetData, columnLabels } = useMemo(
-    () => jsonToSpreadsheetData(results),
-    [results],
-  );
-
-  const toggleFullscreen = useCallback(() => {
-    if (!isFullscreen) {
-      fullscreenRef.current?.requestFullscreen?.();
-    } else {
-      document.exitFullscreen?.();
-    }
-  }, [isFullscreen]);
-
-  useEffect(() => {
-    const handleChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener("fullscreenchange", handleChange);
-    return () => document.removeEventListener("fullscreenchange", handleChange);
-  }, []);
-
   return (
     <section className="flex flex-col gap-4">
-      <h3 className="text-xl font-black uppercase flex items-center gap-2 tracking-tighter">
-        <span className="material-symbols-outlined font-black">
-          data_object
-        </span>
-        Extraction Results
-      </h3>
       <Tabs defaultValue="json">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <TabsList>
@@ -849,38 +817,7 @@ function ResultsSection({ results }: { results: Record<string, unknown> }) {
         </TabsContent>
 
         <TabsContent value="spreadsheet">
-          <div
-            ref={fullscreenRef}
-            className={
-              isFullscreen
-                ? "bg-white flex flex-col h-full"
-                : "bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] rounded-sm overflow-hidden"
-            }
-          >
-            <div className="bg-gray-50 border-b-2 border-black p-3 px-4 flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-widest text-gray-600">
-                Spreadsheet View
-              </span>
-              <button
-                className="text-xs font-bold uppercase tracking-wide text-[#007AFF] hover:underline flex items-center gap-1"
-                onClick={toggleFullscreen}
-              >
-                <span className="material-symbols-outlined text-[16px]">
-                  {isFullscreen ? "fullscreen_exit" : "fullscreen"}
-                </span>
-                {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              </button>
-            </div>
-            <div
-              className={
-                isFullscreen
-                  ? "flex-1 overflow-auto p-4"
-                  : "overflow-auto max-h-[500px] p-4"
-              }
-            >
-              <Spreadsheet data={spreadsheetData} columnLabels={columnLabels} />
-            </div>
-          </div>
+          <SpreadsheetView results={results} />
         </TabsContent>
       </Tabs>
     </section>

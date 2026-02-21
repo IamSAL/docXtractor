@@ -48,3 +48,4 @@ server/upload/
 examples/
 .pnpm-store/
 __pycache__
+misc
