@@ -7,10 +7,18 @@ import {
   useRunsControllerRetry,
   getRunsControllerFindAllQueryKey,
 } from "@/api/endpoints/runs/runs";
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/lib/socket";
 import { toast } from "sonner";
+import Spreadsheet from "react-spreadsheet";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/retroui/Tabs";
+import { jsonToSpreadsheetData } from "@/lib/utils";
 
 export const Route = createFileRoute("/runs/$id")({
   component: RunDetailComponent,
@@ -212,7 +220,9 @@ function RunDetailComponent() {
 
   const totalSources = run.sources?.length || 0;
   const completedPercent =
-    totalSources > 0 ? Math.round((sourceStats.parsed / totalSources) * 100) : 0;
+    totalSources > 0
+      ? Math.round((sourceStats.parsed / totalSources) * 100)
+      : 0;
   const isProcessing =
     run.status === "parsing" ||
     run.status === "extracting" ||
@@ -280,9 +290,7 @@ function RunDetailComponent() {
                   <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-gray-500">
                     <span
                       className={
-                        progressStep >= 1
-                          ? "text-[#007AFF]"
-                          : "text-gray-400"
+                        progressStep >= 1 ? "text-[#007AFF]" : "text-gray-400"
                       }
                     >
                       01. Parsing ({run.progress?.parsed || 0}/
@@ -290,18 +298,14 @@ function RunDetailComponent() {
                     </span>
                     <span
                       className={
-                        progressStep >= 2
-                          ? "text-[#7A00FF]"
-                          : "text-gray-400"
+                        progressStep >= 2 ? "text-[#7A00FF]" : "text-gray-400"
                       }
                     >
                       02. Extracting
                     </span>
                     <span
                       className={
-                        progressStep >= 3
-                          ? "text-green-600"
-                          : "text-gray-400"
+                        progressStep >= 3 ? "text-green-600" : "text-gray-400"
                       }
                     >
                       03. Complete
@@ -342,9 +346,7 @@ function RunDetailComponent() {
                     {/* Extracting segment */}
                     <div
                       className={`h-full w-1/3 border-r-2 border-black flex items-center justify-center relative ${
-                        progressStep >= 2
-                          ? "bg-[#7A00FF]"
-                          : "bg-gray-200"
+                        progressStep >= 2 ? "bg-[#7A00FF]" : "bg-gray-200"
                       }`}
                     >
                       {progressStep > 2 ? (
@@ -555,9 +557,7 @@ function RunDetailComponent() {
                           </p>
                         ))
                       ) : (
-                        <p className="text-gray-500">
-                          No log entries yet...
-                        </p>
+                        <p className="text-gray-500">No log entries yet...</p>
                       )}
                       {isProcessing && (
                         <p className="animate-pulse text-[#00FF99]">_</p>
@@ -570,35 +570,7 @@ function RunDetailComponent() {
 
               {/* Results Section */}
               {run.status === "done" && run.results && (
-                <section className="flex flex-col gap-4">
-                  <h3 className="text-xl font-black uppercase flex items-center gap-2 tracking-tighter">
-                    <span className="material-symbols-outlined font-black">
-                      data_object
-                    </span>
-                    Extraction Results
-                  </h3>
-                  <div className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] rounded-sm overflow-hidden">
-                    <div className="bg-gray-50 border-b-2 border-black p-3 px-4 flex items-center justify-between">
-                      <span className="text-xs font-black uppercase tracking-widest text-gray-600">
-                        JSON Output
-                      </span>
-                      <button
-                        className="text-xs font-bold uppercase tracking-wide text-[#007AFF] hover:underline"
-                        onClick={() => {
-                          navigator.clipboard.writeText(
-                            JSON.stringify(run.results, null, 2),
-                          );
-                          toast.success("Copied to clipboard");
-                        }}
-                      >
-                        Copy
-                      </button>
-                    </div>
-                    <pre className="p-4 text-xs font-mono overflow-x-auto max-h-[500px] overflow-y-auto whitespace-pre-wrap">
-                      {JSON.stringify(run.results, null, 2)}
-                    </pre>
-                  </div>
-                </section>
+                <ResultsSection results={run.results} />
               )}
 
               {/* Error Section */}
@@ -796,5 +768,121 @@ function RunDetailComponent() {
         </div>
       </div>
     </AppLayout>
+  );
+}
+
+function ResultsSection({ results }: { results: Record<string, unknown> }) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const fullscreenRef = useRef<HTMLDivElement>(null);
+
+  const { data: spreadsheetData, columnLabels } = useMemo(
+    () => jsonToSpreadsheetData(results),
+    [results],
+  );
+
+  const toggleFullscreen = useCallback(() => {
+    if (!isFullscreen) {
+      fullscreenRef.current?.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    const handleChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleChange);
+    return () => document.removeEventListener("fullscreenchange", handleChange);
+  }, []);
+
+  return (
+    <section className="flex flex-col gap-4">
+      <h3 className="text-xl font-black uppercase flex items-center gap-2 tracking-tighter">
+        <span className="material-symbols-outlined font-black">
+          data_object
+        </span>
+        Extraction Results
+      </h3>
+      <Tabs defaultValue="json">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <TabsList>
+            <TabsTrigger value="json">
+              <span className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px]">
+                  code
+                </span>
+                JSON
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="spreadsheet">
+              <span className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px]">
+                  table_chart
+                </span>
+                Spreadsheet
+              </span>
+            </TabsTrigger>
+          </TabsList>
+          <button
+            className="text-xs font-bold uppercase tracking-wide text-[#007AFF] hover:underline"
+            onClick={() => {
+              navigator.clipboard.writeText(JSON.stringify(results, null, 2));
+              toast.success("Copied to clipboard");
+            }}
+          >
+            Copy JSON
+          </button>
+        </div>
+
+        <TabsContent value="json">
+          <div className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] rounded-sm overflow-hidden">
+            <div className="bg-gray-50 border-b-2 border-black p-3 px-4">
+              <span className="text-xs font-black uppercase tracking-widest text-gray-600">
+                JSON Output
+              </span>
+            </div>
+            <pre className="p-4 text-xs font-mono overflow-x-auto max-h-[500px] overflow-y-auto whitespace-pre-wrap">
+              {JSON.stringify(results, null, 2)}
+            </pre>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="spreadsheet">
+          <div
+            ref={fullscreenRef}
+            className={
+              isFullscreen
+                ? "bg-white flex flex-col h-full"
+                : "bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] rounded-sm overflow-hidden"
+            }
+          >
+            <div className="bg-gray-50 border-b-2 border-black p-3 px-4 flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-widest text-gray-600">
+                Spreadsheet View
+              </span>
+              <button
+                className="text-xs font-bold uppercase tracking-wide text-[#007AFF] hover:underline flex items-center gap-1"
+                onClick={toggleFullscreen}
+              >
+                <span className="material-symbols-outlined text-[16px]">
+                  {isFullscreen ? "fullscreen_exit" : "fullscreen"}
+                </span>
+                {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              </button>
+            </div>
+            <div
+              className={
+                isFullscreen
+                  ? "flex-1 overflow-auto p-4"
+                  : "overflow-auto max-h-[500px] p-4"
+              }
+            >
+              <Spreadsheet data={spreadsheetData} columnLabels={columnLabels} />
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </section>
   );
 }
