@@ -7,6 +7,15 @@ export const AXIOS_INSTANCE = axios.create({
 });
 
 AXIOS_INSTANCE.interceptors.request.use((config) => {
+  // If we are refreshing the token, attach the refresh token
+  if (config.url?.includes("/auth/refresh")) {
+    const refreshToken = useAuthStore.getState().refreshToken;
+    if (refreshToken) {
+      config.headers.Authorization = `Bearer ${refreshToken}`;
+    }
+    return config;
+  }
+
   const token = useAuthStore.getState().accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

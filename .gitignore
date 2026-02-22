@@ -49,3 +49,4 @@ examples/
 .pnpm-store/
 __pycache__
 misc
+.venv

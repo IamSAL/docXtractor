@@ -36,7 +36,7 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     const { runId } = data;
-    this.logger.log(`Client ${client.id} joining run room: ${runId}`);
+    // this.logger.log(`Client ${client.id} joining run room: ${runId}`);
     client.join(`run:${runId}`);
     return { event: 'joinedRun', data: { runId } };
   }
@@ -47,21 +47,21 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     const { runId } = data;
-    this.logger.log(`Client ${client.id} leaving run room: ${runId}`);
+    // this.logger.log(`Client ${client.id} leaving run room: ${runId}`);
     client.leave(`run:${runId}`);
     return { event: 'leftRun', data: { runId } };
   }
 
   @SubscribeMessage('joinRunsList')
   handleJoinRunsList(@ConnectedSocket() client: Socket) {
-    this.logger.log(`Client ${client.id} joining runs list room`);
+    // this.logger.log(`Client ${client.id} joining runs list room`);
     client.join('runs:list');
     return { event: 'joinedRunsList' };
   }
 
   @SubscribeMessage('leaveRunsList')
   handleLeaveRunsList(@ConnectedSocket() client: Socket) {
-    this.logger.log(`Client ${client.id} leaving runs list room`);
+    // this.logger.log(`Client ${client.id} leaving runs list room`);
     client.leave('runs:list');
     return { event: 'leftRunsList' };
   }

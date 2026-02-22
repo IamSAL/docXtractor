@@ -721,7 +721,7 @@ function RunDetailComponent() {
               )}
 
               {/* Timestamps */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 mt-4">
                 <h4 className="text-xs font-black uppercase tracking-widest text-gray-500 border-b-2 border-gray-200 pb-2">
                   Timing
                 </h4>

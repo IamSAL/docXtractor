@@ -325,7 +325,7 @@ export class RunsService {
             combinedMarkdown,
             extractor?.schema || {},
             extractor?.systemPrompt || '',
-            'nuextract',
+            'qwen3:14b',
           );
 
           run.status = RunStatus.DONE;
@@ -383,12 +383,12 @@ export class RunsService {
           schema: extractor?.schema || {},
           system_prompt: extractor?.systemPrompt || '',
           extraction_type: extractionType,
-          model_id: 'nuextract', // extractor?.defaultModel || 'gemini-2.0-flash-exp',
+          model_id: 'qwen3:14b', // extractor?.defaultModel || 'gemini-2.0-flash-exp',
           examples: extractor?.fewShotExamples || [],
         };
 
         this.logger.log(
-          `📤 Sending extraction job: type=${extractionType}, model=${'nuextract'}`,
+          `📤 Sending extraction job: type=${extractionType}, model=${'qwen3:14b'}`,
         );
         this.logger.debug(
           `Extraction payload: ${JSON.stringify(extractionPayload)}`,

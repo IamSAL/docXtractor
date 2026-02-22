@@ -287,7 +287,7 @@ function ExtractorDetailComponent() {
                     schemaFields.map((field, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(200,200,200,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                        className="flex items-center justify-between p-4 bg-gray-50 xdark:bg-gray-800 border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(200,200,200,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                       >
                         <div className="flex items-center">
                           <span className="material-symbols-outlined text-gray-500 mr-3 text-2xl">
@@ -331,8 +331,8 @@ function ExtractorDetailComponent() {
 
             {/* Logic & Limits Column */}
             <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
-              <div className="neu-card bg-white dark:bg-surface-dark p-6 rounded-xl h-full border-3 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex justify-between items-center mb-6 pb-4 border-b-4 border-black dark:border-gray-600">
+              <div className="neu-card bg-white xdark:bg-surface-dark p-6 rounded-xl h-full border-3 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex justify-between items-center mb-6 pb-4 border-b-4 border-black xdark:border-gray-600">
                   <h3 className="font-bold text-2xl font-display flex items-center">
                     <span className="material-symbols-outlined mr-3 text-3xl">
                       psychology
@@ -342,7 +342,7 @@ function ExtractorDetailComponent() {
                 </div>
                 <div className="space-y-6">
                   {extractor.consensusEnabled && (
-                    <div className="bg-purple-50 dark:bg-gray-800 p-5 rounded-lg border-2 border-black relative shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="bg-purple-50 xdark:bg-gray-800 p-5 rounded-lg border-2 border-black relative shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                       <span className="absolute -top-3 -right-2 bg-primary text-black text-xs font-black px-3 py-1 border-2 border-black shadow-sm uppercase tracking-wider">
                         Active Strategy
                       </span>
@@ -373,7 +373,7 @@ function ExtractorDetailComponent() {
                     </div>
                   )}
 
-                  <div className="bg-white dark:bg-surface-dark p-5 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="bg-white xdark:bg-surface-dark p-5 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="font-bold text-lg flex items-center">
                         <span className="material-symbols-outlined mr-2">
@@ -417,8 +417,8 @@ function ExtractorDetailComponent() {
 
             {/* Management Column */}
             <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
-              <div className="neu-card bg-white dark:bg-surface-dark p-6 rounded-xl h-full flex flex-col border-3 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex justify-between items-center mb-6 pb-4 border-b-4 border-black dark:border-gray-600">
+              <div className="neu-card bg-white xdark:bg-surface-dark p-6 rounded-xl h-full flex flex-col border-3 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex justify-between items-center mb-6 pb-4 border-b-4 border-black xdark:border-gray-600">
                   <h3 className="font-bold text-2xl font-display flex items-center">
                     <span className="material-symbols-outlined mr-3 text-3xl">
                       admin_panel_settings
@@ -436,7 +436,7 @@ function ExtractorDetailComponent() {
                         EDIT Extractor
                       </button>
                     </Link>
-                    <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] space-y-4">
+                    <div className="bg-gray-50 xdark:bg-gray-800 p-5 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] space-y-4">
                       <div className="flex items-center justify-between border-b-2 border-dashed border-gray-300 pb-3">
                         <span className="text-sm font-bold text-gray-500 uppercase">
                           Last Modified
@@ -464,13 +464,13 @@ function ExtractorDetailComponent() {
                         </span>
                       </div>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] space-y-4">
+                    <div className="bg-gray-50 xdark:bg-gray-800 p-5 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] space-y-4">
                       <h4 className="font-bold text-sm uppercase text-gray-500 mb-2">
                         Quick Actions
                       </h4>
                       <div className="grid grid-cols-2 gap-3">
                         <button
-                          className="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-700 border-2 border-black rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                          className="flex flex-col items-center justify-center p-3 bg-white xdark:bg-gray-700 border-2 border-black rounded hover:bg-gray-100 xdark:hover:bg-gray-600 transition-colors"
                           onClick={handleDuplicate}
                         >
                           <span className="material-symbols-outlined mb-1">
@@ -479,7 +479,7 @@ function ExtractorDetailComponent() {
                           <span className="text-xs font-bold">Duplicate</span>
                         </button>
                         <button
-                          className="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-700 border-2 border-black rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                          className="flex flex-col items-center justify-center p-3 bg-white xdark:bg-gray-700 border-2 border-black rounded hover:bg-gray-100 xdark:hover:bg-gray-600 transition-colors"
                           onClick={handleShare}
                         >
                           <span className="material-symbols-outlined mb-1">
@@ -490,7 +490,7 @@ function ExtractorDetailComponent() {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-8 pt-6 border-t-4 border-black dark:border-gray-600">
+                  <div className="mt-8 pt-6 border-t-4 border-black xdark:border-gray-600">
                     <button
                       className="flex items-center justify-center text-red-500 hover:text-red-700 font-bold uppercase text-sm tracking-wider transition-colors group w-full"
                       onClick={handleDelete}

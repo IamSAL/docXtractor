@@ -24,7 +24,7 @@ export class OllamaService {
     );
     this.defaultModel = this.configService.get<string>(
       'OLLAMA_DEFAULT_MODEL',
-      'nuextract',
+      'qwen3:14b',
     );
     this.generationModel = this.configService.get<string>(
       'OLLAMA_GENERATION_MODEL',
@@ -55,13 +55,15 @@ export class OllamaService {
     const fullPrompt = `${instruction}\n\nDocument Content:\n${content}`;
 
     this.logger.log(
-      `Running Ollama extraction: model=${modelId}, content_length=${content.length}`,
+      `Running Ollama extraction: model=${modelId}, content_length=${content.length} , prompt=${fullPrompt}`,
     );
+
+    this.logger.log(`Schema: ${JSON.stringify(schema)}`);
 
     const response = await this.client.chat({
       model: modelId,
       messages: [{ role: 'user', content: fullPrompt }],
-      format: 'json',
+      format: schema,
     });
     this.logger.debug(`Ollama response: ${response.message.content}`);
     const resultData = JSON.parse(
@@ -90,7 +92,7 @@ export class OllamaService {
     const modelId = model || this.generationModel;
 
     this.logger.log(
-      `Running Ollama generation: model=${modelId}, prompt_length=${prompt.length}`,
+      `Running Ollama generation: model=${modelId}, prompt_length=${prompt.length} ,prompt=${prompt}`,
     );
 
     const response = await this.client.chat({
