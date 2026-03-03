@@ -46,3 +46,7 @@ server/upload/
 **/*.log
 **/temp/
 examples/
+.pnpm-store/
+__pycache__
+misc
+.venv

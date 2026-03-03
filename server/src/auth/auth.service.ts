@@ -56,7 +56,7 @@ export class AuthService {
     await this.userService.save(user);
 
     await this.mailService.sendOTPCode(user.email, {
-      companyName: 'NineHertz Medic',
+      companyName: 'DocXtractor',
       otpCode: otp,
     });
   }
@@ -103,7 +103,7 @@ export class AuthService {
     const createdUser = await this.userService.create({
       ...createUserDto,
       password: createUserDto.password,
-      role: 'patient' as UserRole,
+      role: 'user' as UserRole,
     });
 
     await this.initiateEmailVerification(createdUser.email);
@@ -119,48 +119,8 @@ export class AuthService {
       );
     }
 
-    // Fetch user with profile relations to check if profile exists
-    const userWithProfile = await this.userRepository.findOne({
-      where: { id: user.id },
-      relations: [
-        'patientProfile',
-        'doctorProfile',
-        'adminProfile',
-        'pharmacistProfile',
-      ],
-    });
-
-    let hasProfile = false;
-    let fullName = '';
-
-    // Check which profile exists based on user role and extract full name
-    switch (user.role) {
-      case 'patient':
-        if (userWithProfile?.patientProfile) {
-          hasProfile = true;
-          fullName = `${userWithProfile.patientProfile.fullName || ''}`.trim();
-        }
-        break;
-      case 'doctor':
-        if (userWithProfile?.doctorProfile) {
-          hasProfile = true;
-          fullName = `${userWithProfile.doctorProfile.fullName || ''}`.trim();
-        }
-        break;
-      case 'admin':
-        if (userWithProfile?.adminProfile) {
-          hasProfile = true;
-          fullName = `${userWithProfile.adminProfile.fullName || ''}`.trim();
-        }
-        break;
-      case 'pharmacist':
-        if (userWithProfile?.pharmacistProfile) {
-          hasProfile = true;
-          fullName =
-            `${userWithProfile.pharmacistProfile.fullName || ''} `.trim();
-        }
-        break;
-    }
+    const hasProfile = false;
+    const fullName = '';
 
     const tokens = await this.generateTokens(
       user.id,
@@ -192,46 +152,16 @@ export class AuthService {
 
       const user = await this.userRepository.findOne({
         where: { id: payload.sub },
-        relations: [
-          'patientProfile',
-          'doctorProfile',
-          'adminProfile',
-          'pharmacistProfile',
-        ],
+        relations: [],
       });
 
       if (!user) throw new UnauthorizedException('User not found');
 
       // Get updated profile info
-      let hasProfile = false;
-      let fullName = '';
+      const hasProfile = false;
+      const fullName = '';
 
-      switch (user.role) {
-        case 'patient':
-          if (user.patientProfile) {
-            hasProfile = true;
-            fullName = `${user.patientProfile.fullName || ''}`.trim();
-          }
-          break;
-        case 'doctor':
-          if (user.doctorProfile) {
-            hasProfile = true;
-            fullName = `${user.doctorProfile.fullName || ''}`.trim();
-          }
-          break;
-        case 'admin':
-          if (user.adminProfile) {
-            hasProfile = true;
-            fullName = `${user.adminProfile.fullName || ''}`.trim();
-          }
-          break;
-        case 'pharmacist':
-          if (user.pharmacistProfile) {
-            hasProfile = true;
-            fullName = `${user.pharmacistProfile.fullName || ''}`.trim();
-          }
-          break;
-      }
+      // Profile logic removed
 
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
         await this.generateTokens(

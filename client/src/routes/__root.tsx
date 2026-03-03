@@ -1,112 +1,86 @@
-/// <reference types="vite/client" />
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
-import * as React from "react";
-import { NotFound } from "@/components/common/not-found";
-import { DefaultCatchBoundary } from "@/components/common/try-catch-boundary";
-import appCss from "../styles/index.css?url";
-import { seo } from "@/utils/seo";
-import Navbar from "@/components/shared/navbar/navbar";
-import FooterSection from "@/components/shared/footer/footer";
-import { NuqsAdapter } from "nuqs/adapters/react";
-import { Toaster } from "@/components/ui/sonner";
-import "@stream-io/video-react-sdk/dist/css/styles.css";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { InstallPWAButton } from "@/components/common/install-pwa-button";
-import { useOffline } from "@/hooks/use-is-offline";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { WifiOff } from "lucide-react";
-import { Analytics } from "@vercel/analytics/react";
-import { PusherProvider } from "@/providers/pusher-provider";
-import { useUserSessionStore } from "@/stores/user-session-store";
+import {
+  HeadContent,
+  Scripts,
+  createRootRouteWithContext,
+} from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import { TanStackDevtools } from '@tanstack/react-devtools'
 
-export const Route = createRootRoute({
+import Header from '../components/Header'
+
+import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+
+import AiDevtools from '../lib/ai-devtools'
+
+import StoreDevtools from '../lib/demo-store-devtools'
+
+import appCss from '../styles.css?url'
+
+import type { QueryClient } from '@tanstack/react-query'
+import { Toaster } from '@/components/retroui/Sonner'
+import NiceModal from '@ebay/nice-modal-react'
+
+interface MyRouterContext {
+  queryClient: QueryClient
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       {
-        charSet: "utf-8",
+        charSet: 'utf-8',
       },
       {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
+        name: 'viewport',
+        content: 'width=device-width, initial-scale=1',
       },
-      ...seo({
-        title: "Custom Healthcare App Development Services",
-        description: `Streamline healthcare operations with custom app development services. Key modules include doctor appointment solutions, pharmacy app development, and telemedicine.`,
-      }),
+      {
+        title: 'TanStack Start Starter',
+      },
     ],
     links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/pwa-192x192.png", sizes: "192x192" },
-      { rel: "icon", href: "/favicon.ico" },
+      {
+        rel: 'stylesheet',
+        href: appCss,
+      },
     ],
   }),
-  errorComponent: DefaultCatchBoundary,
-  notFoundComponent: () => <NotFound />,
+
   shellComponent: RootDocument,
-});
+})
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const queryClient = new QueryClient();
-  const isOffline = useOffline();
-  const { getCurrentUser } = useUserSessionStore();
-  const user = getCurrentUser();
-  React.useEffect(() => {
-    if ("serviceWorker" in navigator && import.meta.env.PROD) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then((reg) => {
-          console.log("Service Worker registered: ", reg);
-          if (!navigator.serviceWorker.controller) {
-            window.location.reload();
-          }
-        })
-        .catch((error) => {
-          console.log("Service Worker registration failed: ", error);
-        });
-    }
-  }, []);
-
-  const showOfflineAlert =
-    isOffline && (import.meta.env.PROD || !navigator.onLine);
-
   return (
-    <html className="scroll-smooth scroll-">
+    <html lang="en" className='light'>
       <head>
         <HeadContent />
+
+        {/* <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script> */}
       </head>
-      <body>
-        <QueryClientProvider client={queryClient}>
-          <PusherProvider userId={user?.id || ""}>
-            <NuqsAdapter>
-              {showOfflineAlert && (
-                <div className="fixed top-0 left-0 right-0 z-50">
-                  <Alert
-                    variant="destructive"
-                    className="rounded-none border-x-0 border-t-0"
-                  >
-                    <WifiOff className="h-4 w-4" />
-                    <AlertTitle>Offline Mode</AlertTitle>
-                    <AlertDescription>
-                      You're currently offline. App functionality may be
-                      limited.
-                    </AlertDescription>
-                  </Alert>
-                </div>
-              )}
-              <Navbar />
-              <div className={showOfflineAlert ? "mt-12" : ""}>{children}</div>
-              <FooterSection />
-              <InstallPWAButton />
-              <Toaster richColors position="top-center" />
-              <Scripts />
-              <Analytics />
-            </NuqsAdapter>
-            <ReactQueryDevtools initialIsOpen={false} />
-          </PusherProvider>
-        </QueryClientProvider>
+      <body className='bg-background-cream min-h-screen  flex text-black light'>
+        <NiceModal.Provider>
+          {children}
+        </NiceModal.Provider>
+        <TanStackDevtools
+          config={{
+            position: 'bottom-right',
+          }}
+          plugins={[
+            {
+              name: 'Tanstack Router',
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+            TanStackQueryDevtools,
+            AiDevtools,
+            StoreDevtools,
+          ]}
+        />
+        <Scripts />
+        <Toaster />
       </body>
     </html>
-  );
+  )
 }

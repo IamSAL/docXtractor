@@ -1,264 +1,366 @@
-# NineHertz React Client with TanStack Query & Vite
+Welcome to your new TanStack app! 
 
-![React Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/react?color=61dafb&logo=react)
-![TypeScript Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/dev/typescript?color=3178c6&logo=typescript)
-![Vite Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/vite?color=646cff&logo=vite)
-![TanStack Query Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/NineHertz-NestJs-Tanstack-Start/client/@tanstack/react-query?color=ff4154)
-![PNPM](https://img.shields.io/badge/pnpm-✓-orange?logo=pnpm)
-![License](https://img.shields.io/github/license/devalentineomonya/NineHertz-NestJs-Tanstack-Start?color=blue)
+# Getting Started
 
-## Overview
-
-This React client application is part of the NineHertz Full-Stack Starter project, providing a modern frontend interface built with React, TypeScript, and TanStack Query. It connects to the NestJS backend and features responsive design, state management, and authentication flows.
-
-**Live Demo**: [https://nine-hertz-demo.com](https://nine-hertz-demo.com) (example)
-
-## Project Structure
+To run this application:
 
 ```bash
-client/
-├── public/              # Static assets
-├── src/
-│   ├── api/             # API service layer
-│   ├── assets/          # Images, fonts, etc.
-│   ├── components/      # Reusable UI components
-│   ├── context/         # React context providers
-│   ├── hooks/           # Custom React hooks
-│   ├── layouts/         # Page layout components
-│   ├── pages/           # Application pages
-│   ├── styles/          # Global styles and Tailwind config
-│   ├── types/           # TypeScript type definitions
-│   ├── utils/           # Utility functions
-│   ├── App.tsx          # Main application component
-│   ├── main.tsx         # Application entry point
-│   └── vite-env.d.ts    # Vite type declarations
-├── .eslintrc.json       # ESLint configuration
-├── .prettierrc          # Prettier configuration
-├── index.html           # Main HTML template
-├── package.json         # Dependencies and scripts
-├── tailwind.config.js   # Tailwind CSS configuration
-├── tsconfig.json        # TypeScript configuration
-└── vite.config.ts       # Vite build configuration
-```
-
-## Key Features
-
-- ⚡ **Vite-powered** - Blazing fast development experience
-- 🧩 **Component Library** - Reusable UI components with Tailwind CSS
-- 🔄 **TanStack Query** - Powerful data fetching and state management
-- 🔐 **Authentication Flow** - JWT-based login/registration system
-- 📱 **Fully Responsive** - Mobile-first responsive design
-- 📦 **Modular Architecture** - Well-organized feature-based structure
-- 🛡️ **Type Safety** - TypeScript throughout the application
-- 💅 **Tailwind CSS** - Utility-first styling framework
-- ⚙️ **ESLint + Prettier** - Code quality and formatting
-
-## Prerequisites
-
-- Node.js v18+
-- PNPM (recommended) or npm
-- Backend server running (see [server README](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/tree/main/server))
-
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start.git
-   cd NineHertz-NestJs-Tanstack-Start/client
-   ```
-
-2. Install dependencies:
-   ```bash
-   pnpm install
-   # or
-   npm install
-   ```
-
-3. Configure environment variables:
-   ```bash
-   cp .env.example .env.local
-   ```
-   Update the `.env.local` file with your backend API URL:
-   ```env
-   VITE_API_BASE_URL=http://localhost:3000
-   ```
-
-## Running the Application
-
-**Development mode:**
-```bash
+pnpm install
 pnpm dev
-# or
-npm run dev
 ```
 
-**Production build:**
+# Building For Production
+
+To build this application for production:
+
 ```bash
 pnpm build
-pnpm preview
 ```
 
-## Key Technologies Used
+## Testing
 
-| Technology       | Purpose                           |
-|------------------|-----------------------------------|
-| React 18         | Component-based UI library        |
-| TypeScript       | Static type checking              |
-| Vite             | Build tool and development server |
-| TanStack Query   | Data fetching and state management|
-| React Router     | Client-side routing               |
-| Tailwind CSS     | Utility-first CSS framework       |
-| Axios            | HTTP client for API requests      |
-| React Hook Form  | Form management and validation    |
-| Zod              | Schema validation                 |
-| ESLint           | Code linting                      |
-| Prettier         | Code formatting                   |
+This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
 
-## Application Structure Highlights
-
-### 1. API Service Layer (`src/api`)
-```tsx
-// api/auth.ts
-import axios from 'axios';
-
-export const login = async (credentials: LoginDto) => {
-  const response = await axios.post('/auth/login', credentials);
-  return response.data;
-};
-
-export const register = async (userData: RegisterDto) => {
-  const response = await axios.post('/auth/register', userData);
-  return response.data;
-};
+```bash
+pnpm test
 ```
 
-### 2. TanStack Query Integration (`src/App.tsx`)
-```tsx
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+## Styling
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
-    },
+This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+
+
+## Linting & Formatting
+
+This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
+
+
+```bash
+pnpm lint
+pnpm format
+pnpm check
+```
+
+
+## Shadcn
+
+Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
+
+```bash
+pnpm dlx shadcn@latest add button
+```
+
+
+## T3Env
+
+- You can use T3Env to add type safety to your environment variables.
+- Add Environment variables to the `src/env.mjs` file.
+- Use the environment variables in your code.
+
+### Usage
+
+```ts
+import { env } from "@/env";
+
+console.log(env.VITE_APP_TITLE);
+```
+
+
+
+
+
+# TanStack Chat Application
+
+Am example chat application built with TanStack Start, TanStack Store, and Claude AI.
+
+## .env Updates
+
+```env
+ANTHROPIC_API_KEY=your_anthropic_api_key
+```
+
+## ✨ Features
+
+### AI Capabilities
+- 🤖 Powered by Claude 3.5 Sonnet 
+- 📝 Rich markdown formatting with syntax highlighting
+- 🎯 Customizable system prompts for tailored AI behavior
+- 🔄 Real-time message updates and streaming responses (coming soon)
+
+### User Experience
+- 🎨 Modern UI with Tailwind CSS and Lucide icons
+- 🔍 Conversation management and history
+- 🔐 Secure API key management
+- 📋 Markdown rendering with code highlighting
+
+### Technical Features
+- 📦 Centralized state management with TanStack Store
+- 🔌 Extensible architecture for multiple AI providers
+- 🛠️ TypeScript for type safety
+
+## Architecture
+
+### Tech Stack
+- **Frontend Framework**: TanStack Start
+- **Routing**: TanStack Router
+- **State Management**: TanStack Store
+- **Styling**: Tailwind CSS
+- **AI Integration**: Anthropic's Claude API
+
+
+## Routing
+This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
+
+### Adding A Route
+
+To add a new route to your application just add another a new file in the `./src/routes` directory.
+
+TanStack will automatically generate the content of the route file for you.
+
+Now that you have two routes you can use a `Link` component to navigate between them.
+
+### Adding Links
+
+To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
+
+```tsx
+import { Link } from "@tanstack/react-router";
+```
+
+Then anywhere in your JSX you can use it like so:
+
+```tsx
+<Link to="/about">About</Link>
+```
+
+This will create a link that will navigate to the `/about` route.
+
+More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
+
+### Using A Layout
+
+In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you use the `<Outlet />` component.
+
+Here is an example layout that includes a header:
+
+```tsx
+import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+
+import { Link } from "@tanstack/react-router";
+
+export const Route = createRootRoute({
+  component: () => (
+    <>
+      <header>
+        <nav>
+          <Link to="/">Home</Link>
+          <Link to="/about">About</Link>
+        </nav>
+      </header>
+      <Outlet />
+      <TanStackRouterDevtools />
+    </>
+  ),
+})
+```
+
+The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
+
+More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
+
+
+## Data Fetching
+
+There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
+
+For example:
+
+```tsx
+const peopleRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/people",
+  loader: async () => {
+    const response = await fetch("https://swapi.dev/api/people");
+    return response.json() as Promise<{
+      results: {
+        name: string;
+      }[];
+    }>;
+  },
+  component: () => {
+    const data = peopleRoute.useLoaderData();
+    return (
+      <ul>
+        {data.results.map((person) => (
+          <li key={person.name}>{person.name}</li>
+        ))}
+      </ul>
+    );
   },
 });
+```
 
-function App() {
-  return (
+Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
+
+### React-Query
+
+React-Query is an excellent addition or alternative to route loading and integrating it into you application is a breeze.
+
+First add your dependencies:
+
+```bash
+pnpm add @tanstack/react-query @tanstack/react-query-devtools
+```
+
+Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
+
+```tsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// ...
+
+const queryClient = new QueryClient();
+
+// ...
+
+if (!rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement);
+
+  root.render(
     <QueryClientProvider client={queryClient}>
-      {/* Application components */}
+      <RouterProvider router={router} />
     </QueryClientProvider>
   );
 }
 ```
 
-### 3. Protected Route Component (`src/components/ProtectedRoute.tsx`)
+You can also add TanStack Query Devtools to the root route (optional).
+
 ```tsx
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const { isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
-};
+const rootRoute = createRootRoute({
+  component: () => (
+    <>
+      <Outlet />
+      <ReactQueryDevtools buttonPosition="top-right" />
+      <TanStackRouterDevtools />
+    </>
+  ),
+});
 ```
 
-### 4. Responsive Layout (`src/layouts/MainLayout.tsx`)
-```tsx
-import { Outlet } from 'react-router-dom';
-import { Header, Footer, Sidebar } from '../components';
+Now you can use `useQuery` to fetch your data.
 
-const MainLayout = () => {
+```tsx
+import { useQuery } from "@tanstack/react-query";
+
+import "./App.css";
+
+function App() {
+  const { data } = useQuery({
+    queryKey: ["people"],
+    queryFn: () =>
+      fetch("https://swapi.dev/api/people")
+        .then((res) => res.json())
+        .then((data) => data.results as { name: string }[]),
+    initialData: [],
+  });
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      
-      <div className="flex flex-1">
-        <Sidebar />
-        
-        <main className="flex-1 p-4 md:p-6 bg-gray-50">
-          <Outlet />
-        </main>
-      </div>
-      
-      <Footer />
+    <div>
+      <ul>
+        {data.map((person) => (
+          <li key={person.name}>{person.name}</li>
+        ))}
+      </ul>
     </div>
   );
-};
+}
+
+export default App;
 ```
 
-## Environment Variables
+You can find out everything you need to know on how to use React-Query in the [React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
 
-| Variable              | Description                     | Default Value              |
-|-----------------------|--------------------------------|----------------------------|
-| VITE_API_BASE_URL    | Base URL for API requests      | http://localhost:3000     |
-| VITE_APP_NAME        | Application display name       | NineHertz App             |
-| VITE_DEFAULT_THEME   | Default color theme            | light                     |
+## State Management
 
-## Deployment
+Another common requirement for React applications is state management. There are many options for state management in React. TanStack Store provides a great starting point for your project.
 
-The client is ready for deployment to various platforms:
+First you need to add TanStack Store as a dependency:
 
-### Vercel
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdevalentineomonya%2FNineHertz-NestJs-Tanstack-Start&project-name=ninehertz-app&repository-name=ninehertz-app)
+```bash
+pnpm add @tanstack/store
+```
 
-### Netlify
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start)
+Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
 
-### Static Hosting
-1. Build the production bundle:
-   ```bash
-   pnpm build
-   ```
-2. Deploy the `dist` folder to any static hosting service
+```tsx
+import { useStore } from "@tanstack/react-store";
+import { Store } from "@tanstack/store";
+import "./App.css";
 
-## Development Workflow
+const countStore = new Store(0);
 
-1. Start the development server:
-   ```bash
-   pnpm dev
-   ```
+function App() {
+  const count = useStore(countStore);
+  return (
+    <div>
+      <button onClick={() => countStore.setState((n) => n + 1)}>
+        Increment - {count}
+      </button>
+    </div>
+  );
+}
 
-2. Implement features using a component-driven approach:
-   - Create new components in `src/components`
-   - Add new pages in `src/pages`
-   - Create API services in `src/api`
+export default App;
+```
 
-3. Format code before committing:
-   ```bash
-   pnpm format
-   ```
+One of the many nice features of TanStack Store is the ability to derive state from other state. That derived state will update when the base state updates.
 
-4. Lint code to check for issues:
-   ```bash
-   pnpm lint
-   ```
+Let's check this out by doubling the count using derived state.
 
-## Contributing
+```tsx
+import { useStore } from "@tanstack/react-store";
+import { Store, Derived } from "@tanstack/store";
+import "./App.css";
 
-Contributions are welcome! Please follow these guidelines:
-1. Fork the repository
-2. Create a new feature branch
-3. Commit your changes with descriptive messages
-4. Push to your fork
-5. Submit a pull request
+const countStore = new Store(0);
 
-## License
+const doubledStore = new Derived({
+  fn: () => countStore.state * 2,
+  deps: [countStore],
+});
+doubledStore.mount();
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/blob/main/LICENSE) file for details.
+function App() {
+  const count = useStore(countStore);
+  const doubledCount = useStore(doubledStore);
 
-## Support
+  return (
+    <div>
+      <button onClick={() => countStore.setState((n) => n + 1)}>
+        Increment - {count}
+      </button>
+      <div>Doubled - {doubledCount}</div>
+    </div>
+  );
+}
 
-For issues or feature requests, please [open an issue](https://github.com/devalentineomonya/NineHertz-NestJs-Tanstack-Start/issues) on GitHub.
+export default App;
+```
 
----
+We use the `Derived` class to create a new store that is derived from another store. The `Derived` class has a `mount` method that will start the derived store updating.
 
-**Project Maintainer**: [Valentine Omonya](https://github.com/devalentineomonya)  
-**Project Status**: Active Development (July 2024)
+Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
+
+You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
+
+# Demo files
+
+Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
+
+# Learn More
+
+You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).

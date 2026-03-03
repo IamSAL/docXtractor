@@ -220,7 +220,7 @@ Sidebar Design:
 - Logo "DocXTractor" at top (bold, with icon)
 - Navigation items vertical stack:
   - Dashboard (active - yellow background, black border)
-  - Pipelines
+  - Extractors
   - Jobs/Runs
   - Settings
 - Each nav item: icon + label, 8px padding
@@ -232,7 +232,7 @@ Main Content Area:
 - Background: #F7F7F5 (soft cream)
 - Header row:
   - Page title "Dashboard" (text-3xl, font-bold)
-  - Right side: "New Pipeline" primary yellow button with plus icon
+  - Right side: "New Extractor" primary yellow button with plus icon
 
 Stats Row:
 - Grid of 4 stat cards
@@ -242,15 +242,15 @@ Stats Row:
   - 4px hard offset shadow
   - Large bold number (text-4xl)
   - Small label below (text-muted-foreground)
-- Stats: Total Pipelines, Active Jobs, Documents Processed, Success Rate
+- Stats: Total Extractors, Active Jobs, Documents Processed, Success Rate
 
-Recent Pipelines Section:
-- Section heading: "Recent Pipelines"
+Recent Extractors Section:
+- Section heading: "Recent Extractors"
 - Grid layout (3 columns on desktop, 2 on tablet, 1 on mobile)
-- Pipeline cards:
+- Extractor cards:
   - 3px black border, 4px hard shadow
   - 8px border radius
-  - Pipeline name (bold), description preview
+  - Extractor name (bold), description preview
   - Colored icon for extraction type
   - Last run date badge
   - Hover: slight lift (shadow reduces)
@@ -258,7 +258,7 @@ Recent Pipelines Section:
 Recent Jobs Table:
 - Section heading: "Recent Extraction Jobs"
 - Table container with 2px black border
-- Columns: Job ID, Pipeline, Documents, Status, Date
+- Columns: Job ID, Extractor, Documents, Status, Date
 - Status badges:
   - Success: green background (#22c55e), black border
   - In Progress: yellow background (#fde047), black border
@@ -268,10 +268,10 @@ Recent Jobs Table:
 
 ---
 
-### 3. Pipeline List Page
+### 3. Extractor List Page
 
 ```
-Design a pipeline list/management page for "DocXTractor".
+Design a extractor list/management page for "DocXTractor".
 
 Style: Neubrutalism / RetroUI
 
@@ -280,8 +280,8 @@ Layout:
 - Main content area
 
 Header:
-- "My Pipelines" title (text-3xl, font-bold)
-- "New Pipeline" yellow button with plus icon (right side)
+- "My Extractors" title (text-3xl, font-bold)
+- "New Extractor" yellow button with plus icon (right side)
 
 Filters Row:
 - Search input (inset styling, 2px border)
@@ -289,11 +289,11 @@ Filters Row:
 - Extraction type filter (AI/Deterministic)
 - Sort dropdown (Date, Name, Runs)
 
-Pipeline Grid:
-- Each pipeline as a card with:
+Extractor Grid:
+- Each extractor as a card with:
   - 3px black border, 4px hard offset shadow
   - White background
-  - Pipeline name (text-xl, font-bold)
+  - Extractor name (text-xl, font-bold)
   - Description (text-muted-foreground, truncate 2 lines)
   - Tags: AI fields count, Regex fields count (badges)
   - Stats row: total runs, success rate, last run date
@@ -305,17 +305,17 @@ Pipeline Grid:
 
 Empty State:
 - Centered illustration (simple line art, bold outlines)
-- Message: "No pipelines yet"
-- Subtitle: "Create your first pipeline to start extracting data"
-- Large "Create Pipeline" yellow button
+- Message: "No extractors yet"
+- Subtitle: "Create your first extractor to start extracting data"
+- Large "Create Extractor" yellow button
 ```
 
 ---
 
-### 4. Pipeline Editor
+### 4. Extractor Editor
 
 ```
-Design a comprehensive pipeline editor page for "DocXTractor" – create/edit extraction pipelines with full schema configuration.
+Design a comprehensive extractor editor page for "DocXTractor" – create/edit extraction extractors with full schema configuration.
 
 Style: Neubrutalism / RetroUI (https://www.retroui.dev)
 
@@ -331,21 +331,21 @@ Overall Layout:
 
 Top Header Bar:
 - Breadcrumb navigation:
-  - "Pipelines" (link, text-muted-foreground) > 
+  - "Extractors" (link, text-muted-foreground) > 
   - Chevron icon > 
-  - "[Pipeline Name]" or "New Pipeline" (current, text-foreground)
+  - "[Extractor Name]" or "New Extractor" (current, text-foreground)
   - Breadcrumb items: text-sm, hover:underline
-- Pipeline name: 
+- Extractor name: 
   - Inline editable input (text-2xl, font-bold)
   - Pencil icon appears on hover
   - Click to edit mode with focus ring
-  - Placeholder: "Untitled Pipeline"
+  - Placeholder: "Untitled Extractor"
 
 Right Header Actions:
-- "Test Pipeline" button (outline, with play icon)
+- "Test Extractor" button (outline, with play icon)
   - Tooltip: "Test with a sample document"
 - "Duplicate" button (outline, with copy icon)
-- "Save Pipeline" button (yellow primary, with save icon)
+- "Save Extractor" button (yellow primary, with save icon)
 - "Cancel" button (ghost, text only)
 
 Version Indicator (if editing existing):
@@ -363,12 +363,12 @@ Card Container:
 
 Section Header:
 - "Basic Information" (text-xl, font-bold)
-- Info icon with tooltip: "Configure pipeline metadata and output settings"
+- Info icon with tooltip: "Configure extractor metadata and output settings"
 
 Form Fields (vertical stack, 16px gap):
 
-1. Pipeline Name:
-   - Label: "Pipeline Name" (font-medium) + required asterisk (red)
+1. Extractor Name:
+   - Label: "Extractor Name" (font-medium) + required asterisk (red)
    - Input: Full width, inset styling, 2px black border
    - Placeholder: "e.g., Invoice Data Extractor"
    - Validation: Red border + error message if empty on save
@@ -376,7 +376,7 @@ Form Fields (vertical stack, 16px gap):
 2. Description:
    - Label: "Description" (font-medium)
    - Textarea: 4 rows, inset styling, 2px black border
-   - Placeholder: "Describe what this pipeline extracts..."
+   - Placeholder: "Describe what this extractor extracts..."
    - Character count: "0/500" (text-muted-foreground, right aligned)
 
 3. Output Format:
@@ -387,10 +387,10 @@ Form Fields (vertical stack, 16px gap):
      - Inactive: white background, black border
    - Helper text: "Choose how extracted data will be formatted"
 
-4. Pipeline Template (optional):
+4. Extractor Template (optional):
    - Label: "Start from Template" (font-medium)
    - Dropdown with icons:
-     - "Blank Pipeline" (default)
+     - "Blank Extractor" (default)
      - "📄 Invoice Parser"
      - "📋 Contract Extractor"
      - "📨 Receipt Scanner"
@@ -668,12 +668,12 @@ Panel shows different content:
    - Checkbox: "Extract all matches (returns array)"
    - Default: Extract first match only
 
-=== SECTION 4: PIPELINE SETTINGS CARD (Optional) ===
+=== SECTION 4: EXTRACTOR SETTINGS CARD (Optional) ===
 
 Card Container (same styling as other cards):
 
 Section Header:
-- "Pipeline Settings" (text-xl, font-bold)
+- "Extractor Settings" (text-xl, font-bold)
 
 Global Options:
 
@@ -702,19 +702,19 @@ Sticky footer (fixed at bottom when scrolling):
 - Padding: 16px 24px
 
 Left Side:
-- "Delete Pipeline" button (ghost, coral/red text)
-  - Only shown when editing existing pipeline
+- "Delete Extractor" button (ghost, coral/red text)
+  - Only shown when editing existing extractor
   - Confirmation modal on click
 
 Center:
 - Validation status:
-  - "✓ Pipeline valid" (green text)
+  - "✓ Extractor valid" (green text)
   - "⚠ 2 issues to fix" (yellow text, clickable to scroll to errors)
 
 Right Side:
 - "Cancel" button (outline)
 - "Save as Draft" button (outline)
-- "Save Pipeline" button (yellow primary, large)
+- "Save Extractor" button (yellow primary, large)
   - Disabled state if validation fails
   - Loading spinner when saving
 
@@ -727,9 +727,9 @@ Form Validation Visual Cues:
 - Missing few-shot examples warning: Yellow border, "Consider adding examples"
 
 Toast Notifications:
-- Success: "Pipeline saved successfully" (green, checkmark icon)
-- Error: "Failed to save pipeline" (red, X icon)
-- Warning: "Pipeline saved with warnings" (yellow, warning icon)
+- Success: "Extractor saved successfully" (green, checkmark icon)
+- Error: "Failed to save extractor" (red, X icon)
+- Warning: "Extractor saved with warnings" (yellow, warning icon)
 
 === INTERACTIONS & ANIMATIONS ===
 
@@ -766,10 +766,10 @@ Mobile (< 768px):
 
 ---
 
-### 5. Run Pipeline / Multi-Source Upload Modal
+### 5. Run Extractor / Multi-Source Upload Modal
 
 ```
-Design a "Run Pipeline" modal for "DocXTractor" with multi-source document support.
+Design a "Run Extractor" modal for "DocXTractor" with multi-source document support.
 
 Style: Neubrutalism / RetroUI
 
@@ -783,7 +783,7 @@ Modal:
   - 24px padding
 
 Header:
-- "Run Pipeline: [Pipeline Name]" (text-xl, font-bold)
+- "Run Extractor: [Extractor Name]" (text-xl, font-bold)
 - Subtitle: "Add multiple sources for unified extraction"
 - Close X button (top right, outline style)
 
@@ -865,7 +865,7 @@ Layout:
 
 Header:
 - Breadcrumb: Jobs > Job #12345
-- Job title with pipeline name
+- Job title with extractor name
 - **Source count badge**: "6 sources" (shows total sources in job)
 - Status badge (large):
   - "In Progress": yellow bg, black border, spinner icon
@@ -985,7 +985,7 @@ Header:
 Filter Bar:
 - Status dropdown (All, Completed, In Progress, Failed, Needs Review)
 - Date range picker
-- Pipeline selector
+- Extractor selector
 - Confidence filter dropdown (All, High, Medium, Low) **NEW**
 - Each filter: inset styling, 2px black border
 
@@ -994,7 +994,7 @@ Jobs Table:
 - Header row with gray background
 - Columns:
   - Job ID (link style)
-  - Pipeline Name
+  - Extractor Name
   - Documents (count)
   - Status (badge)
   - **Confidence (badge)** - NEW
@@ -1039,7 +1039,7 @@ Overall Layout:
 
 Header Bar:
 - Left: Back button (arrow) + Job title "Review Job #12345"
-- Center: Pipeline name badge
+- Center: Extractor name badge
 - Right: 
   - Processing mode badge ("Unified Extraction" / "Per-Document")
   - Overall confidence indicator (circular progress)
@@ -1531,12 +1531,12 @@ Key Adaptations:
 Screens to Design:
 1. Mobile Dashboard:
    - Collapsed stats (2x2 grid)
-   - Recent pipelines as vertical cards
+   - Recent extractors as vertical cards
    - Hamburger menu icon
 
-2. Mobile Pipeline List:
+2. Mobile Extractor List:
    - Vertical card stack
-   - Floating "+" button for new pipeline
+   - Floating "+" button for new extractor
 
 3. Mobile Job Monitor:
    - Stacked progress sections
@@ -1569,9 +1569,9 @@ Style: Simple line art matching Neubrutalism aesthetic
 
 States Needed:
 
-1. No Pipelines Yet:
+1. No Extractors Yet:
    - Document with plus icon
-   - Text: "Create your first pipeline"
+   - Text: "Create your first extractor"
    - Yellow primary button
 
 2. No Jobs Running:
@@ -1611,16 +1611,16 @@ Each illustration: ~200x200px, works on white and cream backgrounds
 
 ## 🔄 Flows Feature (Automation Workflows)
 
-Flows automate the running of existing extraction pipelines. Currently, users manually click "Run" on a pipeline and upload documents one at a time. **Flows eliminate this manual work** by automatically triggering pipelines on schedules, webhooks, file uploads, or form submissions – and routing results to destinations like Google Sheets or Drive.
+Flows automate the running of existing extraction extractors. Currently, users manually click "Run" on a extractor and upload documents one at a time. **Flows eliminate this manual work** by automatically triggering extractors on schedules, webhooks, file uploads, or form submissions – and routing results to destinations like Google Sheets or Drive.
 
 ---
 
 ### 13. Flow List Page
 
 ```
-Design a flow list/management page for "DocXTractor" – view and manage automated pipeline runs.
+Design a flow list/management page for "DocXTractor" – view and manage automated extractor runs.
 
-**Context**: Flows are automations that run existing pipelines automatically. Instead of manually clicking "Run Pipeline" and uploading documents each time, users create a Flow that triggers their pipeline on a schedule, webhook, file upload, or form submission. This page shows all configured automations.
+**Context**: Flows are automations that run existing extractors automatically. Instead of manually clicking "Run Extractor" and uploading documents each time, users create a Flow that triggers their extractor on a schedule, webhook, file upload, or form submission. This page shows all configured automations.
 
 Style: Neubrutalism / RetroUI (https://www.retroui.dev)
 
@@ -1628,7 +1628,7 @@ Style: Neubrutalism / RetroUI (https://www.retroui.dev)
 
 Overall Layout:
 - Consistent sidebar on left (240px)
-- "Flows" nav item active (between Pipelines and Jobs)
+- "Flows" nav item active (between Extractors and Jobs)
 - Main content area with cream background (#F7F7F5)
 
 === HEADER SECTION ===
@@ -1699,13 +1699,13 @@ Mini Flow Diagram (center of card):
   ```
   [📅] ──▶ [🔧] ──▶ [📑]
   ```
-- Shows: Trigger → Pipeline → Destination
+- Shows: Trigger → Extractor → Destination
 - Nodes as small rounded squares with icons
 - Connection lines between nodes
 
 Card Body:
 - Description (text-muted, 2 lines max, truncated)
-- Pipeline name badge: "Using: Invoice Parser"
+- Extractor name badge: "Using: Invoice Parser"
 
 Card Footer (stats row):
 - Last run: "2 hours ago" or "Never"
@@ -1748,11 +1748,11 @@ When no flows exist:
 ### 14. Flow Builder Canvas
 
 ```
-Design a visual flow builder canvas for "DocXTractor" – configure automated pipeline runs.
+Design a visual flow builder canvas for "DocXTractor" – configure automated extractor runs.
 
-**Context**: This is where users set up HOW and WHEN their existing pipelines run automatically. Instead of manually running pipelines, users connect:
+**Context**: This is where users set up HOW and WHEN their existing extractors run automatically. Instead of manually running extractors, users connect:
 - A TRIGGER (when to run: schedule, webhook, file upload, form)
-- Their PIPELINE (which existing pipeline to execute)
+- Their EXTRACTOR (which existing extractor to execute)
 - A DESTINATION (where to send results: Excel, Google Sheets, Drive)
 
 The canvas provides a visual way to configure this automation.
@@ -1850,8 +1850,8 @@ Node Categories (accordions):
 **Processing:**
 - Section header: "PROCESS"
 
-  🔧 Pipeline
-  - Label: "Pipeline"
+  🔧 Extractor
+  - Label: "Extractor"
   - Description: "Run extraction"
   - Icon: Cog/Wrench
   - **Note: Only one per flow**
@@ -1941,7 +1941,7 @@ Node Body:
 - Examples:
   - Schedule: "Daily at 9:00 AM"
   - Webhook: "POST /api/flows/abc123"
-  - Pipeline: "Invoice Parser"
+  - Extractor: "Invoice Parser"
   - Google Sheets: "Sheet: Invoices"
 - Gray text when not configured: "Click to configure"
 
@@ -2025,20 +2025,20 @@ Panel Content (varies by node type):
 
 **Condition Properties:**
 - Condition builder:
-  - Field dropdown (from pipeline fields)
+  - Field dropdown (from extractor fields)
   - Operator dropdown (equals, contains, greater than, etc.)
   - Value input
 - Add condition (AND/OR toggles)
 - Preview branches: "If true → / If false →"
 
-**Pipeline Properties:**
-- Pipeline selector dropdown
-  - Shows existing pipelines
-  - "Create new pipeline" option
-- Selected pipeline summary:
+**Extractor Properties:**
+- Extractor selector dropdown
+  - Shows existing extractors
+  - "Create new extractor" option
+- Selected extractor summary:
   - Field count
   - Extraction mode (AI/Deterministic)
-- "Edit Pipeline" link
+- "Edit Extractor" link
 
 **Excel Output Properties:**
 - Filename template input
@@ -2106,7 +2106,7 @@ Right Section:
 
 Flow must have:
 - Exactly one trigger (start)
-- Exactly one pipeline node
+- Exactly one extractor node
 - At least one output destination
 - All connections valid (no orphan nodes)
 - All nodes configured (no yellow status dots)
@@ -2129,9 +2129,9 @@ Mobile (not recommended for editing):
 ### 15. Flow Run History
 
 ```
-Design a flow run history/monitoring page for "DocXTractor" – view automated pipeline execution history.
+Design a flow run history/monitoring page for "DocXTractor" – view automated extractor execution history.
 
-**Context**: This page shows the history of all automated pipeline runs for a specific Flow. Each "run" represents one automatic execution of the pipeline (triggered by schedule, webhook, etc.). Users can see when runs happened, whether they succeeded,review, view extracted results, and retry failed runs.
+**Context**: This page shows the history of all automated extractor runs for a specific Flow. Each "run" represents one automatic execution of the extractor (triggered by schedule, webhook, etc.). Users can see when runs happened, whether they succeeded,review, view extracted results, and retry failed runs.
 
 Style: Neubrutalism / RetroUI (https://www.retroui.dev)
 
@@ -2359,7 +2359,7 @@ Example Prompts (clickable to use):
 Available Resources Info:
 - Collapsible section: "Your available resources"
 - Lists:
-  - Pipelines: "Invoice Parser, Contract Extractor"
+  - Extractors: "Invoice Parser, Contract Extractor"
   - Connected accounts: "Google (sheets, drive)"
 
 Action Buttons:
@@ -2380,7 +2380,7 @@ Flow Preview:
   ┌─────────────────────────────────────────────────────────────────┐
   │                                                                 │
   │   [📅 Schedule]  ──▶  [🔧 Invoice Parser]  ──▶  [📑 Sheets]    │
-  │    Daily 9am            Pipeline               Append rows      │
+  │    Daily 9am            Extractor               Append rows      │
   │                                                                 │
   └─────────────────────────────────────────────────────────────────┘
   ```
@@ -2392,7 +2392,7 @@ Detected Settings Card:
 - Light yellow background (#fef9c3)
 - Checklist of detected configurations:
   - ✅ Trigger: Daily schedule at 9:00 AM
-  - ✅ Pipeline: Invoice Parser (matched existing)
+  - ✅ Extractor: Invoice Parser (matched existing)
   - ⚠️ Output: Google Sheets (needs sheet selection)
 - Warning items (⚠️) indicate additional setup needed
 
@@ -2451,7 +2451,7 @@ Modal Content:
 - Title: "Couldn't generate flow"
 - Message: "We had trouble understanding your request. Try being more specific."
 - Suggestions:
-  - "Mention which pipeline to use"
+  - "Mention which extractor to use"
   - "Specify the schedule clearly (daily, weekly, etc.)"
   - "Describe where to save the output"
 - "Try Again" button
@@ -2479,7 +2479,7 @@ States Needed:
 1. No Flows Yet:
    - Illustration: Workflow/automation icon (connected nodes)
    - Heading: "Create your first automation"
-   - Subtext: "Flows run your pipelines automatically on schedules, webhooks, or form submissions"
+   - Subtext: "Flows run your extractors automatically on schedules, webhooks, or form submissions"
    - Two buttons: "Create Flow" (yellow) + "Generate with AI ✨" (outline)
 
 2. Flow Builder Empty Canvas:
@@ -2572,7 +2572,7 @@ States Needed:
 
 ### Consensus Voting UI
 
-#### Field-Level Toggle (Pipeline Editor)
+#### Field-Level Toggle (Extractor Editor)
 
 ```
 ┌──────────────────────────────────────────┐

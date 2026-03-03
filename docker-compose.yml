@@ -1,18 +1,18 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: ninehertz-db
+    container_name: docxtractor-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ninehertz
+      POSTGRES_DB: docxtractor
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - ninehertz-network
+      - docxtractor-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -21,50 +21,65 @@ services:
 
   redis:
     image: redis:alpine
-    container_name: ninehertz-redis
+    container_name: docxtractor-redis
     restart: unless-stopped
+    command: redis-server --port 6380
     ports:
-      - "6379:6379"
+      - "6380:6380"
     networks:
-      - ninehertz-network
+      - docxtractor-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-p", "6380", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  maildev:
+    image: maildev/maildev
+    container_name: docxtractor-maildev
+    ports:
+      - "1081:1080"
+      - "1026:1025"
+    networks:
+      - docxtractor-network
+    restart: unless-stopped
 
   server:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
-    container_name: ninehertz-server
+    container_name: docxtractor-server
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - NODE_ENV=development
+      - OLLAMA_HOST=http://host.docker.internal:11434
+      - OLLAMA_DEFAULT_MODEL=qwen3:14b
+      - OLLAMA_GENERATION_MODEL=qwen3:14b
     env_file:
       - ./server/.env
     volumes:
       - ./server:/app
-      - /app/node_modules
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+      createbuckets:
+        condition: service_completed_successfully
     networks:
-      - ninehertz-network
+      - docxtractor-network
     command: pnpm run start:dev
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile.dev
-    container_name: ninehertz-client
+    container_name: docxtractor-client
     restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "5174:5173"
     environment:
       - NODE_ENV=development
     env_file:
@@ -75,12 +90,88 @@ services:
     depends_on:
       - server
     networks:
-      - ninehertz-network
+      - docxtractor-network
     command: pnpm run dev
+
+  minio:
+    image: minio/minio
+    container_name: docxtractor-minio
+    ports:
+      - "9005:9000"
+      - "9006:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - docxtractor-network
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c " echo 'Waiting for MinIO...'; while ! /usr/bin/mc alias set local http://minio:9000 minioadmin minioadmin > /dev/null 2>&1; do
+        sleep 2;
+      done; /usr/bin/mc mb -p local/docxtractor-documents; /usr/bin/mc anonymous set public local/docxtractor-documents; exit 0; "
+    networks:
+      - docxtractor-network
+
+  parser-service:
+    build:
+      context: ./workers/parser-service
+    container_name: docxtractor-parser
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      createbuckets:
+        condition: service_completed_successfully
+    environment:
+      - REDIS_URL=redis://redis:6380
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET=docxtractor-documents
+      - PARSER_CONCURRENCY=4
+    networks:
+      - docxtractor-network
+    volumes:
+      - ./workers/parser-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8001 --reload
+
+  extraction-service:
+    build:
+      context: ./workers/extraction-service
+    container_name: docxtractor-extractor
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      createbuckets:
+        condition: service_completed_successfully
+    env_file:
+      - ./workers/extraction-service/.env
+    environment:
+      - REDIS_URL=redis://redis:6380
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - LANGEXTRACT_MODEL_URL=http://host.docker.internal:11434
+    networks:
+      - docxtractor-network
+    volumes:
+      - ./workers/extraction-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8002 --reload
 
 volumes:
   postgres_data:
+  minio_data:
 
 networks:
-  ninehertz-network:
+  docxtractor-network:
     driver: bridge

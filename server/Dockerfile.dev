@@ -16,7 +16,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm config set store-dir /pnpm/store
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .

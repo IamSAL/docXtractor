@@ -9,65 +9,71 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthSignupRouteImport } from './routes/auth/signup'
-import { Route as AuthSigninRouteImport } from './routes/auth/signin'
-import { Route as AuthForgetPasswordRouteImport } from './routes/auth/forget-password'
-import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
-import { Route as LayoutpharmacistPharmacistTransactionsRouteImport } from './routes/_layout/(pharmacist)/pharmacist.transactions'
-import { Route as LayoutpharmacistPharmacistSettingsRouteImport } from './routes/_layout/(pharmacist)/pharmacist.settings'
-import { Route as LayoutpharmacistPharmacistPrescriptionsRouteImport } from './routes/_layout/(pharmacist)/pharmacist.prescriptions'
-import { Route as LayoutpharmacistPharmacistOrdersRouteImport } from './routes/_layout/(pharmacist)/pharmacist.orders'
-import { Route as LayoutpharmacistPharmacistNotificationRouteImport } from './routes/_layout/(pharmacist)/pharmacist.notification'
-import { Route as LayoutpharmacistPharmacistMedicineRouteImport } from './routes/_layout/(pharmacist)/pharmacist.medicine'
-import { Route as LayoutpharmacistPharmacistInventoryRouteImport } from './routes/_layout/(pharmacist)/pharmacist.inventory'
-import { Route as LayoutpharmacistPharmacistDashboardRouteImport } from './routes/_layout/(pharmacist)/pharmacist.dashboard'
-import { Route as LayoutpharmacistPharmacistChatRouteImport } from './routes/_layout/(pharmacist)/pharmacist.chat'
-import { Route as LayoutpatientsPatientTransactionsRouteImport } from './routes/_layout/(patients)/patient.transactions'
-import { Route as LayoutpatientsPatientSettingsRouteImport } from './routes/_layout/(patients)/patient.settings'
-import { Route as LayoutpatientsPatientRoomsRouteImport } from './routes/_layout/(patients)/patient.rooms'
-import { Route as LayoutpatientsPatientPrescriptionsRouteImport } from './routes/_layout/(patients)/patient.prescriptions'
-import { Route as LayoutpatientsPatientOrdersRouteImport } from './routes/_layout/(patients)/patient.orders'
-import { Route as LayoutpatientsPatientNotificationRouteImport } from './routes/_layout/(patients)/patient.notification'
-import { Route as LayoutpatientsPatientMedicineRouteImport } from './routes/_layout/(patients)/patient.medicine'
-import { Route as LayoutpatientsPatientDoctorsRouteImport } from './routes/_layout/(patients)/patient.doctors'
-import { Route as LayoutpatientsPatientDashboardRouteImport } from './routes/_layout/(patients)/patient.dashboard'
-import { Route as LayoutpatientsPatientChatRouteImport } from './routes/_layout/(patients)/patient.chat'
-import { Route as LayoutpatientsPatientCalendarRouteImport } from './routes/_layout/(patients)/patient.calendar'
-import { Route as LayoutpatientsPatientAppointmentsRouteImport } from './routes/_layout/(patients)/patient.appointments'
-import { Route as LayoutdoctorsDoctorSettingsRouteImport } from './routes/_layout/(doctors)/doctor.settings'
-import { Route as LayoutdoctorsDoctorRoomsRouteImport } from './routes/_layout/(doctors)/doctor.rooms'
-import { Route as LayoutdoctorsDoctorPrescriptionsRouteImport } from './routes/_layout/(doctors)/doctor.prescriptions'
-import { Route as LayoutdoctorsDoctorPatientsRouteImport } from './routes/_layout/(doctors)/doctor.patients'
-import { Route as LayoutdoctorsDoctorNotificationRouteImport } from './routes/_layout/(doctors)/doctor.notification'
-import { Route as LayoutdoctorsDoctorMedineRouteImport } from './routes/_layout/(doctors)/doctor.medine'
-import { Route as LayoutdoctorsDoctorMedicineRouteImport } from './routes/_layout/(doctors)/doctor.medicine'
-import { Route as LayoutdoctorsDoctorDashboardRouteImport } from './routes/_layout/(doctors)/doctor.dashboard'
-import { Route as LayoutdoctorsDoctorChatRouteImport } from './routes/_layout/(doctors)/doctor.chat'
-import { Route as LayoutdoctorsDoctorCalendarRouteImport } from './routes/_layout/(doctors)/doctor.calendar'
-import { Route as LayoutdoctorsDoctorAppointmentsRouteImport } from './routes/_layout/(doctors)/doctor.appointments'
-import { Route as LayoutadminAdminUsersRouteImport } from './routes/_layout/(admin)/admin.users'
-import { Route as LayoutadminAdminTransactionsRouteImport } from './routes/_layout/(admin)/admin.transactions'
-import { Route as LayoutadminAdminSettingsRouteImport } from './routes/_layout/(admin)/admin.settings'
-import { Route as LayoutadminAdminRoomsRouteImport } from './routes/_layout/(admin)/admin.rooms'
-import { Route as LayoutadminAdminProfileRouteImport } from './routes/_layout/(admin)/admin.profile'
-import { Route as LayoutadminAdminPrescriptionsRouteImport } from './routes/_layout/(admin)/admin.prescriptions'
-import { Route as LayoutadminAdminPharmacistRouteImport } from './routes/_layout/(admin)/admin.pharmacist'
-import { Route as LayoutadminAdminPatientsRouteImport } from './routes/_layout/(admin)/admin.patients'
-import { Route as LayoutadminAdminOrdersRouteImport } from './routes/_layout/(admin)/admin.orders'
-import { Route as LayoutadminAdminNotificationRouteImport } from './routes/_layout/(admin)/admin.notification'
-import { Route as LayoutadminAdminMedicineRouteImport } from './routes/_layout/(admin)/admin.medicine'
-import { Route as LayoutadminAdminInventoryRouteImport } from './routes/_layout/(admin)/admin.inventory'
-import { Route as LayoutadminAdminDoctorsRouteImport } from './routes/_layout/(admin)/admin.doctors'
-import { Route as LayoutadminAdminDashboardRouteImport } from './routes/_layout/(admin)/admin.dashboard'
-import { Route as LayoutadminAdminChatRouteImport } from './routes/_layout/(admin)/admin.chat'
-import { Route as LayoutadminAdminAppointmentsRouteImport } from './routes/_layout/(admin)/admin.appointments'
-import { Route as LayoutadminAdminAdminsRouteImport } from './routes/_layout/(admin)/admin.admins'
-import { Route as callCallJoinCallIdRouteImport } from './routes/(call)/call.join.$callId'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as RunsIndexRouteImport } from './routes/runs/index'
+import { Route as ExtractorsIndexRouteImport } from './routes/extractors/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as AutorunsIndexRouteImport } from './routes/autoruns/index'
+import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
+import { Route as SettingsNotificationsRouteImport } from './routes/settings/notifications'
+import { Route as SettingsExtractionRouteImport } from './routes/settings/extraction'
+import { Route as SettingsAppearanceRouteImport } from './routes/settings/appearance'
+import { Route as SettingsApiKeysRouteImport } from './routes/settings/api-keys'
+import { Route as RunsNewRouteImport } from './routes/runs/new'
+import { Route as RunsIdRouteImport } from './routes/runs/$id'
+import { Route as ExtractorsNewRouteImport } from './routes/extractors/new'
+import { Route as ExtractorsIdRouteImport } from './routes/extractors/$id'
+import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as DemoTableRouteImport } from './routes/demo/table'
+import { Route as DemoStoreRouteImport } from './routes/demo/store'
+import { Route as DemoAiStructuredRouteImport } from './routes/demo/ai-structured'
+import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
+import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
+import { Route as AutorunsNewRouteImport } from './routes/autoruns/new'
+import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
+import { Route as RunsReviewIdRouteImport } from './routes/runs/review.$id'
+import { Route as ExtractorsEditIdRouteImport } from './routes/extractors/edit.$id'
+import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
+import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
+import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
+import { Route as DemoGuitarsGuitarIdRouteImport } from './routes/demo/guitars/$guitarId'
+import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
+import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as AutorunsRunsIdRouteImport } from './routes/autoruns/runs.$id'
+import { Route as AutorunsEditIdRouteImport } from './routes/autoruns/edit.$id'
+import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
+import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
+import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
+import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
+import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
+import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
+import { Route as DemoApiAiStructuredRouteImport } from './routes/demo/api.ai.structured'
+import { Route as DemoApiAiImageRouteImport } from './routes/demo/api.ai.image'
+import { Route as DemoApiAiChatRouteImport } from './routes/demo/api.ai.chat'
 
-const LayoutRouteRoute = LayoutRouteRouteImport.update({
-  id: '/_layout',
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -75,683 +81,551 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/auth/signup',
-  path: '/auth/signup',
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const RunsIndexRoute = RunsIndexRouteImport.update({
+  id: '/runs/',
+  path: '/runs/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthSigninRoute = AuthSigninRouteImport.update({
-  id: '/auth/signin',
-  path: '/auth/signin',
+const ExtractorsIndexRoute = ExtractorsIndexRouteImport.update({
+  id: '/extractors/',
+  path: '/extractors/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthForgetPasswordRoute = AuthForgetPasswordRouteImport.update({
-  id: '/auth/forget-password',
-  path: '/auth/forget-password',
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
+const AutorunsIndexRoute = AutorunsIndexRouteImport.update({
+  id: '/autoruns/',
+  path: '/autoruns/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LayoutpharmacistPharmacistTransactionsRoute =
-  LayoutpharmacistPharmacistTransactionsRouteImport.update({
-    id: '/(pharmacist)/pharmacist/transactions',
-    path: '/pharmacist/transactions',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpharmacistPharmacistSettingsRoute =
-  LayoutpharmacistPharmacistSettingsRouteImport.update({
-    id: '/(pharmacist)/pharmacist/settings',
-    path: '/pharmacist/settings',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpharmacistPharmacistPrescriptionsRoute =
-  LayoutpharmacistPharmacistPrescriptionsRouteImport.update({
-    id: '/(pharmacist)/pharmacist/prescriptions',
-    path: '/pharmacist/prescriptions',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpharmacistPharmacistOrdersRoute =
-  LayoutpharmacistPharmacistOrdersRouteImport.update({
-    id: '/(pharmacist)/pharmacist/orders',
-    path: '/pharmacist/orders',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpharmacistPharmacistNotificationRoute =
-  LayoutpharmacistPharmacistNotificationRouteImport.update({
-    id: '/(pharmacist)/pharmacist/notification',
-    path: '/pharmacist/notification',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpharmacistPharmacistMedicineRoute =
-  LayoutpharmacistPharmacistMedicineRouteImport.update({
-    id: '/(pharmacist)/pharmacist/medicine',
-    path: '/pharmacist/medicine',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpharmacistPharmacistInventoryRoute =
-  LayoutpharmacistPharmacistInventoryRouteImport.update({
-    id: '/(pharmacist)/pharmacist/inventory',
-    path: '/pharmacist/inventory',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpharmacistPharmacistDashboardRoute =
-  LayoutpharmacistPharmacistDashboardRouteImport.update({
-    id: '/(pharmacist)/pharmacist/dashboard',
-    path: '/pharmacist/dashboard',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpharmacistPharmacistChatRoute =
-  LayoutpharmacistPharmacistChatRouteImport.update({
-    id: '/(pharmacist)/pharmacist/chat',
-    path: '/pharmacist/chat',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientTransactionsRoute =
-  LayoutpatientsPatientTransactionsRouteImport.update({
-    id: '/(patients)/patient/transactions',
-    path: '/patient/transactions',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientSettingsRoute =
-  LayoutpatientsPatientSettingsRouteImport.update({
-    id: '/(patients)/patient/settings',
-    path: '/patient/settings',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientRoomsRoute =
-  LayoutpatientsPatientRoomsRouteImport.update({
-    id: '/(patients)/patient/rooms',
-    path: '/patient/rooms',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientPrescriptionsRoute =
-  LayoutpatientsPatientPrescriptionsRouteImport.update({
-    id: '/(patients)/patient/prescriptions',
-    path: '/patient/prescriptions',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientOrdersRoute =
-  LayoutpatientsPatientOrdersRouteImport.update({
-    id: '/(patients)/patient/orders',
-    path: '/patient/orders',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientNotificationRoute =
-  LayoutpatientsPatientNotificationRouteImport.update({
-    id: '/(patients)/patient/notification',
-    path: '/patient/notification',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientMedicineRoute =
-  LayoutpatientsPatientMedicineRouteImport.update({
-    id: '/(patients)/patient/medicine',
-    path: '/patient/medicine',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientDoctorsRoute =
-  LayoutpatientsPatientDoctorsRouteImport.update({
-    id: '/(patients)/patient/doctors',
-    path: '/patient/doctors',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientDashboardRoute =
-  LayoutpatientsPatientDashboardRouteImport.update({
-    id: '/(patients)/patient/dashboard',
-    path: '/patient/dashboard',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientChatRoute =
-  LayoutpatientsPatientChatRouteImport.update({
-    id: '/(patients)/patient/chat',
-    path: '/patient/chat',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientCalendarRoute =
-  LayoutpatientsPatientCalendarRouteImport.update({
-    id: '/(patients)/patient/calendar',
-    path: '/patient/calendar',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutpatientsPatientAppointmentsRoute =
-  LayoutpatientsPatientAppointmentsRouteImport.update({
-    id: '/(patients)/patient/appointments',
-    path: '/patient/appointments',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorSettingsRoute =
-  LayoutdoctorsDoctorSettingsRouteImport.update({
-    id: '/(doctors)/doctor/settings',
-    path: '/doctor/settings',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorRoomsRoute =
-  LayoutdoctorsDoctorRoomsRouteImport.update({
-    id: '/(doctors)/doctor/rooms',
-    path: '/doctor/rooms',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorPrescriptionsRoute =
-  LayoutdoctorsDoctorPrescriptionsRouteImport.update({
-    id: '/(doctors)/doctor/prescriptions',
-    path: '/doctor/prescriptions',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorPatientsRoute =
-  LayoutdoctorsDoctorPatientsRouteImport.update({
-    id: '/(doctors)/doctor/patients',
-    path: '/doctor/patients',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorNotificationRoute =
-  LayoutdoctorsDoctorNotificationRouteImport.update({
-    id: '/(doctors)/doctor/notification',
-    path: '/doctor/notification',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorMedineRoute =
-  LayoutdoctorsDoctorMedineRouteImport.update({
-    id: '/(doctors)/doctor/medine',
-    path: '/doctor/medine',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorMedicineRoute =
-  LayoutdoctorsDoctorMedicineRouteImport.update({
-    id: '/(doctors)/doctor/medicine',
-    path: '/doctor/medicine',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorDashboardRoute =
-  LayoutdoctorsDoctorDashboardRouteImport.update({
-    id: '/(doctors)/doctor/dashboard',
-    path: '/doctor/dashboard',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorChatRoute = LayoutdoctorsDoctorChatRouteImport.update({
-  id: '/(doctors)/doctor/chat',
-  path: '/doctor/chat',
-  getParentRoute: () => LayoutRouteRoute,
+const SettingsProfileRoute = SettingsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SettingsRoute,
 } as any)
-const LayoutdoctorsDoctorCalendarRoute =
-  LayoutdoctorsDoctorCalendarRouteImport.update({
-    id: '/(doctors)/doctor/calendar',
-    path: '/doctor/calendar',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutdoctorsDoctorAppointmentsRoute =
-  LayoutdoctorsDoctorAppointmentsRouteImport.update({
-    id: '/(doctors)/doctor/appointments',
-    path: '/doctor/appointments',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminUsersRoute = LayoutadminAdminUsersRouteImport.update({
-  id: '/(admin)/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => LayoutRouteRoute,
+const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SettingsRoute,
 } as any)
-const LayoutadminAdminTransactionsRoute =
-  LayoutadminAdminTransactionsRouteImport.update({
-    id: '/(admin)/admin/transactions',
-    path: '/admin/transactions',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminSettingsRoute =
-  LayoutadminAdminSettingsRouteImport.update({
-    id: '/(admin)/admin/settings',
-    path: '/admin/settings',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminRoomsRoute = LayoutadminAdminRoomsRouteImport.update({
-  id: '/(admin)/admin/rooms',
-  path: '/admin/rooms',
-  getParentRoute: () => LayoutRouteRoute,
+const SettingsExtractionRoute = SettingsExtractionRouteImport.update({
+  id: '/extraction',
+  path: '/extraction',
+  getParentRoute: () => SettingsRoute,
 } as any)
-const LayoutadminAdminProfileRoute = LayoutadminAdminProfileRouteImport.update({
-  id: '/(admin)/admin/profile',
-  path: '/admin/profile',
-  getParentRoute: () => LayoutRouteRoute,
+const SettingsAppearanceRoute = SettingsAppearanceRouteImport.update({
+  id: '/appearance',
+  path: '/appearance',
+  getParentRoute: () => SettingsRoute,
 } as any)
-const LayoutadminAdminPrescriptionsRoute =
-  LayoutadminAdminPrescriptionsRouteImport.update({
-    id: '/(admin)/admin/prescriptions',
-    path: '/admin/prescriptions',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminPharmacistRoute =
-  LayoutadminAdminPharmacistRouteImport.update({
-    id: '/(admin)/admin/pharmacist',
-    path: '/admin/pharmacist',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminPatientsRoute =
-  LayoutadminAdminPatientsRouteImport.update({
-    id: '/(admin)/admin/patients',
-    path: '/admin/patients',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminOrdersRoute = LayoutadminAdminOrdersRouteImport.update({
-  id: '/(admin)/admin/orders',
-  path: '/admin/orders',
-  getParentRoute: () => LayoutRouteRoute,
+const SettingsApiKeysRoute = SettingsApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => SettingsRoute,
 } as any)
-const LayoutadminAdminNotificationRoute =
-  LayoutadminAdminNotificationRouteImport.update({
-    id: '/(admin)/admin/notification',
-    path: '/admin/notification',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminMedicineRoute =
-  LayoutadminAdminMedicineRouteImport.update({
-    id: '/(admin)/admin/medicine',
-    path: '/admin/medicine',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminInventoryRoute =
-  LayoutadminAdminInventoryRouteImport.update({
-    id: '/(admin)/admin/inventory',
-    path: '/admin/inventory',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminDoctorsRoute = LayoutadminAdminDoctorsRouteImport.update({
-  id: '/(admin)/admin/doctors',
-  path: '/admin/doctors',
-  getParentRoute: () => LayoutRouteRoute,
-} as any)
-const LayoutadminAdminDashboardRoute =
-  LayoutadminAdminDashboardRouteImport.update({
-    id: '/(admin)/admin/dashboard',
-    path: '/admin/dashboard',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminChatRoute = LayoutadminAdminChatRouteImport.update({
-  id: '/(admin)/admin/chat',
-  path: '/admin/chat',
-  getParentRoute: () => LayoutRouteRoute,
-} as any)
-const LayoutadminAdminAppointmentsRoute =
-  LayoutadminAdminAppointmentsRouteImport.update({
-    id: '/(admin)/admin/appointments',
-    path: '/admin/appointments',
-    getParentRoute: () => LayoutRouteRoute,
-  } as any)
-const LayoutadminAdminAdminsRoute = LayoutadminAdminAdminsRouteImport.update({
-  id: '/(admin)/admin/admins',
-  path: '/admin/admins',
-  getParentRoute: () => LayoutRouteRoute,
-} as any)
-const callCallJoinCallIdRoute = callCallJoinCallIdRouteImport.update({
-  id: '/(call)/call/join/$callId',
-  path: '/call/join/$callId',
+const RunsNewRoute = RunsNewRouteImport.update({
+  id: '/runs/new',
+  path: '/runs/new',
   getParentRoute: () => rootRouteImport,
+} as any)
+const RunsIdRoute = RunsIdRouteImport.update({
+  id: '/runs/$id',
+  path: '/runs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtractorsNewRoute = ExtractorsNewRouteImport.update({
+  id: '/extractors/new',
+  path: '/extractors/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtractorsIdRoute = ExtractorsIdRouteImport.update({
+  id: '/extractors/$id',
+  path: '/extractors/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
+  id: '/tanstack-query',
+  path: '/tanstack-query',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoTableRoute = DemoTableRouteImport.update({
+  id: '/table',
+  path: '/table',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoStoreRoute = DemoStoreRouteImport.update({
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoAiStructuredRoute = DemoAiStructuredRouteImport.update({
+  id: '/ai-structured',
+  path: '/ai-structured',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoAiImageRoute = DemoAiImageRouteImport.update({
+  id: '/ai-image',
+  path: '/ai-image',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoAiChatRoute = DemoAiChatRouteImport.update({
+  id: '/ai-chat',
+  path: '/ai-chat',
+  getParentRoute: () => DemoRoute,
+} as any)
+const AutorunsNewRoute = AutorunsNewRouteImport.update({
+  id: '/autoruns/new',
+  path: '/autoruns/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
+  id: '/guitars/',
+  path: '/guitars/',
+  getParentRoute: () => DemoRoute,
+} as any)
+const RunsReviewIdRoute = RunsReviewIdRouteImport.update({
+  id: '/runs/review/$id',
+  path: '/runs/review/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtractorsEditIdRoute = ExtractorsEditIdRouteImport.update({
+  id: '/extractors/edit/$id',
+  path: '/extractors/edit/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
+  id: '/start/server-funcs',
+  path: '/start/server-funcs',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
+  id: '/start/api-request',
+  path: '/start/api-request',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
+  id: '/sentry/testing',
+  path: '/sentry/testing',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoGuitarsGuitarIdRoute = DemoGuitarsGuitarIdRouteImport.update({
+  id: '/guitars/$guitarId',
+  path: '/guitars/$guitarId',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoApiTqTodosRoute = DemoApiTqTodosRouteImport.update({
+  id: '/api/tq-todos',
+  path: '/api/tq-todos',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
+  id: '/api/names',
+  path: '/api/names',
+  getParentRoute: () => DemoRoute,
+} as any)
+const AutorunsRunsIdRoute = AutorunsRunsIdRouteImport.update({
+  id: '/autoruns/runs/$id',
+  path: '/autoruns/runs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AutorunsEditIdRoute = AutorunsEditIdRouteImport.update({
+  id: '/autoruns/edit/$id',
+  path: '/autoruns/edit/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
+  id: '/start/ssr/',
+  path: '/start/ssr/',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
+  id: '/start/ssr/spa-mode',
+  path: '/start/ssr/spa-mode',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoStartSsrFullSsrRoute = DemoStartSsrFullSsrRouteImport.update({
+  id: '/start/ssr/full-ssr',
+  path: '/start/ssr/full-ssr',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
+  id: '/start/ssr/data-only',
+  path: '/start/ssr/data-only',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoApiAiTtsRoute = DemoApiAiTtsRouteImport.update({
+  id: '/api/ai/tts',
+  path: '/api/ai/tts',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoApiAiTranscriptionRoute = DemoApiAiTranscriptionRouteImport.update({
+  id: '/api/ai/transcription',
+  path: '/api/ai/transcription',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoApiAiStructuredRoute = DemoApiAiStructuredRouteImport.update({
+  id: '/api/ai/structured',
+  path: '/api/ai/structured',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoApiAiImageRoute = DemoApiAiImageRouteImport.update({
+  id: '/api/ai/image',
+  path: '/api/ai/image',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoApiAiChatRoute = DemoApiAiChatRouteImport.update({
+  id: '/api/ai/chat',
+  path: '/api/ai/chat',
+  getParentRoute: () => DemoRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth/callback': typeof AuthCallbackRoute
-  '/auth/forget-password': typeof AuthForgetPasswordRoute
-  '/auth/signin': typeof AuthSigninRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/call/join/$callId': typeof callCallJoinCallIdRoute
-  '/admin/admins': typeof LayoutadminAdminAdminsRoute
-  '/admin/appointments': typeof LayoutadminAdminAppointmentsRoute
-  '/admin/chat': typeof LayoutadminAdminChatRoute
-  '/admin/dashboard': typeof LayoutadminAdminDashboardRoute
-  '/admin/doctors': typeof LayoutadminAdminDoctorsRoute
-  '/admin/inventory': typeof LayoutadminAdminInventoryRoute
-  '/admin/medicine': typeof LayoutadminAdminMedicineRoute
-  '/admin/notification': typeof LayoutadminAdminNotificationRoute
-  '/admin/orders': typeof LayoutadminAdminOrdersRoute
-  '/admin/patients': typeof LayoutadminAdminPatientsRoute
-  '/admin/pharmacist': typeof LayoutadminAdminPharmacistRoute
-  '/admin/prescriptions': typeof LayoutadminAdminPrescriptionsRoute
-  '/admin/profile': typeof LayoutadminAdminProfileRoute
-  '/admin/rooms': typeof LayoutadminAdminRoomsRoute
-  '/admin/settings': typeof LayoutadminAdminSettingsRoute
-  '/admin/transactions': typeof LayoutadminAdminTransactionsRoute
-  '/admin/users': typeof LayoutadminAdminUsersRoute
-  '/doctor/appointments': typeof LayoutdoctorsDoctorAppointmentsRoute
-  '/doctor/calendar': typeof LayoutdoctorsDoctorCalendarRoute
-  '/doctor/chat': typeof LayoutdoctorsDoctorChatRoute
-  '/doctor/dashboard': typeof LayoutdoctorsDoctorDashboardRoute
-  '/doctor/medicine': typeof LayoutdoctorsDoctorMedicineRoute
-  '/doctor/medine': typeof LayoutdoctorsDoctorMedineRoute
-  '/doctor/notification': typeof LayoutdoctorsDoctorNotificationRoute
-  '/doctor/patients': typeof LayoutdoctorsDoctorPatientsRoute
-  '/doctor/prescriptions': typeof LayoutdoctorsDoctorPrescriptionsRoute
-  '/doctor/rooms': typeof LayoutdoctorsDoctorRoomsRoute
-  '/doctor/settings': typeof LayoutdoctorsDoctorSettingsRoute
-  '/patient/appointments': typeof LayoutpatientsPatientAppointmentsRoute
-  '/patient/calendar': typeof LayoutpatientsPatientCalendarRoute
-  '/patient/chat': typeof LayoutpatientsPatientChatRoute
-  '/patient/dashboard': typeof LayoutpatientsPatientDashboardRoute
-  '/patient/doctors': typeof LayoutpatientsPatientDoctorsRoute
-  '/patient/medicine': typeof LayoutpatientsPatientMedicineRoute
-  '/patient/notification': typeof LayoutpatientsPatientNotificationRoute
-  '/patient/orders': typeof LayoutpatientsPatientOrdersRoute
-  '/patient/prescriptions': typeof LayoutpatientsPatientPrescriptionsRoute
-  '/patient/rooms': typeof LayoutpatientsPatientRoomsRoute
-  '/patient/settings': typeof LayoutpatientsPatientSettingsRoute
-  '/patient/transactions': typeof LayoutpatientsPatientTransactionsRoute
-  '/pharmacist/chat': typeof LayoutpharmacistPharmacistChatRoute
-  '/pharmacist/dashboard': typeof LayoutpharmacistPharmacistDashboardRoute
-  '/pharmacist/inventory': typeof LayoutpharmacistPharmacistInventoryRoute
-  '/pharmacist/medicine': typeof LayoutpharmacistPharmacistMedicineRoute
-  '/pharmacist/notification': typeof LayoutpharmacistPharmacistNotificationRoute
-  '/pharmacist/orders': typeof LayoutpharmacistPharmacistOrdersRoute
-  '/pharmacist/prescriptions': typeof LayoutpharmacistPharmacistPrescriptionsRoute
-  '/pharmacist/settings': typeof LayoutpharmacistPharmacistSettingsRoute
-  '/pharmacist/transactions': typeof LayoutpharmacistPharmacistTransactionsRoute
+  '/demo': typeof DemoRouteWithChildren
+  '/login': typeof LoginRoute
+  '/settings': typeof SettingsRouteWithChildren
+  '/signup': typeof SignupRoute
+  '/autoruns/new': typeof AutorunsNewRoute
+  '/demo/ai-chat': typeof DemoAiChatRoute
+  '/demo/ai-image': typeof DemoAiImageRoute
+  '/demo/ai-structured': typeof DemoAiStructuredRoute
+  '/demo/store': typeof DemoStoreRoute
+  '/demo/table': typeof DemoTableRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/extractors/$id': typeof ExtractorsIdRoute
+  '/extractors/new': typeof ExtractorsNewRoute
+  '/runs/$id': typeof RunsIdRoute
+  '/runs/new': typeof RunsNewRoute
+  '/settings/api-keys': typeof SettingsApiKeysRoute
+  '/settings/appearance': typeof SettingsAppearanceRoute
+  '/settings/extraction': typeof SettingsExtractionRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/autoruns/': typeof AutorunsIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/extractors/': typeof ExtractorsIndexRoute
+  '/runs/': typeof RunsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
+  '/autoruns/edit/$id': typeof AutorunsEditIdRoute
+  '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
+  '/demo/api/names': typeof DemoApiNamesRoute
+  '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
+  '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
+  '/demo/sentry/testing': typeof DemoSentryTestingRoute
+  '/demo/start/api-request': typeof DemoStartApiRequestRoute
+  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/extractors/edit/$id': typeof ExtractorsEditIdRoute
+  '/runs/review/$id': typeof RunsReviewIdRoute
+  '/demo/guitars/': typeof DemoGuitarsIndexRoute
+  '/demo/api/ai/chat': typeof DemoApiAiChatRoute
+  '/demo/api/ai/image': typeof DemoApiAiImageRoute
+  '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
+  '/demo/api/ai/transcription': typeof DemoApiAiTranscriptionRoute
+  '/demo/api/ai/tts': typeof DemoApiAiTtsRoute
+  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
+  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
+  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth/callback': typeof AuthCallbackRoute
-  '/auth/forget-password': typeof AuthForgetPasswordRoute
-  '/auth/signin': typeof AuthSigninRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/call/join/$callId': typeof callCallJoinCallIdRoute
-  '/admin/admins': typeof LayoutadminAdminAdminsRoute
-  '/admin/appointments': typeof LayoutadminAdminAppointmentsRoute
-  '/admin/chat': typeof LayoutadminAdminChatRoute
-  '/admin/dashboard': typeof LayoutadminAdminDashboardRoute
-  '/admin/doctors': typeof LayoutadminAdminDoctorsRoute
-  '/admin/inventory': typeof LayoutadminAdminInventoryRoute
-  '/admin/medicine': typeof LayoutadminAdminMedicineRoute
-  '/admin/notification': typeof LayoutadminAdminNotificationRoute
-  '/admin/orders': typeof LayoutadminAdminOrdersRoute
-  '/admin/patients': typeof LayoutadminAdminPatientsRoute
-  '/admin/pharmacist': typeof LayoutadminAdminPharmacistRoute
-  '/admin/prescriptions': typeof LayoutadminAdminPrescriptionsRoute
-  '/admin/profile': typeof LayoutadminAdminProfileRoute
-  '/admin/rooms': typeof LayoutadminAdminRoomsRoute
-  '/admin/settings': typeof LayoutadminAdminSettingsRoute
-  '/admin/transactions': typeof LayoutadminAdminTransactionsRoute
-  '/admin/users': typeof LayoutadminAdminUsersRoute
-  '/doctor/appointments': typeof LayoutdoctorsDoctorAppointmentsRoute
-  '/doctor/calendar': typeof LayoutdoctorsDoctorCalendarRoute
-  '/doctor/chat': typeof LayoutdoctorsDoctorChatRoute
-  '/doctor/dashboard': typeof LayoutdoctorsDoctorDashboardRoute
-  '/doctor/medicine': typeof LayoutdoctorsDoctorMedicineRoute
-  '/doctor/medine': typeof LayoutdoctorsDoctorMedineRoute
-  '/doctor/notification': typeof LayoutdoctorsDoctorNotificationRoute
-  '/doctor/patients': typeof LayoutdoctorsDoctorPatientsRoute
-  '/doctor/prescriptions': typeof LayoutdoctorsDoctorPrescriptionsRoute
-  '/doctor/rooms': typeof LayoutdoctorsDoctorRoomsRoute
-  '/doctor/settings': typeof LayoutdoctorsDoctorSettingsRoute
-  '/patient/appointments': typeof LayoutpatientsPatientAppointmentsRoute
-  '/patient/calendar': typeof LayoutpatientsPatientCalendarRoute
-  '/patient/chat': typeof LayoutpatientsPatientChatRoute
-  '/patient/dashboard': typeof LayoutpatientsPatientDashboardRoute
-  '/patient/doctors': typeof LayoutpatientsPatientDoctorsRoute
-  '/patient/medicine': typeof LayoutpatientsPatientMedicineRoute
-  '/patient/notification': typeof LayoutpatientsPatientNotificationRoute
-  '/patient/orders': typeof LayoutpatientsPatientOrdersRoute
-  '/patient/prescriptions': typeof LayoutpatientsPatientPrescriptionsRoute
-  '/patient/rooms': typeof LayoutpatientsPatientRoomsRoute
-  '/patient/settings': typeof LayoutpatientsPatientSettingsRoute
-  '/patient/transactions': typeof LayoutpatientsPatientTransactionsRoute
-  '/pharmacist/chat': typeof LayoutpharmacistPharmacistChatRoute
-  '/pharmacist/dashboard': typeof LayoutpharmacistPharmacistDashboardRoute
-  '/pharmacist/inventory': typeof LayoutpharmacistPharmacistInventoryRoute
-  '/pharmacist/medicine': typeof LayoutpharmacistPharmacistMedicineRoute
-  '/pharmacist/notification': typeof LayoutpharmacistPharmacistNotificationRoute
-  '/pharmacist/orders': typeof LayoutpharmacistPharmacistOrdersRoute
-  '/pharmacist/prescriptions': typeof LayoutpharmacistPharmacistPrescriptionsRoute
-  '/pharmacist/settings': typeof LayoutpharmacistPharmacistSettingsRoute
-  '/pharmacist/transactions': typeof LayoutpharmacistPharmacistTransactionsRoute
+  '/demo': typeof DemoRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/autoruns/new': typeof AutorunsNewRoute
+  '/demo/ai-chat': typeof DemoAiChatRoute
+  '/demo/ai-image': typeof DemoAiImageRoute
+  '/demo/ai-structured': typeof DemoAiStructuredRoute
+  '/demo/store': typeof DemoStoreRoute
+  '/demo/table': typeof DemoTableRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/extractors/$id': typeof ExtractorsIdRoute
+  '/extractors/new': typeof ExtractorsNewRoute
+  '/runs/$id': typeof RunsIdRoute
+  '/runs/new': typeof RunsNewRoute
+  '/settings/api-keys': typeof SettingsApiKeysRoute
+  '/settings/appearance': typeof SettingsAppearanceRoute
+  '/settings/extraction': typeof SettingsExtractionRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/autoruns': typeof AutorunsIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/extractors': typeof ExtractorsIndexRoute
+  '/runs': typeof RunsIndexRoute
+  '/settings': typeof SettingsIndexRoute
+  '/autoruns/edit/$id': typeof AutorunsEditIdRoute
+  '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
+  '/demo/api/names': typeof DemoApiNamesRoute
+  '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
+  '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
+  '/demo/sentry/testing': typeof DemoSentryTestingRoute
+  '/demo/start/api-request': typeof DemoStartApiRequestRoute
+  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/extractors/edit/$id': typeof ExtractorsEditIdRoute
+  '/runs/review/$id': typeof RunsReviewIdRoute
+  '/demo/guitars': typeof DemoGuitarsIndexRoute
+  '/demo/api/ai/chat': typeof DemoApiAiChatRoute
+  '/demo/api/ai/image': typeof DemoApiAiImageRoute
+  '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
+  '/demo/api/ai/transcription': typeof DemoApiAiTranscriptionRoute
+  '/demo/api/ai/tts': typeof DemoApiAiTtsRoute
+  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
+  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
+  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_layout': typeof LayoutRouteRouteWithChildren
-  '/auth/callback': typeof AuthCallbackRoute
-  '/auth/forget-password': typeof AuthForgetPasswordRoute
-  '/auth/signin': typeof AuthSigninRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/(call)/call/join/$callId': typeof callCallJoinCallIdRoute
-  '/_layout/(admin)/admin/admins': typeof LayoutadminAdminAdminsRoute
-  '/_layout/(admin)/admin/appointments': typeof LayoutadminAdminAppointmentsRoute
-  '/_layout/(admin)/admin/chat': typeof LayoutadminAdminChatRoute
-  '/_layout/(admin)/admin/dashboard': typeof LayoutadminAdminDashboardRoute
-  '/_layout/(admin)/admin/doctors': typeof LayoutadminAdminDoctorsRoute
-  '/_layout/(admin)/admin/inventory': typeof LayoutadminAdminInventoryRoute
-  '/_layout/(admin)/admin/medicine': typeof LayoutadminAdminMedicineRoute
-  '/_layout/(admin)/admin/notification': typeof LayoutadminAdminNotificationRoute
-  '/_layout/(admin)/admin/orders': typeof LayoutadminAdminOrdersRoute
-  '/_layout/(admin)/admin/patients': typeof LayoutadminAdminPatientsRoute
-  '/_layout/(admin)/admin/pharmacist': typeof LayoutadminAdminPharmacistRoute
-  '/_layout/(admin)/admin/prescriptions': typeof LayoutadminAdminPrescriptionsRoute
-  '/_layout/(admin)/admin/profile': typeof LayoutadminAdminProfileRoute
-  '/_layout/(admin)/admin/rooms': typeof LayoutadminAdminRoomsRoute
-  '/_layout/(admin)/admin/settings': typeof LayoutadminAdminSettingsRoute
-  '/_layout/(admin)/admin/transactions': typeof LayoutadminAdminTransactionsRoute
-  '/_layout/(admin)/admin/users': typeof LayoutadminAdminUsersRoute
-  '/_layout/(doctors)/doctor/appointments': typeof LayoutdoctorsDoctorAppointmentsRoute
-  '/_layout/(doctors)/doctor/calendar': typeof LayoutdoctorsDoctorCalendarRoute
-  '/_layout/(doctors)/doctor/chat': typeof LayoutdoctorsDoctorChatRoute
-  '/_layout/(doctors)/doctor/dashboard': typeof LayoutdoctorsDoctorDashboardRoute
-  '/_layout/(doctors)/doctor/medicine': typeof LayoutdoctorsDoctorMedicineRoute
-  '/_layout/(doctors)/doctor/medine': typeof LayoutdoctorsDoctorMedineRoute
-  '/_layout/(doctors)/doctor/notification': typeof LayoutdoctorsDoctorNotificationRoute
-  '/_layout/(doctors)/doctor/patients': typeof LayoutdoctorsDoctorPatientsRoute
-  '/_layout/(doctors)/doctor/prescriptions': typeof LayoutdoctorsDoctorPrescriptionsRoute
-  '/_layout/(doctors)/doctor/rooms': typeof LayoutdoctorsDoctorRoomsRoute
-  '/_layout/(doctors)/doctor/settings': typeof LayoutdoctorsDoctorSettingsRoute
-  '/_layout/(patients)/patient/appointments': typeof LayoutpatientsPatientAppointmentsRoute
-  '/_layout/(patients)/patient/calendar': typeof LayoutpatientsPatientCalendarRoute
-  '/_layout/(patients)/patient/chat': typeof LayoutpatientsPatientChatRoute
-  '/_layout/(patients)/patient/dashboard': typeof LayoutpatientsPatientDashboardRoute
-  '/_layout/(patients)/patient/doctors': typeof LayoutpatientsPatientDoctorsRoute
-  '/_layout/(patients)/patient/medicine': typeof LayoutpatientsPatientMedicineRoute
-  '/_layout/(patients)/patient/notification': typeof LayoutpatientsPatientNotificationRoute
-  '/_layout/(patients)/patient/orders': typeof LayoutpatientsPatientOrdersRoute
-  '/_layout/(patients)/patient/prescriptions': typeof LayoutpatientsPatientPrescriptionsRoute
-  '/_layout/(patients)/patient/rooms': typeof LayoutpatientsPatientRoomsRoute
-  '/_layout/(patients)/patient/settings': typeof LayoutpatientsPatientSettingsRoute
-  '/_layout/(patients)/patient/transactions': typeof LayoutpatientsPatientTransactionsRoute
-  '/_layout/(pharmacist)/pharmacist/chat': typeof LayoutpharmacistPharmacistChatRoute
-  '/_layout/(pharmacist)/pharmacist/dashboard': typeof LayoutpharmacistPharmacistDashboardRoute
-  '/_layout/(pharmacist)/pharmacist/inventory': typeof LayoutpharmacistPharmacistInventoryRoute
-  '/_layout/(pharmacist)/pharmacist/medicine': typeof LayoutpharmacistPharmacistMedicineRoute
-  '/_layout/(pharmacist)/pharmacist/notification': typeof LayoutpharmacistPharmacistNotificationRoute
-  '/_layout/(pharmacist)/pharmacist/orders': typeof LayoutpharmacistPharmacistOrdersRoute
-  '/_layout/(pharmacist)/pharmacist/prescriptions': typeof LayoutpharmacistPharmacistPrescriptionsRoute
-  '/_layout/(pharmacist)/pharmacist/settings': typeof LayoutpharmacistPharmacistSettingsRoute
-  '/_layout/(pharmacist)/pharmacist/transactions': typeof LayoutpharmacistPharmacistTransactionsRoute
+  '/demo': typeof DemoRouteWithChildren
+  '/login': typeof LoginRoute
+  '/settings': typeof SettingsRouteWithChildren
+  '/signup': typeof SignupRoute
+  '/autoruns/new': typeof AutorunsNewRoute
+  '/demo/ai-chat': typeof DemoAiChatRoute
+  '/demo/ai-image': typeof DemoAiImageRoute
+  '/demo/ai-structured': typeof DemoAiStructuredRoute
+  '/demo/store': typeof DemoStoreRoute
+  '/demo/table': typeof DemoTableRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/extractors/$id': typeof ExtractorsIdRoute
+  '/extractors/new': typeof ExtractorsNewRoute
+  '/runs/$id': typeof RunsIdRoute
+  '/runs/new': typeof RunsNewRoute
+  '/settings/api-keys': typeof SettingsApiKeysRoute
+  '/settings/appearance': typeof SettingsAppearanceRoute
+  '/settings/extraction': typeof SettingsExtractionRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/autoruns/': typeof AutorunsIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/extractors/': typeof ExtractorsIndexRoute
+  '/runs/': typeof RunsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
+  '/autoruns/edit/$id': typeof AutorunsEditIdRoute
+  '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
+  '/demo/api/names': typeof DemoApiNamesRoute
+  '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
+  '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
+  '/demo/sentry/testing': typeof DemoSentryTestingRoute
+  '/demo/start/api-request': typeof DemoStartApiRequestRoute
+  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/extractors/edit/$id': typeof ExtractorsEditIdRoute
+  '/runs/review/$id': typeof RunsReviewIdRoute
+  '/demo/guitars/': typeof DemoGuitarsIndexRoute
+  '/demo/api/ai/chat': typeof DemoApiAiChatRoute
+  '/demo/api/ai/image': typeof DemoApiAiImageRoute
+  '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
+  '/demo/api/ai/transcription': typeof DemoApiAiTranscriptionRoute
+  '/demo/api/ai/tts': typeof DemoApiAiTtsRoute
+  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
+  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
+  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/auth/callback'
-    | '/auth/forget-password'
-    | '/auth/signin'
-    | '/auth/signup'
-    | '/call/join/$callId'
-    | '/admin/admins'
-    | '/admin/appointments'
-    | '/admin/chat'
-    | '/admin/dashboard'
-    | '/admin/doctors'
-    | '/admin/inventory'
-    | '/admin/medicine'
-    | '/admin/notification'
-    | '/admin/orders'
-    | '/admin/patients'
-    | '/admin/pharmacist'
-    | '/admin/prescriptions'
-    | '/admin/profile'
-    | '/admin/rooms'
-    | '/admin/settings'
-    | '/admin/transactions'
-    | '/admin/users'
-    | '/doctor/appointments'
-    | '/doctor/calendar'
-    | '/doctor/chat'
-    | '/doctor/dashboard'
-    | '/doctor/medicine'
-    | '/doctor/medine'
-    | '/doctor/notification'
-    | '/doctor/patients'
-    | '/doctor/prescriptions'
-    | '/doctor/rooms'
-    | '/doctor/settings'
-    | '/patient/appointments'
-    | '/patient/calendar'
-    | '/patient/chat'
-    | '/patient/dashboard'
-    | '/patient/doctors'
-    | '/patient/medicine'
-    | '/patient/notification'
-    | '/patient/orders'
-    | '/patient/prescriptions'
-    | '/patient/rooms'
-    | '/patient/settings'
-    | '/patient/transactions'
-    | '/pharmacist/chat'
-    | '/pharmacist/dashboard'
-    | '/pharmacist/inventory'
-    | '/pharmacist/medicine'
-    | '/pharmacist/notification'
-    | '/pharmacist/orders'
-    | '/pharmacist/prescriptions'
-    | '/pharmacist/settings'
-    | '/pharmacist/transactions'
+    | '/demo'
+    | '/login'
+    | '/settings'
+    | '/signup'
+    | '/autoruns/new'
+    | '/demo/ai-chat'
+    | '/demo/ai-image'
+    | '/demo/ai-structured'
+    | '/demo/store'
+    | '/demo/table'
+    | '/demo/tanstack-query'
+    | '/extractors/$id'
+    | '/extractors/new'
+    | '/runs/$id'
+    | '/runs/new'
+    | '/settings/api-keys'
+    | '/settings/appearance'
+    | '/settings/extraction'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/autoruns/'
+    | '/dashboard/'
+    | '/extractors/'
+    | '/runs/'
+    | '/settings/'
+    | '/autoruns/edit/$id'
+    | '/autoruns/runs/$id'
+    | '/demo/api/names'
+    | '/demo/api/tq-todos'
+    | '/demo/guitars/$guitarId'
+    | '/demo/sentry/testing'
+    | '/demo/start/api-request'
+    | '/demo/start/server-funcs'
+    | '/extractors/edit/$id'
+    | '/runs/review/$id'
+    | '/demo/guitars/'
+    | '/demo/api/ai/chat'
+    | '/demo/api/ai/image'
+    | '/demo/api/ai/structured'
+    | '/demo/api/ai/transcription'
+    | '/demo/api/ai/tts'
+    | '/demo/start/ssr/data-only'
+    | '/demo/start/ssr/full-ssr'
+    | '/demo/start/ssr/spa-mode'
+    | '/demo/start/ssr/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth/callback'
-    | '/auth/forget-password'
-    | '/auth/signin'
-    | '/auth/signup'
-    | '/call/join/$callId'
-    | '/admin/admins'
-    | '/admin/appointments'
-    | '/admin/chat'
-    | '/admin/dashboard'
-    | '/admin/doctors'
-    | '/admin/inventory'
-    | '/admin/medicine'
-    | '/admin/notification'
-    | '/admin/orders'
-    | '/admin/patients'
-    | '/admin/pharmacist'
-    | '/admin/prescriptions'
-    | '/admin/profile'
-    | '/admin/rooms'
-    | '/admin/settings'
-    | '/admin/transactions'
-    | '/admin/users'
-    | '/doctor/appointments'
-    | '/doctor/calendar'
-    | '/doctor/chat'
-    | '/doctor/dashboard'
-    | '/doctor/medicine'
-    | '/doctor/medine'
-    | '/doctor/notification'
-    | '/doctor/patients'
-    | '/doctor/prescriptions'
-    | '/doctor/rooms'
-    | '/doctor/settings'
-    | '/patient/appointments'
-    | '/patient/calendar'
-    | '/patient/chat'
-    | '/patient/dashboard'
-    | '/patient/doctors'
-    | '/patient/medicine'
-    | '/patient/notification'
-    | '/patient/orders'
-    | '/patient/prescriptions'
-    | '/patient/rooms'
-    | '/patient/settings'
-    | '/patient/transactions'
-    | '/pharmacist/chat'
-    | '/pharmacist/dashboard'
-    | '/pharmacist/inventory'
-    | '/pharmacist/medicine'
-    | '/pharmacist/notification'
-    | '/pharmacist/orders'
-    | '/pharmacist/prescriptions'
-    | '/pharmacist/settings'
-    | '/pharmacist/transactions'
+    | '/demo'
+    | '/login'
+    | '/signup'
+    | '/autoruns/new'
+    | '/demo/ai-chat'
+    | '/demo/ai-image'
+    | '/demo/ai-structured'
+    | '/demo/store'
+    | '/demo/table'
+    | '/demo/tanstack-query'
+    | '/extractors/$id'
+    | '/extractors/new'
+    | '/runs/$id'
+    | '/runs/new'
+    | '/settings/api-keys'
+    | '/settings/appearance'
+    | '/settings/extraction'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/autoruns'
+    | '/dashboard'
+    | '/extractors'
+    | '/runs'
+    | '/settings'
+    | '/autoruns/edit/$id'
+    | '/autoruns/runs/$id'
+    | '/demo/api/names'
+    | '/demo/api/tq-todos'
+    | '/demo/guitars/$guitarId'
+    | '/demo/sentry/testing'
+    | '/demo/start/api-request'
+    | '/demo/start/server-funcs'
+    | '/extractors/edit/$id'
+    | '/runs/review/$id'
+    | '/demo/guitars'
+    | '/demo/api/ai/chat'
+    | '/demo/api/ai/image'
+    | '/demo/api/ai/structured'
+    | '/demo/api/ai/transcription'
+    | '/demo/api/ai/tts'
+    | '/demo/start/ssr/data-only'
+    | '/demo/start/ssr/full-ssr'
+    | '/demo/start/ssr/spa-mode'
+    | '/demo/start/ssr'
   id:
     | '__root__'
     | '/'
-    | '/_layout'
-    | '/auth/callback'
-    | '/auth/forget-password'
-    | '/auth/signin'
-    | '/auth/signup'
-    | '/(call)/call/join/$callId'
-    | '/_layout/(admin)/admin/admins'
-    | '/_layout/(admin)/admin/appointments'
-    | '/_layout/(admin)/admin/chat'
-    | '/_layout/(admin)/admin/dashboard'
-    | '/_layout/(admin)/admin/doctors'
-    | '/_layout/(admin)/admin/inventory'
-    | '/_layout/(admin)/admin/medicine'
-    | '/_layout/(admin)/admin/notification'
-    | '/_layout/(admin)/admin/orders'
-    | '/_layout/(admin)/admin/patients'
-    | '/_layout/(admin)/admin/pharmacist'
-    | '/_layout/(admin)/admin/prescriptions'
-    | '/_layout/(admin)/admin/profile'
-    | '/_layout/(admin)/admin/rooms'
-    | '/_layout/(admin)/admin/settings'
-    | '/_layout/(admin)/admin/transactions'
-    | '/_layout/(admin)/admin/users'
-    | '/_layout/(doctors)/doctor/appointments'
-    | '/_layout/(doctors)/doctor/calendar'
-    | '/_layout/(doctors)/doctor/chat'
-    | '/_layout/(doctors)/doctor/dashboard'
-    | '/_layout/(doctors)/doctor/medicine'
-    | '/_layout/(doctors)/doctor/medine'
-    | '/_layout/(doctors)/doctor/notification'
-    | '/_layout/(doctors)/doctor/patients'
-    | '/_layout/(doctors)/doctor/prescriptions'
-    | '/_layout/(doctors)/doctor/rooms'
-    | '/_layout/(doctors)/doctor/settings'
-    | '/_layout/(patients)/patient/appointments'
-    | '/_layout/(patients)/patient/calendar'
-    | '/_layout/(patients)/patient/chat'
-    | '/_layout/(patients)/patient/dashboard'
-    | '/_layout/(patients)/patient/doctors'
-    | '/_layout/(patients)/patient/medicine'
-    | '/_layout/(patients)/patient/notification'
-    | '/_layout/(patients)/patient/orders'
-    | '/_layout/(patients)/patient/prescriptions'
-    | '/_layout/(patients)/patient/rooms'
-    | '/_layout/(patients)/patient/settings'
-    | '/_layout/(patients)/patient/transactions'
-    | '/_layout/(pharmacist)/pharmacist/chat'
-    | '/_layout/(pharmacist)/pharmacist/dashboard'
-    | '/_layout/(pharmacist)/pharmacist/inventory'
-    | '/_layout/(pharmacist)/pharmacist/medicine'
-    | '/_layout/(pharmacist)/pharmacist/notification'
-    | '/_layout/(pharmacist)/pharmacist/orders'
-    | '/_layout/(pharmacist)/pharmacist/prescriptions'
-    | '/_layout/(pharmacist)/pharmacist/settings'
-    | '/_layout/(pharmacist)/pharmacist/transactions'
+    | '/demo'
+    | '/login'
+    | '/settings'
+    | '/signup'
+    | '/autoruns/new'
+    | '/demo/ai-chat'
+    | '/demo/ai-image'
+    | '/demo/ai-structured'
+    | '/demo/store'
+    | '/demo/table'
+    | '/demo/tanstack-query'
+    | '/extractors/$id'
+    | '/extractors/new'
+    | '/runs/$id'
+    | '/runs/new'
+    | '/settings/api-keys'
+    | '/settings/appearance'
+    | '/settings/extraction'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/autoruns/'
+    | '/dashboard/'
+    | '/extractors/'
+    | '/runs/'
+    | '/settings/'
+    | '/autoruns/edit/$id'
+    | '/autoruns/runs/$id'
+    | '/demo/api/names'
+    | '/demo/api/tq-todos'
+    | '/demo/guitars/$guitarId'
+    | '/demo/sentry/testing'
+    | '/demo/start/api-request'
+    | '/demo/start/server-funcs'
+    | '/extractors/edit/$id'
+    | '/runs/review/$id'
+    | '/demo/guitars/'
+    | '/demo/api/ai/chat'
+    | '/demo/api/ai/image'
+    | '/demo/api/ai/structured'
+    | '/demo/api/ai/transcription'
+    | '/demo/api/ai/tts'
+    | '/demo/start/ssr/data-only'
+    | '/demo/start/ssr/full-ssr'
+    | '/demo/start/ssr/spa-mode'
+    | '/demo/start/ssr/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LayoutRouteRoute: typeof LayoutRouteRouteWithChildren
-  AuthCallbackRoute: typeof AuthCallbackRoute
-  AuthForgetPasswordRoute: typeof AuthForgetPasswordRoute
-  AuthSigninRoute: typeof AuthSigninRoute
-  AuthSignupRoute: typeof AuthSignupRoute
-  callCallJoinCallIdRoute: typeof callCallJoinCallIdRoute
+  DemoRoute: typeof DemoRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  SettingsRoute: typeof SettingsRouteWithChildren
+  SignupRoute: typeof SignupRoute
+  AutorunsNewRoute: typeof AutorunsNewRoute
+  ExtractorsIdRoute: typeof ExtractorsIdRoute
+  ExtractorsNewRoute: typeof ExtractorsNewRoute
+  RunsIdRoute: typeof RunsIdRoute
+  RunsNewRoute: typeof RunsNewRoute
+  AutorunsIndexRoute: typeof AutorunsIndexRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  ExtractorsIndexRoute: typeof ExtractorsIndexRoute
+  RunsIndexRoute: typeof RunsIndexRoute
+  AutorunsEditIdRoute: typeof AutorunsEditIdRoute
+  AutorunsRunsIdRoute: typeof AutorunsRunsIdRoute
+  ExtractorsEditIdRoute: typeof ExtractorsEditIdRoute
+  RunsReviewIdRoute: typeof RunsReviewIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_layout': {
-      id: '/_layout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof LayoutRouteRouteImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -761,515 +635,399 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/signup': {
-      id: '/auth/signup'
-      path: '/auth/signup'
-      fullPath: '/auth/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/runs/': {
+      id: '/runs/'
+      path: '/runs'
+      fullPath: '/runs/'
+      preLoaderRoute: typeof RunsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/signin': {
-      id: '/auth/signin'
-      path: '/auth/signin'
-      fullPath: '/auth/signin'
-      preLoaderRoute: typeof AuthSigninRouteImport
+    '/extractors/': {
+      id: '/extractors/'
+      path: '/extractors'
+      fullPath: '/extractors/'
+      preLoaderRoute: typeof ExtractorsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/forget-password': {
-      id: '/auth/forget-password'
-      path: '/auth/forget-password'
-      fullPath: '/auth/forget-password'
-      preLoaderRoute: typeof AuthForgetPasswordRouteImport
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
+    '/autoruns/': {
+      id: '/autoruns/'
+      path: '/autoruns'
+      fullPath: '/autoruns/'
+      preLoaderRoute: typeof AutorunsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_layout/(pharmacist)/pharmacist/transactions': {
-      id: '/_layout/(pharmacist)/pharmacist/transactions'
-      path: '/pharmacist/transactions'
-      fullPath: '/pharmacist/transactions'
-      preLoaderRoute: typeof LayoutpharmacistPharmacistTransactionsRouteImport
-      parentRoute: typeof LayoutRouteRoute
+    '/settings/profile': {
+      id: '/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof SettingsProfileRouteImport
+      parentRoute: typeof SettingsRoute
     }
-    '/_layout/(pharmacist)/pharmacist/settings': {
-      id: '/_layout/(pharmacist)/pharmacist/settings'
-      path: '/pharmacist/settings'
-      fullPath: '/pharmacist/settings'
-      preLoaderRoute: typeof LayoutpharmacistPharmacistSettingsRouteImport
-      parentRoute: typeof LayoutRouteRoute
+    '/settings/notifications': {
+      id: '/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof SettingsNotificationsRouteImport
+      parentRoute: typeof SettingsRoute
     }
-    '/_layout/(pharmacist)/pharmacist/prescriptions': {
-      id: '/_layout/(pharmacist)/pharmacist/prescriptions'
-      path: '/pharmacist/prescriptions'
-      fullPath: '/pharmacist/prescriptions'
-      preLoaderRoute: typeof LayoutpharmacistPharmacistPrescriptionsRouteImport
-      parentRoute: typeof LayoutRouteRoute
+    '/settings/extraction': {
+      id: '/settings/extraction'
+      path: '/extraction'
+      fullPath: '/settings/extraction'
+      preLoaderRoute: typeof SettingsExtractionRouteImport
+      parentRoute: typeof SettingsRoute
     }
-    '/_layout/(pharmacist)/pharmacist/orders': {
-      id: '/_layout/(pharmacist)/pharmacist/orders'
-      path: '/pharmacist/orders'
-      fullPath: '/pharmacist/orders'
-      preLoaderRoute: typeof LayoutpharmacistPharmacistOrdersRouteImport
-      parentRoute: typeof LayoutRouteRoute
+    '/settings/appearance': {
+      id: '/settings/appearance'
+      path: '/appearance'
+      fullPath: '/settings/appearance'
+      preLoaderRoute: typeof SettingsAppearanceRouteImport
+      parentRoute: typeof SettingsRoute
     }
-    '/_layout/(pharmacist)/pharmacist/notification': {
-      id: '/_layout/(pharmacist)/pharmacist/notification'
-      path: '/pharmacist/notification'
-      fullPath: '/pharmacist/notification'
-      preLoaderRoute: typeof LayoutpharmacistPharmacistNotificationRouteImport
-      parentRoute: typeof LayoutRouteRoute
+    '/settings/api-keys': {
+      id: '/settings/api-keys'
+      path: '/api-keys'
+      fullPath: '/settings/api-keys'
+      preLoaderRoute: typeof SettingsApiKeysRouteImport
+      parentRoute: typeof SettingsRoute
     }
-    '/_layout/(pharmacist)/pharmacist/medicine': {
-      id: '/_layout/(pharmacist)/pharmacist/medicine'
-      path: '/pharmacist/medicine'
-      fullPath: '/pharmacist/medicine'
-      preLoaderRoute: typeof LayoutpharmacistPharmacistMedicineRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(pharmacist)/pharmacist/inventory': {
-      id: '/_layout/(pharmacist)/pharmacist/inventory'
-      path: '/pharmacist/inventory'
-      fullPath: '/pharmacist/inventory'
-      preLoaderRoute: typeof LayoutpharmacistPharmacistInventoryRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(pharmacist)/pharmacist/dashboard': {
-      id: '/_layout/(pharmacist)/pharmacist/dashboard'
-      path: '/pharmacist/dashboard'
-      fullPath: '/pharmacist/dashboard'
-      preLoaderRoute: typeof LayoutpharmacistPharmacistDashboardRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(pharmacist)/pharmacist/chat': {
-      id: '/_layout/(pharmacist)/pharmacist/chat'
-      path: '/pharmacist/chat'
-      fullPath: '/pharmacist/chat'
-      preLoaderRoute: typeof LayoutpharmacistPharmacistChatRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/transactions': {
-      id: '/_layout/(patients)/patient/transactions'
-      path: '/patient/transactions'
-      fullPath: '/patient/transactions'
-      preLoaderRoute: typeof LayoutpatientsPatientTransactionsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/settings': {
-      id: '/_layout/(patients)/patient/settings'
-      path: '/patient/settings'
-      fullPath: '/patient/settings'
-      preLoaderRoute: typeof LayoutpatientsPatientSettingsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/rooms': {
-      id: '/_layout/(patients)/patient/rooms'
-      path: '/patient/rooms'
-      fullPath: '/patient/rooms'
-      preLoaderRoute: typeof LayoutpatientsPatientRoomsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/prescriptions': {
-      id: '/_layout/(patients)/patient/prescriptions'
-      path: '/patient/prescriptions'
-      fullPath: '/patient/prescriptions'
-      preLoaderRoute: typeof LayoutpatientsPatientPrescriptionsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/orders': {
-      id: '/_layout/(patients)/patient/orders'
-      path: '/patient/orders'
-      fullPath: '/patient/orders'
-      preLoaderRoute: typeof LayoutpatientsPatientOrdersRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/notification': {
-      id: '/_layout/(patients)/patient/notification'
-      path: '/patient/notification'
-      fullPath: '/patient/notification'
-      preLoaderRoute: typeof LayoutpatientsPatientNotificationRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/medicine': {
-      id: '/_layout/(patients)/patient/medicine'
-      path: '/patient/medicine'
-      fullPath: '/patient/medicine'
-      preLoaderRoute: typeof LayoutpatientsPatientMedicineRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/doctors': {
-      id: '/_layout/(patients)/patient/doctors'
-      path: '/patient/doctors'
-      fullPath: '/patient/doctors'
-      preLoaderRoute: typeof LayoutpatientsPatientDoctorsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/dashboard': {
-      id: '/_layout/(patients)/patient/dashboard'
-      path: '/patient/dashboard'
-      fullPath: '/patient/dashboard'
-      preLoaderRoute: typeof LayoutpatientsPatientDashboardRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/chat': {
-      id: '/_layout/(patients)/patient/chat'
-      path: '/patient/chat'
-      fullPath: '/patient/chat'
-      preLoaderRoute: typeof LayoutpatientsPatientChatRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/calendar': {
-      id: '/_layout/(patients)/patient/calendar'
-      path: '/patient/calendar'
-      fullPath: '/patient/calendar'
-      preLoaderRoute: typeof LayoutpatientsPatientCalendarRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(patients)/patient/appointments': {
-      id: '/_layout/(patients)/patient/appointments'
-      path: '/patient/appointments'
-      fullPath: '/patient/appointments'
-      preLoaderRoute: typeof LayoutpatientsPatientAppointmentsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/settings': {
-      id: '/_layout/(doctors)/doctor/settings'
-      path: '/doctor/settings'
-      fullPath: '/doctor/settings'
-      preLoaderRoute: typeof LayoutdoctorsDoctorSettingsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/rooms': {
-      id: '/_layout/(doctors)/doctor/rooms'
-      path: '/doctor/rooms'
-      fullPath: '/doctor/rooms'
-      preLoaderRoute: typeof LayoutdoctorsDoctorRoomsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/prescriptions': {
-      id: '/_layout/(doctors)/doctor/prescriptions'
-      path: '/doctor/prescriptions'
-      fullPath: '/doctor/prescriptions'
-      preLoaderRoute: typeof LayoutdoctorsDoctorPrescriptionsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/patients': {
-      id: '/_layout/(doctors)/doctor/patients'
-      path: '/doctor/patients'
-      fullPath: '/doctor/patients'
-      preLoaderRoute: typeof LayoutdoctorsDoctorPatientsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/notification': {
-      id: '/_layout/(doctors)/doctor/notification'
-      path: '/doctor/notification'
-      fullPath: '/doctor/notification'
-      preLoaderRoute: typeof LayoutdoctorsDoctorNotificationRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/medine': {
-      id: '/_layout/(doctors)/doctor/medine'
-      path: '/doctor/medine'
-      fullPath: '/doctor/medine'
-      preLoaderRoute: typeof LayoutdoctorsDoctorMedineRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/medicine': {
-      id: '/_layout/(doctors)/doctor/medicine'
-      path: '/doctor/medicine'
-      fullPath: '/doctor/medicine'
-      preLoaderRoute: typeof LayoutdoctorsDoctorMedicineRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/dashboard': {
-      id: '/_layout/(doctors)/doctor/dashboard'
-      path: '/doctor/dashboard'
-      fullPath: '/doctor/dashboard'
-      preLoaderRoute: typeof LayoutdoctorsDoctorDashboardRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/chat': {
-      id: '/_layout/(doctors)/doctor/chat'
-      path: '/doctor/chat'
-      fullPath: '/doctor/chat'
-      preLoaderRoute: typeof LayoutdoctorsDoctorChatRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/calendar': {
-      id: '/_layout/(doctors)/doctor/calendar'
-      path: '/doctor/calendar'
-      fullPath: '/doctor/calendar'
-      preLoaderRoute: typeof LayoutdoctorsDoctorCalendarRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(doctors)/doctor/appointments': {
-      id: '/_layout/(doctors)/doctor/appointments'
-      path: '/doctor/appointments'
-      fullPath: '/doctor/appointments'
-      preLoaderRoute: typeof LayoutdoctorsDoctorAppointmentsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/users': {
-      id: '/_layout/(admin)/admin/users'
-      path: '/admin/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof LayoutadminAdminUsersRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/transactions': {
-      id: '/_layout/(admin)/admin/transactions'
-      path: '/admin/transactions'
-      fullPath: '/admin/transactions'
-      preLoaderRoute: typeof LayoutadminAdminTransactionsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/settings': {
-      id: '/_layout/(admin)/admin/settings'
-      path: '/admin/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof LayoutadminAdminSettingsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/rooms': {
-      id: '/_layout/(admin)/admin/rooms'
-      path: '/admin/rooms'
-      fullPath: '/admin/rooms'
-      preLoaderRoute: typeof LayoutadminAdminRoomsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/profile': {
-      id: '/_layout/(admin)/admin/profile'
-      path: '/admin/profile'
-      fullPath: '/admin/profile'
-      preLoaderRoute: typeof LayoutadminAdminProfileRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/prescriptions': {
-      id: '/_layout/(admin)/admin/prescriptions'
-      path: '/admin/prescriptions'
-      fullPath: '/admin/prescriptions'
-      preLoaderRoute: typeof LayoutadminAdminPrescriptionsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/pharmacist': {
-      id: '/_layout/(admin)/admin/pharmacist'
-      path: '/admin/pharmacist'
-      fullPath: '/admin/pharmacist'
-      preLoaderRoute: typeof LayoutadminAdminPharmacistRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/patients': {
-      id: '/_layout/(admin)/admin/patients'
-      path: '/admin/patients'
-      fullPath: '/admin/patients'
-      preLoaderRoute: typeof LayoutadminAdminPatientsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/orders': {
-      id: '/_layout/(admin)/admin/orders'
-      path: '/admin/orders'
-      fullPath: '/admin/orders'
-      preLoaderRoute: typeof LayoutadminAdminOrdersRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/notification': {
-      id: '/_layout/(admin)/admin/notification'
-      path: '/admin/notification'
-      fullPath: '/admin/notification'
-      preLoaderRoute: typeof LayoutadminAdminNotificationRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/medicine': {
-      id: '/_layout/(admin)/admin/medicine'
-      path: '/admin/medicine'
-      fullPath: '/admin/medicine'
-      preLoaderRoute: typeof LayoutadminAdminMedicineRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/inventory': {
-      id: '/_layout/(admin)/admin/inventory'
-      path: '/admin/inventory'
-      fullPath: '/admin/inventory'
-      preLoaderRoute: typeof LayoutadminAdminInventoryRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/doctors': {
-      id: '/_layout/(admin)/admin/doctors'
-      path: '/admin/doctors'
-      fullPath: '/admin/doctors'
-      preLoaderRoute: typeof LayoutadminAdminDoctorsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/dashboard': {
-      id: '/_layout/(admin)/admin/dashboard'
-      path: '/admin/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof LayoutadminAdminDashboardRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/chat': {
-      id: '/_layout/(admin)/admin/chat'
-      path: '/admin/chat'
-      fullPath: '/admin/chat'
-      preLoaderRoute: typeof LayoutadminAdminChatRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/appointments': {
-      id: '/_layout/(admin)/admin/appointments'
-      path: '/admin/appointments'
-      fullPath: '/admin/appointments'
-      preLoaderRoute: typeof LayoutadminAdminAppointmentsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/_layout/(admin)/admin/admins': {
-      id: '/_layout/(admin)/admin/admins'
-      path: '/admin/admins'
-      fullPath: '/admin/admins'
-      preLoaderRoute: typeof LayoutadminAdminAdminsRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
-    '/(call)/call/join/$callId': {
-      id: '/(call)/call/join/$callId'
-      path: '/call/join/$callId'
-      fullPath: '/call/join/$callId'
-      preLoaderRoute: typeof callCallJoinCallIdRouteImport
+    '/runs/new': {
+      id: '/runs/new'
+      path: '/runs/new'
+      fullPath: '/runs/new'
+      preLoaderRoute: typeof RunsNewRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/runs/$id': {
+      id: '/runs/$id'
+      path: '/runs/$id'
+      fullPath: '/runs/$id'
+      preLoaderRoute: typeof RunsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extractors/new': {
+      id: '/extractors/new'
+      path: '/extractors/new'
+      fullPath: '/extractors/new'
+      preLoaderRoute: typeof ExtractorsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extractors/$id': {
+      id: '/extractors/$id'
+      path: '/extractors/$id'
+      fullPath: '/extractors/$id'
+      preLoaderRoute: typeof ExtractorsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/tanstack-query': {
+      id: '/demo/tanstack-query'
+      path: '/tanstack-query'
+      fullPath: '/demo/tanstack-query'
+      preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/table': {
+      id: '/demo/table'
+      path: '/table'
+      fullPath: '/demo/table'
+      preLoaderRoute: typeof DemoTableRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/store': {
+      id: '/demo/store'
+      path: '/store'
+      fullPath: '/demo/store'
+      preLoaderRoute: typeof DemoStoreRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/ai-structured': {
+      id: '/demo/ai-structured'
+      path: '/ai-structured'
+      fullPath: '/demo/ai-structured'
+      preLoaderRoute: typeof DemoAiStructuredRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/ai-image': {
+      id: '/demo/ai-image'
+      path: '/ai-image'
+      fullPath: '/demo/ai-image'
+      preLoaderRoute: typeof DemoAiImageRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/ai-chat': {
+      id: '/demo/ai-chat'
+      path: '/ai-chat'
+      fullPath: '/demo/ai-chat'
+      preLoaderRoute: typeof DemoAiChatRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/autoruns/new': {
+      id: '/autoruns/new'
+      path: '/autoruns/new'
+      fullPath: '/autoruns/new'
+      preLoaderRoute: typeof AutorunsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/guitars/': {
+      id: '/demo/guitars/'
+      path: '/guitars'
+      fullPath: '/demo/guitars/'
+      preLoaderRoute: typeof DemoGuitarsIndexRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/runs/review/$id': {
+      id: '/runs/review/$id'
+      path: '/runs/review/$id'
+      fullPath: '/runs/review/$id'
+      preLoaderRoute: typeof RunsReviewIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extractors/edit/$id': {
+      id: '/extractors/edit/$id'
+      path: '/extractors/edit/$id'
+      fullPath: '/extractors/edit/$id'
+      preLoaderRoute: typeof ExtractorsEditIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/start/server-funcs': {
+      id: '/demo/start/server-funcs'
+      path: '/start/server-funcs'
+      fullPath: '/demo/start/server-funcs'
+      preLoaderRoute: typeof DemoStartServerFuncsRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/start/api-request': {
+      id: '/demo/start/api-request'
+      path: '/start/api-request'
+      fullPath: '/demo/start/api-request'
+      preLoaderRoute: typeof DemoStartApiRequestRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/sentry/testing': {
+      id: '/demo/sentry/testing'
+      path: '/sentry/testing'
+      fullPath: '/demo/sentry/testing'
+      preLoaderRoute: typeof DemoSentryTestingRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/guitars/$guitarId': {
+      id: '/demo/guitars/$guitarId'
+      path: '/guitars/$guitarId'
+      fullPath: '/demo/guitars/$guitarId'
+      preLoaderRoute: typeof DemoGuitarsGuitarIdRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/api/tq-todos': {
+      id: '/demo/api/tq-todos'
+      path: '/api/tq-todos'
+      fullPath: '/demo/api/tq-todos'
+      preLoaderRoute: typeof DemoApiTqTodosRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/api/names': {
+      id: '/demo/api/names'
+      path: '/api/names'
+      fullPath: '/demo/api/names'
+      preLoaderRoute: typeof DemoApiNamesRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/autoruns/runs/$id': {
+      id: '/autoruns/runs/$id'
+      path: '/autoruns/runs/$id'
+      fullPath: '/autoruns/runs/$id'
+      preLoaderRoute: typeof AutorunsRunsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/autoruns/edit/$id': {
+      id: '/autoruns/edit/$id'
+      path: '/autoruns/edit/$id'
+      fullPath: '/autoruns/edit/$id'
+      preLoaderRoute: typeof AutorunsEditIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/start/ssr/': {
+      id: '/demo/start/ssr/'
+      path: '/start/ssr'
+      fullPath: '/demo/start/ssr/'
+      preLoaderRoute: typeof DemoStartSsrIndexRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/start/ssr/spa-mode': {
+      id: '/demo/start/ssr/spa-mode'
+      path: '/start/ssr/spa-mode'
+      fullPath: '/demo/start/ssr/spa-mode'
+      preLoaderRoute: typeof DemoStartSsrSpaModeRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/start/ssr/full-ssr': {
+      id: '/demo/start/ssr/full-ssr'
+      path: '/start/ssr/full-ssr'
+      fullPath: '/demo/start/ssr/full-ssr'
+      preLoaderRoute: typeof DemoStartSsrFullSsrRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/start/ssr/data-only': {
+      id: '/demo/start/ssr/data-only'
+      path: '/start/ssr/data-only'
+      fullPath: '/demo/start/ssr/data-only'
+      preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/api/ai/tts': {
+      id: '/demo/api/ai/tts'
+      path: '/api/ai/tts'
+      fullPath: '/demo/api/ai/tts'
+      preLoaderRoute: typeof DemoApiAiTtsRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/api/ai/transcription': {
+      id: '/demo/api/ai/transcription'
+      path: '/api/ai/transcription'
+      fullPath: '/demo/api/ai/transcription'
+      preLoaderRoute: typeof DemoApiAiTranscriptionRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/api/ai/structured': {
+      id: '/demo/api/ai/structured'
+      path: '/api/ai/structured'
+      fullPath: '/demo/api/ai/structured'
+      preLoaderRoute: typeof DemoApiAiStructuredRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/api/ai/image': {
+      id: '/demo/api/ai/image'
+      path: '/api/ai/image'
+      fullPath: '/demo/api/ai/image'
+      preLoaderRoute: typeof DemoApiAiImageRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/api/ai/chat': {
+      id: '/demo/api/ai/chat'
+      path: '/api/ai/chat'
+      fullPath: '/demo/api/ai/chat'
+      preLoaderRoute: typeof DemoApiAiChatRouteImport
+      parentRoute: typeof DemoRoute
     }
   }
 }
 
-interface LayoutRouteRouteChildren {
-  LayoutadminAdminAdminsRoute: typeof LayoutadminAdminAdminsRoute
-  LayoutadminAdminAppointmentsRoute: typeof LayoutadminAdminAppointmentsRoute
-  LayoutadminAdminChatRoute: typeof LayoutadminAdminChatRoute
-  LayoutadminAdminDashboardRoute: typeof LayoutadminAdminDashboardRoute
-  LayoutadminAdminDoctorsRoute: typeof LayoutadminAdminDoctorsRoute
-  LayoutadminAdminInventoryRoute: typeof LayoutadminAdminInventoryRoute
-  LayoutadminAdminMedicineRoute: typeof LayoutadminAdminMedicineRoute
-  LayoutadminAdminNotificationRoute: typeof LayoutadminAdminNotificationRoute
-  LayoutadminAdminOrdersRoute: typeof LayoutadminAdminOrdersRoute
-  LayoutadminAdminPatientsRoute: typeof LayoutadminAdminPatientsRoute
-  LayoutadminAdminPharmacistRoute: typeof LayoutadminAdminPharmacistRoute
-  LayoutadminAdminPrescriptionsRoute: typeof LayoutadminAdminPrescriptionsRoute
-  LayoutadminAdminProfileRoute: typeof LayoutadminAdminProfileRoute
-  LayoutadminAdminRoomsRoute: typeof LayoutadminAdminRoomsRoute
-  LayoutadminAdminSettingsRoute: typeof LayoutadminAdminSettingsRoute
-  LayoutadminAdminTransactionsRoute: typeof LayoutadminAdminTransactionsRoute
-  LayoutadminAdminUsersRoute: typeof LayoutadminAdminUsersRoute
-  LayoutdoctorsDoctorAppointmentsRoute: typeof LayoutdoctorsDoctorAppointmentsRoute
-  LayoutdoctorsDoctorCalendarRoute: typeof LayoutdoctorsDoctorCalendarRoute
-  LayoutdoctorsDoctorChatRoute: typeof LayoutdoctorsDoctorChatRoute
-  LayoutdoctorsDoctorDashboardRoute: typeof LayoutdoctorsDoctorDashboardRoute
-  LayoutdoctorsDoctorMedicineRoute: typeof LayoutdoctorsDoctorMedicineRoute
-  LayoutdoctorsDoctorMedineRoute: typeof LayoutdoctorsDoctorMedineRoute
-  LayoutdoctorsDoctorNotificationRoute: typeof LayoutdoctorsDoctorNotificationRoute
-  LayoutdoctorsDoctorPatientsRoute: typeof LayoutdoctorsDoctorPatientsRoute
-  LayoutdoctorsDoctorPrescriptionsRoute: typeof LayoutdoctorsDoctorPrescriptionsRoute
-  LayoutdoctorsDoctorRoomsRoute: typeof LayoutdoctorsDoctorRoomsRoute
-  LayoutdoctorsDoctorSettingsRoute: typeof LayoutdoctorsDoctorSettingsRoute
-  LayoutpatientsPatientAppointmentsRoute: typeof LayoutpatientsPatientAppointmentsRoute
-  LayoutpatientsPatientCalendarRoute: typeof LayoutpatientsPatientCalendarRoute
-  LayoutpatientsPatientChatRoute: typeof LayoutpatientsPatientChatRoute
-  LayoutpatientsPatientDashboardRoute: typeof LayoutpatientsPatientDashboardRoute
-  LayoutpatientsPatientDoctorsRoute: typeof LayoutpatientsPatientDoctorsRoute
-  LayoutpatientsPatientMedicineRoute: typeof LayoutpatientsPatientMedicineRoute
-  LayoutpatientsPatientNotificationRoute: typeof LayoutpatientsPatientNotificationRoute
-  LayoutpatientsPatientOrdersRoute: typeof LayoutpatientsPatientOrdersRoute
-  LayoutpatientsPatientPrescriptionsRoute: typeof LayoutpatientsPatientPrescriptionsRoute
-  LayoutpatientsPatientRoomsRoute: typeof LayoutpatientsPatientRoomsRoute
-  LayoutpatientsPatientSettingsRoute: typeof LayoutpatientsPatientSettingsRoute
-  LayoutpatientsPatientTransactionsRoute: typeof LayoutpatientsPatientTransactionsRoute
-  LayoutpharmacistPharmacistChatRoute: typeof LayoutpharmacistPharmacistChatRoute
-  LayoutpharmacistPharmacistDashboardRoute: typeof LayoutpharmacistPharmacistDashboardRoute
-  LayoutpharmacistPharmacistInventoryRoute: typeof LayoutpharmacistPharmacistInventoryRoute
-  LayoutpharmacistPharmacistMedicineRoute: typeof LayoutpharmacistPharmacistMedicineRoute
-  LayoutpharmacistPharmacistNotificationRoute: typeof LayoutpharmacistPharmacistNotificationRoute
-  LayoutpharmacistPharmacistOrdersRoute: typeof LayoutpharmacistPharmacistOrdersRoute
-  LayoutpharmacistPharmacistPrescriptionsRoute: typeof LayoutpharmacistPharmacistPrescriptionsRoute
-  LayoutpharmacistPharmacistSettingsRoute: typeof LayoutpharmacistPharmacistSettingsRoute
-  LayoutpharmacistPharmacistTransactionsRoute: typeof LayoutpharmacistPharmacistTransactionsRoute
+interface DemoRouteChildren {
+  DemoAiChatRoute: typeof DemoAiChatRoute
+  DemoAiImageRoute: typeof DemoAiImageRoute
+  DemoAiStructuredRoute: typeof DemoAiStructuredRoute
+  DemoStoreRoute: typeof DemoStoreRoute
+  DemoTableRoute: typeof DemoTableRoute
+  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  DemoApiNamesRoute: typeof DemoApiNamesRoute
+  DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
+  DemoGuitarsGuitarIdRoute: typeof DemoGuitarsGuitarIdRoute
+  DemoSentryTestingRoute: typeof DemoSentryTestingRoute
+  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
+  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  DemoGuitarsIndexRoute: typeof DemoGuitarsIndexRoute
+  DemoApiAiChatRoute: typeof DemoApiAiChatRoute
+  DemoApiAiImageRoute: typeof DemoApiAiImageRoute
+  DemoApiAiStructuredRoute: typeof DemoApiAiStructuredRoute
+  DemoApiAiTranscriptionRoute: typeof DemoApiAiTranscriptionRoute
+  DemoApiAiTtsRoute: typeof DemoApiAiTtsRoute
+  DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
+  DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
+  DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
+  DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
 }
 
-const LayoutRouteRouteChildren: LayoutRouteRouteChildren = {
-  LayoutadminAdminAdminsRoute: LayoutadminAdminAdminsRoute,
-  LayoutadminAdminAppointmentsRoute: LayoutadminAdminAppointmentsRoute,
-  LayoutadminAdminChatRoute: LayoutadminAdminChatRoute,
-  LayoutadminAdminDashboardRoute: LayoutadminAdminDashboardRoute,
-  LayoutadminAdminDoctorsRoute: LayoutadminAdminDoctorsRoute,
-  LayoutadminAdminInventoryRoute: LayoutadminAdminInventoryRoute,
-  LayoutadminAdminMedicineRoute: LayoutadminAdminMedicineRoute,
-  LayoutadminAdminNotificationRoute: LayoutadminAdminNotificationRoute,
-  LayoutadminAdminOrdersRoute: LayoutadminAdminOrdersRoute,
-  LayoutadminAdminPatientsRoute: LayoutadminAdminPatientsRoute,
-  LayoutadminAdminPharmacistRoute: LayoutadminAdminPharmacistRoute,
-  LayoutadminAdminPrescriptionsRoute: LayoutadminAdminPrescriptionsRoute,
-  LayoutadminAdminProfileRoute: LayoutadminAdminProfileRoute,
-  LayoutadminAdminRoomsRoute: LayoutadminAdminRoomsRoute,
-  LayoutadminAdminSettingsRoute: LayoutadminAdminSettingsRoute,
-  LayoutadminAdminTransactionsRoute: LayoutadminAdminTransactionsRoute,
-  LayoutadminAdminUsersRoute: LayoutadminAdminUsersRoute,
-  LayoutdoctorsDoctorAppointmentsRoute: LayoutdoctorsDoctorAppointmentsRoute,
-  LayoutdoctorsDoctorCalendarRoute: LayoutdoctorsDoctorCalendarRoute,
-  LayoutdoctorsDoctorChatRoute: LayoutdoctorsDoctorChatRoute,
-  LayoutdoctorsDoctorDashboardRoute: LayoutdoctorsDoctorDashboardRoute,
-  LayoutdoctorsDoctorMedicineRoute: LayoutdoctorsDoctorMedicineRoute,
-  LayoutdoctorsDoctorMedineRoute: LayoutdoctorsDoctorMedineRoute,
-  LayoutdoctorsDoctorNotificationRoute: LayoutdoctorsDoctorNotificationRoute,
-  LayoutdoctorsDoctorPatientsRoute: LayoutdoctorsDoctorPatientsRoute,
-  LayoutdoctorsDoctorPrescriptionsRoute: LayoutdoctorsDoctorPrescriptionsRoute,
-  LayoutdoctorsDoctorRoomsRoute: LayoutdoctorsDoctorRoomsRoute,
-  LayoutdoctorsDoctorSettingsRoute: LayoutdoctorsDoctorSettingsRoute,
-  LayoutpatientsPatientAppointmentsRoute:
-    LayoutpatientsPatientAppointmentsRoute,
-  LayoutpatientsPatientCalendarRoute: LayoutpatientsPatientCalendarRoute,
-  LayoutpatientsPatientChatRoute: LayoutpatientsPatientChatRoute,
-  LayoutpatientsPatientDashboardRoute: LayoutpatientsPatientDashboardRoute,
-  LayoutpatientsPatientDoctorsRoute: LayoutpatientsPatientDoctorsRoute,
-  LayoutpatientsPatientMedicineRoute: LayoutpatientsPatientMedicineRoute,
-  LayoutpatientsPatientNotificationRoute:
-    LayoutpatientsPatientNotificationRoute,
-  LayoutpatientsPatientOrdersRoute: LayoutpatientsPatientOrdersRoute,
-  LayoutpatientsPatientPrescriptionsRoute:
-    LayoutpatientsPatientPrescriptionsRoute,
-  LayoutpatientsPatientRoomsRoute: LayoutpatientsPatientRoomsRoute,
-  LayoutpatientsPatientSettingsRoute: LayoutpatientsPatientSettingsRoute,
-  LayoutpatientsPatientTransactionsRoute:
-    LayoutpatientsPatientTransactionsRoute,
-  LayoutpharmacistPharmacistChatRoute: LayoutpharmacistPharmacistChatRoute,
-  LayoutpharmacistPharmacistDashboardRoute:
-    LayoutpharmacistPharmacistDashboardRoute,
-  LayoutpharmacistPharmacistInventoryRoute:
-    LayoutpharmacistPharmacistInventoryRoute,
-  LayoutpharmacistPharmacistMedicineRoute:
-    LayoutpharmacistPharmacistMedicineRoute,
-  LayoutpharmacistPharmacistNotificationRoute:
-    LayoutpharmacistPharmacistNotificationRoute,
-  LayoutpharmacistPharmacistOrdersRoute: LayoutpharmacistPharmacistOrdersRoute,
-  LayoutpharmacistPharmacistPrescriptionsRoute:
-    LayoutpharmacistPharmacistPrescriptionsRoute,
-  LayoutpharmacistPharmacistSettingsRoute:
-    LayoutpharmacistPharmacistSettingsRoute,
-  LayoutpharmacistPharmacistTransactionsRoute:
-    LayoutpharmacistPharmacistTransactionsRoute,
+const DemoRouteChildren: DemoRouteChildren = {
+  DemoAiChatRoute: DemoAiChatRoute,
+  DemoAiImageRoute: DemoAiImageRoute,
+  DemoAiStructuredRoute: DemoAiStructuredRoute,
+  DemoStoreRoute: DemoStoreRoute,
+  DemoTableRoute: DemoTableRoute,
+  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  DemoApiNamesRoute: DemoApiNamesRoute,
+  DemoApiTqTodosRoute: DemoApiTqTodosRoute,
+  DemoGuitarsGuitarIdRoute: DemoGuitarsGuitarIdRoute,
+  DemoSentryTestingRoute: DemoSentryTestingRoute,
+  DemoStartApiRequestRoute: DemoStartApiRequestRoute,
+  DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  DemoGuitarsIndexRoute: DemoGuitarsIndexRoute,
+  DemoApiAiChatRoute: DemoApiAiChatRoute,
+  DemoApiAiImageRoute: DemoApiAiImageRoute,
+  DemoApiAiStructuredRoute: DemoApiAiStructuredRoute,
+  DemoApiAiTranscriptionRoute: DemoApiAiTranscriptionRoute,
+  DemoApiAiTtsRoute: DemoApiAiTtsRoute,
+  DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
+  DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
+  DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
+  DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
 }
 
-const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
-  LayoutRouteRouteChildren,
+const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
+
+interface SettingsRouteChildren {
+  SettingsApiKeysRoute: typeof SettingsApiKeysRoute
+  SettingsAppearanceRoute: typeof SettingsAppearanceRoute
+  SettingsExtractionRoute: typeof SettingsExtractionRoute
+  SettingsNotificationsRoute: typeof SettingsNotificationsRoute
+  SettingsProfileRoute: typeof SettingsProfileRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsApiKeysRoute: SettingsApiKeysRoute,
+  SettingsAppearanceRoute: SettingsAppearanceRoute,
+  SettingsExtractionRoute: SettingsExtractionRoute,
+  SettingsNotificationsRoute: SettingsNotificationsRoute,
+  SettingsProfileRoute: SettingsProfileRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LayoutRouteRoute: LayoutRouteRouteWithChildren,
-  AuthCallbackRoute: AuthCallbackRoute,
-  AuthForgetPasswordRoute: AuthForgetPasswordRoute,
-  AuthSigninRoute: AuthSigninRoute,
-  AuthSignupRoute: AuthSignupRoute,
-  callCallJoinCallIdRoute: callCallJoinCallIdRoute,
+  DemoRoute: DemoRouteWithChildren,
+  LoginRoute: LoginRoute,
+  SettingsRoute: SettingsRouteWithChildren,
+  SignupRoute: SignupRoute,
+  AutorunsNewRoute: AutorunsNewRoute,
+  ExtractorsIdRoute: ExtractorsIdRoute,
+  ExtractorsNewRoute: ExtractorsNewRoute,
+  RunsIdRoute: RunsIdRoute,
+  RunsNewRoute: RunsNewRoute,
+  AutorunsIndexRoute: AutorunsIndexRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  ExtractorsIndexRoute: ExtractorsIndexRoute,
+  RunsIndexRoute: RunsIndexRoute,
+  AutorunsEditIdRoute: AutorunsEditIdRoute,
+  AutorunsRunsIdRoute: AutorunsRunsIdRoute,
+  ExtractorsEditIdRoute: ExtractorsEditIdRoute,
+  RunsReviewIdRoute: RunsReviewIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

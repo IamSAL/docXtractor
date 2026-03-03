@@ -18,7 +18,7 @@ import {
   ApiBody,
   ApiProperty,
 } from '@nestjs/swagger';
-import { PermissionHelper } from 'src/shared/helpers/permission.helper';
+
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { GetUser } from './decorators/get-user.decorator';
@@ -42,7 +42,6 @@ import { ConfigService } from '@nestjs/config';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly permissionHelper: PermissionHelper,
     private readonly configService: ConfigService,
   ) {}
 
