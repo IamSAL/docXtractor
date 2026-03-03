@@ -1,34 +1,34 @@
-import { defineConfig } from 'orval';
+import { defineConfig } from "orval";
 
 export default defineConfig({
   api: {
-    input: 'http://localhost:3000/api/swagger.json',
+    input: "http://localhost:3001/api/swagger.json",
     output: {
-      mode: 'tags-split',
-      target: 'src/api/endpoints',
-      schemas: 'src/api/models',
-      client: 'react-query',
+      mode: "tags-split",
+      target: "src/api/endpoints",
+      schemas: "src/api/models",
+      client: "react-query",
       mock: false,
       override: {
         mutator: {
-          path: './src/lib/axios.ts',
-          name: 'HttpClient',
+          path: "./src/lib/axios.ts",
+          name: "HttpClient",
         },
       },
     },
     hooks: {
-      afterAllFilesWrite: 'biome format --write',
+      afterAllFilesWrite: "biome format --write",
     },
   },
-   schema: {
+  schema: {
     input: {
-      target: 'http://localhost:3000/api/swagger.json',
+      target: "http://localhost:3001/api/swagger.json",
     },
     output: {
-      mode: 'tags-split',
-      client: 'zod',
-      target: 'src/api/schemas',
-      fileExtension: '.zod.ts',
+      mode: "tags-split",
+      client: "zod",
+      target: "src/api/schemas",
+      fileExtension: ".zod.ts",
     },
   },
 });

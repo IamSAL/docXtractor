@@ -23,13 +23,14 @@ graph LR
     D[Docker] --> E[Client Container]
     D --> F[API Container]
     D --> G[DB Container]
-    E -->|Port 5173| H[Browser]
-    F -->|Port 3000| H
+    E -->|Port 5174| H[Browser]
+    F -->|Port 3001| H
 ```
 
 ## Key Features
 
 ### Backend (NestJS)
+
 - 🐳 **Dockerized** container deployment
 - 🗄️ **TypeORM** with PostgreSQL integration
 - 🛡️ **JWT Authentication** with protected routes
@@ -38,6 +39,7 @@ graph LR
 - 🔌 **Environment Configuration** system
 
 ### Frontend (React)
+
 - ⚡ **Vite** for blazing fast development
 - 🔄 **TanStack Query** for data fetching
 - 🎨 **Tailwind CSS** for utility-first styling
@@ -55,12 +57,14 @@ graph LR
 ## Getting Started
 
 ### 1. Clone the repository:
+
 ```bash
 git clone https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start.git
 cd DocXtractor-NestJs-Tanstack-Start
 ```
 
 ### 2. Configure environment variables:
+
 ```bash
 # Backend
 cp server/.env.example server/.env
@@ -72,28 +76,33 @@ cp client/.env.example client/.env.local
 Edit the files with your configuration values.
 
 ### 3. Start with Docker Compose:
+
 ```bash
 docker-compose up -d --build
 ```
 
 ### 4. Run database migrations:
+
 ```bash
 docker exec docxtractor-server pnpm typeorm migration:run
 ```
 
 ### 5. Access the applications:
-- **API Server**: http://localhost:3000
-- **React Client**: http://localhost:5173
-- **API Documentation**: http://localhost:3000/api
+
+- **API Server**: http://localhost:3001
+- **React Client**: http://localhost:5174
+- **API Documentation**: http://localhost:3001/api
 
 ## Development Workflow
 
 ### Start all services:
+
 ```bash
 docker-compose up -d
 ```
 
 ### Access containers:
+
 ```bash
 # API container
 docker exec -it docxtractor-server sh
@@ -103,11 +112,13 @@ docker exec -it docxtractor-db psql -U postgres
 ```
 
 ### Generate new migration:
+
 ```bash
 docker exec docxtractor-server pnpm typeorm migration:generate src/migrations/<MigrationName>
 ```
 
 ### View logs:
+
 ```bash
 docker-compose logs -f
 ```
@@ -136,6 +147,7 @@ DocXtractor-NestJs-Tanstack-Start/
 ## Configuration
 
 ### Backend (.env)
+
 ```env
 PORT=3000
 DB_HOST=docxtractor-db
@@ -148,19 +160,22 @@ JWT_EXPIRES_IN=1h
 ```
 
 ### Frontend (.env.local)
+
 ```env
-VITE_API_BASE_URL=http://localhost:3000
+VITE_API_BASE_URL=http://localhost:3001
 VITE_APP_NAME=DocXtractor App
 ```
 
 ## Deployment
 
 ### Production Build:
+
 ```bash
 docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
 ### Deployment Options:
+
 1. **Cloud Providers**:
    - AWS ECS/EKS
    - Google Cloud Run
@@ -168,10 +183,11 @@ docker-compose -f docker-compose.prod.yml up -d --build
    - DigitalOcean App Platform
 
 2. **Server Deployment**:
+
    ```bash
    # Build production images
    docker-compose -f docker-compose.prod.yml build
-   
+
    # Push to container registry
    docker push your-registry/docxtractor-client:latest
    docker push your-registry/docxtractor-server:latest
@@ -179,14 +195,14 @@ docker-compose -f docker-compose.prod.yml up -d --build
 
 ## Key API Endpoints
 
-| Method | Endpoint          | Description                |
-|--------|-------------------|----------------------------|
-| POST   | /auth/register    | Register new user          |
-| POST   | /auth/login       | Authenticate user          |
-| GET    | /users            | Get all users (protected)  |
-| GET    | /users/:id        | Get user by ID (protected) |
-| PUT    | /users/:id        | Update user (protected)    |
-| DELETE | /users/:id        | Delete user (protected)    |
+| Method | Endpoint       | Description                |
+| ------ | -------------- | -------------------------- |
+| POST   | /auth/register | Register new user          |
+| POST   | /auth/login    | Authenticate user          |
+| GET    | /users         | Get all users (protected)  |
+| GET    | /users/:id     | Get user by ID (protected) |
+| PUT    | /users/:id     | Update user (protected)    |
+| DELETE | /users/:id     | Delete user (protected)    |
 
 ## Frontend Features
 
@@ -212,16 +228,19 @@ Contributions are welcome! Please follow these steps:
 ## Troubleshooting
 
 **Database connection issues:**
+
 - Verify DB credentials in `.env` file
 - Check if database container is running: `docker ps`
 - View database logs: `docker-compose logs -f db`
 
 **Migration errors:**
+
 - Ensure migrations are run after database is ready
 - Check for existing migrations in the database
 - Verify TypeORM configuration
 
 **Client not connecting to API:**
+
 - Confirm API container is running
 - Check `VITE_API_BASE_URL` in client environment
 - Verify CORS configuration in server

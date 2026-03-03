@@ -2,8 +2,14 @@ import axios, { AxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/lib/auth-store";
 import { cookieStorage } from "./cookie-storage";
 
+const SERVER_URL =
+  import.meta.env.VITE_API_URL ||
+  (typeof window !== "undefined"
+    ? `${window.location.protocol}//${window.location.hostname}:3001`
+    : "http://localhost:3001");
+
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
+  baseURL: SERVER_URL,
 });
 
 AXIOS_INSTANCE.interceptors.request.use((config) => {

@@ -6,7 +6,7 @@ from typing import Callable, Any, Awaitable
 
 logger = logging.getLogger(__name__)
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6380")
 
 class BullMQClient:
     def __init__(self):

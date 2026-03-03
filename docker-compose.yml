@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: docxtractor
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -23,12 +23,13 @@ services:
     image: redis:alpine
     container_name: docxtractor-redis
     restart: unless-stopped
+    command: redis-server --port 6380
     ports:
-      - "6379:6379"
+      - "6380:6380"
     networks:
       - docxtractor-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-p", "6380", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -37,8 +38,8 @@ services:
     image: maildev/maildev
     container_name: docxtractor-maildev
     ports:
-      - "1080:1080"
-      - "1025:1025"
+      - "1081:1080"
+      - "1026:1025"
     networks:
       - docxtractor-network
     restart: unless-stopped
@@ -50,7 +51,7 @@ services:
     container_name: docxtractor-server
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - NODE_ENV=development
       - OLLAMA_HOST=http://host.docker.internal:11434
@@ -78,7 +79,7 @@ services:
     container_name: docxtractor-client
     restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "5174:5173"
     environment:
       - NODE_ENV=development
     env_file:
@@ -96,8 +97,8 @@ services:
     image: minio/minio
     container_name: docxtractor-minio
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9005:9000"
+      - "9006:9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
@@ -130,7 +131,7 @@ services:
       createbuckets:
         condition: service_completed_successfully
     environment:
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis:6380
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
@@ -156,7 +157,7 @@ services:
     env_file:
       - ./workers/extraction-service/.env
     environment:
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis:6380
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin

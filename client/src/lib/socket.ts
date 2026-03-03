@@ -2,7 +2,10 @@ import { io, Socket } from "socket.io-client";
 
 // In a real app, this URL should come from env vars
 // For local dev, we assume server is on port 3000
-const SERVER_URL = "http://localhost:3000";
+const SERVER_URL =
+  typeof window !== "undefined"
+    ? `${window.location.protocol}//${window.location.hostname}:3001`
+    : "http://localhost:3001";
 
 let socket: Socket | null = null;
 

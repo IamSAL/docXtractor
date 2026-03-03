@@ -53,33 +53,40 @@ server/
 ## Getting Started
 
 ### 1. Clone the repository:
+
 ```bash
 git clone https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start.git
 cd DocXtractor-NestJs-Tanstack-Start/server
 ```
 
 ### 2. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 ### 3. Configure environment:
+
 ```bash
 cp .env.example .env
 ```
+
 Edit the `.env` file with your configuration values.
 
 ### 4. Start Docker containers:
+
 ```bash
 docker-compose up -d
 ```
 
 ### 5. Run database migrations:
+
 ```bash
 pnpm typeorm migration:run
 ```
 
 ### 6. Start the server:
+
 ```bash
 pnpm start:dev
 ```
@@ -87,22 +94,26 @@ pnpm start:dev
 ## Development Workflow
 
 **Start all services:**
+
 ```bash
 docker-compose up -d
 pnpm start:dev
 ```
 
 **Run database migrations:**
+
 ```bash
 pnpm typeorm migration:run
 ```
 
 **Generate new migration:**
+
 ```bash
 pnpm typeorm migration:generate src/migrations/<MigrationName>
 ```
 
 **Access database container:**
+
 ```bash
 docker exec -it docxtractor-db psql -U postgres
 ```
@@ -110,53 +121,60 @@ docker exec -it docxtractor-db psql -U postgres
 ## API Documentation
 
 After starting the server, access the Swagger UI at:
+
 ```
-http://localhost:3000/api
+http://localhost:3001/api
 ```
 
 ## Docker Management
 
 **Start containers:**
+
 ```bash
 docker-compose up -d
 ```
 
 **Stop containers:**
+
 ```bash
 docker-compose down
 ```
 
 **View logs:**
+
 ```bash
 docker-compose logs -f
 ```
 
 **Rebuild containers:**
+
 ```bash
 docker-compose up -d --build
 ```
 
 ## Environment Variables
 
-| Variable         | Description                | Default Value     |
-|------------------|----------------------------|------------------|
-| PORT            | Server port               | 3000            |
-| DB_HOST         | Database host             | localhost       |
-| DB_PORT         | Database port             | 5432            |
-| DB_USERNAME     | Database user             | postgres        |
-| DB_PASSWORD     | Database password         | postgres        |
-| DB_NAME         | Database name             | docxtractor       |
-| JWT_SECRET      | JWT signing secret        | -               |
-| JWT_EXPIRES_IN  | Token expiration time     | 1h              |
+| Variable       | Description           | Default Value |
+| -------------- | --------------------- | ------------- |
+| PORT           | Server port           | 3000          |
+| DB_HOST        | Database host         | localhost     |
+| DB_PORT        | Database port         | 5432          |
+| DB_USERNAME    | Database user         | postgres      |
+| DB_PASSWORD    | Database password     | postgres      |
+| DB_NAME        | Database name         | docxtractor   |
+| JWT_SECRET     | JWT signing secret    | -             |
+| JWT_EXPIRES_IN | Token expiration time | 1h            |
 
 ## Production Deployment
 
 ### Build Docker image:
+
 ```bash
 docker build -t docxtractor-server .
 ```
 
 ### Run container:
+
 ```bash
 docker run -d --name docxtractor-app \
   -p 3000:3000 \
@@ -165,6 +183,7 @@ docker run -d --name docxtractor-app \
 ```
 
 ### Docker Compose (production):
+
 ```bash
 docker-compose -f docker-compose.prod.yml up -d
 ```
