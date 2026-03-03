@@ -278,7 +278,9 @@ function RunDetailComponent() {
                     <span className="material-symbols-outlined font-black">
                       monitor_heart
                     </span>
-                    Unified Extraction Monitor
+                    {run.processingMode === "per_document"
+                      ? "Batch Extraction Monitor"
+                      : "Unified Extraction Monitor"}
                   </h3>
                   <span className="text-xs font-black bg-black text-white px-2 py-1 rounded-sm uppercase tracking-widest">
                     {run.progress?.currentStep || run.status}
@@ -301,6 +303,9 @@ function RunDetailComponent() {
                       }
                     >
                       02. Extracting
+                      {run.progress?.extractionTotal
+                        ? ` (${run.progress?.extracted || 0}/${run.progress?.extractionTotal})`
+                        : ""}
                     </span>
                     <span
                       className={
@@ -446,7 +451,9 @@ function RunDetailComponent() {
                           {run.status === "parsing"
                             ? `Processing ${run.progress?.parsed || 0} of ${run.progress?.total || totalSources} documents through parsers.`
                             : run.status === "extracting"
-                              ? "Running AI extraction on combined document content."
+                              ? run.processingMode === "per_document"
+                                ? `Extracting from ${run.progress?.extracted || 0} of ${run.progress?.extractionTotal || 0} documents independently.`
+                                : "Running AI extraction on combined document content."
                               : "Waiting in queue for processing to begin."}
                         </p>
                       </div>
@@ -500,24 +507,35 @@ function RunDetailComponent() {
                               {source.tokenCount
                                 ? ` • ${source.tokenCount.toLocaleString()} tokens`
                                 : ""}
+                              {source.extractionStatus
+                                ? ` • Extraction: ${source.extractionStatus}`
+                                : ""}
                             </span>
                           </div>
                         </div>
                         <div
                           className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${
-                            source.status === "parsed"
+                            source.extractionStatus === "done"
                               ? "bg-green-400"
-                              : source.status === "failed"
+                              : source.extractionStatus === "failed" ||
+                                  source.status === "failed"
                                 ? "bg-red-500"
-                                : "bg-[#FFD700]"
+                                : source.status === "parsed" &&
+                                    !source.extractionStatus
+                                  ? "bg-green-400"
+                                  : "bg-[#FFD700]"
                           }`}
                         >
                           <span className="material-symbols-outlined text-[16px] font-black text-black">
-                            {source.status === "parsed"
+                            {source.extractionStatus === "done"
                               ? "check"
-                              : source.status === "failed"
+                              : source.extractionStatus === "failed" ||
+                                  source.status === "failed"
                                 ? "close"
-                                : "progress_activity"}
+                                : source.status === "parsed" &&
+                                    !source.extractionStatus
+                                  ? "check"
+                                  : "progress_activity"}
                           </span>
                         </div>
                       </div>
@@ -772,7 +790,7 @@ function RunDetailComponent() {
 function ResultsSection({ results }: { results: Record<string, unknown> }) {
   return (
     <section className="flex flex-col gap-4">
-      <Tabs defaultValue="json">
+      <Tabs defaultValue="spreadsheet">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <TabsList>
             <TabsTrigger value="json">
@@ -817,7 +835,9 @@ function ResultsSection({ results }: { results: Record<string, unknown> }) {
         </TabsContent>
 
         <TabsContent value="spreadsheet">
-          <SpreadsheetView results={results} />
+          <div className="excel-view">
+            <SpreadsheetView results={results} />
+          </div>
         </TabsContent>
       </Tabs>
     </section>

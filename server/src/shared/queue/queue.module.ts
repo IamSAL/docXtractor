@@ -13,7 +13,7 @@ import { QueueService } from './queue.service';
       useFactory: (configService: ConfigService) => ({
         connection: {
           host: configService.get<string>('REDIS_HOST', 'localhost'),
-          port: configService.get<number>('REDIS_PORT', 6380),
+          port: configService.get<number>('REDIS_PORT', 6381),
         },
       }),
     }),

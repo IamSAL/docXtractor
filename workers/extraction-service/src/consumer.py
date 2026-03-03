@@ -26,6 +26,8 @@ async def process_job(job: Job, token: str = None):
     """
     data = job.data
     logs = []
+    document_id = data.get("document_id")  # Present in batch/per_document mode
+    source_name = data.get("source_name")  # Present in batch/per_document mode
     try:
         logger.info(f"📥 Received extraction request job {job.id} for run: {data.get('run_id')}")
         logger.info(f"Job data keys: {list(data.keys())}")
@@ -56,6 +58,8 @@ async def process_job(job: Job, token: str = None):
             logs.append(_make_log("error", "No markdown content provided"))
             event = {
                 "run_id": data.get("run_id"),
+                "document_id": document_id,
+                "source_name": source_name,
                 "status": "failed",
                 "error": "No markdown content",
                 "logs": logs,
@@ -80,6 +84,8 @@ async def process_job(job: Job, token: str = None):
         # Produce Result
         event = {
             "run_id": data.get("run_id"),
+            "document_id": document_id,
+            "source_name": source_name,
             "status": "success",
             "result": result["data"],
             "usage": result["usage"],
@@ -97,6 +103,8 @@ async def process_job(job: Job, token: str = None):
         logs.append(_make_log("error", f"Extraction failed: {e}"))
         event = {
             "run_id": data.get("run_id"),
+            "document_id": document_id,
+            "source_name": source_name,
             "status": "failed",
             "error": str(e),
             "logs": logs,

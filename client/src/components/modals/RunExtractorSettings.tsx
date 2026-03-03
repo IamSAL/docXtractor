@@ -118,15 +118,15 @@ export function RunExtractorSettings() {
                                     <input
                                         type="radio"
                                         className="peer sr-only"
-                                        checked={field.value === 'batch'}
-                                        onChange={() => field.onChange('batch')}
+                                        checked={field.value === 'per_document'}
+                                        onChange={() => field.onChange('per_document')}
                                     />
-                                    <div className={`bg-white border-2 border-black border-dashed p-3 pr-4 flex gap-3 transition-all ${field.value === 'batch' ? 'shadow-hard-sm opacity-100' : 'opacity-60 hover:opacity-100'}`}>
-                                        <div className={`absolute left-0 top-0 bottom-0 w-2 bg-primary border-r-2 border-black ${field.value === 'batch' ? 'block' : 'hidden'}`}></div>
+                                    <div className={`bg-white border-2 border-black border-dashed p-3 pr-4 flex gap-3 transition-all ${field.value === 'per_document' ? 'shadow-hard-sm opacity-100' : 'opacity-60 hover:opacity-100'}`}>
+                                        <div className={`absolute left-0 top-0 bottom-0 w-2 bg-primary border-r-2 border-black ${field.value === 'per_document' ? 'block' : 'hidden'}`}></div>
                                         <div className="pl-2 flex-1">
                                             <div className="flex items-center justify-between mb-1">
                                                 <span className="font-bold text-sm">Batch Processing</span>
-                                                <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center ${field.value === 'batch' ? 'bg-black' : ''}`}>
+                                                <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center ${field.value === 'per_document' ? 'bg-black' : ''}`}>
                                                     <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                                                 </div>
                                             </div>

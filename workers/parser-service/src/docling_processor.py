@@ -3,6 +3,7 @@ import threading
 import boto3
 import logging
 from docling.document_converter import DocumentConverter
+from .parse_cache import compute_file_hash, get_cached_result, set_cached_result
 
 logger = logging.getLogger(__name__)
 
@@ -30,25 +31,39 @@ def _get_converter() -> DocumentConverter:
 def process_document(document_id: str, file_key: str) -> dict:
     """
     Downloads file from MinIO, parses with Docling, and returns result.
+    Uses SHA-256 hash of the file to cache parsed results.
     """
     local_path = f"/tmp/{document_id}_{os.path.basename(file_key)}"
-    
+
     try:
         logger.info(f"Downloading {file_key} from bucket {MINIO_BUCKET} to {local_path}")
         s3_client.download_file(MINIO_BUCKET, file_key, local_path)
-        
+
+        file_hash = compute_file_hash(local_path)
+        logger.info(f"File hash: {file_hash[:12]}...")
+
+        cached = get_cached_result(file_hash)
+        if cached:
+            logger.info(f"Returning cached parse result for {file_key}")
+            os.remove(local_path)
+            return cached
+
         logger.info(f"Parsing {local_path} with Docling...")
         result = _get_converter().convert(local_path)
         markdown_content = result.document.export_to_markdown()
-        
+
         # Cleanup
         os.remove(local_path)
-        
-        return {
+
+        parse_result = {
             "markdown_content": markdown_content,
             "token_count": len(markdown_content.split()) # Rough estimate
         }
-        
+
+        set_cached_result(file_hash, parse_result)
+
+        return parse_result
+
     except Exception as e:
         logger.error(f"Error processing document {document_id}: {e}")
         if os.path.exists(local_path):
