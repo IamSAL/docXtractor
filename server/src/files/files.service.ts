@@ -1,5 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 import { Repository, In } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { File } from './entities/file.entity';
@@ -10,12 +11,19 @@ import { StorageService } from './storage.service';
 @Injectable()
 export class FilesService {
   private readonly logger = new Logger(FilesService.name);
+  private readonly minioPublicUrl: string;
 
   constructor(
     @InjectRepository(File)
     private readonly fileRepository: Repository<File>,
     private readonly storageService: StorageService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.minioPublicUrl =
+      this.configService.get<string>('MINIO_PUBLIC_URL') ||
+      this.configService.get<string>('MINIO_ENDPOINT') ||
+      'http://localhost:9000';
+  }
 
   /**
    * Upload file with user-scoped security
@@ -56,7 +64,7 @@ export class FilesService {
     // Note: In a real app, the URL might be a signed URL or a proxy URL
     return {
       id: fileRecord.id,
-      url: `http://localhost:9000/docxtractor-documents/${storageKey}`,
+      url: `${this.minioPublicUrl}/docxtractor-documents/${storageKey}`,
       storageKey,
     };
   }

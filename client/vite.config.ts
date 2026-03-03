@@ -11,7 +11,7 @@ import { nitro } from "nitro/vite";
 const config = defineConfig({
   server: {
     host: true,
-    allowedHosts: [".sk-salman.com"],
+    allowedHosts: true,
   },
   resolve: {
     alias: {
