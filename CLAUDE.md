@@ -71,7 +71,7 @@ Upload (file/URL)
 Key modules:
 
 - **`ExtractorsModule`** — CRUD for extractor configs; calls Ollama to generate schemas from natural language
-- **`RunsModule`** — Core orchestration: creates runs, dispatches queue jobs, handles callbacks, emits WebSocket events, stores logs to MinIO
+- **`RunsModule`** — Core orchestration: creates runs, dispatches queue jobs, handles callbacks, emits WebSocket events, stores logs to MinIO. In batch mode with Ollama provider, extractions run in parallel using `Promise.allSettled`
 - **`RunsGateway`** — Socket.IO WebSocket gateway (`/runs` namespace)
 - **`FilesModule`** — File upload, MinIO storage
 - **`QueueModule`** (`shared/queue/`) — Global BullMQ setup for all 4 queues
