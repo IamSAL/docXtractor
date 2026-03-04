@@ -21,7 +21,7 @@ ARG VITE_API_URL
 ARG VITE_SENTRY_DSN
 
 # Build the TanStack Start / Nitro app
-RUN NODE_OPTIONS="--max-old-space-size=6144" pnpm run build
+RUN pnpm run build
 
 # ------------------ PRODUCTION ------------------
 FROM node:${NODE_VERSION}-alpine AS production
