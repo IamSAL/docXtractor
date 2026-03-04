@@ -23,7 +23,10 @@ function formatCellValue(val: unknown): string {
   return String(val);
 }
 
-function jsonToSpreadsheetData(json: unknown): SpreadsheetResult {
+function jsonToSpreadsheetData(
+  json: unknown,
+  fieldOrder?: string[],
+): SpreadsheetResult {
   // Array of objects — most common extraction result
   if (Array.isArray(json)) {
     const items = json.filter(
@@ -36,9 +39,24 @@ function jsonToSpreadsheetData(json: unknown): SpreadsheetResult {
         columnLabels: ["Value"],
       };
     }
-    const allKeys = Array.from(
-      new Set(items.flatMap((item) => Object.keys(item))),
-    );
+
+    // Get all unique keys
+    const allKeysSet = new Set(items.flatMap((item) => Object.keys(item)));
+
+    // Order keys based on fieldOrder if provided
+    let allKeys: string[];
+    if (fieldOrder && fieldOrder.length > 0) {
+      // Start with ordered fields that exist in the data
+      const orderedKeys = fieldOrder.filter((key) => allKeysSet.has(key));
+      // Add remaining keys that aren't in the order
+      const remainingKeys = Array.from(allKeysSet).filter(
+        (key) => !fieldOrder.includes(key),
+      );
+      allKeys = [...orderedKeys, ...remainingKeys];
+    } else {
+      allKeys = Array.from(allKeysSet);
+    }
+
     const rows: Matrix<CellBase> = items.map((item) =>
       allKeys.map((key) => ({
         value: item[key] !== undefined ? formatCellValue(item[key]) : "",
@@ -52,7 +70,7 @@ function jsonToSpreadsheetData(json: unknown): SpreadsheetResult {
     const obj = json as Record<string, unknown>;
     const arrayKey = Object.keys(obj).find((key) => Array.isArray(obj[key]));
     if (arrayKey) {
-      return jsonToSpreadsheetData(obj[arrayKey]);
+      return jsonToSpreadsheetData(obj[arrayKey], fieldOrder);
     }
     // Flat object → key-value rows
     const entries = Object.entries(obj);
@@ -89,9 +107,13 @@ function matrixToCsv(data: Matrix<CellBase>, columnLabels: string[]): string {
 
 interface SpreadsheetViewProps {
   results: Record<string, unknown>;
+  fieldOrder?: string[];
 }
 
-export function SpreadsheetView({ results }: SpreadsheetViewProps) {
+export function SpreadsheetView({
+  results,
+  fieldOrder,
+}: SpreadsheetViewProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -99,8 +121,8 @@ export function SpreadsheetView({ results }: SpreadsheetViewProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const { data: rawData, columnLabels } = useMemo(
-    () => jsonToSpreadsheetData(results),
-    [results],
+    () => jsonToSpreadsheetData(results, fieldOrder),
+    [results, fieldOrder],
   );
 
   const [data, setData] = useState<Matrix<CellBase>>(rawData);

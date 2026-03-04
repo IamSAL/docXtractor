@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Input } from "../../components/ui/input.tsx";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { cn, getTypeIcon } from "../../lib/utils.ts";
@@ -55,6 +57,15 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     "object" as SchemaType,
   );
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: name });
+
   // Update temp values when props change
   useEffect(() => {
     setTempName(name);
@@ -93,8 +104,15 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     });
   };
 
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       className={cn(
         "mb-2 group border-b border-border-light xdark:border-border-dark last:border-0 transition-colors",
         expanded
@@ -102,12 +120,17 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
           : "hover:bg-yellow-50/50 xdark:hover:bg-background-dark/50",
         depth > 0 &&
           "ml-4 border-l border-border-light xdark:border-border-dark",
+        isDragging && "opacity-50 z-50",
       )}
     >
       <div className="grid grid-cols-[48px_1fr_120px_100px_48px_48px] items-center py-2 px-2">
         {/* Drag handle */}
-        <div className="flex justify-center text-gray-400 group-hover:text-black transition-colors">
-          <span className="material-symbols-outlined cursor-grab text-xl">
+        <div
+          {...attributes}
+          {...listeners}
+          className="flex justify-center text-gray-400 group-hover:text-black transition-colors cursor-grab active:cursor-grabbing"
+        >
+          <span className="material-symbols-outlined text-xl">
             drag_indicator
           </span>
         </div>
