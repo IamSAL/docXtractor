@@ -162,6 +162,7 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - LANGEXTRACT_MODEL_URL=http://host.docker.internal:11434
+      - EXTRACTION_CONCURRENCY=3
     networks:
       - docxtractor-network
     volumes:

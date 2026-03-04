@@ -1,0 +1,80 @@
+name: Docker CD - Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: |
+            server/pnpm-lock.yaml
+            client/pnpm-lock.yaml
+
+      - name: Lint Server
+        working-directory: server
+        run: pnpm install --frozen-lockfile && pnpm run lint
+
+      - name: Lint Client
+        working-directory: client
+        run: pnpm install --frozen-lockfile && pnpm run check
+
+  deploy:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            cd ${{ secrets.PROJECT_DIR }}
+
+            git pull origin main
+
+            # Write production .env from secret
+            echo "${{ secrets.ENV_FILE_CONTENT_SERVER }}" > ./server/.env
+
+            # Build and restart all services using the production compose file
+            docker compose -f docker-compose.prod.yml up -d --build
+
+            # Wait for health checks to pass
+            echo "Waiting for services to become healthy..."
+            sleep 15
+
+            # Verify critical containers are running
+            for container in docxtractor-server docxtractor-client docxtractor-db docxtractor-redis docxtractor-nginx docxtractor-parser docxtractor-extractor; do
+              if ! docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
+                echo "ERROR: ${container} is not running!"
+                docker logs "${container}" --tail 30 2>&1 || true
+                exit 1
+              fi
+            done
+            echo "All containers are running."
+
+            # Cleanup old images and build cache
+            docker image prune -f
+            docker builder prune -f --filter "until=168h"

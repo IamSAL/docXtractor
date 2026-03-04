@@ -46,6 +46,7 @@ import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
 import { Route as AutorunsRunsIdRouteImport } from './routes/autoruns/runs.$id'
 import { Route as AutorunsEditIdRouteImport } from './routes/autoruns/edit.$id'
+import { Route as AutorunsBuilderIdRouteImport } from './routes/autoruns/builder.$id'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
@@ -241,6 +242,11 @@ const AutorunsEditIdRoute = AutorunsEditIdRouteImport.update({
   path: '/autoruns/edit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AutorunsBuilderIdRoute = AutorunsBuilderIdRouteImport.update({
+  id: '/autoruns/builder/$id',
+  path: '/autoruns/builder/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   id: '/start/ssr/',
   path: '/start/ssr/',
@@ -314,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/extractors/': typeof ExtractorsIndexRoute
   '/runs/': typeof RunsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/autoruns/builder/$id': typeof AutorunsBuilderIdRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -361,6 +368,7 @@ export interface FileRoutesByTo {
   '/extractors': typeof ExtractorsIndexRoute
   '/runs': typeof RunsIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/autoruns/builder/$id': typeof AutorunsBuilderIdRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -410,6 +418,7 @@ export interface FileRoutesById {
   '/extractors/': typeof ExtractorsIndexRoute
   '/runs/': typeof RunsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/autoruns/builder/$id': typeof AutorunsBuilderIdRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -460,6 +469,7 @@ export interface FileRouteTypes {
     | '/extractors/'
     | '/runs/'
     | '/settings/'
+    | '/autoruns/builder/$id'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
     | '/demo/api/names'
@@ -507,6 +517,7 @@ export interface FileRouteTypes {
     | '/extractors'
     | '/runs'
     | '/settings'
+    | '/autoruns/builder/$id'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
     | '/demo/api/names'
@@ -555,6 +566,7 @@ export interface FileRouteTypes {
     | '/extractors/'
     | '/runs/'
     | '/settings/'
+    | '/autoruns/builder/$id'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
     | '/demo/api/names'
@@ -592,6 +604,7 @@ export interface RootRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
   ExtractorsIndexRoute: typeof ExtractorsIndexRoute
   RunsIndexRoute: typeof RunsIndexRoute
+  AutorunsBuilderIdRoute: typeof AutorunsBuilderIdRoute
   AutorunsEditIdRoute: typeof AutorunsEditIdRoute
   AutorunsRunsIdRoute: typeof AutorunsRunsIdRoute
   ExtractorsEditIdRoute: typeof ExtractorsEditIdRoute
@@ -859,6 +872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AutorunsEditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/autoruns/builder/$id': {
+      id: '/autoruns/builder/$id'
+      path: '/autoruns/builder/$id'
+      fullPath: '/autoruns/builder/$id'
+      preLoaderRoute: typeof AutorunsBuilderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/start/ssr/': {
       id: '/demo/start/ssr/'
       path: '/start/ssr'
@@ -1014,6 +1034,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
   ExtractorsIndexRoute: ExtractorsIndexRoute,
   RunsIndexRoute: RunsIndexRoute,
+  AutorunsBuilderIdRoute: AutorunsBuilderIdRoute,
   AutorunsEditIdRoute: AutorunsEditIdRoute,
   AutorunsRunsIdRoute: AutorunsRunsIdRoute,
   ExtractorsEditIdRoute: ExtractorsEditIdRoute,

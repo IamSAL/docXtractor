@@ -197,17 +197,22 @@ export class RunsService {
 
     run.status = RunStatus.PARSING;
     run.progress!.currentStep = 'parsing';
-    await this.runRepo.save(run);
+    const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
 
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: (freshRun || savedRun).status,
+      progress: (freshRun || savedRun).progress,
     });
 
-    return run;
+    return freshRun || savedRun;
   }
 
   async findAll(
@@ -381,13 +386,18 @@ export class RunsService {
       }
     }
 
-    await this.runRepo.save(run);
+    const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: (freshRun || savedRun).status,
+      progress: (freshRun || savedRun).progress,
     });
   }
 
@@ -509,13 +519,15 @@ export class RunsService {
     }
 
     if (run.extractionProvider === ExtractionProvider.OLLAMA) {
-      // Ollama: extract each doc sequentially in-process
+      // Ollama: extract each doc in parallel
       this.logger.log(`🦙 Running batch Ollama extraction for run ${run.id}`);
       this.addLog(run, 'info', 'Starting batch extraction with ollama provider');
+      this.addLog(run, 'info', `Processing ${parsedSources.length} documents in parallel`);
       const allResults: Record<string, unknown>[] = [];
       let totalTokens = 0;
 
-      for (const source of parsedSources) {
+      // Run all extractions in parallel using Promise.allSettled
+      const extractionPromises = parsedSources.map(async (source) => {
         this.addLog(run, 'info', `Extracting from '${source.name}' with Ollama`);
         try {
           const result = await this.ollamaService.extract(
@@ -527,10 +539,8 @@ export class RunsService {
 
           source.extractionStatus = 'done';
           source.extractionResult = result.data;
-          totalTokens += result.usage.totalTokens;
 
           const annotatedRows = this.annotateResultWithSource(result.data, source.name);
-          allResults.push(...annotatedRows);
 
           run.progress!.extracted = (run.progress!.extracted || 0) + 1;
           this.addLog(
@@ -541,6 +551,8 @@ export class RunsService {
 
           this.runsGateway.emitRunSourceUpdated(run.id, source);
           this.runsGateway.emitRunUpdated(run.id, run);
+
+          return { success: true, tokens: result.usage.totalTokens, rows: annotatedRows, source };
         } catch (error) {
           source.extractionStatus = 'failed';
           source.extractionError = error.message;
@@ -551,6 +563,18 @@ export class RunsService {
             `Extraction failed for '${source.name}': ${error.message}`,
           );
           this.runsGateway.emitRunSourceUpdated(run.id, source);
+          return { success: false, source };
+        }
+      });
+
+      // Wait for all extractions to complete
+      const results = await Promise.allSettled(extractionPromises);
+
+      // Collect results
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value.success) {
+          totalTokens += result.value.tokens ?? 0;
+          allResults.push(...(result.value.rows ?? []));
         }
       }
 
@@ -763,13 +787,18 @@ export class RunsService {
       }
     }
 
-    await this.runRepo.save(run);
+    const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: (freshRun || savedRun).status,
+      progress: (freshRun || savedRun).progress,
     });
   }
 
@@ -835,13 +864,18 @@ export class RunsService {
 
     run.status = RunStatus.PARSING;
     run.progress.currentStep = 'parsing';
-    await this.runRepo.save(run);
+    const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: (freshRun || savedRun).status,
+      progress: (freshRun || savedRun).progress,
     });
 
     return run;
@@ -975,7 +1009,13 @@ export class RunsService {
         // Ollama: run inline extraction, then rebuild merged results
         await this.runRepo.save(run);
         await this.flushLogs(run.id);
-        this.runsGateway.emitRunUpdated(run.id, run);
+
+        // Refetch from DB to ensure WebSocket emits committed data
+        const freshRun = await this.runRepo.findOne({
+          where: { id: run.id },
+          relations: ['extractor'],
+        });
+        this.runsGateway.emitRunUpdated(run.id, freshRun || run);
         this.runsGateway.emitRunSourceUpdated(run.id, source);
 
         try {
@@ -1066,15 +1106,22 @@ export class RunsService {
       await this.flushLogs(run.id);
     }
 
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    const runToEmit = freshRun || run;
+
+    this.runsGateway.emitRunUpdated(run.id, runToEmit);
     this.runsGateway.emitRunSourceUpdated(run.id, source);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: runToEmit.status,
+      progress: runToEmit.progress,
     });
 
-    return run;
+    return runToEmit;
   }
 
   async remove(id: string, userId: string) {

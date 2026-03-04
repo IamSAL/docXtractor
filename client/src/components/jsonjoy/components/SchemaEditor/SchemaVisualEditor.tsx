@@ -138,6 +138,11 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
     onChange(newSchema);
   };
 
+  // Handle reordering fields
+  const handleReorderFields = (updatedSchema: JSONSchema) => {
+    onChange(updatedSchema);
+  };
+
   const hasFields =
     !isBooleanSchema(schema) &&
     schema.properties &&
@@ -286,6 +291,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
                       onAddField={handleAddField}
                       onEditField={handleEditField}
                       onDeleteField={handleDeleteField}
+                      onReorderFields={handleReorderFields}
                     />
                   )}
                 </div>

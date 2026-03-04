@@ -1,6 +1,20 @@
 import { type FC, useMemo } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { useTranslation } from "../../hooks/use-translation.ts";
-import { getSchemaProperties } from "../../lib/schemaEditor.ts";
+import { getSchemaProperties, reorderFields } from "../../lib/schemaEditor.ts";
 import type {
   JSONSchema as JSONSchemaType,
   NewField,
@@ -16,18 +30,49 @@ interface SchemaFieldListProps {
   onAddField: (newField: NewField) => void;
   onEditField: (name: string, updatedField: NewField) => void;
   onDeleteField: (name: string) => void;
+  onReorderFields?: (updatedSchema: ObjectJSONSchema) => void;
 }
 
 const SchemaFieldList: FC<SchemaFieldListProps> = ({
   schema,
   onEditField,
   onDeleteField,
+  onReorderFields,
   readOnly = false,
 }) => {
   const t = useTranslation();
 
   // Get the properties from the schema
   const properties = getSchemaProperties(schema);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement required before drag starts
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id && onReorderFields) {
+      const oldIndex = properties.findIndex((p) => p.name === active.id);
+      const newIndex = properties.findIndex((p) => p.name === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const updatedSchema = reorderFields(
+          schema as ObjectJSONSchema,
+          oldIndex,
+          newIndex,
+        );
+        onReorderFields(updatedSchema);
+      }
+    }
+  };
 
   // Get schema type as a valid SchemaType
   const getValidSchemaType = (propSchema: JSONSchemaType): SchemaType => {
@@ -109,36 +154,47 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   );
 
   return (
-    <div className="flex flex-col animate-in">
-      {/* Header Row */}
-      <div className="grid grid-cols-[48px_1fr_120px_100px_48px_48px] items-center py-3 px-2 border-b-2 border-black bg-gray-50/50 text-[10px] font-bold uppercase tracking-widest text-text-secondary-light">
-        <div className="text-center">#</div>
-        <div className="px-3">Field / Property</div>
-        <div className="text-center">Type</div>
-        <div className="text-center">Required</div>
-        <div className="text-center">Action</div>
-        <div className="text-center">View</div>
-      </div>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="flex flex-col animate-in">
+        {/* Header Row */}
+        <div className="grid grid-cols-[48px_1fr_120px_100px_48px_48px] items-center py-3 px-2 border-b-2 border-black bg-gray-50/50 text-[10px] font-bold uppercase tracking-widest text-text-secondary-light">
+          <div className="text-center">#</div>
+          <div className="px-3">Field / Property</div>
+          <div className="text-center">Type</div>
+          <div className="text-center">Required</div>
+          <div className="text-center">Action</div>
+          <div className="text-center">View</div>
+        </div>
 
-      <div className="overflow-visible divide-y divide-border-light xdark:divide-border-dark border-x border-b border-border-light xdark:border-border-dark overflow-hidden">
-        {properties.map((property) => (
-          <SchemaPropertyEditor
-            key={property.name}
-            name={property.name}
-            schema={property.schema}
-            required={property.required}
-            validationNode={validationTree.children[property.name] ?? undefined}
-            onDelete={() => onDeleteField(property.name)}
-            onNameChange={(newName) => handleNameChange(property.name, newName)}
-            onRequiredChange={(required) =>
-              handleRequiredChange(property.name, required)
-            }
-            onSchemaChange={(schema) => handleSchemaChange(property.name, schema)}
-            readOnly={readOnly}
-          />
-        ))}
+        <SortableContext
+          items={properties.map((p) => p.name)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="overflow-visible divide-y divide-border-light xdark:divide-border-dark border-x border-b border-border-light xdark:border-border-dark overflow-hidden">
+            {properties.map((property) => (
+              <SchemaPropertyEditor
+                key={property.name}
+                name={property.name}
+                schema={property.schema}
+                required={property.required}
+                validationNode={validationTree.children[property.name] ?? undefined}
+                onDelete={() => onDeleteField(property.name)}
+                onNameChange={(newName) => handleNameChange(property.name, newName)}
+                onRequiredChange={(required) =>
+                  handleRequiredChange(property.name, required)
+                }
+                onSchemaChange={(schema) => handleSchemaChange(property.name, schema)}
+                readOnly={readOnly}
+              />
+            ))}
+          </div>
+        </SortableContext>
       </div>
-    </div>
+    </DndContext>
   );
 };
 

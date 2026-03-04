@@ -71,7 +71,7 @@ Upload (file/URL)
 Key modules:
 
 - **`ExtractorsModule`** — CRUD for extractor configs; calls Ollama to generate schemas from natural language
-- **`RunsModule`** — Core orchestration: creates runs, dispatches queue jobs, handles callbacks, emits WebSocket events, stores logs to MinIO
+- **`RunsModule`** — Core orchestration: creates runs, dispatches queue jobs, handles callbacks, emits WebSocket events, stores logs to MinIO. In batch mode with Ollama provider, extractions run in parallel using `Promise.allSettled`
 - **`RunsGateway`** — Socket.IO WebSocket gateway (`/runs` namespace)
 - **`FilesModule`** — File upload, MinIO storage
 - **`QueueModule`** (`shared/queue/`) — Global BullMQ setup for all 4 queues
@@ -120,8 +120,8 @@ Queue names are defined in `server/src/shared/queue/queue-names.ts`. NestJS cons
 
 ### Python Workers
 
-- **`parser-service`** (`:8001`): Receives jobs from `uploaded-documents` queue. Uses Docling + RapidOCR to convert documents/URLs to Markdown. Fetches files from MinIO via boto3. Concurrency configurable via `PARSER_CONCURRENCY` env var.
-- **`extraction-service`** (`:8002`): Receives jobs from `extraction-requests` queue. Two modes: direct Google Gemini API (`gemini-2.0-flash-exp`) or LangExtract library (supports local Ollama). Returns structured JSON.
+- **`parser-service`** (`:8001`): Receives jobs from `uploaded-documents` queue. Uses Docling + RapidOCR to convert documents/URLs to Markdown. Fetches files from MinIO via boto3. **Parallel processing**: Concurrency configurable via `PARSER_CONCURRENCY` env var (default: 4).
+- **`extraction-service`** (`:8002`): Receives jobs from `extraction-requests` queue. Two modes: direct Google Gemini API (`gemini-2.0-flash-exp`) or LangExtract library (supports local Ollama). Returns structured JSON. **Parallel processing**: Concurrency configurable via `EXTRACTION_CONCURRENCY` env var (default: 3).
 
 ### WebSocket Events (`/runs` namespace)
 

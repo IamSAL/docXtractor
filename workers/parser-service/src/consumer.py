@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 QUEUE_UPLOADED = "uploaded-documents"
 QUEUE_PARSED = "parsed-documents"
-PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "1"))
+PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "4"))
 
 
 def _make_log(level, message):

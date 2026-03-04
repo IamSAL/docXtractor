@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from datetime import datetime, timezone
 from .bullmq_client import bullmq_client
 from .extractor import run_extraction
@@ -9,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 QUEUE_REQUESTS = "extraction-requests"
 QUEUE_COMPLETED = "extraction-completed"
+EXTRACTION_CONCURRENCY = int(os.getenv("EXTRACTION_CONCURRENCY", "3"))
 
 
 def _make_log(level, message):
@@ -117,8 +119,8 @@ async def consume():
     """
     Main entry point for starting the worker.
     """
-    logger.info(f"Starting BullMQ worker for queue {QUEUE_REQUESTS}")
-    worker = bullmq_client.create_worker(QUEUE_REQUESTS, process_job)
+    logger.info(f"Starting BullMQ worker for queue {QUEUE_REQUESTS} (concurrency={EXTRACTION_CONCURRENCY})")
+    worker = bullmq_client.create_worker(QUEUE_REQUESTS, process_job, concurrency=EXTRACTION_CONCURRENCY)
 
     try:
         while True:

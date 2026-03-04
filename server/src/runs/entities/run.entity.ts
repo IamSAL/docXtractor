@@ -11,6 +11,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Extractor } from '../../extractors/entities/extractor.entity';
 import { User } from '../../user/entities/user.entity';
+import { WorkflowExecution } from '../../workflows/entities/workflow-execution.entity';
 
 // Enums
 export enum RunStatus {
@@ -153,6 +154,11 @@ export class Run {
   @ApiProperty()
   isAutorun: boolean;
 
+  // Workflow execution link
+  @Column({ type: 'uuid', nullable: true })
+  @ApiPropertyOptional()
+  workflowExecutionId: string | null;
+
   @Column({ type: 'timestamp', nullable: true })
   @ApiPropertyOptional()
   startedAt: Date | null;
@@ -177,4 +183,8 @@ export class Run {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @ManyToOne(() => WorkflowExecution, { nullable: true })
+  @JoinColumn({ name: 'workflowExecutionId' })
+  workflowExecution: WorkflowExecution | null;
 }
