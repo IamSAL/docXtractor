@@ -1,0 +1,190 @@
+{
+  "completed": [
+    {
+      "success": true,
+      "transID": "742126",
+      "symbol": "HSI28P2605A",
+      "issuer": "บริษัทหลักทรัพย์ แมคควอรี (ประเทศไทย) จำกัด",
+      "filename": "HSI28P2605A_Terms_742126.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 155197
+    },
+    {
+      "success": true,
+      "transID": "742124",
+      "symbol": "HSI28C2605A",
+      "issuer": "บริษัทหลักทรัพย์ แมคควอรี (ประเทศไทย) จำกัด",
+      "filename": "HSI28C2605A_Terms_742124.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 155193
+    },
+    {
+      "success": true,
+      "transID": "742155",
+      "symbol": "OR01C2608A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "OR01C2608A_Terms_742155.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64310
+    },
+    {
+      "success": true,
+      "transID": "742129",
+      "symbol": "ADVANC01C2607A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "ADVANC01C2607A_Terms_742129.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64318
+    },
+    {
+      "success": true,
+      "transID": "742131",
+      "symbol": "ADVANC01P2607A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "ADVANC01P2607A_Terms_742131.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64520
+    },
+    {
+      "success": true,
+      "transID": "742133",
+      "symbol": "AOT01C2607A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "AOT01C2607A_Terms_742133.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64192
+    },
+    {
+      "success": true,
+      "transID": "742135",
+      "symbol": "AOT01P2607A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "AOT01P2607A_Terms_742135.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64392
+    },
+    {
+      "success": true,
+      "transID": "742137",
+      "symbol": "BJC01C2608A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "BJC01C2608A_Terms_742137.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 63952
+    },
+    {
+      "success": true,
+      "transID": "742139",
+      "symbol": "COM701C2607B",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "COM701C2607B_Terms_742139.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64055
+    },
+    {
+      "success": true,
+      "transID": "742141",
+      "symbol": "CPF01C2608A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "CPF01C2608A_Terms_742141.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64414
+    },
+    {
+      "success": true,
+      "transID": "742143",
+      "symbol": "CPN01C2608A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "CPN01C2608A_Terms_742143.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64662
+    },
+    {
+      "success": true,
+      "transID": "742145",
+      "symbol": "DOHOME01C2608A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "DOHOME01C2608A_Terms_742145.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64737
+    },
+    {
+      "success": true,
+      "transID": "742147",
+      "symbol": "ERW01C2608A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "ERW01C2608A_Terms_742147.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64518
+    },
+    {
+      "success": true,
+      "transID": "742149",
+      "symbol": "GPSC01P2607A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "GPSC01P2607A_Terms_742149.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64306
+    },
+    {
+      "success": true,
+      "transID": "742151",
+      "symbol": "GULF01C2608A",
+      "issuer": "บริษัทหลักทรัพย์ บัวหลวง จำกัด (มหาชน)",
+      "filename": "GULF01C2608A_Terms_742151.pdf",
+      "fileDate": "05-02-2026",
+      "fileSize": 64349
+    }
+  ],
+  "failed": [],
+  "pending": [
+    "742153",
+    "742157",
+    "742159",
+    "742161",
+    "742163",
+    "742165",
+    "742167",
+    "742169",
+    "742171",
+    "742173",
+    "742175",
+    "742177",
+    "742179",
+    "742195",
+    "742186",
+    "742189",
+    "742192",
+    "742183",
+    "741696",
+    "741653",
+    "741656",
+    "741659",
+    "741691",
+    "741681",
+    "741683",
+    "741687",
+    "741689",
+    "741272",
+    "741274",
+    "741276",
+    "741278",
+    "741280",
+    "741282",
+    "741291",
+    "741288",
+    "741286",
+    "741284",
+    "741346",
+    "741343",
+    "741349",
+    "741352",
+    "741355",
+    "741374",
+    "741377",
+    "741371",
+    "740915",
+    "740912",
+    "740906"
+  ]
+}
