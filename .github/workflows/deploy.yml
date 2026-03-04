@@ -85,15 +85,18 @@ jobs:
               BUILD_SERVICES="server client parser-service extraction-service nginx"
             fi
 
-            if [ -n "$BUILD_SERVICES" ]; then
+            # If no changes detected (first deploy, same SHA, or images missing), build all
+            if [ "$PREV_SHA" = "$CURR_SHA" ] || ! docker image ls --format '{{.Repository}}' | grep -q "docxtractor"; then
+              echo "First deploy or no prior images found, building all services..."
+              docker compose -f docker-compose.prod.yml up -d --build
+            elif [ -n "$BUILD_SERVICES" ]; then
               echo "Building changed services:$BUILD_SERVICES"
               docker compose -f docker-compose.prod.yml build $BUILD_SERVICES
+              docker compose -f docker-compose.prod.yml up -d
             else
               echo "No service changes detected, skipping builds."
+              docker compose -f docker-compose.prod.yml up -d
             fi
-
-            # Start/restart services (unchanged ones reuse existing images)
-            docker compose -f docker-compose.prod.yml up -d
 
             # Wait for health checks to pass
             echo "Waiting for services to become healthy..."
