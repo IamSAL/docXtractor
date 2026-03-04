@@ -63,6 +63,7 @@ services:
       - docxtractor-network
 
   server:
+    image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-server:latest
     build:
       context: ./server
       dockerfile: Dockerfile.prod
@@ -113,6 +114,7 @@ services:
       - docxtractor-network
 
   client:
+    image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-client:latest
     build:
       context: ./client
       dockerfile: Dockerfile.prod
@@ -132,6 +134,7 @@ services:
       - docxtractor-network
 
   parser-service:
+    image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-parser:latest
     build:
       context: ./workers/parser-service
     container_name: docxtractor-parser
@@ -155,6 +158,7 @@ services:
     command: uvicorn src.main:app --host 0.0.0.0 --port 8001
 
   extraction-service:
+    image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-extractor:latest
     build:
       context: ./workers/extraction-service
     container_name: docxtractor-extractor

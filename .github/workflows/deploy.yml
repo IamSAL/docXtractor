@@ -5,43 +5,78 @@ on:
     branches:
       - main
 
+env:
+  REGISTRY: ghcr.io
+
 jobs:
-  # lint:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup pnpm
-  #       uses: pnpm/action-setup@v4
-  #       with:
-  #         version: 9
-
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 20
-  #         cache: pnpm
-  #         cache-dependency-path: |
-  #           server/pnpm-lock.yaml
-  #           client/pnpm-lock.yaml
-
-  #     - name: Lint Server
-  #       working-directory: server
-  #       run: pnpm install --frozen-lockfile && pnpm run lint
-
-  #     - name: Lint Client
-  #       working-directory: client
-  #       run: pnpm install --frozen-lockfile && pnpm run check
-
-  deploy:
-    # needs: lint
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        include:
+          - service: server
+            context: ./server
+            dockerfile: ./server/Dockerfile.prod
+            image: docxtractor-server
+          - service: client
+            context: ./client
+            dockerfile: ./client/Dockerfile.prod
+            image: docxtractor-client
+          - service: parser-service
+            context: ./workers/parser-service
+            dockerfile: ./workers/parser-service/Dockerfile
+            image: docxtractor-parser
+          - service: extraction-service
+            context: ./workers/extraction-service
+            dockerfile: ./workers/extraction-service/Dockerfile
+            image: docxtractor-extractor
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+          build-args: |
+            ${{ matrix.service == 'client' && format('VITE_API_URL={0}', secrets.VITE_API_URL) || '' }}
+            ${{ matrix.service == 'client' && format('VITE_SENTRY_DSN={0}', secrets.VITE_SENTRY_DSN) || '' }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -53,50 +88,18 @@ jobs:
           script: |
             cd ${{ secrets.PROJECT_DIR }}
 
-            # Save current HEAD before pulling to detect changes
-            PREV_SHA=$(git rev-parse HEAD)
+            # Pull latest code (for compose file, nginx config, etc.)
             git pull origin main
-            CURR_SHA=$(git rev-parse HEAD)
 
             # Write production .env from secret
             echo "${{ secrets.ENV_FILE_CONTENT_SERVER }}" > ./server/.env
 
-            # Detect which services changed since last deploy
-            CHANGED=$(git diff --name-only "$PREV_SHA" "$CURR_SHA")
-            BUILD_SERVICES=""
+            # Log in to ghcr.io to pull private images (requires a PAT with read:packages scope)
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
 
-            if echo "$CHANGED" | grep -q "^server/"; then
-              BUILD_SERVICES="$BUILD_SERVICES server"
-            fi
-            if echo "$CHANGED" | grep -q "^client/"; then
-              BUILD_SERVICES="$BUILD_SERVICES client"
-            fi
-            if echo "$CHANGED" | grep -q "^workers/parser-service/"; then
-              BUILD_SERVICES="$BUILD_SERVICES parser-service"
-            fi
-            if echo "$CHANGED" | grep -q "^workers/extraction-service/"; then
-              BUILD_SERVICES="$BUILD_SERVICES extraction-service"
-            fi
-            if echo "$CHANGED" | grep -q "^nginx/"; then
-              BUILD_SERVICES="$BUILD_SERVICES nginx"
-            fi
-            # Changes to docker-compose or root config should rebuild all
-            if echo "$CHANGED" | grep -q "^docker-compose.prod.yml$"; then
-              BUILD_SERVICES="server client parser-service extraction-service nginx"
-            fi
-
-            # If no changes detected (first deploy, same SHA, or images missing), build all
-            if [ "$PREV_SHA" = "$CURR_SHA" ] || ! docker image ls --format '{{.Repository}}' | grep -q "docxtractor"; then
-              echo "First deploy or no prior images found, building all services..."
-              docker compose -f docker-compose.prod.yml up -d --build
-            elif [ -n "$BUILD_SERVICES" ]; then
-              echo "Building changed services:$BUILD_SERVICES"
-              docker compose -f docker-compose.prod.yml build $BUILD_SERVICES
-              docker compose -f docker-compose.prod.yml up -d
-            else
-              echo "No service changes detected, skipping builds."
-              docker compose -f docker-compose.prod.yml up -d
-            fi
+            # Pull pre-built images and start services
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
 
             # Wait for health checks to pass
             echo "Waiting for services to become healthy..."
@@ -114,4 +117,3 @@ jobs:
 
             # Cleanup old images and build cache
             docker image prune -f
-            docker builder prune -f --filter "until=168h"
