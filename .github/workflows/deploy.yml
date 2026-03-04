@@ -53,13 +53,50 @@ jobs:
           script: |
             cd ${{ secrets.PROJECT_DIR }}
 
+            # Save current HEAD before pulling to detect changes
+            PREV_SHA=$(git rev-parse HEAD)
             git pull origin main
+            CURR_SHA=$(git rev-parse HEAD)
 
             # Write production .env from secret
             echo "${{ secrets.ENV_FILE_CONTENT_SERVER }}" > ./server/.env
 
-            # Build and restart all services using the production compose file
-            docker compose -f docker-compose.prod.yml up -d --build
+            # Detect which services changed since last deploy
+            CHANGED=$(git diff --name-only "$PREV_SHA" "$CURR_SHA")
+            BUILD_SERVICES=""
+
+            if echo "$CHANGED" | grep -q "^server/"; then
+              BUILD_SERVICES="$BUILD_SERVICES server"
+            fi
+            if echo "$CHANGED" | grep -q "^client/"; then
+              BUILD_SERVICES="$BUILD_SERVICES client"
+            fi
+            if echo "$CHANGED" | grep -q "^workers/parser-service/"; then
+              BUILD_SERVICES="$BUILD_SERVICES parser-service"
+            fi
+            if echo "$CHANGED" | grep -q "^workers/extraction-service/"; then
+              BUILD_SERVICES="$BUILD_SERVICES extraction-service"
+            fi
+            if echo "$CHANGED" | grep -q "^nginx/"; then
+              BUILD_SERVICES="$BUILD_SERVICES nginx"
+            fi
+            # Changes to docker-compose or root config should rebuild all
+            if echo "$CHANGED" | grep -q "^docker-compose.prod.yml$"; then
+              BUILD_SERVICES="server client parser-service extraction-service nginx"
+            fi
+
+            # If no changes detected (first deploy, same SHA, or images missing), build all
+            if [ "$PREV_SHA" = "$CURR_SHA" ] || ! docker image ls --format '{{.Repository}}' | grep -q "docxtractor"; then
+              echo "First deploy or no prior images found, building all services..."
+              docker compose -f docker-compose.prod.yml up -d --build
+            elif [ -n "$BUILD_SERVICES" ]; then
+              echo "Building changed services:$BUILD_SERVICES"
+              docker compose -f docker-compose.prod.yml build $BUILD_SERVICES
+              docker compose -f docker-compose.prod.yml up -d
+            else
+              echo "No service changes detected, skipping builds."
+              docker compose -f docker-compose.prod.yml up -d
+            fi
 
             # Wait for health checks to pass
             echo "Waiting for services to become healthy..."
