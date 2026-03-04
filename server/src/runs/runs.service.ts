@@ -197,17 +197,22 @@ export class RunsService {
 
     run.status = RunStatus.PARSING;
     run.progress!.currentStep = 'parsing';
-    await this.runRepo.save(run);
+    const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
 
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: (freshRun || savedRun).status,
+      progress: (freshRun || savedRun).progress,
     });
 
-    return run;
+    return freshRun || savedRun;
   }
 
   async findAll(
@@ -381,13 +386,18 @@ export class RunsService {
       }
     }
 
-    await this.runRepo.save(run);
+    const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: (freshRun || savedRun).status,
+      progress: (freshRun || savedRun).progress,
     });
   }
 
@@ -763,13 +773,18 @@ export class RunsService {
       }
     }
 
-    await this.runRepo.save(run);
+    const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: (freshRun || savedRun).status,
+      progress: (freshRun || savedRun).progress,
     });
   }
 
@@ -835,13 +850,18 @@ export class RunsService {
 
     run.status = RunStatus.PARSING;
     run.progress.currentStep = 'parsing';
-    await this.runRepo.save(run);
+    const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: (freshRun || savedRun).status,
+      progress: (freshRun || savedRun).progress,
     });
 
     return run;
@@ -975,7 +995,13 @@ export class RunsService {
         // Ollama: run inline extraction, then rebuild merged results
         await this.runRepo.save(run);
         await this.flushLogs(run.id);
-        this.runsGateway.emitRunUpdated(run.id, run);
+
+        // Refetch from DB to ensure WebSocket emits committed data
+        const freshRun = await this.runRepo.findOne({
+          where: { id: run.id },
+          relations: ['extractor'],
+        });
+        this.runsGateway.emitRunUpdated(run.id, freshRun || run);
         this.runsGateway.emitRunSourceUpdated(run.id, source);
 
         try {
@@ -1066,15 +1092,22 @@ export class RunsService {
       await this.flushLogs(run.id);
     }
 
-    this.runsGateway.emitRunUpdated(run.id, run);
+    // Refetch from DB to ensure WebSocket emits committed data
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    const runToEmit = freshRun || run;
+
+    this.runsGateway.emitRunUpdated(run.id, runToEmit);
     this.runsGateway.emitRunSourceUpdated(run.id, source);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: run.status,
-      progress: run.progress,
+      status: runToEmit.status,
+      progress: runToEmit.progress,
     });
 
-    return run;
+    return runToEmit;
   }
 
   async remove(id: string, userId: string) {
