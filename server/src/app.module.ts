@@ -22,6 +22,7 @@ import { RunsModule } from './runs/runs.module';
 import { QueueModule } from './shared/queue/queue.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { OllamaModule } from './shared/ollama/ollama.module';
+import { WorkflowsModule } from './workflows/workflows.module';
 
 @Module({
   imports: [
@@ -68,6 +69,8 @@ import { OllamaModule } from './shared/ollama/ollama.module';
     DashboardModule,
 
     OllamaModule,
+
+    WorkflowsModule,
   ],
   controllers: [AppController],
   providers: [
