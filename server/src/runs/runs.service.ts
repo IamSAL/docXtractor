@@ -509,13 +509,15 @@ export class RunsService {
     }
 
     if (run.extractionProvider === ExtractionProvider.OLLAMA) {
-      // Ollama: extract each doc sequentially in-process
+      // Ollama: extract each doc in parallel
       this.logger.log(`🦙 Running batch Ollama extraction for run ${run.id}`);
       this.addLog(run, 'info', 'Starting batch extraction with ollama provider');
+      this.addLog(run, 'info', `Processing ${parsedSources.length} documents in parallel`);
       const allResults: Record<string, unknown>[] = [];
       let totalTokens = 0;
 
-      for (const source of parsedSources) {
+      // Run all extractions in parallel using Promise.allSettled
+      const extractionPromises = parsedSources.map(async (source) => {
         this.addLog(run, 'info', `Extracting from '${source.name}' with Ollama`);
         try {
           const result = await this.ollamaService.extract(
@@ -527,10 +529,8 @@ export class RunsService {
 
           source.extractionStatus = 'done';
           source.extractionResult = result.data;
-          totalTokens += result.usage.totalTokens;
 
           const annotatedRows = this.annotateResultWithSource(result.data, source.name);
-          allResults.push(...annotatedRows);
 
           run.progress!.extracted = (run.progress!.extracted || 0) + 1;
           this.addLog(
@@ -541,6 +541,8 @@ export class RunsService {
 
           this.runsGateway.emitRunSourceUpdated(run.id, source);
           this.runsGateway.emitRunUpdated(run.id, run);
+
+          return { success: true, tokens: result.usage.totalTokens, rows: annotatedRows, source };
         } catch (error) {
           source.extractionStatus = 'failed';
           source.extractionError = error.message;
@@ -551,6 +553,18 @@ export class RunsService {
             `Extraction failed for '${source.name}': ${error.message}`,
           );
           this.runsGateway.emitRunSourceUpdated(run.id, source);
+          return { success: false, source };
+        }
+      });
+
+      // Wait for all extractions to complete
+      const results = await Promise.allSettled(extractionPromises);
+
+      // Collect results
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value.success) {
+          totalTokens += result.value.tokens;
+          allResults.push(...result.value.rows);
         }
       }
 
