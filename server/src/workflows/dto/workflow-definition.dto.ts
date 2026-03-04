@@ -32,7 +32,7 @@ export class WorkflowNodeDto {
 	@Type(() => WorkflowNodePositionDto)
 	position: WorkflowNodePositionDto;
 
-	@ApiProperty({ type: 'object' })
+	@ApiProperty({ type: 'object', additionalProperties: true })
 	@IsObject()
 	params: Record<string, any>;
 }

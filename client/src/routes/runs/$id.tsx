@@ -116,9 +116,9 @@ function RunDetailComponent() {
   }, [run?.progress?.currentStep, run?.status]);
 
   // Auto-scroll logs
-  useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [run?.logs?.length]);
+  // useEffect(() => {
+  //   logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [run?.logs?.length]);
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {

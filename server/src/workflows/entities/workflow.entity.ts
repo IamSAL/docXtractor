@@ -7,7 +7,7 @@ import {
 	UpdateDateColumn,
 	JoinColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { WorkflowStatus } from '../enums/workflow-status.enum';
 
 export interface WorkflowDefinition {

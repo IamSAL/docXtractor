@@ -573,8 +573,8 @@ export class RunsService {
       // Collect results
       for (const result of results) {
         if (result.status === 'fulfilled' && result.value.success) {
-          totalTokens += result.value.tokens;
-          allResults.push(...result.value.rows);
+          totalTokens += result.value.tokens ?? 0;
+          allResults.push(...(result.value.rows ?? []));
         }
       }
 
