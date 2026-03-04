@@ -450,7 +450,10 @@ function RunDetailComponent() {
                       </div>
                       <div className="mt-2">
                         {run.status === "done" && run.results && (
-                          <ResultsSection results={run.results} />
+                          <ResultsSection
+                            results={run.results}
+                            schema={run.extractor?.schema}
+                          />
                         )}
                       </div>
                     </div>
@@ -831,7 +834,41 @@ function RunDetailComponent() {
   );
 }
 
-function ResultsSection({ results }: { results: Record<string, unknown> }) {
+function ResultsSection({
+  results,
+  schema,
+}: {
+  results: Record<string, unknown>;
+  schema?: any;
+}) {
+  // Extract field order from schema if available
+  const fieldOrder = schema?.fieldOrder as string[] | undefined;
+
+  // Create ordered JSON based on field order
+  const orderedResults = useMemo(() => {
+    if (!fieldOrder || !Array.isArray(results)) return results;
+
+    // If results is an array of objects, reorder each object's keys
+    return results.map((item: any) => {
+      if (typeof item !== "object" || item === null) return item;
+
+      const ordered: Record<string, unknown> = {};
+      // First, add fields in the specified order
+      for (const field of fieldOrder) {
+        if (field in item) {
+          ordered[field] = item[field];
+        }
+      }
+      // Then add any remaining fields not in the order
+      for (const key in item) {
+        if (!(key in ordered)) {
+          ordered[key] = item[key];
+        }
+      }
+      return ordered;
+    });
+  }, [results, fieldOrder]);
+
   return (
     <section className="flex flex-col gap-4">
       <Tabs defaultValue="spreadsheet">
@@ -857,7 +894,9 @@ function ResultsSection({ results }: { results: Record<string, unknown> }) {
           <button
             className="text-xs font-bold uppercase tracking-wide text-[#007AFF] hover:underline"
             onClick={() => {
-              navigator.clipboard.writeText(JSON.stringify(results, null, 2));
+              navigator.clipboard.writeText(
+                JSON.stringify(orderedResults, null, 2),
+              );
               toast.success("Copied to clipboard");
             }}
           >
@@ -873,14 +912,14 @@ function ResultsSection({ results }: { results: Record<string, unknown> }) {
               </span>
             </div>
             <pre className="p-4 text-xs font-mono overflow-x-auto max-h-[500px] overflow-y-auto whitespace-pre-wrap">
-              {JSON.stringify(results, null, 2)}
+              {JSON.stringify(orderedResults, null, 2)}
             </pre>
           </div>
         </TabsContent>
 
         <TabsContent value="spreadsheet">
           <div className="excel-view">
-            <SpreadsheetView results={results} />
+            <SpreadsheetView results={orderedResults} fieldOrder={fieldOrder} />
           </div>
         </TabsContent>
       </Tabs>
