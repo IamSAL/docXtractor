@@ -1,0 +1,70 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { ProcessingMode, ExtractionProvider } from '../entities/run.entity';
+
+export class RunSourceDto {
+  @IsString()
+  @ApiProperty({ enum: ['file', 'url'] })
+  type: 'file' | 'url';
+
+  @IsString()
+  @ApiProperty({ description: 'Display name for the source' })
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ description: 'URL if type is url' })
+  url?: string;
+
+  @IsOptional()
+  @IsUUID()
+  @ApiPropertyOptional({ description: 'File ID if type is file' })
+  fileId?: string;
+}
+
+export class CreateRunDto {
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    description: 'The ID of the extractor to use for this run',
+  })
+  @IsString()
+  @IsNotEmpty()
+  extractorId: string;
+
+  @ApiProperty({
+    type: [RunSourceDto],
+    description: 'List of documents to process',
+    example: [
+      { type: 'url', name: 'Invoice', url: 'https://example.com/invoice.pdf' },
+    ],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => RunSourceDto)
+  sources: RunSourceDto[];
+
+  @IsOptional()
+  @IsEnum(ProcessingMode)
+  @ApiPropertyOptional({
+    enum: ProcessingMode,
+    default: ProcessingMode.UNIFIED,
+  })
+  processingMode?: ProcessingMode;
+
+  @IsOptional()
+  @IsEnum(ExtractionProvider)
+  @ApiPropertyOptional({
+    enum: ExtractionProvider,
+    default: ExtractionProvider.DOCLO,
+  })
+  extractionProvider?: ExtractionProvider;
+}

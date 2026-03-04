@@ -19,7 +19,7 @@ export class CreateUserDto {
   @IsOptional()
   googleId?: string;
 
-  @ApiProperty({ enum: UserRole, default: UserRole.PATIENT })
+  @ApiProperty({ enum: UserRole, default: UserRole.USER })
   @IsEnum(UserRole)
   role: UserRole;
 }

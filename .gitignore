@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+!.env.production
+nginx/certs/
 .DS_Store
 .idea/
 .vscode/
@@ -46,3 +48,7 @@ server/upload/
 **/*.log
 **/temp/
 examples/
+.pnpm-store/
+__pycache__
+misc
+.venv

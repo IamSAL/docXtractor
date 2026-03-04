@@ -1,0 +1,407 @@
+/* ================================================
+   Excel-like Spreadsheet Styles (Neobrutalist theme)
+   ================================================ */
+
+/* --- Container --- */
+
+.spreadsheet-container {
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 2px;
+  box-shadow: 4px 4px 0px 0px #000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+
+.spreadsheet-container--fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* --- Toolbar --- */
+
+.spreadsheet-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-bottom: 2px solid #000;
+  flex-wrap: wrap;
+  min-height: 44px;
+}
+
+.spreadsheet-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spreadsheet-toolbar__badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #fde047;
+  color: #000;
+  padding: 2px 8px;
+  border: 1.5px solid #000;
+  border-radius: 2px;
+}
+
+.spreadsheet-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spreadsheet-toolbar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #374151;
+  background: #fff;
+  border: 1.5px solid #000;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.1s;
+  box-shadow: 1px 1px 0 0 #000;
+}
+
+.spreadsheet-toolbar__btn:hover {
+  background: #f3f4f6;
+  transform: translate(-0.5px, -0.5px);
+  box-shadow: 2px 2px 0 0 #000;
+}
+
+.spreadsheet-toolbar__btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0 0 0 0 #000;
+}
+
+.spreadsheet-toolbar__btn--primary {
+  background: #007aff;
+  color: #fff;
+  border-color: #000;
+}
+
+.spreadsheet-toolbar__btn--primary:hover {
+  background: #0062cc;
+}
+
+/* --- Search --- */
+
+.spreadsheet-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1.5px solid #000;
+  border-radius: 2px;
+  padding: 2px 8px;
+  box-shadow: 1px 1px 0 0 #000;
+}
+
+.spreadsheet-search__input {
+  border: none;
+  outline: none;
+  font-size: 12px;
+  font-family: inherit;
+  width: 140px;
+  padding: 2px 0;
+  background: transparent;
+}
+
+.spreadsheet-search__input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.spreadsheet-search__count {
+  font-size: 10px;
+  font-weight: 700;
+  color: #007aff;
+  white-space: nowrap;
+}
+
+.spreadsheet-search__close {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #6b7280;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.spreadsheet-search__close:hover {
+  color: #000;
+}
+
+/* --- Scroll container --- */
+
+.spreadsheet-scroll {
+  overflow: auto;
+  max-height: 500px;
+  flex: 1;
+  min-width: 0;
+}
+
+.spreadsheet-scroll--fullscreen {
+  overflow: auto;
+  flex: 1;
+}
+
+/* --- Status bar --- */
+
+.spreadsheet-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px;
+  background: #f9fafb;
+  border-top: 2px solid #000;
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ================================================
+   Override react-spreadsheet internals for Excel feel
+   ================================================ */
+
+.spreadsheet-excel {
+  width: max-content;
+  min-width: 100%;
+}
+
+/* Root table */
+.spreadsheet-excel .Spreadsheet__table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 12px;
+}
+
+/* --- Header cells (column labels) --- */
+
+.spreadsheet-excel .Spreadsheet__header {
+  background: #f1f3f5 !important;
+  color: #000;
+  font-weight: 800;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-bottom: 2px solid #000;
+  text-align: left;
+  white-space: nowrap;
+  user-select: none;
+  min-width: 80px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Row number header (top-left corner) */
+.spreadsheet-excel .Spreadsheet__header:first-child {
+  background: #e5e7eb !important;
+  min-width: 40px;
+  text-align: center;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+
+/* Selected column header */
+.spreadsheet-excel .Spreadsheet__header--selected {
+  background: #dbeafe !important;
+  color: #1d4ed8;
+  border-bottom-color: #2563eb;
+}
+
+/* --- Row indicator cells (row numbers) --- */
+
+.spreadsheet-excel th.Spreadsheet__header {
+  background: #f1f3f5 !important;
+}
+
+/* Row number cells on the left */
+.spreadsheet-excel tr > th:first-child {
+  background: #f1f3f5 !important;
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 10px;
+  text-align: center;
+  min-width: 40px;
+  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  border-right: 2px solid #000;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  user-select: none;
+}
+
+/* --- Data cells --- */
+
+.spreadsheet-excel .Spreadsheet__cell {
+  padding: 0;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  min-width: 120px;
+  height: 32px;
+  transition: background 0.05s;
+  position: relative;
+}
+
+/* Alternating row backgrounds */
+.spreadsheet-excel tr:nth-child(even) .Spreadsheet__cell {
+  background: #fafbfc;
+}
+
+/* Hover */
+.spreadsheet-excel .Spreadsheet__cell:hover {
+  background: #f0f4ff;
+}
+
+/* Data viewer (display mode) */
+.spreadsheet-excel .Spreadsheet__data-viewer {
+  padding: 4px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 24px;
+  line-height: 24px;
+  display: block;
+  cursor: cell;
+}
+
+/* Data editor (edit mode) */
+.spreadsheet-excel .Spreadsheet__data-editor {
+  padding: 0;
+}
+
+.spreadsheet-excel .Spreadsheet__data-editor input {
+  width: 100%;
+  height: 100%;
+  padding: 4px 10px;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  font-family: inherit;
+  background: #fffde7;
+  box-shadow: inset 0 0 0 2px #2563eb;
+}
+
+/* --- Active cell --- */
+
+.spreadsheet-excel .Spreadsheet__active-cell {
+  border: 2px solid #2563eb !important;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+  z-index: 5;
+  background: transparent;
+}
+
+.spreadsheet-excel .Spreadsheet__active-cell--edit {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.2);
+}
+
+/* --- Selection / floating rect --- */
+
+.spreadsheet-excel .Spreadsheet__floating-rect--selected {
+  background: rgba(37, 99, 235, 0.08) !important;
+  border: 1px solid rgba(37, 99, 235, 0.3) !important;
+}
+
+.spreadsheet-excel .Spreadsheet__floating-rect--copied {
+  border: 2px dashed #2563eb !important;
+  animation: spreadsheet-marching-ants 0.5s linear infinite;
+}
+
+@keyframes spreadsheet-marching-ants {
+  0% {
+    border-color: #2563eb;
+  }
+  50% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: #2563eb;
+  }
+}
+
+/* --- Search match highlight --- */
+
+.Spreadsheet__cell--search-match {
+  background: #fef08a !important;
+  box-shadow: inset 0 0 0 1px #eab308;
+}
+
+.Spreadsheet__cell--search-match .Spreadsheet__data-viewer {
+  font-weight: 700;
+}
+
+/* --- Boolean values --- */
+
+.spreadsheet-excel .Spreadsheet__data-viewer--boolean {
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+/* --- Scrollbar styling --- */
+
+.spreadsheet-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.spreadsheet-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-left: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.spreadsheet-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+  border: 1px solid #94a3b8;
+}
+
+.spreadsheet-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.spreadsheet-scroll::-webkit-scrollbar-corner {
+  background: #e2e8f0;
+}
+
+.excel-view {
+  overflow-x: scroll;
+  max-width: 51vw;
+}

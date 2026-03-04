@@ -1,0 +1,57 @@
+import type { JSONSchema } from "@/components/jsonjoy/types/jsonSchema";
+import type { FewShotExample } from "@/components/extractors/FewShotExamples";
+
+export interface ExtractorFormData {
+  // Basic Information
+  name: string;
+  thumbnailUrl?: string;
+  description: string;
+
+  // Field Schema
+  schema: JSONSchema;
+
+  // Advanced Options
+  systemPrompt: string;
+  fewShotExamples: FewShotExample[];
+
+  // Extraction Settings - Consensus Voting
+  consensusEnabled: boolean;
+  confidenceThreshold: number;
+  conflictResolution:
+    | "majority"
+    | "highest_confidence"
+    | "human_review"
+    | "conservative";
+
+  // Extraction Settings - Citation Tracking
+  citationEnabled: boolean;
+  citationIncludePdfPage: boolean;
+  citationIncludeBbox: boolean;
+  citationIncludeParagraphId: boolean;
+
+  // Extraction Settings - Model Parameters
+  contextWindow: string;
+  defaultModel: string;
+}
+
+export const defaultExtractorFormValues: ExtractorFormData = {
+  name: "",
+  thumbnailUrl: "",
+  description: "",
+  schema: {
+    type: "object",
+    properties: {},
+    required: [],
+  },
+  systemPrompt: "",
+  fewShotExamples: [],
+  consensusEnabled: false,
+  confidenceThreshold: 85,
+  conflictResolution: "majority",
+  citationEnabled: false,
+  citationIncludePdfPage: false,
+  citationIncludeBbox: false,
+  citationIncludeParagraphId: false,
+  contextWindow: "128k",
+  defaultModel: "qwen3:14b",
+};

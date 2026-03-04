@@ -30,7 +30,7 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { UserService } from './user.service';
 
 @ApiTags('Users')
-@Roles(Role.DOCTOR, Role.PATIENT, Role.PHARMACIST, Role.ADMIN)
+@Roles(Role.ADMIN, Role.USER)
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {

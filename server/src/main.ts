@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './http-exception.filter';
@@ -48,19 +50,14 @@ async function bootstrap() {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-      name: 'jwt-access-token',
-    })
+    .addBearerAuth()
 
-    .setTitle('Nine Hertz Medic Health Care Management System')
+    .setTitle('docXtractor')
     .setDescription(
-      'A comprehensive Health Care Management System to manage patient records, appointments, and medical services effectively.',
+      'A comprehensive docXtractor System to extract text from documents.',
     )
     .setVersion('1.0')
-    .addTag('Health Care')
+    .addTag('docXtractor')
     .build();
 
   const swaggerUser = configService.get<string>('SWAGGER_USER') || 'admin';
@@ -91,8 +88,13 @@ async function bootstrap() {
     customCss: '.topbar { display: none; }',
   });
 
+  // Serve swagger.json
+  app.getHttpAdapter().get('/api/swagger.json', (req, res) => {
+    res.json(document);
+  });
+
   const PORT = configService.get<number>('PORT') || 8800;
-  await app.listen(PORT);
+  await app.listen(PORT, '0.0.0.0');
 }
 
 bootstrap();

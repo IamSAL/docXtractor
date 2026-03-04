@@ -1,0 +1,284 @@
+import type {
+  JSONSchema,
+  NewField,
+  ObjectJSONSchema,
+} from "../types/jsonSchema.ts";
+import { isBooleanSchema, isObjectSchema } from "../types/jsonSchema.ts";
+
+export type Property = {
+  name: string;
+  schema: JSONSchema;
+  required: boolean;
+};
+
+export function copySchema<T extends JSONSchema>(schema: T): T {
+  if (typeof structuredClone === "function") return structuredClone(schema);
+  return JSON.parse(JSON.stringify(schema));
+}
+
+/**
+ * Updates a property in an object schema
+ */
+export function updateObjectProperty(
+  schema: ObjectJSONSchema,
+  propertyName: string,
+  propertySchema: JSONSchema,
+): ObjectJSONSchema {
+  if (!isObjectSchema(schema)) return schema;
+
+  const newSchema = copySchema(schema);
+  if (!newSchema.properties) {
+    newSchema.properties = {};
+  }
+
+  const isNewProperty = !(propertyName in newSchema.properties);
+  newSchema.properties[propertyName] = propertySchema;
+
+  // If this is a new property, add it to fieldOrder
+  if (isNewProperty) {
+    const fieldOrder = (newSchema as any).fieldOrder as string[] | undefined;
+    if (fieldOrder && Array.isArray(fieldOrder)) {
+      (newSchema as any).fieldOrder = [...fieldOrder, propertyName];
+    } else {
+      (newSchema as any).fieldOrder = Object.keys(newSchema.properties);
+    }
+  }
+
+  return newSchema;
+}
+
+/**
+ * Removes a property from an object schema
+ */
+export function removeObjectProperty(
+  schema: ObjectJSONSchema,
+  propertyName: string,
+): ObjectJSONSchema {
+  if (!isObjectSchema(schema) || !schema.properties) return schema;
+
+  const newSchema = copySchema(schema);
+  const { [propertyName]: _, ...remainingProps } = newSchema.properties;
+  newSchema.properties = remainingProps;
+
+  // Also remove from required array if present
+  if (newSchema.required) {
+    newSchema.required = newSchema.required.filter(
+      (name) => name !== propertyName,
+    );
+  }
+
+  // Also remove from fieldOrder if present
+  const fieldOrder = (newSchema as any).fieldOrder as string[] | undefined;
+  if (fieldOrder && Array.isArray(fieldOrder)) {
+    (newSchema as any).fieldOrder = fieldOrder.filter(
+      (name) => name !== propertyName,
+    );
+  }
+
+  return newSchema;
+}
+
+/**
+ * Updates the 'required' status of a property
+ */
+export function updatePropertyRequired(
+  schema: ObjectJSONSchema,
+  propertyName: string,
+  required: boolean,
+): ObjectJSONSchema {
+  if (!isObjectSchema(schema)) return schema;
+
+  const newSchema = copySchema(schema);
+  if (!newSchema.required) {
+    newSchema.required = [];
+  }
+
+  if (required) {
+    // Add to required array if not already there
+    if (!newSchema.required.includes(propertyName)) {
+      newSchema.required.push(propertyName);
+    }
+  } else {
+    // Remove from required array
+    newSchema.required = newSchema.required.filter(
+      (name) => name !== propertyName,
+    );
+  }
+
+  return newSchema;
+}
+
+/**
+ * Updates an array schema's items
+ */
+export function updateArrayItems(
+  schema: JSONSchema,
+  itemsSchema: JSONSchema,
+): JSONSchema {
+  if (isObjectSchema(schema) && schema.type === "array") {
+    return {
+      ...schema,
+      items: itemsSchema,
+    };
+  }
+  return schema;
+}
+
+/**
+ * Creates a schema for a new field
+ */
+export function createFieldSchema(field: NewField): JSONSchema {
+  const { type, description, validation } = field;
+  if (isObjectSchema(validation)) {
+    return {
+      type,
+      description,
+      ...validation,
+    };
+  }
+  return validation;
+}
+
+/**
+ * Validates a field name
+ */
+export function validateFieldName(name: string): boolean {
+  if (!name || name.trim() === "") {
+    return false;
+  }
+
+  // Check that the name doesn't contain invalid characters for property names
+  const validNamePattern = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+  return validNamePattern.test(name);
+}
+
+/**
+ * Gets properties from an object schema in the correct order
+ */
+export function getSchemaProperties(schema: JSONSchema): Property[] {
+  if (!isObjectSchema(schema) || !schema.properties) return [];
+
+  const required = schema.required || [];
+  const fieldOrder = (schema as any).fieldOrder as string[] | undefined;
+
+  const properties = Object.entries(schema.properties).map(([name, propSchema]) => ({
+    name,
+    schema: propSchema,
+    required: required.includes(name),
+  }));
+
+  // If fieldOrder exists, sort properties according to it
+  if (fieldOrder && Array.isArray(fieldOrder)) {
+    return properties.sort((a, b) => {
+      const indexA = fieldOrder.indexOf(a.name);
+      const indexB = fieldOrder.indexOf(b.name);
+      // If field is not in fieldOrder, put it at the end
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+  }
+
+  return properties;
+}
+
+/**
+ * Gets the items schema from an array schema
+ */
+export function getArrayItemsSchema(schema: JSONSchema): JSONSchema | null {
+  if (isBooleanSchema(schema)) return null;
+  if (schema.type !== "array") return null;
+
+  return schema.items || null;
+}
+
+/**
+ * Renames a property while preserving order in the object schema
+ */
+export function renameObjectProperty(
+  schema: ObjectJSONSchema,
+  oldName: string,
+  newName: string,
+): ObjectJSONSchema {
+  if (!isObjectSchema(schema) || !schema.properties) return schema;
+
+  const newSchema = copySchema(schema);
+  const newProperties: Record<string, JSONSchema> = {};
+
+  // Iterate through properties in order, replacing old key with new key
+  for (const [key, value] of Object.entries(newSchema.properties)) {
+    if (key === oldName) {
+      newProperties[newName] = value;
+    } else {
+      newProperties[key] = value;
+    }
+  }
+
+  newSchema.properties = newProperties;
+
+  // Update required array if the field name changed
+  if (newSchema.required) {
+    newSchema.required = newSchema.required.map((field) =>
+      field === oldName ? newName : field,
+    );
+  }
+
+  // Update fieldOrder if present
+  const fieldOrder = (newSchema as any).fieldOrder as string[] | undefined;
+  if (fieldOrder && Array.isArray(fieldOrder)) {
+    (newSchema as any).fieldOrder = fieldOrder.map((field) =>
+      field === oldName ? newName : field,
+    );
+  }
+
+  return newSchema;
+}
+
+/**
+ * Checks if a schema has children
+ */
+export function hasChildren(schema: JSONSchema): boolean {
+  if (!isObjectSchema(schema)) return false;
+
+  if (schema.type === "object" && schema.properties) {
+    return Object.keys(schema.properties).length > 0;
+  }
+
+  if (schema.type === "array" && schema.items && isObjectSchema(schema.items)) {
+    return schema.items.type === "object" && !!schema.items.properties;
+  }
+
+  return false;
+}
+
+/**
+ * Reorders fields in the schema
+ */
+export function reorderFields(
+  schema: ObjectJSONSchema,
+  fromIndex: number,
+  toIndex: number,
+): ObjectJSONSchema {
+  if (!isObjectSchema(schema) || !schema.properties) return schema;
+
+  const newSchema = copySchema(schema);
+  const properties = Object.keys(newSchema.properties);
+
+  // Move the field from fromIndex to toIndex
+  const [movedField] = properties.splice(fromIndex, 1);
+  properties.splice(toIndex, 0, movedField);
+
+  // Rebuild properties object in new order
+  const newProperties: Record<string, JSONSchema> = {};
+  for (const key of properties) {
+    newProperties[key] = newSchema.properties[key];
+  }
+
+  newSchema.properties = newProperties;
+
+  // Update fieldOrder metadata
+  (newSchema as any).fieldOrder = properties;
+
+  return newSchema;
+}

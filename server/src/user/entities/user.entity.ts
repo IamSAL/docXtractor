@@ -2,26 +2,19 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
+  Index,
   BeforeInsert,
   BeforeUpdate,
-  Index,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
-import { Patient } from 'src/patient/entities/patient.entity';
-import { Doctor } from 'src/doctor/entities/doctor.entity';
-import { Admin } from 'src/admin/entities/admin.entity';
-import { Pharmacist } from 'src/pharmacist/entities/pharmacist.entity';
-import { Notification } from 'src/notification/entities/notification.entity';
-import { Transaction } from 'src/transactions/entities/transaction.entity';
 
 import * as bcrypt from 'bcrypt';
-
+import { Admin } from 'src/admin/entities/admin.entity';
+import { Notification } from 'src/notification/entities/notification.entity';
 export enum UserRole {
-  PATIENT = 'patient',
-  DOCTOR = 'doctor',
+  USER = 'user',
   ADMIN = 'admin',
-  PHARMACIST = 'pharmacist',
 }
 
 @Entity()
@@ -53,8 +46,8 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: ['patient', 'doctor', 'admin', 'pharmacist'],
-    default: 'patient',
+    enum: ['user', 'admin'],
+    default: 'user',
   })
   role: string;
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -67,26 +60,11 @@ export class User {
   })
   updatedAt: Date;
 
-  @OneToOne(() => Patient, (patient) => patient.user, { cascade: true })
-  patientProfile?: Patient;
-
-  @OneToOne(() => Doctor, (doctor) => doctor.user, {
-    onDelete: 'CASCADE',
-  })
-  doctorProfile?: Doctor;
-
   @OneToOne(() => Admin, (admin) => admin.user, { cascade: true })
   adminProfile?: Admin;
 
-  @OneToOne(() => Pharmacist, (pharmacist) => pharmacist.user, {
-    cascade: true,
-  })
-  pharmacistProfile?: Pharmacist;
-
   @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[];
-  @OneToMany(() => Transaction, (transaction) => transaction.user)
-  transactions: Transaction[];
 
   @BeforeInsert()
   @BeforeUpdate()

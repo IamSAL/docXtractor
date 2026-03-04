@@ -1,13 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
-import { OrderModule } from './order/order.module';
-import { InventoryItemModule } from './inventory-item/inventory-item.module';
-import { MedicineModule } from './medicine/medicine.module';
-import { PrescriptionModule } from './prescription/prescription.module';
-import { AppointmentModule } from './appointment/appointment.module';
-import { AdminModule } from './admin/admin.module';
-import { DoctorModule } from './doctor/doctor.module';
-import { PatientModule } from './patient/patient.module';
+
 // import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
@@ -16,36 +9,29 @@ import { DatabaseModule } from './database/database.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
-import { PharmacistModule } from './pharmacist/pharmacist.module';
+
 import { ChatModule } from './chat/chat.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
-import { ContactHelper } from './shared/helpers/contact.helper';
+
 import { AppController } from './app.controller';
-import { NotificationModule } from './notification/notification.module';
-import { AdminDashboardModule } from './dashboard/admin-dashboard.module';
-import { TransactionsModule } from './transactions/transactions.module';
-import { PatientDashboardModule } from './dashboard/patient-dashboard-module';
-import { DoctorDashboardModule } from './dashboard/doctor-dashboard.module';
-import { PharmacistDashboardModule } from './dashboard/pharmacist-dashboard.module';
-import { MessagingModule } from './messaging/messaging.module';
+
+import { ExtractorsModule } from './extractors/extractors.module';
+import { FilesModule } from './files/files.module';
+import { RunsModule } from './runs/runs.module';
+import { QueueModule } from './shared/queue/queue.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { OllamaModule } from './shared/ollama/ollama.module';
+import { WorkflowsModule } from './workflows/workflows.module';
 
 @Module({
   imports: [
     UserModule,
-    PatientModule,
-    DoctorModule,
-    AdminModule,
-    PharmacistModule,
-    AppointmentModule,
-    PrescriptionModule,
-    MedicineModule,
-    InventoryItemModule,
-    OrderModule,
+
     DatabaseModule,
     AuthModule,
     ChatModule,
-    NotificationModule,
+    QueueModule,
 
     // CacheModule.registerAsync({
     //   imports: [ConfigModule],
@@ -73,17 +59,21 @@ import { MessagingModule } from './messaging/messaging.module';
         },
       ],
     }),
-    PharmacistModule,
-    TransactionsModule,
-    AdminDashboardModule,
-    DoctorDashboardModule,
-    PatientDashboardModule,
-    PharmacistDashboardModule,
-    MessagingModule,
+
+    ExtractorsModule,
+
+    FilesModule,
+
+    RunsModule,
+
+    DashboardModule,
+
+    OllamaModule,
+
+    WorkflowsModule,
   ],
   controllers: [AppController],
   providers: [
-    ContactHelper,
     // {
     //   provide: APP_INTERCEPTOR,
     //   useClass: CacheInterceptor,

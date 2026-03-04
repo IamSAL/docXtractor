@@ -46,10 +46,10 @@ export const baseStyles = {
 };
 
 export function baseEmailTemplate({
-  companyName = 'CRM Nexus',
+  companyName = 'DocXtractor',
   title,
   content,
-  footerTagline = 'Empowering Connections, Driving Growth',
+  footerTagline = 'Automated Document Extraction',
 }: {
   companyName?: string;
   title: string;
@@ -98,7 +98,7 @@ export function otpEmail({
   otpCode,
   expiryMinutes = 30,
   supportEmail = 'support@example.com',
-  companyName = 'NineHertz Medic',
+  companyName = 'DocXtractor',
 }: otpEmailProps) {
   const minutesText = expiryMinutes === 1 ? 'minute' : 'minutes';
   const otpDigits = otpCode
@@ -140,7 +140,7 @@ export function otpEmail({
 
 export function ResetPasswordEmail({
   resetLink,
-  companyName = 'CRM Nexus',
+  companyName = 'DocXtractor',
 }: {
   resetLink: string;
   companyName?: string;
@@ -151,7 +151,7 @@ export function ResetPasswordEmail({
       You've requested to reset your password. Click the button below to proceed:
     </p>
 
-    <a href="https://127.0.0.1:3000/api/reset-password?token=${resetLink}" style="${baseStyles.actionButton};">
+    <a href="${resetLink}" style="${baseStyles.actionButton};">
       Reset Password
     </a>
 
@@ -170,198 +170,5 @@ export function ResetPasswordEmail({
     companyName,
     title: 'Password Reset Request',
     content,
-  });
-}
-export interface QuotationStatusEmailProps {
-  quoteNumber: string;
-  projectName: string;
-  customerName: string;
-  estimatedCost?: string;
-  currency?: string;
-  validUntil?: Date;
-  message?: string;
-  dashboardUrl: string;
-  companyName?: string;
-}
-export function QuotationStatusEmail({
-  quoteNumber,
-  projectName,
-  message,
-  dashboardUrl,
-  customerName,
-  estimatedCost,
-  currency = 'USD',
-  validUntil,
-  companyName = 'CRM Nexus',
-}: QuotationStatusEmailProps): string {
-  const text = 'helo';
-  const color = '#fff000';
-  const statusStyle = `background-color:${color}20;color:${color};${baseStyles.statusBadge}`;
-
-  const content = `
-    <h1 style="${baseStyles.heading}text-align:start;">Quotation Update: ${projectName}</h1>
-
-    <div style=" margin-bottom:25px;">
-      <span style="${statusStyle}text-align:center;">
-        ${text}
-      </span>
-    </div>
-
-    <table style="${baseStyles.table}">
-      <tr>
-        <td style="${baseStyles.labelCell}">Quote Number:</td>
-        <td style="${baseStyles.valueCell}">
-          ${quoteNumber.split('-')[0]}-${quoteNumber.split('-').slice(-1)[0]}
-        </td>
-      </tr>
-      <tr>
-        <td style="${baseStyles.labelCell}">Project:</td>
-        <td style="${baseStyles.valueCell}">${projectName}</td>
-      </tr>
-      ${
-        estimatedCost
-          ? `<tr>
-             <td style="${baseStyles.labelCell}">Estimated Cost:</td>
-             <td style="${baseStyles.valueCell}">${currency} ${estimatedCost}</td>
-           </tr>`
-          : ''
-      }
-      ${
-        validUntil
-          ? `<tr>
-             <td style="${baseStyles.labelCell}">Valid Until:</td>
-             <td style="${baseStyles.valueCell}">${new Date(validUntil).toLocaleDateString()}</td>
-           </tr>`
-          : ''
-      }
-    </table>
-
-    <p style="${baseStyles.contentText}">
-      Hello ${customerName}, your quotation for <strong>${projectName}</strong> has been updated to <strong>${text}</strong>.
-    </p>
-
-    ${
-      message
-        ? `
-      <div style="${baseStyles.messageBox}">
-        <h3 style="${baseStyles.messageHeading}">Message from our team:</h3>
-        <p style="${baseStyles.messageText}">${message}</p>
-      </div>
-    `
-        : ''
-    }
-
-    <a href="${dashboardUrl}" style="${baseStyles.actionButton};">
-      View Full Quotation Details
-    </a>
-
-    <hr style="${baseStyles.divider}" />
-
-    <p style="${baseStyles.footerText}">
-      Need assistance? Reply to this email or contact our support team.<br>
-      ${companyName} · Your Business Growth, Our Priority
-    </p>
-  `;
-
-  return baseEmailTemplate({
-    companyName,
-    title: `Quotation ${text}`,
-    content,
-    footerTagline: '',
-  });
-}
-export interface IssueAssignmentEmailProps {
-  issueId: string;
-  issueTitle: string;
-  action: 'assigned' | 'closed';
-  assignedTo?: string;
-  closedBy?: string;
-  dashboardUrl: string;
-  companyName?: string;
-  userName?: string;
-  dateString?: string;
-}
-
-export function IssueAssignmentEmail({
-  issueId,
-  issueTitle,
-  action,
-  assignedTo,
-  closedBy,
-  dashboardUrl,
-  userName,
-  dateString,
-  companyName = 'CRM Nexus',
-}: IssueAssignmentEmailProps) {
-  const actionConfig = {
-    assigned: {
-      color: '#3B82F6',
-      text: 'Assigned to You',
-    },
-    closed: {
-      color: '#10B981',
-      text: 'Resolved',
-    },
-  };
-
-  const { color, text } = actionConfig[action];
-  const actionStyle = `background-color:${color}20;color:${color};${baseStyles.statusBadge}`;
-
-  const content = `
-    <h1 style="${baseStyles.heading}">Issue Update: ${issueTitle}</h1>
-
-    <div style="text-align:left; margin-bottom:25px;">
-      <span style="${actionStyle}">
-        ${text}
-      </span>
-    </div>
-
-    <table style="${baseStyles.table}">
-      <tr>
-        <td style="${baseStyles.labelCell}">Issue ID:</td>
-        <td style="${baseStyles.valueCell}">${issueId}</td>
-      </tr>
-      ${
-        action === 'assigned' && assignedTo
-          ? `<tr>
-             <td style="${baseStyles.labelCell}">Assigned To:</td>
-             <td style="${baseStyles.valueCell}">${assignedTo}</td>
-           </tr>`
-          : ''
-      }
-      ${
-        action === 'closed' && closedBy
-          ? `<tr>
-             <td style="${baseStyles.labelCell}">Resolved By:</td>
-             <td style="${baseStyles.valueCell}">${closedBy}</td>
-           </tr>`
-          : ''
-      }
-    </table>
-
-    <p style="${baseStyles.contentText}">
-      The issue <strong>${issueTitle}</strong> opened by ${userName ?? 'you'} on ${dateString}  has been ${action === 'assigned' ? 'assigned to you' : 'marked as resolved'}.
-    </p>
-
-    <a href="${dashboardUrl}" style="${baseStyles.actionButton}">
-      ${action === 'assigned' ? 'View Issue Details' : 'Review Resolution'}
-    </a>
-
-    <hr style="${baseStyles.divider}" />
-
-    <p style="${baseStyles.contentText}">
-      ${
-        action === 'assigned'
-          ? 'Please address this issue promptly. Contact support if you need assistance.'
-          : "If this resolution doesn't solve the problem, you can reopen the ticket."
-      }
-    </p>
-  `;
-
-  return baseEmailTemplate({
-    companyName,
-    title: `Issue ${text}`,
-    content,
-    footerTagline: 'Efficient Solutions for Your Business Needs',
   });
 }

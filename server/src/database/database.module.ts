@@ -22,7 +22,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         // //  configService.get<string>('NODE_ENV') !== 'development',
         synchronize: true,
         //  configService.get<string>('NODE_ENV') !== 'production',
-        logging: true,
+        logging: false,
         //  configService.get<string>('NODE_ENV') !== 'production',
         url: configService.get<string>('DATABASE_URL'),
       }),
