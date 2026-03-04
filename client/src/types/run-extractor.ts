@@ -16,7 +16,7 @@ export const RunExtractorFormSchema = z.object({
   sources: z
     .array(SourceSchema)
     .min(1, "At least one input source is required"),
-  processingMode: z.enum(["unified", "batch"]).default("unified"),
+  processingMode: z.enum(["unified", "per_document"]).default("unified"),
   extractionProvider: z.enum(["doclo", "langextract", "ollama"]).default("doclo"),
   consensusVoting: z.boolean().default(false),
   citationTracking: z.boolean().default(true),

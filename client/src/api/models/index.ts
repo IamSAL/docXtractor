@@ -37,6 +37,8 @@ export * from "./filesControllerUploadFile201";
 export * from "./filesControllerUploadFileBody";
 export * from "./filesControllerUploadMultipleFiles201Item";
 export * from "./filesControllerUploadMultipleFilesBody";
+export * from "./generateExtractorDto";
+export * from "./generateSchemaDto";
 export * from "./loginDto";
 export * from "./messageDto";
 export * from "./refreshTokenDto";

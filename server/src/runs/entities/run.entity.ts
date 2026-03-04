@@ -47,12 +47,21 @@ export interface RunSource {
   error?: string;
   parsedContent?: string;
   tokenCount?: number;
+  // Per-document extraction tracking (PER_DOCUMENT mode only)
+  extractionStatus?: 'pending' | 'extracting' | 'done' | 'failed';
+  extractionResult?: Record<string, unknown> | unknown[];
+  extractionError?: string;
+  // Flag used during per-source retry to only trigger extraction for retried sources
+  isRetrying?: boolean;
 }
 
 export interface RunProgress {
   parsed: number;
   total: number;
   currentStep: 'queued' | 'parsing' | 'extracting' | 'complete';
+  // Batch mode extraction progress
+  extracted?: number;
+  extractionTotal?: number;
 }
 
 export interface RunLogEntry {

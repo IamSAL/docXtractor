@@ -1,0 +1,38 @@
+ARG NODE_VERSION=22.15.0
+ARG PNPM_VERSION=10.11.0
+
+# ------------------ BUILD ------------------
+FROM node:${NODE_VERSION}-alpine AS builder
+
+RUN npm install -g pnpm@${PNPM_VERSION}
+
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm config set store-dir /pnpm/store
+RUN --mount=type=cache,id=pnpm-client,target=/pnpm/store pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build arguments for Vite env vars (baked into the bundle at build time)
+ARG VITE_API_URL
+ARG VITE_SENTRY_DSN
+
+# Build the TanStack Start / Nitro app
+RUN pnpm run build
+
+# ------------------ PRODUCTION ------------------
+FROM node:${NODE_VERSION}-alpine AS production
+
+WORKDIR /app
+
+# Copy the built output
+COPY --from=builder /app/.output ./.output
+
+# The Nitro server runs on port 3000 by default
+EXPOSE 3000
+
+# Start the production server
+CMD ["node", ".output/server/index.mjs"]

@@ -16,8 +16,7 @@ import type { ValidationTreeNode } from "../../types/validation.ts";
 import TypeDropdown from "./TypeDropdown.tsx";
 import TypeEditor from "./TypeEditor.tsx";
 import { Switch } from "@/components/retroui/Switch.tsx";
-
-
+import { Textarea } from "@/components/retroui/Textarea.tsx";
 
 export interface SchemaPropertyEditorProps {
   name: string;
@@ -98,19 +97,28 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     <div
       className={cn(
         "mb-2 group border-b border-border-light xdark:border-border-dark last:border-0 transition-colors",
-        expanded ? " xdark:bg-background-dark/30 bg-gray-200 border-b-2 border-black rounded-2xl" : "hover:bg-yellow-50/50 xdark:hover:bg-background-dark/50",
-        depth > 0 && "ml-4 border-l border-border-light xdark:border-border-dark"
+        expanded
+          ? " xdark:bg-background-dark/30 bg-gray-200 border-b-2 border-black rounded-2xl"
+          : "hover:bg-yellow-50/50 xdark:hover:bg-background-dark/50",
+        depth > 0 &&
+          "ml-4 border-l border-border-light xdark:border-border-dark",
       )}
     >
       <div className="grid grid-cols-[48px_1fr_120px_100px_48px_48px] items-center py-2 px-2">
         {/* Drag handle */}
         <div className="flex justify-center text-gray-400 group-hover:text-black transition-colors">
-          <span className="material-symbols-outlined cursor-grab text-xl">drag_indicator</span>
+          <span className="material-symbols-outlined cursor-grab text-xl">
+            drag_indicator
+          </span>
         </div>
 
         {/* Name / Icon */}
         <div className="flex items-center gap-3 min-w-0 pr-4">
-          <span className={cn("material-symbols-outlined text-text-secondary-light text-xl shrink-0")}>
+          <span
+            className={cn(
+              "material-symbols-outlined text-text-secondary-light text-xl shrink-0",
+            )}
+          >
             {getTypeIcon(type)}
           </span>
           <div className="flex flex-col min-w-0 flex-1">
@@ -136,7 +144,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
 
             {/* Description (sub-text) */}
             {!readOnly && isEditingDesc ? (
-              <Input
+              <Textarea
                 value={tempDesc}
                 onChange={(e) => setTempDesc(e.target.value)}
                 onBlur={handleDescSubmit}
@@ -154,14 +162,16 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
               >
                 {tempDesc}
               </button>
-            ) : !readOnly && (
-              <button
-                type="button"
-                onClick={() => setIsEditingDesc(true)}
-                className="text-[10px] text-text-secondary-light/50 opacity-0 group-hover:opacity-100 transition-opacity truncate text-left"
-              >
-                + description
-              </button>
+            ) : (
+              !readOnly && (
+                <button
+                  type="button"
+                  onClick={() => setIsEditingDesc(true)}
+                  className="text-[10px] text-text-secondary-light/50 opacity-0 group-hover:opacity-100 transition-opacity truncate text-left"
+                >
+                  + description
+                </button>
+              )
             )}
           </div>
         </div>
@@ -185,7 +195,9 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
           <div className="flex flex-col items-center gap-1">
             <Switch
               checked={required}
-              onCheckedChange={(checked) => !readOnly && onRequiredChange(checked)}
+              onCheckedChange={(checked) =>
+                !readOnly && onRequiredChange(checked)
+              }
               disabled={readOnly}
             />
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
@@ -214,12 +226,14 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             type="button"
             className={cn(
               "p-1.5 rounded-lg border-2 border-transparent hover:border-black hover:bg-primary/10 transition-all",
-              expanded && "rotate-180"
+              expanded && "rotate-180",
             )}
             onClick={() => setExpanded(!expanded)}
             aria-label={expanded ? t.collapse : t.expand}
           >
-            <span className="material-symbols-outlined text-xl">expand_more</span>
+            <span className="material-symbols-outlined text-xl">
+              expand_more
+            </span>
           </button>
         </div>
       </div>
@@ -227,7 +241,9 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
       {/* Type-specific editor or nested fields */}
       {expanded && (
         <div className="border-t-2 border-black/5 bg-gray-50/30 xdark:bg-gray-800/10 p-4 animate-in slide-in-from-top-1">
-          {readOnly && tempDesc && <p className="mb-4 text-sm text-text-secondary-light">{tempDesc}</p>}
+          {readOnly && tempDesc && (
+            <p className="mb-4 text-sm text-text-secondary-light">{tempDesc}</p>
+          )}
           <TypeEditor
             schema={schema}
             readOnly={readOnly}
@@ -240,6 +256,5 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     </div>
   );
 };
-
 
 export default SchemaPropertyEditor;

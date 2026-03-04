@@ -12,6 +12,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  max-width: 100%;
 }
 
 .spreadsheet-container--fullscreen {
@@ -159,6 +160,7 @@
   overflow: auto;
   max-height: 500px;
   flex: 1;
+  min-width: 0;
 }
 
 .spreadsheet-scroll--fullscreen {
@@ -187,14 +189,20 @@
    ================================================ */
 
 .spreadsheet-excel {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
 }
 
 /* Root table */
 .spreadsheet-excel .Spreadsheet__table {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-size: 12px;
 }
 
@@ -265,8 +273,7 @@
   padding: 0;
   border: 1px solid #e5e7eb;
   background: #fff;
-  min-width: 100px;
-  max-width: 300px;
+  min-width: 120px;
   height: 32px;
   transition: background 0.05s;
   position: relative;
@@ -338,9 +345,15 @@
 }
 
 @keyframes spreadsheet-marching-ants {
-  0% { border-color: #2563eb; }
-  50% { border-color: transparent; }
-  100% { border-color: #2563eb; }
+  0% {
+    border-color: #2563eb;
+  }
+  50% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: #2563eb;
+  }
 }
 
 /* --- Search match highlight --- */
@@ -386,4 +399,9 @@
 
 .spreadsheet-scroll::-webkit-scrollbar-corner {
   background: #e2e8f0;
+}
+
+.excel-view {
+  overflow-x: scroll;
+  max-width: 51vw;
 }

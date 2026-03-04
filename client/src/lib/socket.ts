@@ -1,11 +1,13 @@
 import { io, Socket } from "socket.io-client";
 
-// In a real app, this URL should come from env vars
-// For local dev, we assume server is on port 3000
+// Socket.IO needs the base origin (no /api path), since it connects via /socket.io/
 const SERVER_URL =
-  typeof window !== "undefined"
-    ? `${window.location.protocol}//${window.location.hostname}:3001`
-    : "http://localhost:3001";
+  import.meta.env.VITE_WS_URL ||
+  (import.meta.env.VITE_API_URL
+    ? new URL(import.meta.env.VITE_API_URL).origin
+    : typeof window !== "undefined"
+      ? `${window.location.protocol}//${window.location.hostname}:3001`
+      : "http://localhost:3001");
 
 let socket: Socket | null = null;
 

@@ -24,6 +24,8 @@ import type {
 import type {
 	CreateExtractorDto,
 	Extractor,
+	GenerateExtractorDto,
+	GenerateSchemaDto,
 	UpdateExtractorDto,
 } from "../../models";
 
@@ -311,6 +313,221 @@ export function useExtractorsControllerFindAll<
 	return { ...query, queryKey: queryOptions.queryKey };
 }
 
+/**
+ * @summary Generate a JSON schema from a description using AI
+ */
+export type extractorsControllerGenerateSchemaResponse201 = {
+	data: void;
+	status: 201;
+};
+
+export type extractorsControllerGenerateSchemaResponseSuccess =
+	extractorsControllerGenerateSchemaResponse201 & {
+		headers: Headers;
+	};
+
+export type extractorsControllerGenerateSchemaResponse =
+	extractorsControllerGenerateSchemaResponseSuccess;
+
+export const getExtractorsControllerGenerateSchemaUrl = () => {
+	return `/extractors/generate-schema`;
+};
+
+export const extractorsControllerGenerateSchema = async (
+	generateSchemaDto: GenerateSchemaDto,
+	options?: RequestInit,
+): Promise<extractorsControllerGenerateSchemaResponse> => {
+	return HttpClient<extractorsControllerGenerateSchemaResponse>(
+		getExtractorsControllerGenerateSchemaUrl(),
+		{
+			...options,
+			method: "POST",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(generateSchemaDto),
+		},
+	);
+};
+
+export const getExtractorsControllerGenerateSchemaMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof extractorsControllerGenerateSchema>>,
+		TError,
+		{ data: GenerateSchemaDto },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof extractorsControllerGenerateSchema>>,
+	TError,
+	{ data: GenerateSchemaDto },
+	TContext
+> => {
+	const mutationKey = ["extractorsControllerGenerateSchema"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof extractorsControllerGenerateSchema>>,
+		{ data: GenerateSchemaDto }
+	> = (props) => {
+		const { data } = props ?? {};
+
+		return extractorsControllerGenerateSchema(data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ExtractorsControllerGenerateSchemaMutationResult = NonNullable<
+	Awaited<ReturnType<typeof extractorsControllerGenerateSchema>>
+>;
+export type ExtractorsControllerGenerateSchemaMutationBody = GenerateSchemaDto;
+export type ExtractorsControllerGenerateSchemaMutationError = unknown;
+
+/**
+ * @summary Generate a JSON schema from a description using AI
+ */
+export const useExtractorsControllerGenerateSchema = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof extractorsControllerGenerateSchema>>,
+			TError,
+			{ data: GenerateSchemaDto },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof extractorsControllerGenerateSchema>>,
+	TError,
+	{ data: GenerateSchemaDto },
+	TContext
+> => {
+	return useMutation(
+		getExtractorsControllerGenerateSchemaMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * @summary Generate a full extractor configuration from a description using AI
+ */
+export type extractorsControllerGenerateExtractorResponse201 = {
+	data: void;
+	status: 201;
+};
+
+export type extractorsControllerGenerateExtractorResponseSuccess =
+	extractorsControllerGenerateExtractorResponse201 & {
+		headers: Headers;
+	};
+
+export type extractorsControllerGenerateExtractorResponse =
+	extractorsControllerGenerateExtractorResponseSuccess;
+
+export const getExtractorsControllerGenerateExtractorUrl = () => {
+	return `/extractors/generate-extractor`;
+};
+
+export const extractorsControllerGenerateExtractor = async (
+	generateExtractorDto: GenerateExtractorDto,
+	options?: RequestInit,
+): Promise<extractorsControllerGenerateExtractorResponse> => {
+	return HttpClient<extractorsControllerGenerateExtractorResponse>(
+		getExtractorsControllerGenerateExtractorUrl(),
+		{
+			...options,
+			method: "POST",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(generateExtractorDto),
+		},
+	);
+};
+
+export const getExtractorsControllerGenerateExtractorMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof extractorsControllerGenerateExtractor>>,
+		TError,
+		{ data: GenerateExtractorDto },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof extractorsControllerGenerateExtractor>>,
+	TError,
+	{ data: GenerateExtractorDto },
+	TContext
+> => {
+	const mutationKey = ["extractorsControllerGenerateExtractor"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof extractorsControllerGenerateExtractor>>,
+		{ data: GenerateExtractorDto }
+	> = (props) => {
+		const { data } = props ?? {};
+
+		return extractorsControllerGenerateExtractor(data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ExtractorsControllerGenerateExtractorMutationResult = NonNullable<
+	Awaited<ReturnType<typeof extractorsControllerGenerateExtractor>>
+>;
+export type ExtractorsControllerGenerateExtractorMutationBody =
+	GenerateExtractorDto;
+export type ExtractorsControllerGenerateExtractorMutationError = unknown;
+
+/**
+ * @summary Generate a full extractor configuration from a description using AI
+ */
+export const useExtractorsControllerGenerateExtractor = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof extractorsControllerGenerateExtractor>>,
+			TError,
+			{ data: GenerateExtractorDto },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof extractorsControllerGenerateExtractor>>,
+	TError,
+	{ data: GenerateExtractorDto },
+	TContext
+> => {
+	return useMutation(
+		getExtractorsControllerGenerateExtractorMutationOptions(options),
+		queryClient,
+	);
+};
 /**
  * @summary Get an extractor by id
  */

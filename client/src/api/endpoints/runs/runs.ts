@@ -841,3 +841,126 @@ export const useRunsControllerRetry = <TError = void, TContext = unknown>(
 		queryClient,
 	);
 };
+/**
+ * @summary Retry a single failed source within a run
+ */
+export type runsControllerRetrySourceResponse200 = {
+	data: void;
+	status: 200;
+};
+
+export type runsControllerRetrySourceResponse400 = {
+	data: void;
+	status: 400;
+};
+
+export type runsControllerRetrySourceResponse404 = {
+	data: void;
+	status: 404;
+};
+
+export type runsControllerRetrySourceResponseSuccess =
+	runsControllerRetrySourceResponse200 & {
+		headers: Headers;
+	};
+export type runsControllerRetrySourceResponseError = (
+	| runsControllerRetrySourceResponse400
+	| runsControllerRetrySourceResponse404
+) & {
+	headers: Headers;
+};
+
+export type runsControllerRetrySourceResponse =
+	| runsControllerRetrySourceResponseSuccess
+	| runsControllerRetrySourceResponseError;
+
+export const getRunsControllerRetrySourceUrl = (
+	id: string,
+	sourceId: string,
+) => {
+	return `/runs/${id}/sources/${sourceId}/retry`;
+};
+
+export const runsControllerRetrySource = async (
+	id: string,
+	sourceId: string,
+	options?: RequestInit,
+): Promise<runsControllerRetrySourceResponse> => {
+	return HttpClient<runsControllerRetrySourceResponse>(
+		getRunsControllerRetrySourceUrl(id, sourceId),
+		{
+			...options,
+			method: "POST",
+		},
+	);
+};
+
+export const getRunsControllerRetrySourceMutationOptions = <
+	TError = void,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof runsControllerRetrySource>>,
+		TError,
+		{ id: string; sourceId: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof runsControllerRetrySource>>,
+	TError,
+	{ id: string; sourceId: string },
+	TContext
+> => {
+	const mutationKey = ["runsControllerRetrySource"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof runsControllerRetrySource>>,
+		{ id: string; sourceId: string }
+	> = (props) => {
+		const { id, sourceId } = props ?? {};
+
+		return runsControllerRetrySource(id, sourceId, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type RunsControllerRetrySourceMutationResult = NonNullable<
+	Awaited<ReturnType<typeof runsControllerRetrySource>>
+>;
+
+export type RunsControllerRetrySourceMutationError = void;
+
+/**
+ * @summary Retry a single failed source within a run
+ */
+export const useRunsControllerRetrySource = <TError = void, TContext = unknown>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof runsControllerRetrySource>>,
+			TError,
+			{ id: string; sourceId: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof runsControllerRetrySource>>,
+	TError,
+	{ id: string; sourceId: string },
+	TContext
+> => {
+	return useMutation(
+		getRunsControllerRetrySourceMutationOptions(options),
+		queryClient,
+	);
+};

@@ -80,6 +80,20 @@ export const ExtractorsControllerFindAllResponseItem = zod.object({
 export const ExtractorsControllerFindAllResponse = zod.array(ExtractorsControllerFindAllResponseItem)
 
 /**
+ * @summary Generate a JSON schema from a description using AI
+ */
+export const ExtractorsControllerGenerateSchemaBody = zod.object({
+  "description": zod.string().describe('A description of the data fields to extract')
+})
+
+/**
+ * @summary Generate a full extractor configuration from a description using AI
+ */
+export const ExtractorsControllerGenerateExtractorBody = zod.object({
+  "description": zod.string().describe('A description of the extractor to generate, including what documents it processes and what data to extract')
+})
+
+/**
  * @summary Get an extractor by id
  */
 export const ExtractorsControllerFindOneParams = zod.object({
