@@ -71,4 +71,17 @@ export class RunsController {
   retry(@Param('id') id: string, @GetUser() user: JWTPayload) {
     return this.runsService.retry(id, user.sub);
   }
+
+  @Post(':id/sources/:sourceId/retry')
+  @ApiOperation({ summary: 'Retry a single failed source within a run' })
+  @ApiResponse({ status: 200, description: 'Source retry started' })
+  @ApiResponse({ status: 400, description: 'Source is not in a failed state' })
+  @ApiResponse({ status: 404, description: 'Run or source not found' })
+  retrySource(
+    @Param('id') id: string,
+    @Param('sourceId') sourceId: string,
+    @GetUser() user: JWTPayload,
+  ) {
+    return this.runsService.retrySource(id, sourceId, user.sub);
+  }
 }

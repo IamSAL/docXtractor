@@ -51,6 +51,8 @@ export interface RunSource {
   extractionStatus?: 'pending' | 'extracting' | 'done' | 'failed';
   extractionResult?: Record<string, unknown> | unknown[];
   extractionError?: string;
+  // Flag used during per-source retry to only trigger extraction for retried sources
+  isRetrying?: boolean;
 }
 
 export interface RunProgress {

@@ -2,7 +2,9 @@ import os
 import threading
 import logging
 import requests
-from docling.document_converter import DocumentConverter
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
 from .parse_cache import compute_file_hash, get_cached_result, set_cached_result
 
 logger = logging.getLogger(__name__)
@@ -12,7 +14,12 @@ _thread_local = threading.local()
 
 def _get_converter() -> DocumentConverter:
     if not hasattr(_thread_local, "converter"):
-        _thread_local.converter = DocumentConverter()
+        pipeline_options = PdfPipelineOptions(do_ocr=False, pdf_backend="dlparse_v2")
+        _thread_local.converter = DocumentConverter(
+            format_options={
+                InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+            }
+        )
     return _thread_local.converter
 
 def process_url_document(document_id: str, url: str) -> dict:

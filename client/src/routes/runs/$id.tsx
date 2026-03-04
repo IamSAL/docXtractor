@@ -5,6 +5,7 @@ import {
   useRunsControllerFindOne,
   getRunsControllerFindOneQueryKey,
   useRunsControllerRetry,
+  useRunsControllerRetrySource,
   getRunsControllerFindAllQueryKey,
 } from "@/api/endpoints/runs/runs";
 import { useEffect, useRef, useMemo } from "react";
@@ -21,6 +22,7 @@ import {
 
 export const Route = createFileRoute("/runs/$id")({
   component: RunDetailComponent,
+  ssr: false,
 });
 
 function RunDetailComponent() {
@@ -28,6 +30,7 @@ function RunDetailComponent() {
   const { data, isLoading, error } = useRunsControllerFindOne(id);
   const queryClient = useQueryClient();
   const retryMutation = useRunsControllerRetry();
+  const retrySourceMutation = useRunsControllerRetrySource();
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -181,6 +184,23 @@ function RunDetailComponent() {
       toast.error("Failed to retry run");
     }
   };
+
+  const handleRetrySource = async (sourceId: string, sourceName: string) => {
+    try {
+      await retrySourceMutation.mutateAsync({ id, sourceId });
+      toast.success(`Retrying source '${sourceName}'`);
+      queryClient.invalidateQueries({
+        queryKey: getRunsControllerFindAllQueryKey(),
+      });
+    } catch {
+      toast.error(`Failed to retry source '${sourceName}'`);
+    }
+  };
+
+  const isTerminalState =
+    run?.status === "done" ||
+    run?.status === "failed" ||
+    run?.status === "review";
 
   if (isLoading) {
     return (
@@ -472,74 +492,98 @@ function RunDetailComponent() {
                     Active Sources
                   </h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {run.sources?.map((source: any, idx: number) => (
-                      <div
-                        key={source.id || idx}
-                        className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-3 rounded-sm flex items-center justify-between group hover:translate-x-1 transition-transform"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`size-10 border-2 border-black rounded-sm flex items-center justify-center ${
-                              source.type === "file"
-                                ? "bg-red-50"
-                                : "bg-blue-50"
-                            }`}
-                          >
-                            <span
-                              className={`material-symbols-outlined ${
+                    {run.sources?.map((source: any, idx: number) => {
+                      const isSourceFailed =
+                        source.status === "failed" ||
+                        source.extractionStatus === "failed";
+                      const canRetrySource = isSourceFailed && isTerminalState;
+
+                      return (
+                        <div
+                          key={source.id || idx}
+                          className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-3 rounded-sm flex items-center justify-between group hover:translate-x-1 transition-transform"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`size-10 border-2 border-black rounded-sm flex items-center justify-center ${
                                 source.type === "file"
-                                  ? "text-red-600"
-                                  : "text-blue-600"
+                                  ? "bg-red-50"
+                                  : "bg-blue-50"
                               }`}
                             >
-                              {source.type === "file"
-                                ? "picture_as_pdf"
-                                : "link"}
-                            </span>
+                              <span
+                                className={`material-symbols-outlined ${
+                                  source.type === "file"
+                                    ? "text-red-600"
+                                    : "text-blue-600"
+                                }`}
+                              >
+                                {source.type === "file"
+                                  ? "picture_as_pdf"
+                                  : "link"}
+                              </span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-black text-xs uppercase tracking-tight text-black">
+                                {source.name}
+                              </span>
+                              <span className="text-[10px] font-bold text-gray-400">
+                                {source.type === "file" ? "File" : "URL"} •{" "}
+                                {source.status}
+                                {source.tokenCount
+                                  ? ` • ${source.tokenCount.toLocaleString()} tokens`
+                                  : ""}
+                                {source.extractionStatus
+                                  ? ` • Extraction: ${source.extractionStatus}`
+                                  : ""}
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex flex-col">
-                            <span className="font-black text-xs uppercase tracking-tight text-black">
-                              {source.name}
-                            </span>
-                            <span className="text-[10px] font-bold text-gray-400">
-                              {source.type === "file" ? "File" : "URL"} •{" "}
-                              {source.status}
-                              {source.tokenCount
-                                ? ` • ${source.tokenCount.toLocaleString()} tokens`
-                                : ""}
-                              {source.extractionStatus
-                                ? ` • Extraction: ${source.extractionStatus}`
-                                : ""}
-                            </span>
-                          </div>
-                        </div>
-                        <div
-                          className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${
-                            source.extractionStatus === "done"
-                              ? "bg-green-400"
-                              : source.extractionStatus === "failed" ||
-                                  source.status === "failed"
-                                ? "bg-red-500"
-                                : source.status === "parsed" &&
-                                    !source.extractionStatus
+                          <div className="flex items-center gap-2">
+                            {canRetrySource && (
+                              <button
+                                type="button"
+                                className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-blue-100 transition-colors disabled:opacity-50"
+                                onClick={() =>
+                                  handleRetrySource(source.id, source.name)
+                                }
+                                disabled={retrySourceMutation.isPending}
+                              >
+                                <span className="material-symbols-outlined text-[14px]">
+                                  replay
+                                </span>
+                                Retry
+                              </button>
+                            )}
+                            <div
+                              className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${
+                                source.extractionStatus === "done"
                                   ? "bg-green-400"
-                                  : "bg-[#FFD700]"
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-[16px] font-black text-black">
-                            {source.extractionStatus === "done"
-                              ? "check"
-                              : source.extractionStatus === "failed" ||
-                                  source.status === "failed"
-                                ? "close"
-                                : source.status === "parsed" &&
-                                    !source.extractionStatus
+                                  : source.extractionStatus === "failed" ||
+                                      source.status === "failed"
+                                    ? "bg-red-500"
+                                    : source.status === "parsed" &&
+                                        !source.extractionStatus
+                                      ? "bg-green-400"
+                                      : "bg-[#FFD700]"
+                              }`}
+                            >
+                              <span className="material-symbols-outlined text-[16px] font-black text-black">
+                                {source.extractionStatus === "done"
                                   ? "check"
-                                  : "progress_activity"}
-                          </span>
+                                  : source.extractionStatus === "failed" ||
+                                      source.status === "failed"
+                                    ? "close"
+                                    : source.status === "parsed" &&
+                                        !source.extractionStatus
+                                      ? "check"
+                                      : "progress_activity"}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </section>
               </div>

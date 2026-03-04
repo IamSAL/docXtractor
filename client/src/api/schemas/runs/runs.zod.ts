@@ -85,3 +85,11 @@ export const RunsControllerRetryParams = zod.object({
   "id": zod.string()
 })
 
+/**
+ * @summary Retry a single failed source within a run
+ */
+export const RunsControllerRetrySourceParams = zod.object({
+  "id": zod.string(),
+  "sourceId": zod.string()
+})
+

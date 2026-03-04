@@ -42,7 +42,8 @@ export class OllamaService {
     systemPrompt: string,
     model?: string,
   ): Promise<OllamaExtractionResult> {
-    const modelId = model || this.defaultModel;
+    // const modelId = model || this.defaultModel;
+    const modelId = 'gpt-oss:120b-cloud';
 
     // Build field descriptions from schema
     const fieldsDesc = this.buildFieldsDescription(schema);
@@ -54,11 +55,7 @@ export class OllamaService {
 
     const fullPrompt = `${instruction}\n\nDocument Content:\n${content}`;
 
-    this.logger.log(
-      `Running Ollama extraction: model=${modelId}, content_length=${content.length} , prompt=${fullPrompt}`,
-    );
-
-    this.logger.log(`Schema: ${JSON.stringify(schema)}`);
+    this.logger.log(`Running Ollama extraction`);
 
     const response = await this.client.chat({
       model: modelId,

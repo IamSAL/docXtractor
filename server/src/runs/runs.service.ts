@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -353,10 +358,24 @@ export class RunsService {
         });
 
         if (run.processingMode === ProcessingMode.PER_DOCUMENT) {
+          // Check if this is a retry — only extract retried sources
+          const retryingSources = parsedSources.filter((s) => s.isRetrying);
+          const sourcesToExtract =
+            retryingSources.length > 0 ? retryingSources : parsedSources;
+
+          // Clear isRetrying flags
+          for (const s of retryingSources) {
+            s.isRetrying = undefined;
+          }
+
           // BATCH MODE: Extract each document independently
-          await this.handleBatchExtraction(run, parsedSources, extractor);
+          await this.handleBatchExtraction(run, sourcesToExtract, extractor);
         } else {
           // UNIFIED MODE: Combine all docs and extract once
+          // Clear any isRetrying flags
+          for (const s of parsedSources) {
+            s.isRetrying = undefined;
+          }
           await this.handleUnifiedExtraction(run, extractor);
         }
       }
@@ -819,6 +838,236 @@ export class RunsService {
     await this.runRepo.save(run);
     await this.flushLogs(run.id);
     this.runsGateway.emitRunUpdated(run.id, run);
+    this.runsGateway.emitRunsListUpdated({
+      runId: run.id,
+      status: run.status,
+      progress: run.progress,
+    });
+
+    return run;
+  }
+
+  /**
+   * Retry a single failed source within a run.
+   */
+  async retrySource(
+    runId: string,
+    sourceId: string,
+    userId: string,
+  ): Promise<Run> {
+    const run = await this.findOne(runId, userId);
+
+    // Validate run is in a retryable state
+    const retryableStatuses = [
+      RunStatus.DONE,
+      RunStatus.FAILED,
+      RunStatus.REVIEW,
+      RunStatus.PARSING,
+      RunStatus.EXTRACTING,
+    ];
+    if (!retryableStatuses.includes(run.status)) {
+      throw new BadRequestException(
+        `Cannot retry source when run is in '${run.status}' state`,
+      );
+    }
+
+    const source = run.sources.find((s) => s.id === sourceId);
+    if (!source) {
+      throw new NotFoundException('Source not found in this run');
+    }
+
+    const isParseFailure = source.status === 'failed';
+    const isExtractionFailure =
+      source.status === 'parsed' && source.extractionStatus === 'failed';
+
+    if (!isParseFailure && !isExtractionFailure) {
+      throw new BadRequestException(
+        'Source is not in a failed state (parse or extraction)',
+      );
+    }
+
+    if (isParseFailure) {
+      // --- Parse failure path ---
+      source.status = 'parsing';
+      source.error = undefined;
+      source.parsedContent = undefined;
+      source.tokenCount = undefined;
+      source.extractionStatus = undefined;
+      source.extractionResult = undefined;
+      source.extractionError = undefined;
+      source.isRetrying = true;
+
+      run.status = RunStatus.PARSING;
+      run.finishedAt = null;
+      run.error = null;
+
+      // Recalculate parsed progress from actual source states
+      run.progress = {
+        parsed: run.sources.filter(
+          (s) => s.status === 'parsed' || s.status === 'failed',
+        ).length - 1, // minus this source which we just reset
+        total: run.sources.length,
+        currentStep: 'parsing',
+      };
+
+      this.addLog(
+        run,
+        'info',
+        `Retrying parse for source '${source.name}'`,
+      );
+
+      await this.runRepo.save(run);
+      await this.flushLogs(run.id);
+
+      // Queue parse job
+      await this.queueService.addJob(
+        QueueName.UPLOADED_DOCUMENTS,
+        'parse-document',
+        {
+          run_id: run.id,
+          document_id: source.id,
+          type: source.type,
+          file_key: source.fileKey,
+          url: source.url,
+          name: source.name,
+        },
+      );
+    } else {
+      // --- Extraction failure path (PER_DOCUMENT only) ---
+      if (run.processingMode === ProcessingMode.UNIFIED) {
+        throw new BadRequestException(
+          'Cannot retry individual source extraction in unified mode. Use full "Retry Run" instead.',
+        );
+      }
+
+      source.extractionStatus = 'extracting';
+      source.extractionError = undefined;
+      source.extractionResult = undefined;
+
+      run.status = RunStatus.EXTRACTING;
+      run.finishedAt = null;
+      run.error = null;
+
+      // Recalculate extraction progress from actual source states
+      const parsedSources = run.sources.filter((s) => s.status === 'parsed');
+      const completedExtractions = parsedSources.filter(
+        (s) =>
+          s.extractionStatus === 'done' || s.extractionStatus === 'failed',
+      ).length - 1; // minus this source which we just reset
+      run.progress = {
+        ...run.progress!,
+        currentStep: 'extracting',
+        extracted: Math.max(0, completedExtractions),
+        extractionTotal: parsedSources.length,
+      };
+
+      this.addLog(
+        run,
+        'info',
+        `Retrying extraction for source '${source.name}'`,
+      );
+
+      const extractor = await this.extractorRepo.findOne({
+        where: { id: run.extractorId },
+      });
+
+      if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+        // Ollama: run inline extraction, then rebuild merged results
+        await this.runRepo.save(run);
+        await this.flushLogs(run.id);
+        this.runsGateway.emitRunUpdated(run.id, run);
+        this.runsGateway.emitRunSourceUpdated(run.id, source);
+
+        try {
+          const result = await this.ollamaService.extract(
+            source.parsedContent!,
+            extractor?.schema || {},
+            extractor?.systemPrompt || '',
+            'qwen3:14b',
+          );
+
+          source.extractionStatus = 'done';
+          source.extractionResult = result.data;
+          run.progress!.extracted = (run.progress!.extracted || 0) + 1;
+
+          this.addLog(
+            run,
+            'info',
+            `Extraction for '${source.name}' completed (${result.usage.totalTokens} tokens)`,
+          );
+        } catch (error) {
+          source.extractionStatus = 'failed';
+          source.extractionError = error.message;
+          run.progress!.extracted = (run.progress!.extracted || 0) + 1;
+
+          this.addLog(
+            run,
+            'error',
+            `Extraction failed for '${source.name}': ${error.message}`,
+          );
+        }
+
+        this.runsGateway.emitRunSourceUpdated(run.id, source);
+
+        // Rebuild merged results from all sources
+        const allResults: Record<string, unknown>[] = [];
+        for (const s of run.sources) {
+          if (s.extractionStatus === 'done' && s.extractionResult) {
+            const annotated = this.annotateResultWithSource(
+              s.extractionResult,
+              s.name,
+            );
+            allResults.push(...annotated);
+          }
+        }
+
+        if (allResults.length > 0) {
+          run.results = allResults as any;
+          run.status = RunStatus.DONE;
+        } else {
+          run.status = RunStatus.FAILED;
+          run.error = 'All document extractions failed';
+        }
+        run.progress!.currentStep = 'complete';
+        run.finishedAt = new Date();
+      } else {
+        // Queue-based extraction: queue a single extraction job
+        const extractionType =
+          run.extractionProvider === ExtractionProvider.LANGEXTRACT
+            ? 'langextract'
+            : 'llm';
+
+        await this.queueService.addJob(
+          QueueName.EXTRACTION_REQUESTS,
+          'extract-data',
+          {
+            run_id: run.id,
+            document_id: source.id,
+            source_name: source.name,
+            content: {
+              combined_markdown: source.parsedContent,
+            },
+            schema: extractor?.schema || {},
+            system_prompt: extractor?.systemPrompt || '',
+            extraction_type: extractionType,
+            model_id: 'qwen3:14b',
+            examples: extractor?.fewShotExamples || [],
+          },
+        );
+
+        this.addLog(
+          run,
+          'info',
+          `Extraction job queued for '${source.name}'`,
+        );
+      }
+
+      await this.runRepo.save(run);
+      await this.flushLogs(run.id);
+    }
+
+    this.runsGateway.emitRunUpdated(run.id, run);
+    this.runsGateway.emitRunSourceUpdated(run.id, source);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
       status: run.status,
