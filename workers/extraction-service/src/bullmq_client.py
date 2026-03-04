@@ -28,8 +28,8 @@ class BullMQClient:
         except Exception as e:
             logger.error(f"Failed to add job to {queue_name}: {e}")
 
-    def create_worker(self, queue_name: str, processor: Callable[[Job], Awaitable[Any]]):
-        return Worker(queue_name, processor, opts={"connection": REDIS_URL})
+    def create_worker(self, queue_name: str, processor: Callable[[Job], Awaitable[Any]], concurrency: int = 1):
+        return Worker(queue_name, processor, opts={"connection": REDIS_URL, "concurrency": concurrency})
 
 bullmq_client = BullMQClient()
 
