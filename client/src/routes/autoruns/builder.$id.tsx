@@ -1,5 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useState, useCallback, useRef } from 'react';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
 	Node,
 	Edge,
@@ -14,6 +14,13 @@ import { NodePalette } from '@/components/workflow/NodePalette';
 import { NodeConfigPanel } from '@/components/workflow/NodeConfigPanel';
 import { WorkflowToolbar } from '@/components/workflow/WorkflowToolbar';
 import { TriggerNode, ProcessorNode, ActionNode } from '@/components/workflow/nodes';
+import {
+	useGetWorkflowsId,
+	useUpdateWorkflowsId,
+	useActivateWorkflowsId,
+	usePauseWorkflowsId,
+} from '@/api/endpoints/workflows/workflows';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/autoruns/builder/$id')({
 	component: WorkflowBuilder,
@@ -27,6 +34,7 @@ const nodeTypes = {
 
 function WorkflowBuilder() {
 	const { id } = Route.useParams();
+	const navigate = useNavigate();
 	const [nodes, setNodes, onNodesChange] = useNodesState([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
@@ -34,6 +42,51 @@ function WorkflowBuilder() {
 	const [workflowStatus, setWorkflowStatus] = useState<'draft' | 'active' | 'paused'>('draft');
 	const reactFlowWrapper = useRef<HTMLDivElement>(null);
 	const dragDataRef = useRef<{ type: string; category: string; label: string } | null>(null);
+
+	// API hooks
+	const { data: workflow, isLoading } = useGetWorkflowsId(id, {
+		query: { enabled: id !== 'new' },
+	});
+	const updateWorkflow = useUpdateWorkflowsId();
+	const activateWorkflow = useActivateWorkflowsId();
+	const pauseWorkflow = usePauseWorkflowsId();
+
+	// Load workflow data
+	useEffect(() => {
+		if (workflow) {
+			setWorkflowName(workflow.name);
+			setWorkflowStatus(workflow.status as 'draft' | 'active' | 'paused');
+
+			// Load nodes and edges from workflow definition
+			if (workflow.definition) {
+				const loadedNodes = workflow.definition.nodes.map((node: any) => ({
+					id: node.id,
+					type: node.type.includes('trigger')
+						? 'trigger'
+						: node.type.includes('filter') || node.type.includes('transform')
+							? 'processor'
+							: 'action',
+					position: node.position,
+					data: {
+						label: node.params.label || node.type,
+						type: node.type,
+						params: node.params,
+					},
+				}));
+
+				const loadedEdges = workflow.definition.connections.map((conn: any) => ({
+					id: conn.id,
+					source: conn.source,
+					target: conn.target,
+					sourceHandle: conn.sourceHandle,
+					targetHandle: conn.targetHandle,
+				}));
+
+				setNodes(loadedNodes);
+				setEdges(loadedEdges);
+			}
+		}
+	}, [workflow, setNodes, setEdges]);
 
 	// Handle connecting nodes
 	const onConnect = useCallback(
@@ -114,32 +167,78 @@ function WorkflowBuilder() {
 
 	// Toolbar actions
 	const handleBack = useCallback(() => {
-		window.history.back();
-	}, []);
+		navigate({ to: '/autoruns' });
+	}, [navigate]);
 
-	const handleSave = useCallback(() => {
-		console.log('Saving workflow:', { nodes, edges });
-		// TODO: Implement save logic with API call
-		alert('Save functionality will be implemented in Phase 9');
-	}, [nodes, edges]);
+	const handleSave = useCallback(async () => {
+		try {
+			// Convert nodes and edges to workflow definition format
+			const definition = {
+				nodes: nodes.map((node) => ({
+					id: node.id,
+					type: node.data.type,
+					position: node.position,
+					params: { ...node.data.params, label: node.data.label },
+				})),
+				connections: edges.map((edge) => ({
+					id: edge.id,
+					source: edge.source,
+					target: edge.target,
+					sourceHandle: edge.sourceHandle,
+					targetHandle: edge.targetHandle,
+				})),
+			};
+
+			await updateWorkflow.mutateAsync({
+				id,
+				data: {
+					name: workflowName,
+					definition,
+				},
+			});
+
+			toast.success('Workflow saved successfully');
+		} catch (error) {
+			toast.error('Failed to save workflow');
+			console.error('Save error:', error);
+		}
+	}, [nodes, edges, workflowName, id, updateWorkflow]);
 
 	const handleTest = useCallback(() => {
-		console.log('Testing workflow:', { nodes, edges });
-		// TODO: Implement test logic
-		alert('Test functionality will be implemented in Phase 10');
-	}, [nodes, edges]);
-
-	const handleActivate = useCallback(() => {
-		console.log('Activating workflow');
-		setWorkflowStatus('active');
-		// TODO: Implement activate logic with API call
+		toast.info('Test functionality coming soon');
+		// TODO: Implement test logic in Phase 10
 	}, []);
 
-	const handlePause = useCallback(() => {
-		console.log('Pausing workflow');
-		setWorkflowStatus('paused');
-		// TODO: Implement pause logic with API call
-	}, []);
+	const handleActivate = useCallback(async () => {
+		try {
+			await activateWorkflow.mutateAsync({ id });
+			setWorkflowStatus('active');
+			toast.success('Workflow activated');
+		} catch (error: any) {
+			toast.error(error.message || 'Failed to activate workflow');
+		}
+	}, [id, activateWorkflow]);
+
+	const handlePause = useCallback(async () => {
+		try {
+			await pauseWorkflow.mutateAsync({ id });
+			setWorkflowStatus('paused');
+			toast.success('Workflow paused');
+		} catch (error: any) {
+			toast.error(error.message || 'Failed to pause workflow');
+		}
+	}, [id, pauseWorkflow]);
+
+	if (isLoading && id !== 'new') {
+		return (
+			<div className="h-screen flex items-center justify-center bg-cream">
+				<div className="text-center">
+					<div className="animate-spin w-12 h-12 border-4 border-black border-t-transparent rounded-full mx-auto mb-4" />
+					<p className="font-display font-bold uppercase">Loading workflow...</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="h-screen flex flex-col bg-cream">
@@ -151,6 +250,7 @@ function WorkflowBuilder() {
 				onTest={handleTest}
 				onActivate={handleActivate}
 				onPause={handlePause}
+				isSaving={updateWorkflow.isPending}
 			/>
 
 			<div className="flex-1 flex overflow-hidden">
