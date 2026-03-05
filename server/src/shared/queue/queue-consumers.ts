@@ -50,3 +50,5 @@ export class ExtractionCompletedConsumer extends WorkerHost {
     }
   }
 }
+
+// Note: WorkflowExecutionsConsumer is in workflows module to avoid circular dependency

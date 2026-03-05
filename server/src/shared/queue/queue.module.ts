@@ -22,6 +22,7 @@ import { QueueService } from './queue.service';
       { name: QueueName.PARSED_DOCUMENTS },
       { name: QueueName.EXTRACTION_REQUESTS },
       { name: QueueName.EXTRACTION_COMPLETED },
+      { name: QueueName.WORKFLOW_EXECUTIONS },
     ),
   ],
   providers: [QueueService],
