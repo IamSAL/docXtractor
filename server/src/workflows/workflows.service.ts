@@ -2,6 +2,8 @@ import {
 	Injectable,
 	NotFoundException,
 	BadRequestException,
+	Inject,
+	forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +13,9 @@ import { CreateWorkflowDto } from './dto/create-workflow.dto';
 import { UpdateWorkflowDto } from './dto/update-workflow.dto';
 import { WorkflowStatus } from './enums/workflow-status.enum';
 import { ExecutionStatus } from './enums/execution-status.enum';
+import { WorkflowExecutorService } from './executor/workflow-executor.service';
+import { TriggerManagerService } from './triggers/trigger-manager.service';
+import { QueueService } from '../shared/queue/queue.service';
 
 @Injectable()
 export class WorkflowsService {
@@ -19,6 +24,11 @@ export class WorkflowsService {
 		private workflowRepository: Repository<Workflow>,
 		@InjectRepository(WorkflowExecution)
 		private workflowExecutionRepository: Repository<WorkflowExecution>,
+		@Inject(forwardRef(() => WorkflowExecutorService))
+		private workflowExecutor: WorkflowExecutorService,
+		@Inject(forwardRef(() => TriggerManagerService))
+		private triggerManager: TriggerManagerService,
+		private queueService: QueueService,
 	) {}
 
 	async create(createWorkflowDto: CreateWorkflowDto, userId: string) {
@@ -101,13 +111,23 @@ export class WorkflowsService {
 		this.validateWorkflowDefinition(workflow.definition);
 
 		workflow.status = WorkflowStatus.ACTIVE;
-		return this.workflowRepository.save(workflow);
+		const savedWorkflow = await this.workflowRepository.save(workflow);
+
+		// Register triggers
+		await this.triggerManager.registerTriggers(id);
+
+		return savedWorkflow;
 	}
 
 	async pause(id: string, userId: string) {
 		const workflow = await this.findOne(id, userId);
 		workflow.status = WorkflowStatus.PAUSED;
-		return this.workflowRepository.save(workflow);
+		const savedWorkflow = await this.workflowRepository.save(workflow);
+
+		// Unregister triggers
+		await this.triggerManager.unregisterTriggers(id);
+
+		return savedWorkflow;
 	}
 
 	async getExecutions(workflowId: string, userId: string) {
@@ -123,19 +143,44 @@ export class WorkflowsService {
 	async triggerManually(id: string, userId: string, payload: any = {}) {
 		const workflow = await this.findOne(id, userId);
 
-		// Create execution record
-		const execution = this.workflowExecutionRepository.create({
-			workflowId: id,
-			status: ExecutionStatus.PENDING,
-			triggerPayload: payload,
+		// Validate workflow definition
+		this.validateWorkflowDefinition(workflow.definition);
+
+		// Queue execution via BullMQ
+		await this.queueService.queueWorkflowExecution(id, payload);
+
+		// Update last triggered time
+		workflow.lastTriggeredAt = new Date();
+		await this.workflowRepository.save(workflow);
+
+		return { message: 'Workflow execution queued successfully' };
+	}
+
+	/**
+	 * Trigger workflow execution (used by trigger system)
+	 */
+	async triggerWorkflow(workflowId: string, payload: any = {}) {
+		const workflow = await this.workflowRepository.findOne({
+			where: { id: workflowId },
 		});
 
-		const savedExecution = await this.workflowExecutionRepository.save(execution);
+		if (!workflow) {
+			throw new NotFoundException(`Workflow ${workflowId} not found`);
+		}
 
-		// TODO: Queue workflow execution job
-		// This will be implemented in Phase 3 when we create the WorkflowExecutorService
+		// Check if workflow is active
+		if (workflow.status !== WorkflowStatus.ACTIVE) {
+			throw new BadRequestException('Workflow is not active');
+		}
 
-		return savedExecution;
+		// Queue execution
+		await this.queueService.queueWorkflowExecution(workflowId, payload);
+
+		// Update last triggered time
+		workflow.lastTriggeredAt = new Date();
+		await this.workflowRepository.save(workflow);
+
+		return { message: 'Workflow execution queued successfully' };
 	}
 
 	private validateWorkflowDefinition(definition: any) {
