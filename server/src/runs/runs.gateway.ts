@@ -86,4 +86,110 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }) {
     this.server.to('runs:list').emit('runs:list:updated', payload);
   }
+
+  // Workflow execution events
+  @SubscribeMessage('joinWorkflow')
+  handleJoinWorkflow(
+    @MessageBody() data: { workflowId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { workflowId } = data;
+    client.join(`workflow:${workflowId}`);
+    return { event: 'joinedWorkflow', data: { workflowId } };
+  }
+
+  @SubscribeMessage('leaveWorkflow')
+  handleLeaveWorkflow(
+    @MessageBody() data: { workflowId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { workflowId } = data;
+    client.leave(`workflow:${workflowId}`);
+    return { event: 'leftWorkflow', data: { workflowId } };
+  }
+
+  @SubscribeMessage('joinWorkflowExecution')
+  handleJoinWorkflowExecution(
+    @MessageBody() data: { executionId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { executionId } = data;
+    client.join(`workflow-execution:${executionId}`);
+    return { event: 'joinedWorkflowExecution', data: { executionId } };
+  }
+
+  @SubscribeMessage('leaveWorkflowExecution')
+  handleLeaveWorkflowExecution(
+    @MessageBody() data: { executionId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { executionId } = data;
+    client.leave(`workflow-execution:${executionId}`);
+    return { event: 'leftWorkflowExecution', data: { executionId } };
+  }
+
+  @SubscribeMessage('joinWorkflowsList')
+  handleJoinWorkflowsList(@ConnectedSocket() client: Socket) {
+    client.join('workflows:list');
+    return { event: 'joinedWorkflowsList' };
+  }
+
+  @SubscribeMessage('leaveWorkflowsList')
+  handleLeaveWorkflowsList(@ConnectedSocket() client: Socket) {
+    client.leave('workflows:list');
+    return { event: 'leftWorkflowsList' };
+  }
+
+  // Emit workflow events
+  emitWorkflowExecutionStarted(execution: any) {
+    this.server.to(`workflow:${execution.workflowId}`).emit('workflow:execution:started', execution);
+    this.server.to(`workflow-execution:${execution.id}`).emit('workflow:execution:started', execution);
+    this.server.to('workflows:list').emit('workflows:list:updated', {
+      workflowId: execution.workflowId,
+      executionId: execution.id,
+      status: 'started',
+    });
+  }
+
+  emitWorkflowExecutionCompleted(execution: any) {
+    this.server.to(`workflow:${execution.workflowId}`).emit('workflow:execution:completed', execution);
+    this.server.to(`workflow-execution:${execution.id}`).emit('workflow:execution:completed', execution);
+    this.server.to('workflows:list').emit('workflows:list:updated', {
+      workflowId: execution.workflowId,
+      executionId: execution.id,
+      status: 'completed',
+    });
+  }
+
+  emitWorkflowExecutionFailed(execution: any, errorMessage: string) {
+    this.server.to(`workflow:${execution.workflowId}`).emit('workflow:execution:failed', {
+      execution,
+      errorMessage,
+    });
+    this.server.to(`workflow-execution:${execution.id}`).emit('workflow:execution:failed', {
+      execution,
+      errorMessage,
+    });
+    this.server.to('workflows:list').emit('workflows:list:updated', {
+      workflowId: execution.workflowId,
+      executionId: execution.id,
+      status: 'failed',
+      errorMessage,
+    });
+  }
+
+  emitWorkflowNodeStarted(nodeExecution: any) {
+    this.server.to(`workflow-execution:${nodeExecution.executionId}`).emit('workflow:node:started', nodeExecution);
+  }
+
+  emitWorkflowNodeCompleted(nodeExecution: any) {
+    this.server.to(`workflow-execution:${nodeExecution.executionId}`).emit('workflow:node:completed', nodeExecution);
+  }
+
+  emitWorkflowNodeFailed(nodeExecution: any, errorMessage: string) {
+    this.server.to(`workflow-execution:${nodeExecution.executionId}`).emit('workflow:node:failed', {
+      nodeExecution,
+      errorMessage,
+    });
+  }
 }

@@ -1,19 +1,65 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { AppLayout } from '../../components/AppLayout'
-import { PageHeader } from '@/components/retroui/PageHeader'
-import { Button } from '@/components/retroui/Button'
-import { Input } from '@/components/retroui/Input'
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { AppLayout } from '../../components/AppLayout';
+import { PageHeader } from '@/components/retroui/PageHeader';
+import { Button } from '@/components/retroui/Button';
+import { Input } from '@/components/retroui/Input';
+import { useGetWorkflows, useDeleteWorkflows } from '@/api/endpoints/workflows/workflows';
+import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/autoruns/')({
     component: AutoRunsComponent,
 })
 
 function AutoRunsComponent() {
-    return (
-        <AppLayout>
-            <div className="flex flex-col h-full p-4 lg:p-12">
-                {/* Background Pattern */}
-                <div className="absolute inset-0 z-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+	const { data: workflows, isLoading } = useGetWorkflows();
+	const deleteWorkflow = useDeleteWorkflows();
+
+	const handleDelete = async (id: string) => {
+		if (confirm('Are you sure you want to delete this workflow?')) {
+			try {
+				await deleteWorkflow.mutateAsync({ id });
+				toast.success('Workflow deleted');
+			} catch (error) {
+				toast.error('Failed to delete workflow');
+			}
+		}
+	};
+
+	const getStatusColor = (status: string) => {
+		switch (status) {
+			case 'active':
+				return '#33FF57';
+			case 'paused':
+				return '#fb923c';
+			case 'draft':
+				return '#gray-400';
+			default:
+				return '#gray-400';
+		}
+	};
+
+	const getNodeIcons = (workflow: any) => {
+		const nodes = workflow.definition?.nodes || [];
+		const triggers = nodes.filter((n: any) => n.type.includes('trigger'));
+		const processors = nodes.filter((n: any) => n.type.includes('filter') || n.type.includes('transform'));
+		const actions = nodes.filter((n: any) => n.type.includes('extract') || n.type.includes('email') || n.type.includes('webhook'));
+
+		return {
+			icon1: triggers[0]?.type.includes('webhook') ? 'webhook' : triggers[0]?.type.includes('schedule') ? 'schedule' : 'mail',
+			label1: triggers[0]?.type.includes('webhook') ? 'Webhook' : triggers[0]?.type.includes('schedule') ? 'Schedule' : 'Email',
+			icon2: actions[0]?.type.includes('extract') ? 'psychology' : 'api',
+			label2: actions[0]?.type.includes('extract') ? 'Extract' : 'Action',
+			icon3: actions[0]?.type.includes('email') ? 'mail' : actions[0]?.type.includes('webhook') ? 'api' : 'table_chart',
+			label3: actions[0]?.type.includes('email') ? 'Email' : actions[0]?.type.includes('webhook') ? 'API' : 'Output',
+		};
+	};
+
+	return (
+		<AppLayout>
+			<div className="flex flex-col h-full p-4 lg:p-12">
+				{/* Background Pattern */}
+				<div className="absolute inset-0 z-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
 
                 <PageHeader
                     heading="AutoRuns"
