@@ -3,6 +3,24 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { cookieStorage } from "./cookie-storage";
 import * as authApi from "@/api/endpoints/auth/auth";
 import type { UserResponseDto } from "@/api/models";
+import { disconnectSocket } from "./socket";
+
+// Callback to clear query cache on logout, set by root-provider to avoid circular deps
+let _clearQueryCache: (() => void) | null = null;
+export function setQueryCacheClearer(fn: () => void) {
+  _clearQueryCache = fn;
+}
+
+/** Check if a JWT is expired (or will expire within bufferSeconds). Returns true if expired/invalid. */
+function isTokenExpired(token: string, bufferSeconds = 60): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (!payload.exp) return false; // no expiry claim — treat as valid
+    return payload.exp * 1000 < Date.now() + bufferSeconds * 1000;
+  } catch {
+    return true; // malformed token
+  }
+}
 
 interface AuthState {
   // State
@@ -139,6 +157,10 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           error: null,
         });
+        // Disconnect socket on logout
+        disconnectSocket();
+        // Clear query cache to prevent stale data from previous session
+        _clearQueryCache?.();
       },
 
       // Refresh access token
@@ -238,7 +260,27 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
       }),
       onRehydrateStorage: () => (state) => {
-        state?.setHydrated(true);
+        if (state) {
+          // Validate rehydrated auth state
+          if (state.isAuthenticated) {
+            // Missing essential data — clear immediately
+            if (!state.accessToken || !state.refreshToken || !state.user) {
+              state.logout();
+            }
+            // Access token expired — try refresh, or clear if refresh token is also expired
+            else if (isTokenExpired(state.accessToken)) {
+              if (isTokenExpired(state.refreshToken)) {
+                state.logout();
+              } else {
+                // Access token expired but refresh token still valid — trigger refresh
+                state.refreshAccessToken().catch(() => {
+                  state.logout();
+                });
+              }
+            }
+          }
+          state.setHydrated(true);
+        }
       },
     },
   ),

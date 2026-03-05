@@ -6,7 +6,7 @@ import { CheckCircle2, XCircle, Loader2, Clock } from "lucide-react";
 interface BaseWorkflowNodeProps {
   id: string;
   data: {
-    label: string;
+    label?: string;
     icon?: ReactNode;
     params?: Record<string, any>;
     status?: "idle" | "pending" | "running" | "success" | "failed";

@@ -5,7 +5,6 @@ import { FilesService } from './files.service';
 import { File } from './entities/file.entity';
 import { StorageService } from './storage.service';
 
-
 @Module({
   imports: [TypeOrmModule.forFeature([File])],
   controllers: [FilesController],
