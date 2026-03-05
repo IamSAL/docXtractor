@@ -55,19 +55,84 @@ export class ExtractDataNode extends ActionNode {
 				return this.error('No document sources found in input data');
 			}
 
-			// TODO: This will be implemented in Phase 10 when we integrate with RunsService
-			// For now, return a placeholder indicating extraction will be queued
+			const { extractorId, processingMode = 'unified', waitForCompletion = true } = params;
+
+			// Create a Run entity linked to this workflow execution
+			const runData = {
+				extractorId,
+				processingMode,
+				sources: sources.map((source: any) => ({
+					type: source.type || 'url',
+					location: source.url || source.location,
+					name: source.name,
+					parseStatus: 'pending',
+				})),
+				workflowExecutionId: context.executionId,
+			};
+
+			// Create the run via RunsService
+			const run = await context.runsService.create(runData, context.userId);
+
+			// Queue documents for parsing
+			for (let i = 0; i < sources.length; i++) {
+				const source = sources[i];
+				await context.queueService.addJob(
+					'uploaded-documents' as any, // QueueName enum
+					'parse-document',
+					{
+						runId: run.id,
+						sourceIndex: i,
+						url: source.url || source.location,
+						fileName: source.name,
+					},
+				);
+			}
+
+			// If waitForCompletion is true, poll for completion (with timeout)
+			if (waitForCompletion) {
+				const result = await this.waitForRunCompletion(run.id, context, 300000); // 5 min timeout
+				return this.success({
+					runId: run.id,
+					status: result.status,
+					extractionResult: result.extractionResult,
+					sources: result.sources,
+				});
+			}
+
+			// Return immediately with runId
 			return this.success({
+				runId: run.id,
 				status: 'queued',
-				extractorId: params.extractorId,
-				processingMode: params.processingMode || 'unified',
-				sources,
-				message:
-					'Extraction queued - will be implemented in Phase 10',
+				message: 'Extraction started, continuing workflow without waiting',
 			});
 		} catch (error) {
-			return this.error(`Failed to queue extraction: ${error.message}`);
+			return this.error(`Failed to start extraction: ${error.message}`);
 		}
+	}
+
+	/**
+	 * Poll for run completion (used when waitForCompletion=true)
+	 */
+	private async waitForRunCompletion(
+		runId: string,
+		context: ExecutionContext,
+		timeoutMs: number,
+	): Promise<any> {
+		const startTime = Date.now();
+		const pollInterval = 2000; // 2 seconds
+
+		while (Date.now() - startTime < timeoutMs) {
+			const run = await context.runsService.findOne(runId, context.userId);
+
+			if (run.status === 'done' || run.status === 'failed') {
+				return run;
+			}
+
+			// Wait before next poll
+			await new Promise((resolve) => setTimeout(resolve, pollInterval));
+		}
+
+		throw new Error('Extraction timeout - exceeded 5 minutes');
 	}
 
 	private extractSources(inputData: any): any[] {

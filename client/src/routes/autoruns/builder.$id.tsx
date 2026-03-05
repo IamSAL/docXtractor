@@ -13,14 +13,19 @@ import { WorkflowCanvas } from '@/components/workflow/WorkflowCanvas';
 import { NodePalette } from '@/components/workflow/NodePalette';
 import { NodeConfigPanel } from '@/components/workflow/NodeConfigPanel';
 import { WorkflowToolbar } from '@/components/workflow/WorkflowToolbar';
+import { ExecutionStatusPanel } from '@/components/workflow/ExecutionStatusPanel';
 import { TriggerNode, ProcessorNode, ActionNode } from '@/components/workflow/nodes';
 import {
 	useGetWorkflowsId,
 	useUpdateWorkflowsId,
 	useActivateWorkflowsId,
 	usePauseWorkflowsId,
+	useGetWorkflowsIdExecutions,
+	useWorkflowsControllerTrigger,
 } from '@/api/endpoints/workflows/workflows';
 import { toast } from 'sonner';
+import { useWorkflowExecution } from '@/hooks/useWorkflowExecution';
+import { joinWorkflow, leaveWorkflow } from '@/lib/socket';
 
 export const Route = createFileRoute('/autoruns/builder/$id')({
 	component: WorkflowBuilder,
@@ -40,6 +45,7 @@ function WorkflowBuilder() {
 	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 	const [workflowName, setWorkflowName] = useState('New Workflow');
 	const [workflowStatus, setWorkflowStatus] = useState<'draft' | 'active' | 'paused'>('draft');
+	const [currentExecutionId, setCurrentExecutionId] = useState<string | null>(null);
 	const reactFlowWrapper = useRef<HTMLDivElement>(null);
 	const dragDataRef = useRef<{ type: string; category: string; label: string } | null>(null);
 
@@ -50,6 +56,13 @@ function WorkflowBuilder() {
 	const updateWorkflow = useUpdateWorkflowsId();
 	const activateWorkflow = useActivateWorkflowsId();
 	const pauseWorkflow = usePauseWorkflowsId();
+	const triggerWorkflow = useWorkflowsControllerTrigger();
+	const { data: executions, refetch: refetchExecutions } = useGetWorkflowsIdExecutions(id, {
+		query: { enabled: id !== 'new' },
+	});
+
+	// Live execution tracking
+	const { execution, nodeExecutions, getNodeStatus } = useWorkflowExecution(currentExecutionId);
 
 	// Load workflow data
 	useEffect(() => {
@@ -71,6 +84,7 @@ function WorkflowBuilder() {
 						label: node.params.label || node.type,
 						type: node.type,
 						params: node.params,
+						status: 'idle', // Will be updated by live execution
 					},
 				}));
 
@@ -87,6 +101,43 @@ function WorkflowBuilder() {
 			}
 		}
 	}, [workflow, setNodes, setEdges]);
+
+	// Join workflow room for real-time updates
+	useEffect(() => {
+		if (id && id !== 'new') {
+			joinWorkflow(id);
+			return () => leaveWorkflow(id);
+		}
+	}, [id]);
+
+	// Track latest execution
+	useEffect(() => {
+		if (executions && executions.length > 0) {
+			const latest = executions[0];
+			// Only track running executions
+			if (latest.status === 'running' || latest.status === 'pending') {
+				setCurrentExecutionId(latest.id);
+			}
+		}
+	}, [executions]);
+
+	// Update node statuses based on live execution
+	useEffect(() => {
+		if (!execution) return;
+
+		setNodes((nds) =>
+			nds.map((node) => {
+				const status = getNodeStatus(node.id);
+				return {
+					...node,
+					data: {
+						...node.data,
+						status: status === 'idle' ? 'idle' : status,
+					},
+				};
+			}),
+		);
+	}, [nodeExecutions, getNodeStatus, setNodes, execution]);
 
 	// Handle connecting nodes
 	const onConnect = useCallback(
@@ -204,10 +255,22 @@ function WorkflowBuilder() {
 		}
 	}, [nodes, edges, workflowName, id, updateWorkflow]);
 
-	const handleTest = useCallback(() => {
-		toast.info('Test functionality coming soon');
-		// TODO: Implement test logic in Phase 10
-	}, []);
+	const handleTest = useCallback(async () => {
+		try {
+			// Save workflow before testing
+			await handleSave();
+
+			// Trigger workflow execution
+			await triggerWorkflow.mutateAsync({ id });
+
+			toast.success('Workflow execution started! Watch nodes animate.');
+
+			// Refetch executions to get the new execution ID
+			setTimeout(() => refetchExecutions(), 500);
+		} catch (error: any) {
+			toast.error(error.message || 'Failed to trigger workflow');
+		}
+	}, [id, triggerWorkflow, handleSave, refetchExecutions]);
 
 	const handleActivate = useCallback(async () => {
 		try {
@@ -283,6 +346,13 @@ function WorkflowBuilder() {
 					onUpdateNode={onUpdateNode}
 				/>
 			</div>
+
+			{/* Floating Execution Status Panel */}
+			<ExecutionStatusPanel
+				execution={execution}
+				executionOrder={executionOrder}
+				nodeExecutions={nodeExecutions}
+			/>
 		</div>
 	);
 }

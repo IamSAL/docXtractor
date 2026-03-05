@@ -39,3 +39,91 @@ export const disconnectSocket = () => {
     socket = null;
   }
 };
+
+// Workflow room management
+export const joinWorkflow = (workflowId: string) => {
+  const s = getSocket();
+  s.emit("joinWorkflow", { workflowId });
+};
+
+export const leaveWorkflow = (workflowId: string) => {
+  const s = getSocket();
+  s.emit("leaveWorkflow", { workflowId });
+};
+
+export const joinWorkflowExecution = (executionId: string) => {
+  const s = getSocket();
+  s.emit("joinWorkflowExecution", { executionId });
+};
+
+export const leaveWorkflowExecution = (executionId: string) => {
+  const s = getSocket();
+  s.emit("leaveWorkflowExecution", { executionId });
+};
+
+export const joinWorkflowsList = () => {
+  const s = getSocket();
+  s.emit("joinWorkflowsList");
+};
+
+export const leaveWorkflowsList = () => {
+  const s = getSocket();
+  s.emit("leaveWorkflowsList");
+};
+
+// Workflow event listeners
+export const onWorkflowExecutionStarted = (
+  callback: (data: any) => void,
+): (() => void) => {
+  const s = getSocket();
+  s.on("workflow:execution:started", callback);
+  return () => s.off("workflow:execution:started", callback);
+};
+
+export const onWorkflowExecutionCompleted = (
+  callback: (data: any) => void,
+): (() => void) => {
+  const s = getSocket();
+  s.on("workflow:execution:completed", callback);
+  return () => s.off("workflow:execution:completed", callback);
+};
+
+export const onWorkflowExecutionFailed = (
+  callback: (data: any) => void,
+): (() => void) => {
+  const s = getSocket();
+  s.on("workflow:execution:failed", callback);
+  return () => s.off("workflow:execution:failed", callback);
+};
+
+export const onWorkflowNodeStarted = (
+  callback: (data: any) => void,
+): (() => void) => {
+  const s = getSocket();
+  s.on("workflow:node:started", callback);
+  return () => s.off("workflow:node:started", callback);
+};
+
+export const onWorkflowNodeCompleted = (
+  callback: (data: any) => void,
+): (() => void) => {
+  const s = getSocket();
+  s.on("workflow:node:completed", callback);
+  return () => s.off("workflow:node:completed", callback);
+};
+
+export const onWorkflowNodeFailed = (
+  callback: (data: any) => void,
+): (() => void) => {
+  const s = getSocket();
+  s.on("workflow:node:failed", callback);
+  return () => s.off("workflow:node:failed", callback);
+};
+
+export const onWorkflowsListUpdated = (
+  callback: (data: any) => void,
+): (() => void) => {
+  const s = getSocket();
+  s.on("workflows:list:updated", callback);
+  return () => s.off("workflows:list:updated", callback);
+};
