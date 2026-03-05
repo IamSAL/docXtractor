@@ -25,6 +25,6 @@ import { RunsGateway } from './runs.gateway';
     ExtractionCompletedConsumer,
     RunsGateway,
   ],
-  exports: [RunsService],
+  exports: [RunsService, RunsGateway],
 })
 export class RunsModule {}

@@ -16,6 +16,8 @@ export class QueueService {
     private readonly extractionRequestsQueue: Queue,
     @InjectQueue(QueueName.EXTRACTION_COMPLETED)
     private readonly extractionCompletedQueue: Queue,
+    @InjectQueue(QueueName.WORKFLOW_EXECUTIONS)
+    private readonly workflowExecutionsQueue: Queue,
   ) {}
 
   async addJob(
@@ -46,8 +48,29 @@ export class QueueService {
         return this.extractionRequestsQueue;
       case QueueName.EXTRACTION_COMPLETED:
         return this.extractionCompletedQueue;
+      case QueueName.WORKFLOW_EXECUTIONS:
+        return this.workflowExecutionsQueue;
       default:
         return null;
     }
+  }
+
+  /**
+   * Queue a workflow execution
+   */
+  async queueWorkflowExecution(workflowId: string, triggerPayload: any = {}) {
+    this.logger.log(`Queueing workflow execution for workflow ${workflowId}`);
+    return await this.addJob(
+      QueueName.WORKFLOW_EXECUTIONS,
+      'execute-workflow',
+      { workflowId, triggerPayload },
+      {
+        attempts: 2, // Retry once if fails
+        backoff: {
+          type: 'exponential',
+          delay: 2000, // 2s, then 4s
+        },
+      },
+    );
   }
 }
