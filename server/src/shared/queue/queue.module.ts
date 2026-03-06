@@ -12,8 +12,8 @@ import { QueueService } from './queue.service';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         connection: {
-          host: configService.get<string>('REDIS_HOST', 'localhost'),
-          port: configService.get<number>('REDIS_PORT', 6381),
+          host: configService.get<string>('REDIS_HOST', 'redis'),
+          port: configService.get<number>('REDIS_PORT', 6380),
         },
       }),
     }),

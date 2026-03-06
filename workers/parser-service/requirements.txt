@@ -5,8 +5,6 @@ bullmq
 docling
 python-dotenv
 boto3
-rapidocr-onnxruntime
-onnxruntime
 watchfiles
 requests
 redis

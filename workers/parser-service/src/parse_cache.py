@@ -7,7 +7,7 @@ import redis
 
 logger = logging.getLogger(__name__)
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6381")
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6380")
 CACHE_TTL = int(os.getenv("PARSE_CACHE_TTL", str(60 * 60 * 24 * 7)))  # 7 days default
 CACHE_PREFIX = "parse_cache:"
 

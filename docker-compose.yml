@@ -51,7 +51,7 @@ services:
     container_name: docxtractor-server
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "3001:3001"
     environment:
       - NODE_ENV=development
       - OLLAMA_HOST=http://host.docker.internal:11434
