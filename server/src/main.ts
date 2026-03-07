@@ -32,7 +32,12 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization',
     exposedHeaders: 'Content-Type, Content-Length, Content-Encoding',
     credentials: true,
-    origin: true,
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'https://docxtract.sk-salman.com',
+      'https://docxtractor.sk-salman.com',
+    ],
   });
 
   app.useGlobalPipes(
