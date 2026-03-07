@@ -34,16 +34,6 @@ services:
       timeout: 5s
       retries: 5
 
-  maildev:
-    image: maildev/maildev
-    container_name: docxtractor-maildev
-    ports:
-      - "1081:1080"
-      - "1026:1025"
-    networks:
-      - docxtractor-network
-    restart: unless-stopped
-
   server:
     build:
       context: ./server
