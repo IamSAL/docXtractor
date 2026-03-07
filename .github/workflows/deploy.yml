@@ -105,7 +105,7 @@ jobs:
             cd ${{ secrets.PROJECT_DIR }}
 
             # Write production .env from secret
-            echo "${{ secrets.ENV_FILE_CONTENT_SERVER }}" > ./server/.env
+            echo "${{ secrets.ENV_FILE_CONTENT_SERVER }}" > .env
 
             # Log in to ghcr.io to pull private images
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
