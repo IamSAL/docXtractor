@@ -46,7 +46,6 @@ services:
       - ./server/.env
     environment:
       - NODE_ENV=development
-      # Override host-based values for Docker networking
       - DATABASE_URL=postgres://postgres:postgres@db:5432/docxtractor
       - REDIS_HOST=redis
       - REDIS_PORT=6380
