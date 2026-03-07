@@ -42,6 +42,8 @@ services:
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
     networks:
       - docxtractor-network
 
@@ -72,8 +74,8 @@ services:
       dockerfile: Dockerfile.prod
     container_name: docxtractor-server
     restart: unless-stopped
-    expose:
-      - "3000"
+    ports:
+      - "3001:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -137,8 +139,8 @@ services:
         - VITE_SENTRY_DSN=${VITE_SENTRY_DSN:-}
     container_name: docxtractor-client
     restart: unless-stopped
-    expose:
-      - "3000"
+    ports:
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - NITRO_PORT=3000
