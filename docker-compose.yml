@@ -42,13 +42,22 @@ services:
     restart: unless-stopped
     ports:
       - "3001:3001"
+    env_file:
+      - ./server/.env
     environment:
       - NODE_ENV=development
+      # Override host-based values for Docker networking
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/docxtractor
+      - REDIS_HOST=redis
+      - REDIS_PORT=6380
+      - REDIS_URL=redis://redis:6380
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET=docxtractor-documents
       - OLLAMA_HOST=http://host.docker.internal:11434
       - OLLAMA_DEFAULT_MODEL=qwen3:14b
       - OLLAMA_GENERATION_MODEL=qwen3:14b
-    env_file:
-      - ./server/.env
     volumes:
       - ./server:/app
     depends_on:

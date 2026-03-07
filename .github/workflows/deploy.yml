@@ -95,26 +95,33 @@ jobs:
 
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_CONTENT: ${{ secrets.ENV_FILE_CONTENT_SERVER }}
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          GHCR_USER: ${{ secrets.GHCR_USERNAME }}
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script_stop: true
+          envs: ENV_CONTENT,GHCR_PAT,GHCR_USER
           script: |
             cd ${{ secrets.PROJECT_DIR }}
 
-            # Write production .env from secret
-            echo "${{ secrets.ENV_FILE_CONTENT_SERVER }}" > .env
+            # Write production .env using a quoted heredoc to prevent shell injection
+            cat <<'EOF' > .env
+            $ENV_CONTENT
+            EOF
 
-            # Log in to ghcr.io to pull private images
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
+            # Log in to ghcr.io using environment variables for better security
+            echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
 
             # Pull pre-built images and start services
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
 
-            # Wait for health checks to pass
+            # Wait for health checks
             echo "Waiting for services to become healthy..."
             sleep 15
 
@@ -126,7 +133,7 @@ jobs:
                 exit 1
               fi
             done
-            echo "All containers are running."
+            echo "All containers are running successfully."
 
-            # Cleanup old images and build cache
+            # Cleanup old images
             docker image prune -f
