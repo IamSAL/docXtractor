@@ -109,11 +109,6 @@ jobs:
           script: |
             cd ${{ secrets.PROJECT_DIR }}
 
-            # Write production .env using a quoted heredoc to prevent shell injection
-            cat <<'EOF' > .env
-            $ENV_CONTENT
-            EOF
-
             # Log in to ghcr.io using environment variables for better security
             echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
 
