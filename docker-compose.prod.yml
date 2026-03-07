@@ -77,11 +77,6 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DB_HOST=docxtractor-db
-      - DB_PORT=5432
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
       - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@docxtractor-db:5432/${DB_NAME}
       - REDIS_HOST=docxtractor-redis
       - REDIS_PORT=6379
@@ -94,7 +89,6 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
-      - JWT_EXPIRES_IN=1h
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
