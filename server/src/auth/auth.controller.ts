@@ -25,6 +25,7 @@ import { GetUser } from './decorators/get-user.decorator';
 import { JWTPayload } from 'src/shared/types/jwt-payload.types';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/signup.dto';
+import { AdminSetupDto } from './dto/admin-setup.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ResetPasswordInitiateDto } from './dto/reset-password.dto';
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto';
@@ -45,19 +46,48 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
-  @Post('signup')
-  @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'User successfully registered',
+  @Post('admin-setup')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'First-run admin setup (only works when no users exist)',
   })
   @ApiResponse({
-    status: HttpStatus.CONFLICT,
-    description: 'Email already exists',
+    status: HttpStatus.CREATED,
+    description: 'Admin account created and instance initialized',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Instance already initialized',
+  })
+  @ApiBody({ type: AdminSetupDto })
+  async adminSetup(@Body() dto: AdminSetupDto) {
+    return this.authService.adminSetup(dto);
+  }
+
+  @Post('signup')
+  @ApiOperation({ summary: 'Register a new user (cloud mode only)' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Verification email sent',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Public signup is disabled',
   })
   @ApiBody({ type: SignUpDto })
   async signUp(@Body() signUpDto: SignUpDto) {
     return this.authService.signUp(signUpDto);
+  }
+
+  @Get('verify-magic-link')
+  @ApiOperation({ summary: 'Verify email via magic link' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Email verified and user logged in',
+  })
+  async verifyMagicLink(@Req() req: Request) {
+    const token = req.query.token as string;
+    return this.authService.verifyMagicLink(token);
   }
 
   @Post('login')

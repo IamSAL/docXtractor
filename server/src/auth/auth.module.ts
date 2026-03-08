@@ -5,12 +5,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { RefreshTokenStrategy } from './strategy/refresh-token.strategy';
 import { AccessTokenStrategy } from './strategy/access-token.strategy';
-
 import { GoogleStrategy } from './strategy/google.strategy';
 import { User } from 'src/user/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from 'src/user/user.service';
-import { MailService } from 'src/shared/mail/mail.service';
 
 @Module({
   imports: [
@@ -26,9 +24,7 @@ import { MailService } from 'src/shared/mail/mail.service';
     RefreshTokenStrategy,
     AccessTokenStrategy,
     GoogleStrategy,
-
     UserService,
-    MailService,
   ],
 })
 export class AuthModule {}

@@ -49,6 +49,7 @@ server/upload/
 **/temp/
 examples/
 .pnpm-store/
-__pycache__
+**/__pycache__/
 misc
 .venv
+workers/**/src/__pycache__/

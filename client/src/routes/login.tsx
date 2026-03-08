@@ -5,6 +5,7 @@ import { Button } from "../components/retroui/Button";
 import { Input } from "../components/retroui/Input";
 import { Card } from "../components/retroui/Card";
 import { useAuth, useRedirectIfAuthenticated } from "../hooks/useAuth";
+import { AXIOS_INSTANCE } from "@/lib/axios";
 
 export const Route = createFileRoute("/login")({
   component: LoginComponent,
@@ -15,13 +16,42 @@ interface LoginFormData {
   password: string;
 }
 
+interface InstanceStatus {
+  isInitialized: boolean;
+  allowPublicSignup: boolean;
+  instanceName: string;
+  googleOAuthEnabled: boolean;
+}
+
 function LoginComponent() {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError } = useAuth();
   const [showError, setShowError] = useState(false);
+  const [instanceStatus, setInstanceStatus] = useState<InstanceStatus | null>(null);
 
   // Redirect if already authenticated
   useRedirectIfAuthenticated("/dashboard");
+
+  // Check instance status
+  useEffect(() => {
+    AXIOS_INSTANCE.get("/instance/status")
+      .then((res) => {
+        const status = res.data as InstanceStatus;
+        setInstanceStatus(status);
+        if (!status.isInitialized) {
+          navigate({ to: "/setup" });
+        }
+      })
+      .catch(() => {
+        // If instance endpoint doesn't exist, assume initialized
+        setInstanceStatus({
+          isInitialized: true,
+          allowPublicSignup: false,
+          instanceName: "DocXtractor",
+          googleOAuthEnabled: false,
+        });
+      });
+  }, [navigate]);
 
   const {
     register,
@@ -75,7 +105,7 @@ function LoginComponent() {
           </div>
           <div className="text-center mt-2">
             <h1 className="text-3xl font-extrabold text-black tracking-tight leading-none uppercase">
-              DocXTractor
+              {instanceStatus?.instanceName || "DocXTractor"}
             </h1>
             <p className="text-black font-medium text-sm mt-1">
               Extract data with confidence.
@@ -164,41 +194,49 @@ function LoginComponent() {
             </span>
           </Button>
         </form>
-        <div className="mt-8 flex flex-col gap-4">
-          <div className="relative flex items-center">
-            <div className="grow border-t-2 border-black"></div>
-            <span className="shrink mx-4 text-xs font-bold uppercase tracking-widest text-black">
-              Or sign in quickly
-            </span>
-            <div className="grow border-t-2 border-black"></div>
+        {instanceStatus?.googleOAuthEnabled && (
+          <div className="mt-8 flex flex-col gap-4">
+            <div className="relative flex items-center">
+              <div className="grow border-t-2 border-black"></div>
+              <span className="shrink mx-4 text-xs font-bold uppercase tracking-widest text-black">
+                Or sign in quickly
+              </span>
+              <div className="grow border-t-2 border-black"></div>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              <Button
+                variant="outline"
+                className="h-12 justify-center gap-2 bg-white"
+                type="button"
+                onClick={handleGoogleLogin}
+              >
+                <img
+                  alt="Google"
+                  className="w-5 h-5"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG90Z0AqtXTsKm_McnzdJ534I7h656CC9oy9GK-L8ZmZ8LkmZRDXDuni-Z29mx0GbXvC9pBPIYa9JcxHyhBT7vkzXss60ytmXn70RiwQFONlZ2pbVv1sR_iA5RAfqJTDq72dxwRd6Q3UDl7hwzWCZ-d5OY-h3MiqHgRKrohV5Z8nLrHF8pSR2I-SKHwmS0Dqe2nNqQglAEBgT4ybbGq_eWDYduq4useGThVgxApzxbhshN5zeCbFU9jdehEln6RYHmgpexMGGhBbhx"
+                />
+                Continue with Google
+              </Button>
+            </div>
           </div>
-          <div className="grid grid-cols-1 gap-4">
-            <Button
-              variant="outline"
-              className="h-12 justify-center gap-2 bg-white"
-              type="button"
-              onClick={handleGoogleLogin}
-            >
-              <img
-                alt="Google"
-                className="w-5 h-5"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG90Z0AqtXTsKm_McnzdJ534I7h656CC9oy9GK-L8ZmZ8LkmZRDXDuni-Z29mx0GbXvC9pBPIYa9JcxHyhBT7vkzXss60ytmXn70RiwQFONlZ2pbVv1sR_iA5RAfqJTDq72dxwRd6Q3UDl7hwzWCZ-d5OY-h3MiqHgRKrohV5Z8nLrHF8pSR2I-SKHwmS0Dqe2nNqQglAEBgT4ybbGq_eWDYduq4useGThVgxApzxbhshN5zeCbFU9jdehEln6RYHmgpexMGGhBbhx"
-              />
-              Continue with Google
-            </Button>
-          </div>
-        </div>
+        )}
         <div className="mt-8 pt-6 border-t-2 border-black flex justify-center">
-          <p className="text-black font-medium text-sm">
-            Don't have an account?
-            <Link
-              to="/signup"
-              replace
-              className="font-bold underline decoration-2 decoration-primary underline-offset-4 hover:bg-primary hover:text-black transition-colors px-1 ml-1 no-underline"
-            >
-              Sign Up
-            </Link>
-          </p>
+          {instanceStatus?.allowPublicSignup ? (
+            <p className="text-black font-medium text-sm">
+              Don't have an account?
+              <Link
+                to="/signup"
+                replace
+                className="font-bold underline decoration-2 decoration-primary underline-offset-4 hover:bg-primary hover:text-black transition-colors px-1 ml-1 no-underline"
+              >
+                Sign Up
+              </Link>
+            </p>
+          ) : (
+            <p className="text-gray-500 font-medium text-sm text-center">
+              Need an account? Contact your administrator for an invite.
+            </p>
+          )}
         </div>
         <div className="absolute -top-3 -left-3 w-6 h-6 bg-black rounded-full border-2 border-white z-10"></div>
         <div className="absolute -top-3 -right-3 w-6 h-6 bg-black rounded-full border-2 border-white z-10"></div>

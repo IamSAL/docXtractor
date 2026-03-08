@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import * as Pusher from 'pusher';
 import * as webpush from 'web-push';
 import { ConfigService } from '@nestjs/config';
@@ -13,8 +13,9 @@ import { PushSubscriptionDto } from './dto/push-subscription.dto';
 
 @Injectable()
 export class NotificationService {
-  private pusher: Pusher;
-  private twilioClient: twilio.Twilio;
+  private readonly logger = new Logger(NotificationService.name);
+  private pusher: Pusher | null = null;
+  private twilioClient: twilio.Twilio | null = null;
 
   constructor(
     @InjectRepository(Notification)
@@ -23,24 +24,49 @@ export class NotificationService {
     private pushSubscriptionRepository: Repository<PushSubscription>,
     private configService: ConfigService,
   ) {
-    // Initialize Pusher
-    this.pusher = new Pusher({
-      appId: this.configService.getOrThrow('PUSHER_APP_ID'),
-      key: this.configService.getOrThrow('PUSHER_KEY'),
-      secret: this.configService.getOrThrow('PUSHER_SECRET'),
-      cluster: this.configService.getOrThrow('PUSHER_CLUSTER'),
-      useTLS: true,
-    });
-    this.twilioClient = twilio(
-      this.configService.get('TWILIO_ACCOUNT_SID'),
-      this.configService.get('TWILIO_AUTH_TOKEN'),
-    );
-    // Initialize Web Push
-    webpush.setVapidDetails(
-      `mailto:${this.configService.getOrThrow('VAPID_EMAIL')}`,
-      this.configService.getOrThrow('VAPID_PUBLIC_KEY'),
-      this.configService.getOrThrow('VAPID_PRIVATE_KEY'),
-    );
+    // Initialize Pusher (optional)
+    const pusherAppId = this.configService.get('PUSHER_APP_ID');
+    const pusherKey = this.configService.get('PUSHER_KEY');
+    const pusherSecret = this.configService.get('PUSHER_SECRET');
+    const pusherCluster = this.configService.get('PUSHER_CLUSTER');
+
+    if (pusherAppId && pusherKey && pusherSecret && pusherCluster) {
+      this.pusher = new Pusher({
+        appId: pusherAppId,
+        key: pusherKey,
+        secret: pusherSecret,
+        cluster: pusherCluster,
+        useTLS: true,
+      });
+    } else {
+      this.logger.warn(
+        'Pusher is not configured. Set PUSHER_APP_ID, PUSHER_KEY, PUSHER_SECRET, PUSHER_CLUSTER to enable.',
+      );
+    }
+
+    // Initialize Twilio (optional)
+    const twilioSid = this.configService.get('TWILIO_ACCOUNT_SID');
+    const twilioToken = this.configService.get('TWILIO_AUTH_TOKEN');
+    if (twilioSid && twilioToken) {
+      this.twilioClient = twilio(twilioSid, twilioToken);
+    }
+
+    // Initialize Web Push (optional)
+    const vapidEmail = this.configService.get('VAPID_EMAIL');
+    const vapidPublicKey = this.configService.get('VAPID_PUBLIC_KEY');
+    const vapidPrivateKey = this.configService.get('VAPID_PRIVATE_KEY');
+
+    if (vapidEmail && vapidPublicKey && vapidPrivateKey) {
+      webpush.setVapidDetails(
+        `mailto:${vapidEmail}`,
+        vapidPublicKey,
+        vapidPrivateKey,
+      );
+    } else {
+      this.logger.warn(
+        'Web Push (VAPID) is not configured. Set VAPID_EMAIL, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY to enable.',
+      );
+    }
   }
 
   /**
@@ -61,11 +87,13 @@ export class NotificationService {
     const savedNotification =
       await this.notificationRepository.save(notification);
 
-    await this.pusher.trigger(
-      `user-${userId}`,
-      'new-notification',
-      savedNotification,
-    );
+    if (this.pusher) {
+      await this.pusher.trigger(
+        `user-${userId}`,
+        'new-notification',
+        savedNotification,
+      );
+    }
     await this.sendPushNotification(userId, {
       title: dto.title || 'New Notification',
       body: dto.message,
@@ -125,6 +153,10 @@ export class NotificationService {
    * Internal Twilio WhatsApp sender
    */
   private async sendTwilioWhatsApp(to: string, body: string) {
+    if (!this.twilioClient) {
+      this.logger.warn('Twilio is not configured — skipping WhatsApp message');
+      return;
+    }
     try {
       await this.twilioClient.messages.create({
         body,
@@ -286,11 +318,12 @@ export class NotificationService {
     event: string,
     data: any,
   ): Promise<void> {
+    if (!this.pusher) return;
     try {
       const uniqueChannels = [...new Set(channelIds)];
       await Promise.all(
         uniqueChannels.map((channelId) =>
-          this.pusher.trigger(`user-${channelId}`, event, data),
+          this.pusher?.trigger(`user-${channelId}`, event, data),
         ),
       );
     } catch (error) {

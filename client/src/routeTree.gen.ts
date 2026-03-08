@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SetupRouteImport } from './routes/setup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DemoRouteImport } from './routes/demo'
@@ -21,11 +22,13 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AutorunsIndexRouteImport } from './routes/autoruns/index'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
 import { Route as SettingsNotificationsRouteImport } from './routes/settings/notifications'
+import { Route as SettingsInstanceRouteImport } from './routes/settings/instance'
 import { Route as SettingsExtractionRouteImport } from './routes/settings/extraction'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings/appearance'
 import { Route as SettingsApiKeysRouteImport } from './routes/settings/api-keys'
 import { Route as RunsNewRouteImport } from './routes/runs/new'
 import { Route as RunsIdRouteImport } from './routes/runs/$id'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ExtractorsNewRouteImport } from './routes/extractors/new'
 import { Route as ExtractorsIdRouteImport } from './routes/extractors/$id'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
@@ -35,6 +38,7 @@ import { Route as DemoAiStructuredRouteImport } from './routes/demo/ai-structure
 import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
 import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
 import { Route as AutorunsNewRouteImport } from './routes/autoruns/new'
+import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
 import { Route as RunsReviewIdRouteImport } from './routes/runs/review.$id'
@@ -61,6 +65,11 @@ import { Route as DemoApiAiChatRouteImport } from './routes/demo/api.ai.chat'
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetupRoute = SetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -118,6 +127,11 @@ const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => SettingsRoute,
 } as any)
+const SettingsInstanceRoute = SettingsInstanceRouteImport.update({
+  id: '/instance',
+  path: '/instance',
+  getParentRoute: () => SettingsRoute,
+} as any)
 const SettingsExtractionRoute = SettingsExtractionRouteImport.update({
   id: '/extraction',
   path: '/extraction',
@@ -141,6 +155,11 @@ const RunsNewRoute = RunsNewRouteImport.update({
 const RunsIdRoute = RunsIdRouteImport.update({
   id: '/runs/$id',
   path: '/runs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExtractorsNewRoute = ExtractorsNewRouteImport.update({
@@ -186,6 +205,11 @@ const DemoAiChatRoute = DemoAiChatRouteImport.update({
 const AutorunsNewRoute = AutorunsNewRouteImport.update({
   id: '/autoruns/new',
   path: '/autoruns/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthVerifyRoute = AuthVerifyRouteImport.update({
+  id: '/auth/verify',
+  path: '/auth/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -304,8 +328,10 @@ export interface FileRoutesByFullPath {
   '/demo': typeof DemoRouteWithChildren
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRouteWithChildren
+  '/setup': typeof SetupRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/autoruns/new': typeof AutorunsNewRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -315,11 +341,13 @@ export interface FileRoutesByFullPath {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/runs/$id': typeof RunsIdRoute
   '/runs/new': typeof RunsNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
+  '/settings/instance': typeof SettingsInstanceRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/autoruns/': typeof AutorunsIndexRoute
@@ -353,8 +381,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRouteWithChildren
   '/login': typeof LoginRoute
+  '/setup': typeof SetupRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/autoruns/new': typeof AutorunsNewRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -364,11 +394,13 @@ export interface FileRoutesByTo {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/runs/$id': typeof RunsIdRoute
   '/runs/new': typeof RunsNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
+  '/settings/instance': typeof SettingsInstanceRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/autoruns': typeof AutorunsIndexRoute
@@ -404,8 +436,10 @@ export interface FileRoutesById {
   '/demo': typeof DemoRouteWithChildren
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRouteWithChildren
+  '/setup': typeof SetupRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/autoruns/new': typeof AutorunsNewRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -415,11 +449,13 @@ export interface FileRoutesById {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/runs/$id': typeof RunsIdRoute
   '/runs/new': typeof RunsNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/extraction': typeof SettingsExtractionRoute
+  '/settings/instance': typeof SettingsInstanceRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/autoruns/': typeof AutorunsIndexRoute
@@ -456,8 +492,10 @@ export interface FileRouteTypes {
     | '/demo'
     | '/login'
     | '/settings'
+    | '/setup'
     | '/signup'
     | '/auth/callback'
+    | '/auth/verify'
     | '/autoruns/new'
     | '/demo/ai-chat'
     | '/demo/ai-image'
@@ -467,11 +505,13 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/extractors/$id'
     | '/extractors/new'
+    | '/invite/$token'
     | '/runs/$id'
     | '/runs/new'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
+    | '/settings/instance'
     | '/settings/notifications'
     | '/settings/profile'
     | '/autoruns/'
@@ -505,8 +545,10 @@ export interface FileRouteTypes {
     | '/'
     | '/demo'
     | '/login'
+    | '/setup'
     | '/signup'
     | '/auth/callback'
+    | '/auth/verify'
     | '/autoruns/new'
     | '/demo/ai-chat'
     | '/demo/ai-image'
@@ -516,11 +558,13 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/extractors/$id'
     | '/extractors/new'
+    | '/invite/$token'
     | '/runs/$id'
     | '/runs/new'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
+    | '/settings/instance'
     | '/settings/notifications'
     | '/settings/profile'
     | '/autoruns'
@@ -555,8 +599,10 @@ export interface FileRouteTypes {
     | '/demo'
     | '/login'
     | '/settings'
+    | '/setup'
     | '/signup'
     | '/auth/callback'
+    | '/auth/verify'
     | '/autoruns/new'
     | '/demo/ai-chat'
     | '/demo/ai-image'
@@ -566,11 +612,13 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/extractors/$id'
     | '/extractors/new'
+    | '/invite/$token'
     | '/runs/$id'
     | '/runs/new'
     | '/settings/api-keys'
     | '/settings/appearance'
     | '/settings/extraction'
+    | '/settings/instance'
     | '/settings/notifications'
     | '/settings/profile'
     | '/autoruns/'
@@ -606,11 +654,14 @@ export interface RootRouteChildren {
   DemoRoute: typeof DemoRouteWithChildren
   LoginRoute: typeof LoginRoute
   SettingsRoute: typeof SettingsRouteWithChildren
+  SetupRoute: typeof SetupRoute
   SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthVerifyRoute: typeof AuthVerifyRoute
   AutorunsNewRoute: typeof AutorunsNewRoute
   ExtractorsIdRoute: typeof ExtractorsIdRoute
   ExtractorsNewRoute: typeof ExtractorsNewRoute
+  InviteTokenRoute: typeof InviteTokenRoute
   RunsIdRoute: typeof RunsIdRoute
   RunsNewRoute: typeof RunsNewRoute
   AutorunsIndexRoute: typeof AutorunsIndexRoute
@@ -631,6 +682,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -710,6 +768,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsNotificationsRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/settings/instance': {
+      id: '/settings/instance'
+      path: '/instance'
+      fullPath: '/settings/instance'
+      preLoaderRoute: typeof SettingsInstanceRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/settings/extraction': {
       id: '/settings/extraction'
       path: '/extraction'
@@ -743,6 +808,13 @@ declare module '@tanstack/react-router' {
       path: '/runs/$id'
       fullPath: '/runs/$id'
       preLoaderRoute: typeof RunsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/extractors/new': {
@@ -806,6 +878,13 @@ declare module '@tanstack/react-router' {
       path: '/autoruns/new'
       fullPath: '/autoruns/new'
       preLoaderRoute: typeof AutorunsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/verify': {
+      id: '/auth/verify'
+      path: '/auth/verify'
+      fullPath: '/auth/verify'
+      preLoaderRoute: typeof AuthVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -1021,6 +1100,7 @@ interface SettingsRouteChildren {
   SettingsApiKeysRoute: typeof SettingsApiKeysRoute
   SettingsAppearanceRoute: typeof SettingsAppearanceRoute
   SettingsExtractionRoute: typeof SettingsExtractionRoute
+  SettingsInstanceRoute: typeof SettingsInstanceRoute
   SettingsNotificationsRoute: typeof SettingsNotificationsRoute
   SettingsProfileRoute: typeof SettingsProfileRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
@@ -1030,6 +1110,7 @@ const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsApiKeysRoute: SettingsApiKeysRoute,
   SettingsAppearanceRoute: SettingsAppearanceRoute,
   SettingsExtractionRoute: SettingsExtractionRoute,
+  SettingsInstanceRoute: SettingsInstanceRoute,
   SettingsNotificationsRoute: SettingsNotificationsRoute,
   SettingsProfileRoute: SettingsProfileRoute,
   SettingsIndexRoute: SettingsIndexRoute,
@@ -1044,11 +1125,14 @@ const rootRouteChildren: RootRouteChildren = {
   DemoRoute: DemoRouteWithChildren,
   LoginRoute: LoginRoute,
   SettingsRoute: SettingsRouteWithChildren,
+  SetupRoute: SetupRoute,
   SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  AuthVerifyRoute: AuthVerifyRoute,
   AutorunsNewRoute: AutorunsNewRoute,
   ExtractorsIdRoute: ExtractorsIdRoute,
   ExtractorsNewRoute: ExtractorsNewRoute,
+  InviteTokenRoute: InviteTokenRoute,
   RunsIdRoute: RunsIdRoute,
   RunsNewRoute: RunsNewRoute,
   AutorunsIndexRoute: AutorunsIndexRoute,

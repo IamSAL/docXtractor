@@ -19,9 +19,11 @@ import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto';
 import { SignUpDto } from './dto/signup.dto';
 import { MailService } from 'src/shared/mail/mail.service';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { AdminSetupDto } from './dto/admin-setup.dto';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { InstanceSettingsService } from 'src/instance-settings/instance-settings.service';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +32,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly mailService: MailService,
+    private readonly instanceSettingsService: InstanceSettingsService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
@@ -39,6 +42,107 @@ export class AuthService {
 
     const isValid = await user.comparePassword(password);
     return isValid ? user : null;
+  }
+
+  async adminSetup(dto: AdminSetupDto) {
+    const hasUsers = await this.instanceSettingsService.hasAnyUsers();
+    if (hasUsers) {
+      throw new ForbiddenException(
+        'Instance is already initialized. Admin setup is no longer available.',
+      );
+    }
+
+    // Create admin user (auto-verified, no email needed)
+    const user = await this.userService.create({
+      email: dto.email,
+      password: dto.password,
+      role: UserRole.ADMIN,
+      isEmailVerified: true,
+    } as any);
+
+    // Initialize instance settings
+    if (dto.instanceName) {
+      await this.instanceSettingsService.updateSettings({
+        instanceName: dto.instanceName,
+      });
+    }
+
+    return this.login(user);
+  }
+
+  async signUpWithMagicLink(signUpDto: SignUpDto) {
+    const settings = await this.instanceSettingsService.getSettings();
+    if (!settings.allowPublicSignup) {
+      throw new ForbiddenException(
+        'Public signup is disabled. Contact your administrator for an invite.',
+      );
+    }
+
+    const existingUser = await this.userService.findByEmail(signUpDto.email);
+    if (existingUser) {
+      if (existingUser.isEmailVerified) {
+        throw new ConflictException('Email already registered');
+      }
+      // Resend magic link for unverified users
+      await this.sendMagicLink(existingUser);
+      return { message: 'Verification email sent. Please check your inbox.' };
+    }
+
+    const user = await this.userService.create({
+      ...signUpDto,
+      password: signUpDto.password,
+      role: 'user' as UserRole,
+    });
+
+    await this.sendMagicLink(user);
+    return { message: 'Verification email sent. Please check your inbox.' };
+  }
+
+  private async sendMagicLink(user: User) {
+    const token = this.jwtService.sign(
+      { sub: user.id, email: user.email, type: 'magic-link' },
+      {
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        expiresIn: '15m',
+      },
+    );
+
+    const frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5174';
+    const verifyUrl = `${frontendUrl}/auth/verify?token=${token}`;
+
+    await this.mailService.sendMagicLink(user.email, verifyUrl);
+  }
+
+  async verifyMagicLink(token: string) {
+    try {
+      const payload = this.jwtService.verify<{
+        sub: string;
+        email: string;
+        type: string;
+      }>(token, {
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+      });
+
+      if (payload.type !== 'magic-link') {
+        throw new UnauthorizedException('Invalid token type');
+      }
+
+      const user = await this.userRepository.findOne({
+        where: { id: payload.sub },
+      });
+
+      if (!user) throw new NotFoundException('User not found');
+
+      if (!user.isEmailVerified) {
+        user.isEmailVerified = true;
+        await this.userService.save(user);
+      }
+
+      return this.login(user);
+    } catch {
+      throw new UnauthorizedException('Invalid or expired verification link');
+    }
   }
 
   async initiateEmailVerification(email: string): Promise<void> {
@@ -89,27 +193,8 @@ export class AuthService {
     return this.login(user);
   }
 
-  async signUp(createUserDto: SignUpDto): Promise<User> {
-    const existingUser = await this.userService.findByEmail(
-      createUserDto.email,
-    );
-    if (existingUser) {
-      await this.initiateEmailVerification(existingUser.email);
-      delete existingUser.otpHash;
-      delete existingUser.otpExpiry;
-      return existingUser;
-    }
-
-    const createdUser = await this.userService.create({
-      ...createUserDto,
-      password: createUserDto.password,
-      role: 'user' as UserRole,
-    });
-
-    await this.initiateEmailVerification(createdUser.email);
-    delete createdUser.otpHash;
-    delete createdUser.otpExpiry;
-    return createdUser;
+  async signUp(createUserDto: SignUpDto) {
+    return this.signUpWithMagicLink(createUserDto);
   }
 
   async login(user: User) {

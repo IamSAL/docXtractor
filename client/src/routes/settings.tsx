@@ -2,12 +2,25 @@ import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
 import { AppLayout } from '../components/AppLayout'
 import { PageHeader } from '../components/retroui/PageHeader'
 import { Button } from '@/components/retroui/Button'
+import { useAuthStore } from '@/lib/auth-store'
 
 export const Route = createFileRoute('/settings')({
     component: SettingsLayout,
 })
 
 function SettingsLayout() {
+    const user = useAuthStore((s) => s.user)
+    const isAdmin = user?.role === 'admin'
+
+    const tabs = [
+        { label: 'Extraction', icon: 'tune', path: '/settings/extraction' },
+        { label: 'Profile', icon: 'person', path: '/settings/profile' },
+        { label: 'API Keys', icon: 'key', path: '/settings/api-keys' },
+        { label: 'Notifications', icon: 'notifications', path: '/settings/notifications' },
+        { label: 'Appearance', icon: 'palette', path: '/settings/appearance' },
+        ...(isAdmin ? [{ label: 'Instance', icon: 'admin_panel_settings', path: '/settings/instance' }] : []),
+    ]
+
     return (
         <AppLayout>
             <div className="w-full  mx-auto p-4 lg:p-12">
@@ -28,13 +41,7 @@ function SettingsLayout() {
 
                 <div className="overflow-x-auto mb-8 pb-1 no-scrollbar border-b-2 border-[#e6e3d1]">
                     <div className="flex min-w-max gap-8 px-2">
-                        {[
-                            { label: 'Extraction', icon: 'tune', path: '/settings/extraction' },
-                            { label: 'Profile', icon: 'person', path: '/settings/profile' },
-                            { label: 'API Keys', icon: 'key', path: '/settings/api-keys' },
-                            { label: 'Notifications', icon: 'notifications', path: '/settings/notifications' },
-                            { label: 'Appearance', icon: 'palette', path: '/settings/appearance' }
-                        ].map((tab) => (
+                        {tabs.map((tab) => (
                             <Link
                                 key={tab.path}
                                 to={tab.path}

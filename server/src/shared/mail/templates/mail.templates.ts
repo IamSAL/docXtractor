@@ -138,6 +138,41 @@ export function otpEmail({
   });
 }
 
+export function MagicLinkEmail({
+  verifyUrl,
+  companyName = 'DocXtractor',
+}: {
+  verifyUrl: string;
+  companyName?: string;
+}) {
+  const content = `
+    <h1 style="${baseStyles.heading}">Verify Your Email</h1>
+    <p style="${baseStyles.description}">
+      Click the button below to verify your email and sign in:
+    </p>
+
+    <a href="${verifyUrl}" style="${baseStyles.actionButton};">
+      Verify Email
+    </a>
+
+    <p style="${baseStyles.expiryText}">
+      This link will expire in 15 minutes.
+    </p>
+
+    <hr style="${baseStyles.divider}" />
+
+    <p style="${baseStyles.securityWarning}">
+      If you didn't sign up for ${companyName}, you can safely ignore this email.
+    </p>
+  `;
+
+  return baseEmailTemplate({
+    companyName,
+    title: 'Verify Your Email',
+    content,
+  });
+}
+
 export function ResetPasswordEmail({
   resetLink,
   companyName = 'DocXtractor',

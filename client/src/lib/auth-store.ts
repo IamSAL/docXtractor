@@ -34,6 +34,7 @@ interface AuthState {
   // Actions
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<{ email: string }>;
+  adminSetup: (email: string, password: string, instanceName?: string) => Promise<void>;
   verifyEmail: (email: string, otp: string) => Promise<void>;
   logout: () => void;
   refreshAccessToken: () => Promise<void>;
@@ -82,6 +83,41 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : "Login failed",
+            isLoading: false,
+          });
+          throw error;
+        }
+      },
+
+      // Admin setup action (first-run)
+      adminSetup: async (email: string, password: string, instanceName?: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await authApi.authControllerAdminSetup({
+            email,
+            password,
+            instanceName,
+          });
+          const successResponse = response as unknown as {
+            data: {
+              user: UserResponseDto;
+              accessToken: string;
+              refreshToken: string;
+            };
+          };
+          const { user, accessToken, refreshToken } = successResponse.data;
+
+          set({
+            user,
+            accessToken,
+            refreshToken,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+        } catch (error) {
+          set({
+            error: error instanceof Error ? error.message : "Admin setup failed",
             isLoading: false,
           });
           throw error;

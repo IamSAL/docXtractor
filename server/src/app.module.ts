@@ -10,7 +10,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 
-import { ChatModule } from './chat/chat.module';
+import { InstanceSettingsModule } from './instance-settings/instance-settings.module';
+import { InviteModule } from './invite/invite.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 
@@ -22,6 +23,7 @@ import { RunsModule } from './runs/runs.module';
 import { QueueModule } from './shared/queue/queue.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { OllamaModule } from './shared/ollama/ollama.module';
+import { MailModule } from './shared/mail/mail.module';
 import { WorkflowsModule } from './workflows/workflows.module';
 
 @Module({
@@ -29,8 +31,10 @@ import { WorkflowsModule } from './workflows/workflows.module';
     UserModule,
 
     DatabaseModule,
+    InstanceSettingsModule,
+    MailModule,
     AuthModule,
-    ChatModule,
+    InviteModule,
     QueueModule,
 
     // CacheModule.registerAsync({

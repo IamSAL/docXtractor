@@ -43,7 +43,8 @@ services:
     ports:
       - "3001:3001"
     env_file:
-      - ./server/.env
+      - path: ./server/.env
+        required: false
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgres://postgres:postgres@db:5432/docxtractor
@@ -57,6 +58,10 @@ services:
       - OLLAMA_HOST=http://host.docker.internal:11434
       - OLLAMA_DEFAULT_MODEL=qwen3:14b
       - OLLAMA_GENERATION_MODEL=qwen3:14b
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET:-docxtractor-dev-access-secret}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-docxtractor-dev-refresh-secret}
+      - JWT_RESET_SECRET=${JWT_RESET_SECRET:-docxtractor-dev-reset-secret}
+      - FRONTEND_URL=http://localhost:5174
     volumes:
       - ./server:/app
     depends_on:
@@ -81,7 +86,8 @@ services:
     environment:
       - NODE_ENV=development
     env_file:
-      - ./client/.env.local
+      - path: ./client/.env.local
+        required: false
     volumes:
       - ./client:/app
       - /app/node_modules
@@ -153,7 +159,8 @@ services:
       createbuckets:
         condition: service_completed_successfully
     env_file:
-      - ./workers/extraction-service/.env
+      - path: ./workers/extraction-service/.env
+        required: false
     environment:
       - REDIS_URL=redis://redis:6380
       - MINIO_ENDPOINT=http://minio:9000
