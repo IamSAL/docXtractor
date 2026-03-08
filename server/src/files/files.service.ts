@@ -65,7 +65,7 @@ export class FilesService {
     // Note: In a real app, the URL might be a signed URL or a proxy URL
     return {
       id: fileRecord.id,
-      url: `${this.minioPublicUrl}/docxtractor-documents/${storageKey}`,
+      url: `${this.minioPublicUrl}/${storageKey}`,
       storageKey,
     };
   }
