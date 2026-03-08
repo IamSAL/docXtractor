@@ -32,7 +32,7 @@ def _get_converter(backend: str = "dlparse_v2") -> DocumentConverter:
     if not hasattr(_thread_local, attr):
         pipeline_options = PdfPipelineOptions(
             do_ocr=False,
-            do_table_structure=False,
+            do_table_structure=True,
             pdf_backend=backend,
         )
         converter = DocumentConverter(
@@ -45,12 +45,14 @@ def _get_converter(backend: str = "dlparse_v2") -> DocumentConverter:
     return getattr(_thread_local, attr)
 
 
-def _convert_with_fallback(source):
+def _convert_with_fallback(name: str, file_bytes: bytes):
     """Try dlparse_v2 first, fall back to pypdfium2 on ConversionError."""
     try:
+        source = DocumentStream(name=name, stream=io.BytesIO(file_bytes))
         return _get_converter("dlparse_v2").convert(source)
     except ConversionError as e:
         logger.warning(f"dlparse_v2 failed ({e}), retrying with pypdfium2 backend")
+        source = DocumentStream(name=name, stream=io.BytesIO(file_bytes))
         return _get_converter("pypdfium2").convert(source)
 
 
@@ -71,8 +73,7 @@ def process_document(document_id: str, file_key: str) -> dict:
             return cached
 
         # 3. Convert from stream (with fallback backend)
-        source = DocumentStream(name=file_key, stream=io.BytesIO(file_bytes))
-        result = _convert_with_fallback(source)
+        result = _convert_with_fallback(file_key, file_bytes)
 
         markdown_content = result.document.export_to_markdown()
 
