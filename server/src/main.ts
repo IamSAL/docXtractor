@@ -12,7 +12,18 @@ import { TimeoutInterceptor } from './timeout-intercepter';
 import * as compression from 'compression';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const logLevel = (process.env.LOG_LEVEL || 'debug').toLowerCase();
+  const nestLogLevels: Record<string, string[]> = {
+    error: ['error'],
+    warn: ['error', 'warn'],
+    log: ['error', 'warn', 'log'],
+    info: ['error', 'warn', 'log'],
+    debug: ['error', 'warn', 'log', 'debug'],
+    verbose: ['error', 'warn', 'log', 'debug', 'verbose'],
+  };
+  const app = await NestFactory.create(AppModule, {
+    logger: (nestLogLevels[logLevel] || nestLogLevels.debug) as any,
+  });
   const configService = app.get(ConfigService);
   app.use(helmet());
 

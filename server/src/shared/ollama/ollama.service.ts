@@ -55,27 +55,37 @@ export class OllamaService {
 
     const fullPrompt = `${instruction}\n\nDocument Content:\n${content}`;
 
-    this.logger.log(`Running Ollama extraction`);
+    this.logger.log(
+      `Running Ollama extraction, mode: ${modelId}, host: ${this.configService.get<string>(
+        'OLLAMA_HOST',
+        'http://localhost:11434',
+      )}`,
+    );
 
-    const response = await this.client.chat({
-      model: modelId,
-      messages: [{ role: 'user', content: fullPrompt }],
-      format: schema,
-    });
-    this.logger.debug(`Ollama response: ${response.message.content}`);
-    const resultData = JSON.parse(
-      jsonrepair(response.message.content),
-    ) as Record<string, unknown>;
+    try {
+      const response = await this.client.chat({
+        model: modelId,
+        messages: [{ role: 'user', content: fullPrompt }],
+        format: schema,
+      });
+      this.logger.debug(`Ollama response: ${response.message.content}`);
+      const resultData = JSON.parse(
+        jsonrepair(response.message.content),
+      ) as Record<string, unknown>;
 
-    const totalTokens =
-      (response.prompt_eval_count || 0) + (response.eval_count || 0);
+      const totalTokens =
+        (response.prompt_eval_count || 0) + (response.eval_count || 0);
 
-    this.logger.log(`Ollama extraction complete: tokens=${totalTokens}`);
+      this.logger.log(`Ollama extraction complete: tokens=${totalTokens}`);
 
-    return {
-      data: resultData,
-      usage: { totalTokens },
-    };
+      return {
+        data: resultData,
+        usage: { totalTokens },
+      };
+    } catch (error) {
+      this.logger.error(`Ollama extraction failed: ${error}`);
+      throw error;
+    }
   }
 
   /**

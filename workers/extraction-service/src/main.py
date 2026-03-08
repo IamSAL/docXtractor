@@ -1,11 +1,13 @@
 import asyncio
+import os
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from .consumer import consume
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()
 logging.basicConfig(
-    level=logging.INFO,
+    level=getattr(logging, LOG_LEVEL, logging.DEBUG),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
