@@ -3,6 +3,9 @@ import io
 import threading
 import boto3
 import logging
+import torch
+torch.backends.mkldnn.enabled = False
+
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption, DocumentStream

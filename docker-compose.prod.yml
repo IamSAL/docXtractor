@@ -154,7 +154,6 @@ services:
       - MINIO_BUCKET=docxtractor-documents
       - PARSER_CONCURRENCY=4
       - DNNL_VERBOSE=0
-      - TORCH_MKLDNN_ENABLED=0
     networks:
       - docxtractor-network
     command: uvicorn src.main:app --host 0.0.0.0 --port 8001
