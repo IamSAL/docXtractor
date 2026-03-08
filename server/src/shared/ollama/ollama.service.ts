@@ -20,7 +20,7 @@ export class OllamaService {
   constructor(private configService: ConfigService) {
     const host = this.configService.get<string>(
       'OLLAMA_HOST',
-      'http://localhost:11434',
+      'http://host.docked.internal:11434',
     );
     this.defaultModel = this.configService.get<string>(
       'OLLAMA_DEFAULT_MODEL',
