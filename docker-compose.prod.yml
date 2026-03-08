@@ -74,6 +74,8 @@ services:
       dockerfile: Dockerfile.prod
     container_name: docxtractor-server
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "3001:3000"
     environment:
