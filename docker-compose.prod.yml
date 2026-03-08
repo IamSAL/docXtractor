@@ -100,6 +100,9 @@ services:
       - SWAGGER_PASS=${SWAGGER_PASS:-admin}
       - THROTTLER_TTL=${THROTTLER_TTL:-60000}
       - THROTTLER_LIMIT=${THROTTLER_LIMIT:-100}
+    # Optional: mount a custom seed file to pre-populate extractors on first run
+    # volumes:
+    #   - ./extractors.json:/app/seed/extractors.json:ro
     depends_on:
       db:
         condition: service_healthy

@@ -6,6 +6,7 @@ import logging
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption, DocumentStream
+from docling.exceptions import ConversionError
 from .parse_cache import compute_file_hash, get_cached_result, set_cached_result
 
 logger = logging.getLogger(__name__)
@@ -26,23 +27,32 @@ s3_client = boto3.client(
 _thread_local = threading.local()
 
 
-def _get_converter() -> DocumentConverter:
-    if not hasattr(_thread_local, "converter"):
-        # SPEED TRICK: Disable heavy table structure if you only need text/basic tables
-        # Use 'pypdfium2' if dlparse_v2 is still too slow for your needs
+def _get_converter(backend: str = "dlparse_v2") -> DocumentConverter:
+    attr = f"converter_{backend}"
+    if not hasattr(_thread_local, attr):
         pipeline_options = PdfPipelineOptions(
-            do_ocr=False, 
-            do_table_structure=False, # Set False for max speed
-            pdf_backend="dlparse_v2" 
+            do_ocr=False,
+            do_table_structure=False,
+            pdf_backend=backend,
         )
-        
-        _thread_local.converter = DocumentConverter(
-            allowed_formats=[InputFormat.PDF], # Restrict formats to skip init logic
+        converter = DocumentConverter(
+            allowed_formats=[InputFormat.PDF],
             format_options={
                 InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
             }
         )
-    return _thread_local.converter
+        setattr(_thread_local, attr, converter)
+    return getattr(_thread_local, attr)
+
+
+def _convert_with_fallback(source):
+    """Try dlparse_v2 first, fall back to pypdfium2 on ConversionError."""
+    try:
+        return _get_converter("dlparse_v2").convert(source)
+    except ConversionError as e:
+        logger.warning(f"dlparse_v2 failed ({e}), retrying with pypdfium2 backend")
+        return _get_converter("pypdfium2").convert(source)
+
 
 def process_document(document_id: str, file_key: str) -> dict:
     try:
@@ -60,10 +70,10 @@ def process_document(document_id: str, file_key: str) -> dict:
         if cached:
             return cached
 
-        # 3. Convert from stream
+        # 3. Convert from stream (with fallback backend)
         source = DocumentStream(name=file_key, stream=io.BytesIO(file_bytes))
-        result = _get_converter().convert(source)
-        
+        result = _convert_with_fallback(source)
+
         markdown_content = result.document.export_to_markdown()
 
         parse_result = {

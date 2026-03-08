@@ -1,13 +1,23 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateExtractorDto } from './dto/create-extractor.dto';
 import { UpdateExtractorDto } from './dto/update-extractor.dto';
 import { Extractor } from './entities/extractor.entity';
 import { OllamaService } from '../shared/ollama/ollama.service';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// User-mountable seed path (e.g. via docker volume) takes priority over built-in
+const CUSTOM_SEED_PATH = '/app/seed/extractors.json';
 
 @Injectable()
-export class ExtractorsService {
+export class ExtractorsService implements OnModuleInit {
   private readonly logger = new Logger(ExtractorsService.name);
 
   constructor(
@@ -15,6 +25,45 @@ export class ExtractorsService {
     private readonly extractorRepository: Repository<Extractor>,
     private readonly ollamaService: OllamaService,
   ) {}
+
+  async onModuleInit() {
+    const count = await this.extractorRepository.count();
+    if (count === 0) {
+      const seedData = this.loadSeedData();
+      if (seedData.length > 0) {
+        this.logger.log('No extractors found — seeding defaults...');
+        const extractors = this.extractorRepository.create(seedData);
+        await this.extractorRepository.save(extractors);
+        this.logger.log(`Seeded ${extractors.length} default extractors`);
+      }
+    }
+  }
+
+  private loadSeedData(): any[] {
+    // 1. Check for user-provided seed file (docker volume mount)
+    if (fs.existsSync(CUSTOM_SEED_PATH)) {
+      try {
+        const data = JSON.parse(fs.readFileSync(CUSTOM_SEED_PATH, 'utf-8'));
+        this.logger.log(`Loading seed extractors from ${CUSTOM_SEED_PATH}`);
+        return Array.isArray(data) ? data : [];
+      } catch (e) {
+        this.logger.error(`Failed to parse ${CUSTOM_SEED_PATH}: ${e.message}`);
+      }
+    }
+
+    // 2. Fall back to built-in seed data
+    const builtinPath = path.join(__dirname, 'seed-extractors.json');
+    if (fs.existsSync(builtinPath)) {
+      try {
+        const data = JSON.parse(fs.readFileSync(builtinPath, 'utf-8'));
+        return Array.isArray(data) ? data : [];
+      } catch (e) {
+        this.logger.error(`Failed to parse built-in seed: ${e.message}`);
+      }
+    }
+
+    return [];
+  }
 
   async create(createExtractorDto: CreateExtractorDto): Promise<Extractor> {
     const extractor = this.extractorRepository.create(createExtractorDto);
