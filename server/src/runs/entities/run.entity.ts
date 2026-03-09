@@ -79,6 +79,13 @@ export interface RunMetrics {
   totalOutputTokens?: number;
 }
 
+export interface SortConfig {
+  referenceValues: string[];
+  matchColumn: string;
+  fileName: string;
+  referenceColumn: string;
+}
+
 // Entity
 @Entity('runs')
 @Index(['userId', 'status'])
@@ -153,6 +160,22 @@ export class Run {
   @Column({ default: false })
   @ApiProperty()
   isAutorun: boolean;
+
+  // Schema customization: variant selection + field skipping
+  @Column({ type: 'text', nullable: true })
+  @ApiPropertyOptional({ description: 'ID of schema variant used for this run' })
+  variantId: string | null;
+
+  @Column('jsonb', { nullable: true })
+  @ApiPropertyOptional({
+    description: 'Field names excluded from extraction',
+    example: ['optional_notes', 'internal_reference'],
+  })
+  skippedFields: string[] | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  @ApiPropertyOptional({ description: 'Reference sort configuration from uploaded XLSX' })
+  sortConfig: SortConfig | null;
 
   // Workflow execution link
   @Column({ type: 'uuid', nullable: true })
