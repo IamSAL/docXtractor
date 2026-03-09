@@ -284,7 +284,7 @@ function AutoRunsComponent() {
                   </span>
                 </div>
                 <h3 className="text-xl font-bold uppercase text-black">
-                  Create New Workflow
+                  New Automation
                 </h3>
                 <p className="text-sm font-medium mt-2 text-gray-600">
                   Design your automation workflow

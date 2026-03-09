@@ -16,20 +16,20 @@ export const RunExtractorFormSchema = z.object({
   sources: z
     .array(SourceSchema)
     .min(1, "At least one input source is required"),
-  processingMode: z.enum(["unified", "per_document"]).default("unified"),
-  extractionProvider: z.enum(["doclo", "langextract", "ollama"]).default("doclo"),
-  consensusVoting: z.boolean().default(false),
-  citationTracking: z.boolean().default(true),
+  processingMode: z.enum(["unified", "per_document"]),
+  extractionProvider: z.enum(["doclo", "langextract", "ollama"]),
+  consensusVoting: z.boolean(),
+  citationTracking: z.boolean(),
   variantId: z.string().optional(),
-  skippedFields: z.array(z.string()).default([]),
+  skippedFields: z.array(z.string()),
 });
 
 export type RunExtractorFormData = z.infer<typeof RunExtractorFormSchema>;
 
 export const defaultRunExtractorValues: RunExtractorFormData = {
   sources: [],
-  processingMode: "unified",
-  extractionProvider: "doclo",
+  processingMode: "per_document",
+  extractionProvider: "ollama",
   consensusVoting: false,
   citationTracking: true,
   variantId: undefined,
