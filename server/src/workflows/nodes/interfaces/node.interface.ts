@@ -13,6 +13,8 @@ export interface ExecutionContext {
 	triggerPayload: any;
 	nodeOutputs: Map<string, any>;
 	variables: Record<string, any>;
+	runsService?: any;
+	queueService?: any;
 }
 
 export interface JSONSchema {
