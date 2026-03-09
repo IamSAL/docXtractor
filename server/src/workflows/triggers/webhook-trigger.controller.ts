@@ -13,7 +13,7 @@ export class WebhookTriggerController {
    * POST /webhooks/:workflowId/*
    */
   @Public()
-  @Post(':workflowId/:path(*)')
+  @Post(':workflowId/*path')
   async handleWebhook(
     @Param('workflowId') workflowId: string,
     @Param('path') path: string,
