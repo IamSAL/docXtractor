@@ -77,13 +77,6 @@ services:
       - "11434:11434"
     networks:
       - docxtractor-network
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
 
   server:
     image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-server:latest
