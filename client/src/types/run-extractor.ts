@@ -20,6 +20,8 @@ export const RunExtractorFormSchema = z.object({
   extractionProvider: z.enum(["doclo", "langextract", "ollama"]).default("doclo"),
   consensusVoting: z.boolean().default(false),
   citationTracking: z.boolean().default(true),
+  variantId: z.string().optional(),
+  skippedFields: z.array(z.string()).default([]),
 });
 
 export type RunExtractorFormData = z.infer<typeof RunExtractorFormSchema>;
@@ -30,4 +32,6 @@ export const defaultRunExtractorValues: RunExtractorFormData = {
   extractionProvider: "doclo",
   consensusVoting: false,
   citationTracking: true,
+  variantId: undefined,
+  skippedFields: [],
 };

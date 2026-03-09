@@ -67,4 +67,20 @@ export class CreateRunDto {
     default: ExtractionProvider.DOCLO,
   })
   extractionProvider?: ExtractionProvider;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: 'ID of schema variant to use for extraction',
+  })
+  variantId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ApiPropertyOptional({
+    description: 'Field names to exclude from extraction',
+    example: ['optional_notes', 'internal_reference'],
+  })
+  skippedFields?: string[];
 }

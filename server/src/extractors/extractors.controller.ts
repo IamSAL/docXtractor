@@ -17,6 +17,10 @@ import { ExtractorsService } from './extractors.service';
 import { CreateExtractorDto } from './dto/create-extractor.dto';
 import { UpdateExtractorDto } from './dto/update-extractor.dto';
 import {
+  CreateSchemaVariantDto,
+  UpdateSchemaVariantDto,
+} from './dto/schema-variant.dto';
+import {
   GenerateSchemaDto,
   GenerateExtractorDto,
 } from './dto/generate-extractor.dto';
@@ -108,5 +112,50 @@ export class ExtractorsController {
   })
   remove(@Param('id') id: string) {
     return this.extractorsService.remove(id);
+  }
+
+  // --- Schema Variant Endpoints ---
+
+  @Post(':id/variants')
+  @ApiOperation({ summary: 'Add a schema variant to an extractor' })
+  @ApiResponse({
+    status: 201,
+    description: 'Variant added successfully.',
+    type: Extractor,
+  })
+  addVariant(
+    @Param('id') id: string,
+    @Body() dto: CreateSchemaVariantDto,
+  ) {
+    return this.extractorsService.addVariant(id, dto);
+  }
+
+  @Patch(':id/variants/:variantId')
+  @ApiOperation({ summary: 'Update a schema variant' })
+  @ApiResponse({
+    status: 200,
+    description: 'Variant updated successfully.',
+    type: Extractor,
+  })
+  updateVariant(
+    @Param('id') id: string,
+    @Param('variantId') variantId: string,
+    @Body() dto: UpdateSchemaVariantDto,
+  ) {
+    return this.extractorsService.updateVariant(id, variantId, dto);
+  }
+
+  @Delete(':id/variants/:variantId')
+  @ApiOperation({ summary: 'Delete a schema variant' })
+  @ApiResponse({
+    status: 200,
+    description: 'Variant deleted successfully.',
+    type: Extractor,
+  })
+  deleteVariant(
+    @Param('id') id: string,
+    @Param('variantId') variantId: string,
+  ) {
+    return this.extractorsService.deleteVariant(id, variantId);
   }
 }

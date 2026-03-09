@@ -15,7 +15,10 @@ import {
   CreateRunDtoExtractionProvider as ExtractionProvider,
   RunSourceDto,
 } from "@/api/models";
-import { useExtractorsControllerFindAll } from "@/api/endpoints/extractors/extractors";
+import {
+  useExtractorsControllerFindAll,
+  useExtractorsControllerFindOne,
+} from "@/api/endpoints/extractors/extractors";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   RunExtractorFormSchema,
@@ -24,6 +27,7 @@ import {
 } from "@/types/run-extractor";
 import { RunExtractorSources } from "./RunExtractorSources";
 import { RunExtractorSettings } from "./RunExtractorSettings";
+import { RunExtractorFieldSelector } from "./RunExtractorFieldSelector";
 import { toast } from "sonner";
 
 import { Dialog } from "@/components/retroui/Dialog";
@@ -67,6 +71,16 @@ export const RunExtractorModal = NiceModal.create(
     }, [propId, propName]);
 
     const activeExtractorId = propId || selectedExtractorId;
+
+    // Fetch full extractor data (schema + variants) when an extractor is selected
+    const { data: extractorDetail } = useExtractorsControllerFindOne(
+      activeExtractorId || "",
+      {
+        query: {
+          enabled: !!activeExtractorId,
+        },
+      },
+    );
 
     const methods = useForm<RunExtractorFormData>({
       defaultValues: defaultRunExtractorValues,
@@ -113,12 +127,17 @@ export const RunExtractorModal = NiceModal.create(
           fileId: source.type === "file" ? source.id : undefined,
         }));
 
-        const dto: CreateRunDto = {
+        // Note: variantId and skippedFields will be typed after running `pnpm run gen:api`
+        const dto = {
           extractorId: activeExtractorId,
           processingMode: data.processingMode as ProcessingMode,
           extractionProvider: data.extractionProvider as ExtractionProvider,
           sources: sourcesDto,
-        };
+          ...(data.variantId ? { variantId: data.variantId } : {}),
+          ...(data.skippedFields?.length
+            ? { skippedFields: data.skippedFields }
+            : {}),
+        } as CreateRunDto;
 
         await createRunMutation.mutateAsync({
           data: dto,
@@ -225,9 +244,16 @@ export const RunExtractorModal = NiceModal.create(
               {/* Content */}
               <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 custom-scrollbar">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                  {/* Left Column: Input Sources */}
+                  {/* Left Column: Input Sources + Schema Fields */}
                   <div className="lg:col-span-7 flex flex-col gap-6">
                     <RunExtractorSources onUploadFile={handleUploadFile} />
+
+                    {extractorDetail?.data && (
+                      <RunExtractorFieldSelector
+                        schema={(extractorDetail.data as any).schema || {}}
+                        variants={(extractorDetail.data as any).variants || []}
+                      />
+                    )}
                   </div>
 
                   {/* Right Column: Configuration */}

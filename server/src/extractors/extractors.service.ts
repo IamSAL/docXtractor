@@ -1,9 +1,19 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { CreateExtractorDto } from './dto/create-extractor.dto';
 import { UpdateExtractorDto } from './dto/update-extractor.dto';
-import { Extractor } from './entities/extractor.entity';
+import {
+  CreateSchemaVariantDto,
+  UpdateSchemaVariantDto,
+} from './dto/schema-variant.dto';
+import { Extractor, SchemaVariant } from './entities/extractor.entity';
 import { OllamaService } from '../shared/ollama/ollama.service';
 
 @Injectable()
@@ -49,6 +59,79 @@ export class ExtractorsService {
     if (result.affected === 0) {
       throw new NotFoundException(`Extractor with ID ${id} not found`);
     }
+  }
+
+  // --- Schema Variant CRUD ---
+
+  async addVariant(
+    extractorId: string,
+    dto: CreateSchemaVariantDto,
+  ): Promise<Extractor> {
+    const extractor = await this.findOne(extractorId);
+
+    if (extractor.variants.some((v) => v.name === dto.name)) {
+      throw new BadRequestException('Variant name already exists');
+    }
+
+    const isFirstOrDefault =
+      dto.isDefault || extractor.variants.length === 0;
+
+    if (isFirstOrDefault) {
+      extractor.variants.forEach((v) => (v.isDefault = false));
+    }
+
+    const variant: SchemaVariant = {
+      id: uuidv4(),
+      name: dto.name,
+      description: dto.description,
+      schema: dto.schema,
+      isDefault: isFirstOrDefault,
+      createdAt: new Date().toISOString(),
+    };
+
+    extractor.variants.push(variant);
+    return this.extractorRepository.save(extractor);
+  }
+
+  async updateVariant(
+    extractorId: string,
+    variantId: string,
+    dto: UpdateSchemaVariantDto,
+  ): Promise<Extractor> {
+    const extractor = await this.findOne(extractorId);
+    const variant = extractor.variants.find((v) => v.id === variantId);
+
+    if (!variant) {
+      throw new NotFoundException('Variant not found');
+    }
+
+    if (dto.isDefault) {
+      extractor.variants.forEach((v) => (v.isDefault = false));
+    }
+
+    Object.assign(variant, dto);
+    return this.extractorRepository.save(extractor);
+  }
+
+  async deleteVariant(
+    extractorId: string,
+    variantId: string,
+  ): Promise<Extractor> {
+    const extractor = await this.findOne(extractorId);
+    const index = extractor.variants.findIndex((v) => v.id === variantId);
+
+    if (index === -1) {
+      throw new NotFoundException('Variant not found');
+    }
+
+    const wasDefault = extractor.variants[index].isDefault;
+    extractor.variants.splice(index, 1);
+
+    if (wasDefault && extractor.variants.length > 0) {
+      extractor.variants[0].isDefault = true;
+    }
+
+    return this.extractorRepository.save(extractor);
   }
 
   async generateSchema(
