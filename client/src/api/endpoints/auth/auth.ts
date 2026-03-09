@@ -22,6 +22,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+	AdminSetupDto,
 	AuthControllerInitiateEmailVerificationBody,
 	LoginDto,
 	RefreshTokenDto,
@@ -38,16 +39,130 @@ import { HttpClient } from "../../../lib/axios";
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
- * @summary Register a new user
+ * @summary First-run admin setup (only works when no users exist)
+ */
+export type authControllerAdminSetupResponse201 = {
+	data: void;
+	status: 201;
+};
+
+export type authControllerAdminSetupResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type authControllerAdminSetupResponseSuccess =
+	authControllerAdminSetupResponse201 & {
+		headers: Headers;
+	};
+export type authControllerAdminSetupResponseError =
+	authControllerAdminSetupResponse403 & {
+		headers: Headers;
+	};
+
+export type authControllerAdminSetupResponse =
+	| authControllerAdminSetupResponseSuccess
+	| authControllerAdminSetupResponseError;
+
+export const getAuthControllerAdminSetupUrl = () => {
+	return `/auth/admin-setup`;
+};
+
+export const authControllerAdminSetup = async (
+	adminSetupDto: AdminSetupDto,
+	options?: RequestInit,
+): Promise<authControllerAdminSetupResponse> => {
+	return HttpClient<authControllerAdminSetupResponse>(
+		getAuthControllerAdminSetupUrl(),
+		{
+			...options,
+			method: "POST",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(adminSetupDto),
+		},
+	);
+};
+
+export const getAuthControllerAdminSetupMutationOptions = <
+	TError = void,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof authControllerAdminSetup>>,
+		TError,
+		{ data: AdminSetupDto },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof authControllerAdminSetup>>,
+	TError,
+	{ data: AdminSetupDto },
+	TContext
+> => {
+	const mutationKey = ["authControllerAdminSetup"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof authControllerAdminSetup>>,
+		{ data: AdminSetupDto }
+	> = (props) => {
+		const { data } = props ?? {};
+
+		return authControllerAdminSetup(data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type AuthControllerAdminSetupMutationResult = NonNullable<
+	Awaited<ReturnType<typeof authControllerAdminSetup>>
+>;
+export type AuthControllerAdminSetupMutationBody = AdminSetupDto;
+export type AuthControllerAdminSetupMutationError = void;
+
+/**
+ * @summary First-run admin setup (only works when no users exist)
+ */
+export const useAuthControllerAdminSetup = <TError = void, TContext = unknown>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof authControllerAdminSetup>>,
+			TError,
+			{ data: AdminSetupDto },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof authControllerAdminSetup>>,
+	TError,
+	{ data: AdminSetupDto },
+	TContext
+> => {
+	return useMutation(
+		getAuthControllerAdminSetupMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * @summary Register a new user (cloud mode only)
  */
 export type authControllerSignUpResponse201 = {
 	data: void;
 	status: 201;
 };
 
-export type authControllerSignUpResponse409 = {
+export type authControllerSignUpResponse403 = {
 	data: void;
-	status: 409;
+	status: 403;
 };
 
 export type authControllerSignUpResponseSuccess =
@@ -55,7 +170,7 @@ export type authControllerSignUpResponseSuccess =
 		headers: Headers;
 	};
 export type authControllerSignUpResponseError =
-	authControllerSignUpResponse409 & {
+	authControllerSignUpResponse403 & {
 		headers: Headers;
 	};
 
@@ -127,7 +242,7 @@ export type AuthControllerSignUpMutationBody = SignUpDto;
 export type AuthControllerSignUpMutationError = void;
 
 /**
- * @summary Register a new user
+ * @summary Register a new user (cloud mode only)
  */
 export const useAuthControllerSignUp = <TError = void, TContext = unknown>(
 	options?: {
@@ -151,6 +266,179 @@ export const useAuthControllerSignUp = <TError = void, TContext = unknown>(
 		queryClient,
 	);
 };
+/**
+ * @summary Verify email via magic link
+ */
+export type authControllerVerifyMagicLinkResponse200 = {
+	data: void;
+	status: 200;
+};
+
+export type authControllerVerifyMagicLinkResponseSuccess =
+	authControllerVerifyMagicLinkResponse200 & {
+		headers: Headers;
+	};
+
+export type authControllerVerifyMagicLinkResponse =
+	authControllerVerifyMagicLinkResponseSuccess;
+
+export const getAuthControllerVerifyMagicLinkUrl = () => {
+	return `/auth/verify-magic-link`;
+};
+
+export const authControllerVerifyMagicLink = async (
+	options?: RequestInit,
+): Promise<authControllerVerifyMagicLinkResponse> => {
+	return HttpClient<authControllerVerifyMagicLinkResponse>(
+		getAuthControllerVerifyMagicLinkUrl(),
+		{
+			...options,
+			method: "GET",
+		},
+	);
+};
+
+export const getAuthControllerVerifyMagicLinkQueryKey = () => {
+	return [`/auth/verify-magic-link`] as const;
+};
+
+export const getAuthControllerVerifyMagicLinkQueryOptions = <
+	TData = Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+	TError = unknown,
+>(options?: {
+	query?: Partial<
+		UseQueryOptions<
+			Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+			TError,
+			TData
+		>
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}) => {
+	const { query: queryOptions, request: requestOptions } = options ?? {};
+
+	const queryKey =
+		queryOptions?.queryKey ?? getAuthControllerVerifyMagicLinkQueryKey();
+
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof authControllerVerifyMagicLink>>
+	> = ({ signal }) =>
+		authControllerVerifyMagicLink({ signal, ...requestOptions });
+
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AuthControllerVerifyMagicLinkQueryResult = NonNullable<
+	Awaited<ReturnType<typeof authControllerVerifyMagicLink>>
+>;
+export type AuthControllerVerifyMagicLinkQueryError = unknown;
+
+export function useAuthControllerVerifyMagicLink<
+	TData = Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+	TError = unknown,
+>(
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+					TError,
+					Awaited<ReturnType<typeof authControllerVerifyMagicLink>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthControllerVerifyMagicLink<
+	TData = Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+	TError = unknown,
+>(
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+					TError,
+					Awaited<ReturnType<typeof authControllerVerifyMagicLink>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthControllerVerifyMagicLink<
+	TData = Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+	TError = unknown,
+>(
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Verify email via magic link
+ */
+
+export function useAuthControllerVerifyMagicLink<
+	TData = Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+	TError = unknown,
+>(
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof authControllerVerifyMagicLink>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+} {
+	const queryOptions = getAuthControllerVerifyMagicLinkQueryOptions(options);
+
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+	return { ...query, queryKey: queryOptions.queryKey };
+}
+
 /**
  * @summary Authenticate user
  */

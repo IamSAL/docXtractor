@@ -8,6 +8,7 @@
 import type { ExtractorConflictResolution } from "./extractorConflictResolution";
 import type { ExtractorFewShotExamplesItem } from "./extractorFewShotExamplesItem";
 import type { ExtractorSchema } from "./extractorSchema";
+import type { ExtractorVariantsItem } from "./extractorVariantsItem";
 
 export interface Extractor {
 	id: string;
@@ -17,6 +18,7 @@ export interface Extractor {
 	schema: ExtractorSchema;
 	systemPrompt: string;
 	fewShotExamples?: ExtractorFewShotExamplesItem[];
+	variants?: ExtractorVariantsItem[];
 	consensusEnabled?: boolean;
 	confidenceThreshold?: number;
 	conflictResolution?: ExtractorConflictResolution;

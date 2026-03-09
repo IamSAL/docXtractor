@@ -18,6 +18,7 @@ import * as z from "zod";
 import { ExtractorsControllerCreateBody } from "@/api/schemas/extractors/extractors.zod";
 import { BasicInfoSection } from "./BasicInfoSection";
 import { AdvancedOptionsSection } from "./AdvancedOptionsSection";
+import { VariantManager } from "./VariantManager";
 import { Accordion } from "@/components/ui/accordion";
 import NiceModal from "@ebay/nice-modal-react";
 import { RunExtractorModal } from "@/components/modals/RunExtractorModal";
@@ -29,7 +30,7 @@ const extractorFormSchema = ExtractorsControllerCreateBody.extend({
 });
 
 interface ExtractorFormProps {
-  initialData?: ExtractorFormData;
+  initialData?: ExtractorFormData & { id?: string; variants?: any[] };
   onSubmit: (data: ExtractorFormData) => Promise<void>;
   isSubmitting: boolean;
   title: string;
@@ -214,6 +215,14 @@ export function ExtractorForm({
                 }
                 readOnly={false}
               />
+
+              {initialData?.id && (
+                <VariantManager
+                  extractorId={initialData.id}
+                  variants={initialData.variants || []}
+                  baseSchema={schema as Record<string, any>}
+                />
+              )}
 
               <AdvancedOptionsSection
                 onResetPrompt={handleResetPrompt}

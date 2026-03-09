@@ -63,7 +63,7 @@ export function FewShotExamples({ onUploadFile }: FewShotExamplesProps) {
       </div>
 
       {examples.length === 0 ? (
-        <div className="border-4 border-dashed border-gray-200 rounded-xl p-12 text-center bg-gray-50/50">
+        <div className="border-4 border-dashed border-gray-200 rounded-xl p-12 text-center bg-gray-50/50 justify-center flex flex-col">
           <div className="w-16 h-16 bg-white border-2 border-black rounded-full flex items-center justify-center mx-auto mb-4 shadow-hard-sm">
             <span className="material-symbols-outlined text-3xl text-gray-400">
               psychology
@@ -79,7 +79,7 @@ export function FewShotExamples({ onUploadFile }: FewShotExamplesProps) {
           <Button
             type="button"
             onClick={addExample}
-            className="bg-primary hover:bg-primary-hover shadow-hard"
+            className="bg-primary hover:bg-primary-hover shadow-hard  m-auto"
           >
             <span className="material-symbols-outlined mr-2">add_circle</span>
             CREATE FIRST EXAMPLE

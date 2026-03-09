@@ -22,7 +22,9 @@ export const RunsControllerCreateBody = zod.object({
   "fileId": zod.string().optional().describe('File ID if type is file')
 })).describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerCreateBodyProcessingModeDefault),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerCreateBodyExtractionProviderDefault)
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerCreateBodyExtractionProviderDefault),
+  "variantId": zod.string().optional().describe('ID of schema variant to use for extraction'),
+  "skippedFields": zod.array(zod.string()).optional().describe('Field names to exclude from extraction')
 })
 
 /**
@@ -68,7 +70,12 @@ export const RunsControllerUpdateBody = zod.object({
   "fileId": zod.string().optional().describe('File ID if type is file')
 })).optional().describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerUpdateBodyProcessingModeDefault),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerUpdateBodyExtractionProviderDefault)
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerUpdateBodyExtractionProviderDefault),
+  "variantId": zod.string().optional().describe('ID of schema variant to use for extraction'),
+  "skippedFields": zod.array(zod.string()).optional().describe('Field names to exclude from extraction'),
+  "sortConfig": zod.object({
+
+}).optional().describe('Reference sort configuration')
 })
 
 /**

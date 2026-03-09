@@ -8,6 +8,7 @@
 import type { RunSourceDto } from "./runSourceDto";
 import type { UpdateRunDtoExtractionProvider } from "./updateRunDtoExtractionProvider";
 import type { UpdateRunDtoProcessingMode } from "./updateRunDtoProcessingMode";
+import type { UpdateRunDtoSortConfig } from "./updateRunDtoSortConfig";
 
 export interface UpdateRunDto {
 	/** The ID of the extractor to use for this run */
@@ -16,4 +17,10 @@ export interface UpdateRunDto {
 	sources?: RunSourceDto[];
 	processingMode?: UpdateRunDtoProcessingMode;
 	extractionProvider?: UpdateRunDtoExtractionProvider;
+	/** ID of schema variant to use for extraction */
+	variantId?: string;
+	/** Field names to exclude from extraction */
+	skippedFields?: string[];
+	/** Reference sort configuration */
+	sortConfig?: UpdateRunDtoSortConfig;
 }

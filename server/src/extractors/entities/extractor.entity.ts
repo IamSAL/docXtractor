@@ -22,6 +22,15 @@ export interface FewShotExample {
   output: string;
 }
 
+export interface SchemaVariant {
+  id: string;
+  name: string;
+  description?: string;
+  schema: Record<string, any>;
+  isDefault: boolean;
+  createdAt: string;
+}
+
 @Entity()
 export class Extractor {
   @ApiProperty({ example: '3fa85f64-5717-4562-b3fc-2c963f66afa6' })
@@ -55,6 +64,14 @@ export class Extractor {
   })
   @Column('jsonb', { default: [] })
   fewShotExamples: FewShotExample[];
+
+  @ApiPropertyOptional({
+    type: 'array',
+    items: { type: 'object' },
+    example: [],
+  })
+  @Column('jsonb', { default: [] })
+  variants: SchemaVariant[];
 
   @ApiPropertyOptional({ default: false })
   @Column({ default: false })

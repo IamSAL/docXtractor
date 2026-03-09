@@ -65,6 +65,9 @@ export const ExtractorsControllerFindAllResponseItem = zod.object({
   "fewShotExamples": zod.array(zod.object({
 
 })).optional(),
+  "variants": zod.array(zod.object({
+
+})).optional(),
   "consensusEnabled": zod.boolean().default(extractorsControllerFindAllResponseConsensusEnabledDefault),
   "confidenceThreshold": zod.number().default(extractorsControllerFindAllResponseConfidenceThresholdDefault),
   "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerFindAllResponseConflictResolutionDefault),
@@ -112,6 +115,9 @@ export const ExtractorsControllerFindOneResponse = zod.object({
 }),
   "systemPrompt": zod.string(),
   "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "variants": zod.array(zod.object({
 
 })).optional(),
   "consensusEnabled": zod.boolean().default(extractorsControllerFindOneResponseConsensusEnabledDefault),
@@ -185,6 +191,9 @@ export const ExtractorsControllerUpdateResponse = zod.object({
   "fewShotExamples": zod.array(zod.object({
 
 })).optional(),
+  "variants": zod.array(zod.object({
+
+})).optional(),
   "consensusEnabled": zod.boolean().default(extractorsControllerUpdateResponseConsensusEnabledDefault),
   "confidenceThreshold": zod.number().default(extractorsControllerUpdateResponseConfidenceThresholdDefault),
   "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateResponseConflictResolutionDefault),
@@ -203,5 +212,110 @@ export const ExtractorsControllerUpdateResponse = zod.object({
  */
 export const ExtractorsControllerRemoveParams = zod.object({
   "id": zod.string()
+})
+
+/**
+ * @summary Add a schema variant to an extractor
+ */
+export const ExtractorsControllerAddVariantParams = zod.object({
+  "id": zod.string()
+})
+
+export const extractorsControllerAddVariantBodyIsDefaultDefault = false;
+
+export const ExtractorsControllerAddVariantBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "schema": zod.object({
+
+}),
+  "isDefault": zod.boolean().default(extractorsControllerAddVariantBodyIsDefaultDefault)
+})
+
+/**
+ * @summary Update a schema variant
+ */
+export const ExtractorsControllerUpdateVariantParams = zod.object({
+  "id": zod.string(),
+  "variantId": zod.string()
+})
+
+export const extractorsControllerUpdateVariantBodyIsDefaultDefault = false;
+
+export const ExtractorsControllerUpdateVariantBody = zod.object({
+  "name": zod.string().optional(),
+  "description": zod.string().optional(),
+  "schema": zod.object({
+
+}).optional(),
+  "isDefault": zod.boolean().default(extractorsControllerUpdateVariantBodyIsDefaultDefault)
+})
+
+export const extractorsControllerUpdateVariantResponseConsensusEnabledDefault = false;export const extractorsControllerUpdateVariantResponseConfidenceThresholdDefault = 85;export const extractorsControllerUpdateVariantResponseConflictResolutionDefault = `majority`;export const extractorsControllerUpdateVariantResponseCitationEnabledDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateVariantResponseContextWindowDefault = `128k`;export const extractorsControllerUpdateVariantResponseDefaultModelDefault = `gpt-4o`;
+
+export const ExtractorsControllerUpdateVariantResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "variants": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerUpdateVariantResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerUpdateVariantResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateVariantResponseConflictResolutionDefault),
+  "citationEnabled": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerUpdateVariantResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerUpdateVariantResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
+
+/**
+ * @summary Delete a schema variant
+ */
+export const ExtractorsControllerDeleteVariantParams = zod.object({
+  "id": zod.string(),
+  "variantId": zod.string()
+})
+
+export const extractorsControllerDeleteVariantResponseConsensusEnabledDefault = false;export const extractorsControllerDeleteVariantResponseConfidenceThresholdDefault = 85;export const extractorsControllerDeleteVariantResponseConflictResolutionDefault = `majority`;export const extractorsControllerDeleteVariantResponseCitationEnabledDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerDeleteVariantResponseContextWindowDefault = `128k`;export const extractorsControllerDeleteVariantResponseDefaultModelDefault = `gpt-4o`;
+
+export const ExtractorsControllerDeleteVariantResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "variants": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerDeleteVariantResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerDeleteVariantResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerDeleteVariantResponseConflictResolutionDefault),
+  "citationEnabled": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerDeleteVariantResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerDeleteVariantResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
 })
 

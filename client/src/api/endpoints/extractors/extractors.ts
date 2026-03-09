@@ -23,10 +23,12 @@ import type {
 
 import type {
 	CreateExtractorDto,
+	CreateSchemaVariantDto,
 	Extractor,
 	GenerateExtractorDto,
 	GenerateSchemaDto,
 	UpdateExtractorDto,
+	UpdateSchemaVariantDto,
 } from "../../models";
 
 import { HttpClient } from "../../../lib/axios";
@@ -924,6 +926,341 @@ export const useExtractorsControllerRemove = <
 > => {
 	return useMutation(
 		getExtractorsControllerRemoveMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * @summary Add a schema variant to an extractor
+ */
+export type extractorsControllerAddVariantResponse201 = {
+	data: Extractor;
+	status: 201;
+};
+
+export type extractorsControllerAddVariantResponseSuccess =
+	extractorsControllerAddVariantResponse201 & {
+		headers: Headers;
+	};
+
+export type extractorsControllerAddVariantResponse =
+	extractorsControllerAddVariantResponseSuccess;
+
+export const getExtractorsControllerAddVariantUrl = (id: string) => {
+	return `/extractors/${id}/variants`;
+};
+
+export const extractorsControllerAddVariant = async (
+	id: string,
+	createSchemaVariantDto: CreateSchemaVariantDto,
+	options?: RequestInit,
+): Promise<extractorsControllerAddVariantResponse> => {
+	return HttpClient<extractorsControllerAddVariantResponse>(
+		getExtractorsControllerAddVariantUrl(id),
+		{
+			...options,
+			method: "POST",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(createSchemaVariantDto),
+		},
+	);
+};
+
+export const getExtractorsControllerAddVariantMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof extractorsControllerAddVariant>>,
+		TError,
+		{ id: string; data: CreateSchemaVariantDto },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof extractorsControllerAddVariant>>,
+	TError,
+	{ id: string; data: CreateSchemaVariantDto },
+	TContext
+> => {
+	const mutationKey = ["extractorsControllerAddVariant"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof extractorsControllerAddVariant>>,
+		{ id: string; data: CreateSchemaVariantDto }
+	> = (props) => {
+		const { id, data } = props ?? {};
+
+		return extractorsControllerAddVariant(id, data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ExtractorsControllerAddVariantMutationResult = NonNullable<
+	Awaited<ReturnType<typeof extractorsControllerAddVariant>>
+>;
+export type ExtractorsControllerAddVariantMutationBody = CreateSchemaVariantDto;
+export type ExtractorsControllerAddVariantMutationError = unknown;
+
+/**
+ * @summary Add a schema variant to an extractor
+ */
+export const useExtractorsControllerAddVariant = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof extractorsControllerAddVariant>>,
+			TError,
+			{ id: string; data: CreateSchemaVariantDto },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof extractorsControllerAddVariant>>,
+	TError,
+	{ id: string; data: CreateSchemaVariantDto },
+	TContext
+> => {
+	return useMutation(
+		getExtractorsControllerAddVariantMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * @summary Update a schema variant
+ */
+export type extractorsControllerUpdateVariantResponse200 = {
+	data: Extractor;
+	status: 200;
+};
+
+export type extractorsControllerUpdateVariantResponseSuccess =
+	extractorsControllerUpdateVariantResponse200 & {
+		headers: Headers;
+	};
+
+export type extractorsControllerUpdateVariantResponse =
+	extractorsControllerUpdateVariantResponseSuccess;
+
+export const getExtractorsControllerUpdateVariantUrl = (
+	id: string,
+	variantId: string,
+) => {
+	return `/extractors/${id}/variants/${variantId}`;
+};
+
+export const extractorsControllerUpdateVariant = async (
+	id: string,
+	variantId: string,
+	updateSchemaVariantDto: UpdateSchemaVariantDto,
+	options?: RequestInit,
+): Promise<extractorsControllerUpdateVariantResponse> => {
+	return HttpClient<extractorsControllerUpdateVariantResponse>(
+		getExtractorsControllerUpdateVariantUrl(id, variantId),
+		{
+			...options,
+			method: "PATCH",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(updateSchemaVariantDto),
+		},
+	);
+};
+
+export const getExtractorsControllerUpdateVariantMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof extractorsControllerUpdateVariant>>,
+		TError,
+		{ id: string; variantId: string; data: UpdateSchemaVariantDto },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof extractorsControllerUpdateVariant>>,
+	TError,
+	{ id: string; variantId: string; data: UpdateSchemaVariantDto },
+	TContext
+> => {
+	const mutationKey = ["extractorsControllerUpdateVariant"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof extractorsControllerUpdateVariant>>,
+		{ id: string; variantId: string; data: UpdateSchemaVariantDto }
+	> = (props) => {
+		const { id, variantId, data } = props ?? {};
+
+		return extractorsControllerUpdateVariant(
+			id,
+			variantId,
+			data,
+			requestOptions,
+		);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ExtractorsControllerUpdateVariantMutationResult = NonNullable<
+	Awaited<ReturnType<typeof extractorsControllerUpdateVariant>>
+>;
+export type ExtractorsControllerUpdateVariantMutationBody =
+	UpdateSchemaVariantDto;
+export type ExtractorsControllerUpdateVariantMutationError = unknown;
+
+/**
+ * @summary Update a schema variant
+ */
+export const useExtractorsControllerUpdateVariant = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof extractorsControllerUpdateVariant>>,
+			TError,
+			{ id: string; variantId: string; data: UpdateSchemaVariantDto },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof extractorsControllerUpdateVariant>>,
+	TError,
+	{ id: string; variantId: string; data: UpdateSchemaVariantDto },
+	TContext
+> => {
+	return useMutation(
+		getExtractorsControllerUpdateVariantMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * @summary Delete a schema variant
+ */
+export type extractorsControllerDeleteVariantResponse200 = {
+	data: Extractor;
+	status: 200;
+};
+
+export type extractorsControllerDeleteVariantResponseSuccess =
+	extractorsControllerDeleteVariantResponse200 & {
+		headers: Headers;
+	};
+
+export type extractorsControllerDeleteVariantResponse =
+	extractorsControllerDeleteVariantResponseSuccess;
+
+export const getExtractorsControllerDeleteVariantUrl = (
+	id: string,
+	variantId: string,
+) => {
+	return `/extractors/${id}/variants/${variantId}`;
+};
+
+export const extractorsControllerDeleteVariant = async (
+	id: string,
+	variantId: string,
+	options?: RequestInit,
+): Promise<extractorsControllerDeleteVariantResponse> => {
+	return HttpClient<extractorsControllerDeleteVariantResponse>(
+		getExtractorsControllerDeleteVariantUrl(id, variantId),
+		{
+			...options,
+			method: "DELETE",
+		},
+	);
+};
+
+export const getExtractorsControllerDeleteVariantMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof extractorsControllerDeleteVariant>>,
+		TError,
+		{ id: string; variantId: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof extractorsControllerDeleteVariant>>,
+	TError,
+	{ id: string; variantId: string },
+	TContext
+> => {
+	const mutationKey = ["extractorsControllerDeleteVariant"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof extractorsControllerDeleteVariant>>,
+		{ id: string; variantId: string }
+	> = (props) => {
+		const { id, variantId } = props ?? {};
+
+		return extractorsControllerDeleteVariant(id, variantId, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ExtractorsControllerDeleteVariantMutationResult = NonNullable<
+	Awaited<ReturnType<typeof extractorsControllerDeleteVariant>>
+>;
+
+export type ExtractorsControllerDeleteVariantMutationError = unknown;
+
+/**
+ * @summary Delete a schema variant
+ */
+export const useExtractorsControllerDeleteVariant = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof extractorsControllerDeleteVariant>>,
+			TError,
+			{ id: string; variantId: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof extractorsControllerDeleteVariant>>,
+	TError,
+	{ id: string; variantId: string },
+	TContext
+> => {
+	return useMutation(
+		getExtractorsControllerDeleteVariantMutationOptions(options),
 		queryClient,
 	);
 };
