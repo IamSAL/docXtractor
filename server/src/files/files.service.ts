@@ -7,7 +7,6 @@ import { File } from './entities/file.entity';
 import { FileStatus } from './enums/file-status.enum';
 import { StorageService } from './storage.service';
 
-
 @Injectable()
 export class FilesService {
   private readonly logger = new Logger(FilesService.name);
@@ -58,7 +57,9 @@ export class FilesService {
       metadata: metadata || {},
     });
 
-    this.logger.log(`File uploaded (pending): ${fileRecord.id} by user ${userId}`);
+    this.logger.log(
+      `File uploaded (pending): ${fileRecord.id} by user ${userId}`,
+    );
 
     // Return file reference
     // Note: In a real app, the URL might be a signed URL or a proxy URL
@@ -80,7 +81,9 @@ export class FilesService {
       { status: FileStatus.COMPLETED },
     );
 
-    this.logger.log(`Files completed: ${fileIds.join(', ')} for user ${userId}`);
+    this.logger.log(
+      `Files completed: ${fileIds.join(', ')} for user ${userId}`,
+    );
   }
 
   /**

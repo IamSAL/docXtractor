@@ -133,9 +133,9 @@ export class RunsService {
     sourceName: string,
   ): Record<string, unknown>[] {
     if (Array.isArray(result)) {
-      return result.map((item) => {
+      return (result as unknown[]).map((item) => {
         if (typeof item === 'object' && item !== null) {
-          return { _source: sourceName, ...item };
+          return { _source: sourceName, ...(item as Record<string, unknown>) };
         }
         return { _source: sourceName, value: item };
       });
@@ -147,7 +147,10 @@ export class RunsService {
       if (arrayKey) {
         return (obj[arrayKey] as unknown[]).map((item) => {
           if (typeof item === 'object' && item !== null) {
-            return { _source: sourceName, ...(item as Record<string, unknown>) };
+            return {
+              _source: sourceName,
+              ...(item as Record<string, unknown>),
+            };
           }
           return { _source: sourceName, value: item };
         });
@@ -372,9 +375,7 @@ export class RunsService {
         `🎯 All documents parsed for run ${run.id}, starting extraction`,
       );
 
-      const parsedSources = run.sources.filter(
-        (s) => s.status === 'parsed',
-      );
+      const parsedSources = run.sources.filter((s) => s.status === 'parsed');
       const failedCount = run.sources.filter(
         (s) => s.status === 'failed',
       ).length;
@@ -388,7 +389,11 @@ export class RunsService {
         run.status = RunStatus.FAILED;
         run.error = 'No documents were successfully parsed';
         run.finishedAt = new Date();
-        this.addLog(run, 'error', 'No documents parsed successfully, run failed');
+        this.addLog(
+          run,
+          'error',
+          'No documents parsed successfully, run failed',
+        );
       } else {
         run.status = RunStatus.EXTRACTING;
         run.progress!.currentStep = 'extracting';
@@ -483,11 +488,7 @@ export class RunsService {
         this.logger.error(
           `Ollama extraction failed for run ${run.id}: ${error.message}`,
         );
-        this.addLog(
-          run,
-          'error',
-          `Ollama extraction failed: ${error.message}`,
-        );
+        this.addLog(run, 'error', `Ollama extraction failed: ${error.message}`);
         run.status = RunStatus.FAILED;
         run.error = error.message || 'Ollama extraction failed';
         run.finishedAt = new Date();
@@ -525,9 +526,7 @@ export class RunsService {
         'extract-data',
         extractionPayload,
       );
-      this.logger.log(
-        `✅ Job added to ${QueueName.EXTRACTION_REQUESTS} queue`,
-      );
+      this.logger.log(`✅ Job added to ${QueueName.EXTRACTION_REQUESTS} queue`);
       this.addLog(run, 'info', 'Extraction job queued');
     }
   }
@@ -557,14 +556,26 @@ export class RunsService {
     if (run.extractionProvider === ExtractionProvider.OLLAMA) {
       // Ollama: extract each doc in parallel
       this.logger.log(`🦙 Running batch Ollama extraction for run ${run.id}`);
-      this.addLog(run, 'info', 'Starting batch extraction with ollama provider');
-      this.addLog(run, 'info', `Processing ${parsedSources.length} documents in parallel`);
+      this.addLog(
+        run,
+        'info',
+        'Starting batch extraction with ollama provider',
+      );
+      this.addLog(
+        run,
+        'info',
+        `Processing ${parsedSources.length} documents in parallel`,
+      );
       const allResults: Record<string, unknown>[] = [];
       let totalTokens = 0;
 
       // Run all extractions in parallel using Promise.allSettled
       const extractionPromises = parsedSources.map(async (source) => {
-        this.addLog(run, 'info', `Extracting from '${source.name}' with Ollama`);
+        this.addLog(
+          run,
+          'info',
+          `Extracting from '${source.name}' with Ollama`,
+        );
         try {
           const result = await this.ollamaService.extract(
             source.parsedContent!,
@@ -576,7 +587,10 @@ export class RunsService {
           source.extractionStatus = 'done';
           source.extractionResult = result.data;
 
-          const annotatedRows = this.annotateResultWithSource(result.data, source.name);
+          const annotatedRows = this.annotateResultWithSource(
+            result.data,
+            source.name,
+          );
 
           run.progress!.extracted = (run.progress!.extracted || 0) + 1;
           this.addLog(
@@ -588,7 +602,12 @@ export class RunsService {
           this.runsGateway.emitRunSourceUpdated(run.id, source);
           this.runsGateway.emitRunUpdated(run.id, run);
 
-          return { success: true, tokens: result.usage.totalTokens, rows: annotatedRows, source };
+          return {
+            success: true,
+            tokens: result.usage.totalTokens,
+            rows: annotatedRows,
+            source,
+          };
         } catch (error) {
           source.extractionStatus = 'failed';
           source.extractionError = error.message;
@@ -749,9 +768,7 @@ export class RunsService {
       // PER_DOCUMENT mode: accumulate per-source results
       const source = run.sources.find((s) => s.id === document_id);
       if (!source) {
-        this.logger.warn(
-          `Source ${document_id} not found in run ${run_id}`,
-        );
+        this.logger.warn(`Source ${document_id} not found in run ${run_id}`);
         return;
       }
 
@@ -774,7 +791,8 @@ export class RunsService {
       }
 
       // Accumulate metrics incrementally
-      if (!run.metrics) run.metrics = { totalInputTokens: 0, totalOutputTokens: 0 };
+      if (!run.metrics)
+        run.metrics = { totalInputTokens: 0, totalOutputTokens: 0 };
       run.metrics.totalInputTokens =
         (run.metrics.totalInputTokens || 0) + (usage?.input_tokens || 0);
       run.metrics.totalOutputTokens =
@@ -973,18 +991,15 @@ export class RunsService {
 
       // Recalculate parsed progress from actual source states
       run.progress = {
-        parsed: run.sources.filter(
-          (s) => s.status === 'parsed' || s.status === 'failed',
-        ).length - 1, // minus this source which we just reset
+        parsed:
+          run.sources.filter(
+            (s) => s.status === 'parsed' || s.status === 'failed',
+          ).length - 1, // minus this source which we just reset
         total: run.sources.length,
         currentStep: 'parsing',
       };
 
-      this.addLog(
-        run,
-        'info',
-        `Retrying parse for source '${source.name}'`,
-      );
+      this.addLog(run, 'info', `Retrying parse for source '${source.name}'`);
 
       await this.runRepo.save(run);
       await this.flushLogs(run.id);
@@ -1020,10 +1035,11 @@ export class RunsService {
 
       // Recalculate extraction progress from actual source states
       const parsedSources = run.sources.filter((s) => s.status === 'parsed');
-      const completedExtractions = parsedSources.filter(
-        (s) =>
-          s.extractionStatus === 'done' || s.extractionStatus === 'failed',
-      ).length - 1; // minus this source which we just reset
+      const completedExtractions =
+        parsedSources.filter(
+          (s) =>
+            s.extractionStatus === 'done' || s.extractionStatus === 'failed',
+        ).length - 1; // minus this source which we just reset
       run.progress = {
         ...run.progress!,
         currentStep: 'extracting',
@@ -1064,7 +1080,7 @@ export class RunsService {
 
           source.extractionStatus = 'done';
           source.extractionResult = result.data;
-          run.progress!.extracted = (run.progress!.extracted || 0) + 1;
+          run.progress.extracted = (run.progress.extracted || 0) + 1;
 
           this.addLog(
             run,
@@ -1074,7 +1090,7 @@ export class RunsService {
         } catch (error) {
           source.extractionStatus = 'failed';
           source.extractionError = error.message;
-          run.progress!.extracted = (run.progress!.extracted || 0) + 1;
+          run.progress.extracted = (run.progress.extracted || 0) + 1;
 
           this.addLog(
             run,
@@ -1104,7 +1120,7 @@ export class RunsService {
           run.status = RunStatus.FAILED;
           run.error = 'All document extractions failed';
         }
-        run.progress!.currentStep = 'complete';
+        run.progress.currentStep = 'complete';
         run.finishedAt = new Date();
       } else {
         // Queue-based extraction: queue a single extraction job
@@ -1131,11 +1147,7 @@ export class RunsService {
           },
         );
 
-        this.addLog(
-          run,
-          'info',
-          `Extraction job queued for '${source.name}'`,
-        );
+        this.addLog(run, 'info', `Extraction job queued for '${source.name}'`);
       }
 
       await this.runRepo.save(run);

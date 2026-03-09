@@ -142,8 +142,12 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Emit workflow events
   emitWorkflowExecutionStarted(execution: any) {
-    this.server.to(`workflow:${execution.workflowId}`).emit('workflow:execution:started', execution);
-    this.server.to(`workflow-execution:${execution.id}`).emit('workflow:execution:started', execution);
+    this.server
+      .to(`workflow:${execution.workflowId}`)
+      .emit('workflow:execution:started', execution);
+    this.server
+      .to(`workflow-execution:${execution.id}`)
+      .emit('workflow:execution:started', execution);
     this.server.to('workflows:list').emit('workflows:list:updated', {
       workflowId: execution.workflowId,
       executionId: execution.id,
@@ -152,8 +156,12 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   emitWorkflowExecutionCompleted(execution: any) {
-    this.server.to(`workflow:${execution.workflowId}`).emit('workflow:execution:completed', execution);
-    this.server.to(`workflow-execution:${execution.id}`).emit('workflow:execution:completed', execution);
+    this.server
+      .to(`workflow:${execution.workflowId}`)
+      .emit('workflow:execution:completed', execution);
+    this.server
+      .to(`workflow-execution:${execution.id}`)
+      .emit('workflow:execution:completed', execution);
     this.server.to('workflows:list').emit('workflows:list:updated', {
       workflowId: execution.workflowId,
       executionId: execution.id,
@@ -162,14 +170,18 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   emitWorkflowExecutionFailed(execution: any, errorMessage: string) {
-    this.server.to(`workflow:${execution.workflowId}`).emit('workflow:execution:failed', {
-      execution,
-      errorMessage,
-    });
-    this.server.to(`workflow-execution:${execution.id}`).emit('workflow:execution:failed', {
-      execution,
-      errorMessage,
-    });
+    this.server
+      .to(`workflow:${execution.workflowId}`)
+      .emit('workflow:execution:failed', {
+        execution,
+        errorMessage,
+      });
+    this.server
+      .to(`workflow-execution:${execution.id}`)
+      .emit('workflow:execution:failed', {
+        execution,
+        errorMessage,
+      });
     this.server.to('workflows:list').emit('workflows:list:updated', {
       workflowId: execution.workflowId,
       executionId: execution.id,
@@ -179,17 +191,23 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   emitWorkflowNodeStarted(nodeExecution: any) {
-    this.server.to(`workflow-execution:${nodeExecution.executionId}`).emit('workflow:node:started', nodeExecution);
+    this.server
+      .to(`workflow-execution:${nodeExecution.executionId}`)
+      .emit('workflow:node:started', nodeExecution);
   }
 
   emitWorkflowNodeCompleted(nodeExecution: any) {
-    this.server.to(`workflow-execution:${nodeExecution.executionId}`).emit('workflow:node:completed', nodeExecution);
+    this.server
+      .to(`workflow-execution:${nodeExecution.executionId}`)
+      .emit('workflow:node:completed', nodeExecution);
   }
 
   emitWorkflowNodeFailed(nodeExecution: any, errorMessage: string) {
-    this.server.to(`workflow-execution:${nodeExecution.executionId}`).emit('workflow:node:failed', {
-      nodeExecution,
-      errorMessage,
-    });
+    this.server
+      .to(`workflow-execution:${nodeExecution.executionId}`)
+      .emit('workflow:node:failed', {
+        nodeExecution,
+        errorMessage,
+      });
   }
 }

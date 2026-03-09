@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { Workflow } from '../entities/workflow.entity';
 import { WorkflowStatus } from '../enums/workflow-status.enum';
 import { WorkflowsService } from '../workflows.service';
-import { QueueService } from '../../shared/queue/queue.service';
 
 @Injectable()
 export class TriggerManagerService {
@@ -42,7 +41,7 @@ export class TriggerManagerService {
         break;
 
       case 'schedule':
-        await this.registerScheduleTrigger(workflow);
+        this.registerScheduleTrigger(workflow);
         break;
 
       case 'email':
@@ -58,7 +57,7 @@ export class TriggerManagerService {
   /**
    * Unregister triggers when workflow is paused/deleted
    */
-  async unregisterTriggers(workflowId: string) {
+  unregisterTriggers(workflowId: string) {
     this.logger.log(`Unregistering triggers for workflow ${workflowId}`);
 
     // Remove scheduled jobs
@@ -74,7 +73,7 @@ export class TriggerManagerService {
   /**
    * Register a schedule (cron) trigger
    */
-  private async registerScheduleTrigger(workflow: Workflow) {
+  private registerScheduleTrigger(workflow: Workflow) {
     const { cronExpression } = workflow.triggerConfig || {};
 
     if (!cronExpression) {
@@ -156,8 +155,7 @@ export class TriggerManagerService {
   /**
    * Cleanup on service shutdown
    */
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async onModuleDestroy() {
+  onModuleDestroy() {
     this.logger.log('Cleaning up triggers...');
 
     for (const [, job] of this.scheduledJobs.entries()) {

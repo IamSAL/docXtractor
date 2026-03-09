@@ -20,11 +20,11 @@ import {
   ActionNode,
 } from "@/components/workflow/nodes";
 import {
-  useGetWorkflowsId,
-  useUpdateWorkflowsId,
-  useActivateWorkflowsId,
-  usePauseWorkflowsId,
-  useGetWorkflowsIdExecutions,
+  useWorkflowsControllerFindOne,
+  useWorkflowsControllerUpdate,
+  useWorkflowsControllerActivate,
+  useWorkflowsControllerPause,
+  useWorkflowsControllerGetExecutions,
   useWorkflowsControllerTrigger,
 } from "@/api/endpoints/workflows/workflows";
 import { toast } from "sonner";
@@ -44,8 +44,8 @@ const nodeTypes = {
 function WorkflowBuilder() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [workflowName, setWorkflowName] = useState("New Workflow");
   const [workflowStatus, setWorkflowStatus] = useState<
@@ -61,21 +61,24 @@ function WorkflowBuilder() {
     label: string;
   } | null>(null);
 
-  // API hooks
-  const { data: workflow, isLoading } = useGetWorkflowsId(id, {
+  const { data: response, isLoading } = useWorkflowsControllerFindOne(id, {
     query: { enabled: id !== "new" },
   });
-  const updateWorkflow = useUpdateWorkflowsId();
-  const activateWorkflow = useActivateWorkflowsId();
-  const pauseWorkflow = usePauseWorkflowsId();
+  const workflow = response?.data as unknown as any;
+
+  const updateWorkflow = useWorkflowsControllerUpdate();
+  const activateWorkflow = useWorkflowsControllerActivate();
+  const pauseWorkflow = useWorkflowsControllerPause();
   const triggerWorkflow = useWorkflowsControllerTrigger();
-  const { data: executions, refetch: refetchExecutions } =
-    useGetWorkflowsIdExecutions(id, {
+
+  const { data: executionResponse, refetch: refetchExecutions } =
+    useWorkflowsControllerGetExecutions(id, {
       query: { enabled: id !== "new" },
     });
+  const executions = executionResponse?.data as unknown as any[];
 
   // Live execution tracking
-  const { execution, nodeExecutions, getNodeStatus } =
+  const { execution, nodeExecutions, executionOrder, getNodeStatus } =
     useWorkflowExecution(currentExecutionId);
 
   // Load workflow data
@@ -217,7 +220,7 @@ function WorkflowBuilder() {
       setNodes((nds) =>
         nds.map((node) =>
           node.id === nodeId
-            ? { ...node, data: { ...node.data, ...updates } }
+            ? { ...node, data: { ...(node.data as any), ...updates } }
             : node,
         ),
       );
@@ -243,16 +246,16 @@ function WorkflowBuilder() {
       const definition = {
         nodes: nodes.map((node) => ({
           id: node.id,
-          type: node.data.type,
+          type: node.data.type as string,
           position: node.position,
-          params: { ...node.data.params, label: node.data.label },
+          params: { ...(node.data.params as any), label: node.data.label },
         })),
         connections: edges.map((edge) => ({
           id: edge.id,
           source: edge.source,
           target: edge.target,
-          sourceHandle: edge.sourceHandle,
-          targetHandle: edge.targetHandle,
+          sourceHandle: edge.sourceHandle ?? undefined,
+          targetHandle: edge.targetHandle ?? undefined,
         })),
       };
 
@@ -322,7 +325,7 @@ function WorkflowBuilder() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-cream">
+    <div className="h-screen flex flex-col bg-cream w-screen">
       <WorkflowToolbar
         workflowName={workflowName}
         workflowStatus={workflowStatus}

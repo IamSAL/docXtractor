@@ -1,7 +1,7 @@
 export enum NodeExecutionStatus {
-	PENDING = 'pending',
-	RUNNING = 'running',
-	SUCCESS = 'success',
-	FAILED = 'failed',
-	SKIPPED = 'skipped',
+  PENDING = 'pending',
+  RUNNING = 'running',
+  SUCCESS = 'success',
+  FAILED = 'failed',
+  SKIPPED = 'skipped',
 }

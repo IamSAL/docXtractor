@@ -79,6 +79,13 @@ export interface RunMetrics {
   totalOutputTokens?: number;
 }
 
+export interface SortConfig {
+  referenceValues: string[];
+  matchColumn: string;
+  fileName: string;
+  referenceColumn: string;
+}
+
 // Entity
 @Entity('runs')
 @Index(['userId', 'status'])

@@ -35,6 +35,7 @@ import { Route as DemoAiStructuredRouteImport } from './routes/demo/ai-structure
 import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
 import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
 import { Route as AutorunsNewRouteImport } from './routes/autoruns/new'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
 import { Route as RunsReviewIdRouteImport } from './routes/runs/review.$id'
 import { Route as ExtractorsEditIdRouteImport } from './routes/extractors/edit.$id'
@@ -187,6 +188,11 @@ const AutorunsNewRoute = AutorunsNewRouteImport.update({
   path: '/autoruns/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
   id: '/guitars/',
   path: '/guitars/',
@@ -299,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/autoruns/new': typeof AutorunsNewRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -347,6 +354,7 @@ export interface FileRoutesByTo {
   '/demo': typeof DemoRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/autoruns/new': typeof AutorunsNewRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -397,6 +405,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/autoruns/new': typeof AutorunsNewRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -448,6 +457,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/settings'
     | '/signup'
+    | '/auth/callback'
     | '/autoruns/new'
     | '/demo/ai-chat'
     | '/demo/ai-image'
@@ -496,6 +506,7 @@ export interface FileRouteTypes {
     | '/demo'
     | '/login'
     | '/signup'
+    | '/auth/callback'
     | '/autoruns/new'
     | '/demo/ai-chat'
     | '/demo/ai-image'
@@ -545,6 +556,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/settings'
     | '/signup'
+    | '/auth/callback'
     | '/autoruns/new'
     | '/demo/ai-chat'
     | '/demo/ai-image'
@@ -595,6 +607,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   AutorunsNewRoute: typeof AutorunsNewRoute
   ExtractorsIdRoute: typeof ExtractorsIdRoute
   ExtractorsNewRoute: typeof ExtractorsNewRoute
@@ -793,6 +806,13 @@ declare module '@tanstack/react-router' {
       path: '/autoruns/new'
       fullPath: '/autoruns/new'
       preLoaderRoute: typeof AutorunsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/guitars/': {
@@ -1025,6 +1045,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   AutorunsNewRoute: AutorunsNewRoute,
   ExtractorsIdRoute: ExtractorsIdRoute,
   ExtractorsNewRoute: ExtractorsNewRoute,

@@ -12,7 +12,6 @@ import { WorkflowExecution } from './entities/workflow-execution.entity';
 import { CreateWorkflowDto } from './dto/create-workflow.dto';
 import { UpdateWorkflowDto } from './dto/update-workflow.dto';
 import { WorkflowStatus } from './enums/workflow-status.enum';
-import { ExecutionStatus } from './enums/execution-status.enum';
 import { WorkflowExecutorService } from './executor/workflow-executor.service';
 import { TriggerManagerService } from './triggers/trigger-manager.service';
 import { QueueService } from '../shared/queue/queue.service';
@@ -126,7 +125,7 @@ export class WorkflowsService {
     const savedWorkflow = await this.workflowRepository.save(workflow);
 
     // Unregister triggers
-    await this.triggerManager.unregisterTriggers(id);
+    this.triggerManager.unregisterTriggers(id);
 
     return savedWorkflow;
   }
@@ -203,12 +202,13 @@ export class WorkflowsService {
     });
 
     const orphanedNodes = nodes.filter(
-      (node) => !connectedNodeIds.has(node.id) && nodes.length > 1,
+      (node: any) =>
+        !connectedNodeIds.has(node.id as string) && nodes.length > 1,
     );
 
     if (orphanedNodes.length > 0 && nodes.length > 1) {
       throw new BadRequestException(
-        `Found orphaned nodes: ${orphanedNodes.map((n) => n.id).join(', ')}`,
+        `Found orphaned nodes: ${orphanedNodes.map((n: any) => n.id as string).join(', ')}`,
       );
     }
 
@@ -218,8 +218,8 @@ export class WorkflowsService {
     }
 
     // Validate that all connection references exist
-    const nodeIds = new Set(nodes.map((n) => n.id));
-    connections.forEach((conn) => {
+    const nodeIds = new Set(nodes.map((n: any) => n.id as string));
+    connections.forEach((conn: any) => {
       if (!nodeIds.has(conn.source)) {
         throw new BadRequestException(
           `Connection references non-existent source node: ${conn.source}`,

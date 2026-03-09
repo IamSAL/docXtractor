@@ -76,6 +76,7 @@ AXIOS_INSTANCE.interceptors.response.use(
             } catch (e) {}
           }
 
+          // logout() already clears query cache and disconnects socket
           useAuthStore.getState().logout();
 
           // Redirect to login page

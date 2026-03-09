@@ -77,7 +77,7 @@ Key modules:
 - **`QueueModule`** (`shared/queue/`) — Global BullMQ setup for all 4 queues
 - **`AuthModule`** — JWT + Google OAuth, guards, strategies
 - **`OllamaModule`** (`shared/ollama/`) — Global Ollama client (model: `qwen3:14b`)
-- **`MailModule`** (`shared/mail/`) — Email sending service
+- **`MailModule`** (`shared/mail/`) — Email sending via Brevo (SendGrid) SMTP
 
 Key entities:
 
@@ -142,8 +142,6 @@ Queue names are defined in `server/src/shared/queue/queue-names.ts`. NestJS cons
 | Parser Service     | 8001  |
 | Extraction Service | 8002  |
 | Ollama             | 11434 |
-| Maildev UI         | 1081  |
-| Maildev SMTP       | 1026  |
 
 ## Development Patterns
 
@@ -172,6 +170,7 @@ Copy `server/env.example` to `server/.env`. Key variables:
 - `JWT_SECRET`, `JWT_REFRESH_SECRET`
 - `REDIS_HOST`, `REDIS_PORT` (default: `localhost:6380`)
 - `OLLAMA_HOST`, `OLLAMA_DEFAULT_MODEL` (default: `qwen3:14b`)
+- `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASS` — Brevo SMTP for transactional email
 - `GOOGLE_CLIENT_ID/SECRET` — OAuth
 
 The extraction-service needs its own `.env` with `GOOGLE_API_KEY` and `LANGEXTRACT_API_KEY`.

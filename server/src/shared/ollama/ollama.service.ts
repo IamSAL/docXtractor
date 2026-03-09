@@ -40,9 +40,9 @@ export class OllamaService {
     content: string,
     schema: Record<string, any>,
     systemPrompt: string,
-    model?: string,
+    _model?: string,
   ): Promise<OllamaExtractionResult> {
-    // const modelId = model || this.defaultModel;
+    // const modelId = _model || this.defaultModel;
     const modelId = 'gpt-oss:120b-cloud';
 
     // Build field descriptions from schema

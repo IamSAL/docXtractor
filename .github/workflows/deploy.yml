@@ -77,6 +77,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: docker-compose.prod.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Copy compose file to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: docker-compose.prod.yml
+          target: ${{ secrets.PROJECT_DIR }}
+
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -88,13 +104,10 @@ jobs:
           script: |
             cd ${{ secrets.PROJECT_DIR }}
 
-            # Pull latest code (for compose file, nginx config, etc.)
-            git pull origin main
-
             # Write production .env from secret
-            echo "${{ secrets.ENV_FILE_CONTENT_SERVER }}" > ./server/.env
+            echo "${{ secrets.ENV_FILE_CONTENT_SERVER }}" > .env
 
-            # Log in to ghcr.io to pull private images (requires a PAT with read:packages scope)
+            # Log in to ghcr.io to pull private images
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
 
             # Pull pre-built images and start services

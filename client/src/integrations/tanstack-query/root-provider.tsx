@@ -1,20 +1,42 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { setQueryCacheClearer } from "@/lib/auth-store";
+
+let _queryClient: QueryClient | null = null;
 
 export function getContext() {
-  const queryClient = new QueryClient()
-  return {
-    queryClient,
-  }
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				staleTime: 30 * 1000, // 30 seconds before data is considered stale
+				gcTime: 5 * 60 * 1000, // Garbage collect after 5 minutes
+				retry: 1,
+				refetchOnWindowFocus: false,
+			},
+		},
+	});
+	_queryClient = queryClient;
+	return {
+		queryClient,
+	};
 }
 
 export function Provider({
-  children,
-  queryClient,
+	children,
+	queryClient,
 }: {
-  children: React.ReactNode
-  queryClient: QueryClient
+	children: React.ReactNode;
+	queryClient: QueryClient;
 }) {
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  )
+	// Register the query cache clearer so auth-store can clear cache on logout
+	useEffect(() => {
+		_queryClient = queryClient;
+		setQueryCacheClearer(() => {
+			queryClient.clear();
+		});
+	}, [queryClient]);
+
+	return (
+		<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+	);
 }

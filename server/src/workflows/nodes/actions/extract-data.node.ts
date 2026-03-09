@@ -127,7 +127,7 @@ export class ExtractDataNode extends ActionNode {
     while (Date.now() - startTime < timeoutMs) {
       const run = await context.runsService.findOne(runId, context.userId);
 
-      if (run.status === 'done' || run.status === 'failed') {
+      if (String(run.status) === 'done' || String(run.status) === 'failed') {
         return run;
       }
 
@@ -146,12 +146,12 @@ export class ExtractDataNode extends ActionNode {
 
     // If input has a sources array (from webhook with file URLs)
     if (Array.isArray(inputData.sources)) {
-      return inputData.sources;
+      return inputData.sources as any[];
     }
 
     // If input has documents array
     if (Array.isArray(inputData.documents)) {
-      return inputData.documents;
+      return inputData.documents as any[];
     }
 
     // If input has a single documentUrl
@@ -167,11 +167,13 @@ export class ExtractDataNode extends ActionNode {
 
     // If input has fileUrls array (from email trigger)
     if (Array.isArray(inputData.fileUrls)) {
-      return inputData.fileUrls.map((url: string, index: number) => ({
-        type: 'url',
-        url,
-        name: inputData.fileNames?.[index] || `file-${index}`,
-      }));
+      return (inputData.fileUrls as string[]).map(
+        (url: string, index: number) => ({
+          type: 'url',
+          url,
+          name: inputData.fileNames?.[index] || `file-${index}`,
+        }),
+      );
     }
 
     return [];
