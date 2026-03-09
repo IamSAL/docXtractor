@@ -16,4 +16,8 @@ export interface CreateRunDto {
 	sources: RunSourceDto[];
 	processingMode?: CreateRunDtoProcessingMode;
 	extractionProvider?: CreateRunDtoExtractionProvider;
+	/** ID of schema variant to use for extraction */
+	variantId?: string;
+	/** Field names to exclude from extraction */
+	skippedFields?: string[];
 }

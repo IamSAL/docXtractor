@@ -9,7 +9,16 @@ import * as zod from 'zod';
 
 
 /**
- * @summary Register a new user
+ * @summary First-run admin setup (only works when no users exist)
+ */
+export const AuthControllerAdminSetupBody = zod.object({
+  "email": zod.string(),
+  "password": zod.string(),
+  "instanceName": zod.string().optional()
+})
+
+/**
+ * @summary Register a new user (cloud mode only)
  */
 export const AuthControllerSignUpBody = zod.object({
   "email": zod.string().describe('The email address of the user'),

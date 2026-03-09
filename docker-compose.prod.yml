@@ -68,7 +68,7 @@ services:
       - docxtractor-network
 
   ollama:
-    image: ollama/ollama:latest
+    image: alpine/ollama:latest
     container_name: docxtractor-ollama
     restart: unless-stopped
     volumes:
