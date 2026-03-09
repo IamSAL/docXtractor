@@ -41,6 +41,40 @@ export class RunsService {
     private ollamaService: OllamaService,
   ) {}
 
+  /**
+   * Resolve the effective schema for a run, considering variant selection and skipped fields.
+   */
+  private resolveEffectiveSchema(
+    extractor: Extractor | null,
+    variantId: string | null | undefined,
+    skippedFields: string[] | null | undefined,
+  ): Record<string, any> {
+    let schema = extractor?.schema || {};
+
+    // Use variant schema if specified
+    if (variantId && extractor?.variants?.length) {
+      const variant = extractor.variants.find((v) => v.id === variantId);
+      if (variant) schema = variant.schema;
+    }
+
+    // Apply skipped fields filter
+    if (!skippedFields?.length) return schema;
+
+    const filtered = { ...schema };
+    if (filtered.properties) {
+      filtered.properties = { ...filtered.properties };
+      for (const field of skippedFields) {
+        delete filtered.properties[field];
+      }
+    }
+    if (Array.isArray(filtered.required)) {
+      filtered.required = filtered.required.filter(
+        (f: string) => !skippedFields.includes(f),
+      );
+    }
+    return filtered;
+  }
+
   private pendingLogLines: Map<string, string[]> = new Map();
   // Serialize concurrent extraction completions per run to prevent race conditions
   private extractionLocks: Map<string, Promise<void>> = new Map();
@@ -163,6 +197,8 @@ export class RunsService {
       sources,
       processingMode: dto.processingMode,
       extractionProvider: dto.extractionProvider,
+      variantId: dto.variantId || null,
+      skippedFields: dto.skippedFields?.length ? dto.skippedFields : null,
       status: RunStatus.QUEUED,
       progress: { parsed: 0, total: sources.length, currentStep: 'queued' },
       startedAt: new Date(),
@@ -417,7 +453,7 @@ export class RunsService {
       try {
         const result = await this.ollamaService.extract(
           combinedMarkdown,
-          extractor?.schema || {},
+          this.resolveEffectiveSchema(extractor, run.variantId, run.skippedFields),
           extractor?.systemPrompt || '',
           'qwen3:14b',
         );
@@ -473,7 +509,7 @@ export class RunsService {
         content: {
           combined_markdown: combinedMarkdown,
         },
-        schema: extractor?.schema || {},
+        schema: this.resolveEffectiveSchema(extractor, run.variantId, run.skippedFields),
         system_prompt: extractor?.systemPrompt || '',
         extraction_type: extractionType,
         model_id: 'qwen3:14b',
@@ -617,7 +653,7 @@ export class RunsService {
           content: {
             combined_markdown: source.parsedContent,
           },
-          schema: extractor?.schema || {},
+          schema: this.resolveEffectiveSchema(extractor, run.variantId, run.skippedFields),
           system_prompt: extractor?.systemPrompt || '',
           extraction_type: extractionType,
           model_id: 'qwen3:14b',
@@ -1087,7 +1123,7 @@ export class RunsService {
             content: {
               combined_markdown: source.parsedContent,
             },
-            schema: extractor?.schema || {},
+            schema: this.resolveEffectiveSchema(extractor, run.variantId, run.skippedFields),
             system_prompt: extractor?.systemPrompt || '',
             extraction_type: extractionType,
             model_id: 'qwen3:14b',
