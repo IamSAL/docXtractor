@@ -6,9 +6,10 @@ import {
   getRunsControllerFindOneQueryKey,
   useRunsControllerRetry,
   useRunsControllerRetrySource,
+  useRunsControllerUpdate,
   getRunsControllerFindAllQueryKey,
 } from "@/api/endpoints/runs/runs";
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/lib/socket";
 import { toast } from "sonner";
@@ -451,8 +452,10 @@ function RunDetailComponent() {
                       <div className="mt-2">
                         {run.status === "done" && run.results && (
                           <ResultsSection
+                            runId={run.id}
                             results={run.results}
                             schema={run.extractor?.schema}
+                            sortConfig={run.sortConfig}
                           />
                         )}
                       </div>
@@ -835,14 +838,44 @@ function RunDetailComponent() {
 }
 
 function ResultsSection({
+  runId,
   results,
   schema,
+  sortConfig: initialSortConfig,
 }: {
+  runId: string;
   results: Record<string, unknown>;
   schema?: any;
+  sortConfig?: any;
 }) {
   // Extract field order from schema if available
   const fieldOrder = schema?.fieldOrder as string[] | undefined;
+  const queryClient = useQueryClient();
+  const updateMutation = useRunsControllerUpdate();
+
+  const handleSortChange = useCallback(
+    (config: any) => {
+      updateMutation.mutate(
+        { id: runId, data: { sortConfig: config } as any },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: getRunsControllerFindOneQueryKey(runId),
+            });
+            if (config) {
+              toast.success(`Rows sorted by "${config.matchColumn}"`);
+            } else {
+              toast.success("Sort cleared");
+            }
+          },
+          onError: () => {
+            toast.error("Failed to save sort configuration");
+          },
+        },
+      );
+    },
+    [runId, updateMutation, queryClient],
+  );
 
   // Create ordered JSON based on field order
   const orderedResults = useMemo(() => {
@@ -919,7 +952,12 @@ function ResultsSection({
 
         <TabsContent value="spreadsheet">
           <div className="excel-view">
-            <SpreadsheetView results={orderedResults} fieldOrder={fieldOrder} />
+            <SpreadsheetView
+              results={orderedResults}
+              fieldOrder={fieldOrder}
+              sortConfig={initialSortConfig}
+              onSortChange={handleSortChange}
+            />
           </div>
         </TabsContent>
       </Tabs>
