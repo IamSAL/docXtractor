@@ -458,7 +458,11 @@ export class RunsService {
       try {
         const result = await this.ollamaService.extract(
           combinedMarkdown,
-          this.resolveEffectiveSchema(extractor, run.variantId, run.skippedFields),
+          this.resolveEffectiveSchema(
+            extractor,
+            run.variantId,
+            run.skippedFields,
+          ),
           extractor?.systemPrompt || '',
           'qwen3:14b',
         );
@@ -510,7 +514,11 @@ export class RunsService {
         content: {
           combined_markdown: combinedMarkdown,
         },
-        schema: this.resolveEffectiveSchema(extractor, run.variantId, run.skippedFields),
+        schema: this.resolveEffectiveSchema(
+          extractor,
+          run.variantId,
+          run.skippedFields,
+        ),
         system_prompt: extractor?.systemPrompt || '',
         extraction_type: extractionType,
         model_id: 'qwen3:14b',
@@ -569,8 +577,18 @@ export class RunsService {
       const allResults: Record<string, unknown>[] = [];
       let totalTokens = 0;
 
-      // Run all extractions in parallel using Promise.allSettled
-      const extractionPromises = parsedSources.map(async (source) => {
+      // Run extractions with throttled concurrency to respect Ollama rate limits
+      const OLLAMA_CONCURRENCY = parseInt(
+        process.env.OLLAMA_CONCURRENCY || '2',
+        10,
+      );
+      this.addLog(
+        run,
+        'info',
+        `Ollama concurrency limit: ${OLLAMA_CONCURRENCY}`,
+      );
+
+      const extractOne = async (source: RunSource) => {
         this.addLog(
           run,
           'info',
@@ -579,7 +597,11 @@ export class RunsService {
         try {
           const result = await this.ollamaService.extract(
             source.parsedContent!,
-            extractor?.schema || {},
+            this.resolveEffectiveSchema(
+              extractor,
+              run.variantId,
+              run.skippedFields,
+            ),
             extractor?.systemPrompt || '',
             'qwen3:14b',
           );
@@ -620,10 +642,15 @@ export class RunsService {
           this.runsGateway.emitRunSourceUpdated(run.id, source);
           return { success: false, source };
         }
-      });
+      };
 
-      // Wait for all extractions to complete
-      const results = await Promise.allSettled(extractionPromises);
+      // Process in batches of OLLAMA_CONCURRENCY
+      const results: PromiseSettledResult<any>[] = [];
+      for (let i = 0; i < parsedSources.length; i += OLLAMA_CONCURRENCY) {
+        const batch = parsedSources.slice(i, i + OLLAMA_CONCURRENCY);
+        const batchResults = await Promise.allSettled(batch.map(extractOne));
+        results.push(...batchResults);
+      }
 
       // Collect results
       for (const result of results) {
@@ -672,7 +699,11 @@ export class RunsService {
           content: {
             combined_markdown: source.parsedContent,
           },
-          schema: this.resolveEffectiveSchema(extractor, run.variantId, run.skippedFields),
+          schema: this.resolveEffectiveSchema(
+            extractor,
+            run.variantId,
+            run.skippedFields,
+          ),
           system_prompt: extractor?.systemPrompt || '',
           extraction_type: extractionType,
           model_id: 'qwen3:14b',
@@ -1073,7 +1104,11 @@ export class RunsService {
         try {
           const result = await this.ollamaService.extract(
             source.parsedContent!,
-            extractor?.schema || {},
+            this.resolveEffectiveSchema(
+              extractor,
+              run.variantId,
+              run.skippedFields,
+            ),
             extractor?.systemPrompt || '',
             'qwen3:14b',
           );
@@ -1139,7 +1174,11 @@ export class RunsService {
             content: {
               combined_markdown: source.parsedContent,
             },
-            schema: this.resolveEffectiveSchema(extractor, run.variantId, run.skippedFields),
+            schema: this.resolveEffectiveSchema(
+              extractor,
+              run.variantId,
+              run.skippedFields,
+            ),
             system_prompt: extractor?.systemPrompt || '',
             extraction_type: extractionType,
             model_id: 'qwen3:14b',
