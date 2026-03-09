@@ -67,6 +67,24 @@ services:
     networks:
       - docxtractor-network
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: docxtractor-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - docxtractor-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
   server:
     image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-server:latest
     build:
@@ -74,8 +92,6 @@ services:
       dockerfile: Dockerfile.prod
     container_name: docxtractor-server
     restart: unless-stopped
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     ports:
       - "3001:3000"
     environment:
@@ -95,7 +111,7 @@ services:
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET}
       - FRONTEND_URL=${FRONTEND_URL:-https://docxtractor.sk-salman.com}
-      - OLLAMA_HOST=${OLLAMA_HOST}
+      - OLLAMA_HOST=http://ollama:11434
       - OLLAMA_DEFAULT_MODEL=${OLLAMA_DEFAULT_MODEL:-qwen3:14b}
       - OLLAMA_GENERATION_MODEL=${OLLAMA_GENERATION_MODEL:-qwen3:14b}
       - SWAGGER_USER=${SWAGGER_USER:-admin}
@@ -112,6 +128,8 @@ services:
         condition: service_healthy
       createbuckets:
         condition: service_completed_successfully
+      ollama:
+        condition: service_started
     networks:
       - docxtractor-network
 
@@ -166,8 +184,6 @@ services:
       context: ./workers/extraction-service
     container_name: docxtractor-extractor
     restart: unless-stopped
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
       redis:
         condition: service_healthy
@@ -175,6 +191,8 @@ services:
         condition: service_started
       createbuckets:
         condition: service_completed_successfully
+      ollama:
+        condition: service_started
     environment:
       - REDIS_URL=redis://docxtractor-redis:6379
       - MINIO_ENDPOINT=http://minio:9000
@@ -183,7 +201,7 @@ services:
       - MINIO_BUCKET=docxtractor-documents
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - LANGEXTRACT_API_KEY=${LANGEXTRACT_API_KEY}
-      - LANGEXTRACT_MODEL_URL=${OLLAMA_HOST}
+      - LANGEXTRACT_MODEL_URL=http://ollama:11434
       - EXTRACTION_CONCURRENCY=${EXTRACTION_CONCURRENCY:-3}
     networks:
       - docxtractor-network
@@ -193,6 +211,7 @@ volumes:
   postgres_data:
   minio_data:
   redis_data:
+  ollama_data:
 
 networks:
   docxtractor-network:

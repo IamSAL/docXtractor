@@ -34,6 +34,17 @@ services:
       timeout: 5s
       retries: 5
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: docxtractor-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - docxtractor-network
+
   server:
     build:
       context: ./server
@@ -55,7 +66,7 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=docxtractor-documents
-      - OLLAMA_HOST=http://host.docker.internal:11434
+      - OLLAMA_HOST=http://ollama:11434
       - OLLAMA_DEFAULT_MODEL=qwen3:14b
       - OLLAMA_GENERATION_MODEL=qwen3:14b
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET:-docxtractor-dev-access-secret}
@@ -71,6 +82,8 @@ services:
         condition: service_healthy
       createbuckets:
         condition: service_completed_successfully
+      ollama:
+        condition: service_started
     networks:
       - docxtractor-network
     command: pnpm run start:dev
@@ -167,7 +180,7 @@ services:
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
-      - LANGEXTRACT_MODEL_URL=http://host.docker.internal:11434
+      - LANGEXTRACT_MODEL_URL=http://ollama:11434
       - EXTRACTION_CONCURRENCY=3
     networks:
       - docxtractor-network
@@ -178,6 +191,7 @@ services:
 volumes:
   postgres_data:
   minio_data:
+  ollama_data:
 
 networks:
   docxtractor-network:
