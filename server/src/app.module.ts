@@ -26,6 +26,30 @@ import { OllamaModule } from './shared/ollama/ollama.module';
 import { MailModule } from './shared/mail/mail.module';
 import { WorkflowsModule } from './workflows/workflows.module';
 
+// Conditional imports based on rate limiting configuration
+const conditionalImports = [];
+const conditionalProviders = [];
+
+// Only enable rate limiting if ENABLE_RATE_LIMITING=true
+if (process.env.ENABLE_RATE_LIMITING === 'true') {
+  conditionalImports.push(
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          ttl: config.get('THROTTLER_TTL') ?? 60000,
+          limit: config.get('THROTTLER_LIMIT') ?? 1500,
+        },
+      ],
+    }),
+  );
+  conditionalProviders.push({
+    provide: APP_GUARD,
+    useClass: ThrottlerGuard,
+  });
+}
+
 @Module({
   imports: [
     UserModule,
@@ -53,16 +77,8 @@ import { WorkflowsModule } from './workflows/workflows.module';
     //     };
     //   },
     // }),
-    ThrottlerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => [
-        {
-          ttl: config.get('THROTTLER_TTL') ?? 60000,
-          limit: config.get('THROTTLER_LIMIT') ?? 1500,
-        },
-      ],
-    }),
+
+    ...conditionalImports,
 
     ExtractorsModule,
 
@@ -82,10 +98,7 @@ import { WorkflowsModule } from './workflows/workflows.module';
     //   provide: APP_INTERCEPTOR,
     //   useClass: CacheInterceptor,
     // },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    ...conditionalProviders,
     {
       provide: APP_GUARD,
       useClass: AccessTokenGuard,
