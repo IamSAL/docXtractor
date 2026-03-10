@@ -595,7 +595,7 @@ export class RunsService {
         'info',
         `Processing ${parsedSources.length} documents in parallel`,
       );
-      const allResults: Record<string, unknown>[] = [];
+      run.results = [] as any;
       let totalTokens = 0;
 
       // Run extractions with throttled concurrency to respect Ollama rate limits
@@ -636,21 +636,19 @@ export class RunsService {
           );
 
           run.progress!.extracted = (run.progress!.extracted || 0) + 1;
+          (run.results as unknown as Record<string, unknown>[]).push(...annotatedRows);
+          totalTokens += result.usage.totalTokens;
           this.addLog(
             run,
             'info',
             `Extraction for '${source.name}' completed (${result.usage.totalTokens} tokens)`,
           );
 
+          await this.runRepo.save(run);
           this.runsGateway.emitRunSourceUpdated(run.id, source);
           this.runsGateway.emitRunUpdated(run.id, run);
 
-          return {
-            success: true,
-            tokens: result.usage.totalTokens,
-            rows: annotatedRows,
-            source,
-          };
+          return { success: true, source };
         } catch (error) {
           source.extractionStatus = 'failed';
           source.extractionError = error.message;
@@ -673,17 +671,8 @@ export class RunsService {
         results.push(...batchResults);
       }
 
-      // Collect results
-      for (const result of results) {
-        if (result.status === 'fulfilled' && result.value.success) {
-          totalTokens += result.value.tokens ?? 0;
-          allResults.push(...(result.value.rows ?? []));
-        }
-      }
-
       // Finalize
-      if (allResults.length > 0) {
-        run.results = allResults as any;
+      if ((run.results as unknown as Record<string, unknown>[]).length > 0) {
         run.status = RunStatus.DONE;
         run.metrics = { totalInputTokens: totalTokens, totalOutputTokens: 0 };
       } else {
@@ -697,7 +686,7 @@ export class RunsService {
       this.addLog(
         run,
         'info',
-        `Batch extraction complete: ${allResults.length} rows from ${parsedSources.length} documents in ${Math.round(durationMs / 1000)}s`,
+        `Batch extraction complete: ${(run.results as unknown as Record<string, unknown>[]).length} rows from ${parsedSources.length} documents in ${Math.round(durationMs / 1000)}s`,
       );
     } else {
       // Queue N separate extraction jobs to Python worker
@@ -851,6 +840,17 @@ export class RunsService {
         (run.metrics.totalOutputTokens || 0) + (usage?.output_tokens || 0);
 
       run.progress!.extracted = (run.progress!.extracted || 0) + 1;
+
+      // Incrementally append results so the frontend can display them as they arrive
+      if (source.extractionStatus === 'done' && source.extractionResult) {
+        if (!run.results) run.results = [] as any;
+        const annotated = this.annotateResultWithSource(
+          source.extractionResult,
+          source.name,
+        );
+        (run.results as unknown as Record<string, unknown>[]).push(...annotated);
+      }
+
       this.runsGateway.emitRunSourceUpdated(run.id, source);
 
       // Check if all extractions are complete
@@ -858,20 +858,11 @@ export class RunsService {
       const extractionTotal = run.progress!.extractionTotal || 0;
 
       if (extractedCount >= extractionTotal) {
-        // All done — merge results from all successful sources
-        const allResults: Record<string, unknown>[] = [];
-        for (const s of run.sources) {
-          if (s.extractionStatus === 'done' && s.extractionResult) {
-            const annotated = this.annotateResultWithSource(
-              s.extractionResult,
-              s.name,
-            );
-            allResults.push(...annotated);
-          }
-        }
-
-        if (allResults.length > 0) {
-          run.results = allResults as any;
+        // All done — results already accumulated incrementally
+        if (
+          run.results &&
+          (run.results as unknown as Record<string, unknown>[]).length > 0
+        ) {
           run.status = RunStatus.DONE;
         } else {
           run.status = RunStatus.FAILED;
@@ -885,7 +876,7 @@ export class RunsService {
         this.addLog(
           run,
           'info',
-          `Batch extraction complete: ${allResults.length} rows from ${extractionTotal} documents in ${Math.round(durationMs / 1000)}s`,
+          `Batch extraction complete: ${(run.results as unknown as Record<string, unknown>[]).length} rows from ${extractionTotal} documents in ${Math.round(durationMs / 1000)}s`,
         );
 
         // Clean up lock

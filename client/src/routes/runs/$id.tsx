@@ -461,28 +461,43 @@ function RunDetailComponent() {
                       </div>
                     </div>
                   ) : isProcessing ? (
-                    <div className="bg-blue-50 border-l-4 border-[#007AFF] p-4 flex gap-4 items-start">
-                      <span className="material-symbols-outlined text-[#007AFF] mt-0.5">
-                        info
-                      </span>
-                      <div>
-                        <p className="font-black text-sm uppercase tracking-tight">
-                          {run.status === "parsing"
-                            ? "Parsing Documents..."
-                            : run.status === "extracting"
-                              ? "Extracting Data..."
-                              : "Queued for Processing..."}
-                        </p>
-                        <p className="text-xs mt-1 text-gray-600 font-medium">
-                          {run.status === "parsing"
-                            ? `Processing ${run.progress?.parsed || 0} of ${run.progress?.total || totalSources} documents through parsers.`
-                            : run.status === "extracting"
-                              ? run.processingMode === "per_document"
-                                ? `Extracting from ${run.progress?.extracted || 0} of ${run.progress?.extractionTotal || 0} documents independently.`
-                                : "Running AI extraction on combined document content."
-                              : "Waiting in queue for processing to begin."}
-                        </p>
+                    <div>
+                      <div className="bg-blue-50 border-l-4 border-[#007AFF] p-4 flex gap-4 items-start">
+                        <span className="material-symbols-outlined text-[#007AFF] mt-0.5">
+                          info
+                        </span>
+                        <div>
+                          <p className="font-black text-sm uppercase tracking-tight">
+                            {run.status === "parsing"
+                              ? "Parsing Documents..."
+                              : run.status === "extracting"
+                                ? "Extracting Data..."
+                                : "Queued for Processing..."}
+                          </p>
+                          <p className="text-xs mt-1 text-gray-600 font-medium">
+                            {run.status === "parsing"
+                              ? `Processing ${run.progress?.parsed || 0} of ${run.progress?.total || totalSources} documents through parsers.`
+                              : run.status === "extracting"
+                                ? run.processingMode === "per_document"
+                                  ? `Extracting from ${run.progress?.extracted || 0} of ${run.progress?.extractionTotal || 0} documents independently.`
+                                  : "Running AI extraction on combined document content."
+                                : "Waiting in queue for processing to begin."}
+                          </p>
+                        </div>
                       </div>
+                      {run.status === "extracting" &&
+                        run.results &&
+                        Array.isArray(run.results) &&
+                        run.results.length > 0 && (
+                          <div className="mt-2">
+                            <ResultsSection
+                              runId={run.id}
+                              results={run.results}
+                              schema={run.extractor?.schema}
+                              sortConfig={run.sortConfig}
+                            />
+                          </div>
+                        )}
                     </div>
                   ) : null}
                 </div>
