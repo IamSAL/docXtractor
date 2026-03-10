@@ -153,7 +153,7 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=docxtractor-documents
-      - PARSER_CONCURRENCY=4
+      - PARSER_CONCURRENCY=20
       - DNNL_VERBOSE=0
     networks:
       - docxtractor-network

@@ -62,30 +62,44 @@ export class OllamaService {
       )}`,
     );
 
-    try {
-      const response = await this.client.chat({
-        model: modelId,
-        messages: [{ role: 'user', content: fullPrompt }],
-        format: schema,
-      });
-      this.logger.debug(`Ollama response: ${response.message.content}`);
-      const resultData = JSON.parse(
-        jsonrepair(response.message.content),
-      ) as Record<string, unknown>;
+    const maxRetries = this.configService.get<number>(
+      'OLLAMA_EXTRACTION_MAX_RETRIES',
+      3,
+    );
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await this.client.chat({
+          model: modelId,
+          messages: [{ role: 'user', content: fullPrompt }],
+          format: schema,
+        });
+        this.logger.debug(`Ollama response: ${response.message.content}`);
+        const resultData = JSON.parse(
+          jsonrepair(response.message.content),
+        ) as Record<string, unknown>;
 
-      const totalTokens =
-        (response.prompt_eval_count || 0) + (response.eval_count || 0);
+        const totalTokens =
+          (response.prompt_eval_count || 0) + (response.eval_count || 0);
 
-      this.logger.log(`Ollama extraction complete: tokens=${totalTokens}`);
+        this.logger.log(`Ollama extraction complete: tokens=${totalTokens}`);
 
-      return {
-        data: resultData,
-        usage: { totalTokens },
-      };
-    } catch (error) {
-      this.logger.error(`Ollama extraction failed: ${error}`);
-      throw error;
+        return {
+          data: resultData,
+          usage: { totalTokens },
+        };
+      } catch (error) {
+        this.logger.error(
+          `Ollama extraction failed (attempt ${attempt}/${maxRetries}): ${error}`,
+        );
+        if (attempt === maxRetries) {
+          throw error;
+        }
+        // Wait before retrying (1s, 2s)
+        await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+      }
     }
+    // Unreachable, but satisfies TypeScript
+    throw new Error('Ollama extraction failed after retries');
   }
 
   /**

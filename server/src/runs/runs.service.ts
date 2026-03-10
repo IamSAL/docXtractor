@@ -6,6 +6,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -39,6 +40,7 @@ export class RunsService {
     private storageService: StorageService,
     private runsGateway: RunsGateway,
     private ollamaService: OllamaService,
+    private configService: ConfigService,
   ) {}
 
   /**
@@ -578,8 +580,8 @@ export class RunsService {
       let totalTokens = 0;
 
       // Run extractions with throttled concurrency to respect Ollama rate limits
-      const OLLAMA_CONCURRENCY = parseInt(
-        process.env.OLLAMA_CONCURRENCY || '2',
+      const OLLAMA_CONCURRENCY = this.configService.get<number>(
+        'OLLAMA_CONCURRENCY',
         10,
       );
       this.addLog(
