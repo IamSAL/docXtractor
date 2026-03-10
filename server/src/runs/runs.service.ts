@@ -364,9 +364,28 @@ export class RunsService {
       );
     }
 
-    this.runsGateway.emitRunSourceUpdated(run.id, source);
+    // Save source status update first, then atomically increment parsed count
+    await this.runRepo.save(run);
+    await this.runRepo
+      .createQueryBuilder()
+      .update(Run)
+      .set({
+        progress: () =>
+          `jsonb_set(progress, '{parsed}', (COALESCE((progress->>'parsed')::int, 0) + 1)::text::jsonb)`,
+      })
+      .where('id = :id', { id: run.id })
+      .execute();
 
-    run.progress!.parsed += 1;
+    // Re-fetch to get the true state of all sources (avoids race condition)
+    const freshRunForCheck = await this.runRepo.findOne({
+      where: { id: run_id },
+    });
+    if (!freshRunForCheck) return;
+
+    // Use re-fetched run from here on to avoid stale data
+    Object.assign(run, freshRunForCheck);
+
+    this.runsGateway.emitRunSourceUpdated(run.id, source);
 
     // Check if all sources are parsed
     const allParsed = run.sources.every(
