@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 
 // import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
@@ -27,8 +27,8 @@ import { MailModule } from './shared/mail/mail.module';
 import { WorkflowsModule } from './workflows/workflows.module';
 
 // Conditional imports based on rate limiting configuration
-const conditionalImports = [];
-const conditionalProviders = [];
+const conditionalImports: DynamicModule[] = [];
+const conditionalProviders: any[] = [];
 
 // Only enable rate limiting if ENABLE_RATE_LIMITING=true
 if (process.env.ENABLE_RATE_LIMITING === 'true') {
