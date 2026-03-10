@@ -59,7 +59,7 @@ import { WorkflowsModule } from './workflows/workflows.module';
       useFactory: (config: ConfigService) => [
         {
           ttl: config.get('THROTTLER_TTL') ?? 60000,
-          limit: config.get('THROTTLER_LIMIT') ?? 100,
+          limit: config.get('THROTTLER_LIMIT') ?? 1500,
         },
       ],
     }),
