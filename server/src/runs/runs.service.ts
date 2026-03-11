@@ -21,6 +21,7 @@ import {
 import { Extractor } from '../extractors/entities/extractor.entity';
 import { CreateRunDto } from './dto/create-run.dto';
 import { UpdateRunDto } from './dto/update-run.dto';
+import { RetrySourcesDto, RetryMode } from './dto/retry-sources.dto';
 import { QueueService } from '../shared/queue/queue.service';
 import { QueueName } from '../shared/queue/queue-names';
 import { FilesService } from '../files/files.service';
@@ -601,7 +602,7 @@ export class RunsService {
       // Run extractions with throttled concurrency to respect Ollama rate limits
       const OLLAMA_CONCURRENCY = this.configService.get<number>(
         'OLLAMA_CONCURRENCY',
-        10,
+        5,
       );
       this.addLog(
         run,
@@ -636,7 +637,9 @@ export class RunsService {
           );
 
           run.progress!.extracted = (run.progress!.extracted || 0) + 1;
-          (run.results as unknown as Record<string, unknown>[]).push(...annotatedRows);
+          (run.results as unknown as Record<string, unknown>[]).push(
+            ...annotatedRows,
+          );
           totalTokens += result.usage.totalTokens;
           this.addLog(
             run,
@@ -848,7 +851,9 @@ export class RunsService {
           source.extractionResult,
           source.name,
         );
-        (run.results as unknown as Record<string, unknown>[]).push(...annotated);
+        (run.results as unknown as Record<string, unknown>[]).push(
+          ...annotated,
+        );
       }
 
       this.runsGateway.emitRunSourceUpdated(run.id, source);
@@ -1214,6 +1219,284 @@ export class RunsService {
 
     this.runsGateway.emitRunUpdated(run.id, runToEmit);
     this.runsGateway.emitRunSourceUpdated(run.id, source);
+    this.runsGateway.emitRunsListUpdated({
+      runId: run.id,
+      status: runToEmit.status,
+      progress: runToEmit.progress,
+    });
+
+    return runToEmit;
+  }
+
+  /**
+   * Batch retry specific sources with options for mode, schema variant, and field selection.
+   */
+  async retrySourcesBatch(
+    runId: string,
+    userId: string,
+    dto: RetrySourcesDto,
+  ): Promise<Run> {
+    const run = await this.findOne(runId, userId);
+
+    const retryableStatuses = [
+      RunStatus.DONE,
+      RunStatus.FAILED,
+      RunStatus.REVIEW,
+      RunStatus.PARSING,
+      RunStatus.EXTRACTING,
+    ];
+    if (!retryableStatuses.includes(run.status)) {
+      throw new BadRequestException(
+        `Cannot retry sources when run is in '${run.status}' state`,
+      );
+    }
+
+    const sources = dto.sourceIds.map((sid) => {
+      const s = run.sources.find((src) => src.id === sid);
+      if (!s) throw new NotFoundException(`Source '${sid}' not found`);
+      return s;
+    });
+
+    const extractor = await this.extractorRepo.findOne({
+      where: { id: run.extractorId },
+    });
+
+    // Resolve schema: use dto overrides, else fall back to run's saved variant/skipped
+    const effectiveVariantId =
+      dto.schemaVariantId !== undefined
+        ? dto.schemaVariantId || null
+        : run.variantId;
+
+    // Build effective schema with field selection
+    let effectiveSchema = this.resolveEffectiveSchema(
+      extractor,
+      effectiveVariantId,
+      null,
+    );
+
+    // If selectedFields provided, filter schema to only those fields
+    if (dto.selectedFields?.length && effectiveSchema.properties) {
+      const filtered: Record<string, any> = {
+        ...effectiveSchema,
+        properties: {},
+      };
+      for (const field of dto.selectedFields) {
+        if (effectiveSchema.properties[field]) {
+          filtered.properties[field] = effectiveSchema.properties[field];
+        }
+      }
+      if (Array.isArray(filtered.required)) {
+        filtered.required = (filtered.required as string[]).filter(
+          (r: string) => dto.selectedFields!.includes(r),
+        );
+      }
+      effectiveSchema = filtered;
+    }
+
+    if (dto.mode === RetryMode.PARSE_AND_EXTRACTION) {
+      // Reset sources fully and re-parse
+      for (const source of sources) {
+        source.status = 'parsing';
+        source.error = undefined;
+        source.parsedContent = undefined;
+        source.tokenCount = undefined;
+        source.extractionStatus = undefined;
+        source.extractionResult = undefined;
+        source.extractionError = undefined;
+        source.isRetrying = true;
+      }
+
+      run.status = RunStatus.PARSING;
+      run.finishedAt = null;
+      run.error = null;
+      run.progress = {
+        parsed: run.sources.filter(
+          (s) =>
+            (s.status === 'parsed' || s.status === 'failed') &&
+            !sources.includes(s),
+        ).length,
+        total: run.sources.length,
+        currentStep: 'parsing',
+      };
+
+      this.addLog(
+        run,
+        'info',
+        `Batch retry (parse+extraction) for ${sources.length} source(s)`,
+      );
+      await this.runRepo.save(run);
+      await this.flushLogs(run.id);
+
+      for (const source of sources) {
+        await this.queueService.addJob(
+          QueueName.UPLOADED_DOCUMENTS,
+          'parse-document',
+          {
+            run_id: run.id,
+            document_id: source.id,
+            type: source.type,
+            file_key: source.fileKey,
+            url: source.url,
+            name: source.name,
+          },
+        );
+      }
+    } else {
+      // Extraction only — sources must be parsed
+      const unparsed = sources.filter((s) => s.status !== 'parsed');
+      if (unparsed.length) {
+        throw new BadRequestException(
+          `Cannot retry extraction-only for unparsed sources: ${unparsed.map((s) => s.name).join(', ')}. Use parse+extraction mode instead.`,
+        );
+      }
+
+      for (const source of sources) {
+        source.extractionStatus = 'extracting';
+        source.extractionError = undefined;
+        source.extractionResult = undefined;
+      }
+
+      run.status = RunStatus.EXTRACTING;
+      run.finishedAt = null;
+      run.error = null;
+
+      const parsedSources = run.sources.filter((s) => s.status === 'parsed');
+      const completedExtractions = parsedSources.filter(
+        (s) =>
+          (s.extractionStatus === 'done' || s.extractionStatus === 'failed') &&
+          !sources.includes(s),
+      ).length;
+      run.progress = {
+        ...run.progress!,
+        currentStep: 'extracting',
+        extracted: completedExtractions,
+        extractionTotal: parsedSources.length,
+      };
+
+      this.addLog(
+        run,
+        'info',
+        `Batch retry (extraction-only) for ${sources.length} source(s)`,
+      );
+
+      if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+        await this.runRepo.save(run);
+        await this.flushLogs(run.id);
+
+        // Run inline Ollama extraction for each source
+        for (const source of sources) {
+          try {
+            const result = await this.ollamaService.extract(
+              source.parsedContent!,
+              effectiveSchema,
+              extractor?.systemPrompt || '',
+              'qwen3:14b',
+            );
+            source.extractionStatus = 'done';
+            source.extractionResult = result.data;
+            run.progress.extracted = (run.progress.extracted || 0) + 1;
+            this.addLog(
+              run,
+              'info',
+              `Extraction for '${source.name}' completed (${result.usage.totalTokens} tokens)`,
+            );
+          } catch (error) {
+            source.extractionStatus = 'failed';
+            source.extractionError = error.message;
+            run.progress.extracted = (run.progress.extracted || 0) + 1;
+            this.addLog(
+              run,
+              'error',
+              `Extraction failed for '${source.name}': ${error.message}`,
+            );
+          }
+          this.runsGateway.emitRunSourceUpdated(run.id, source);
+        }
+
+        // Rebuild merged results
+        const allResults: Record<string, unknown>[] = [];
+        for (const s of run.sources) {
+          if (s.extractionStatus === 'done' && s.extractionResult) {
+            const annotated = this.annotateResultWithSource(
+              s.extractionResult,
+              s.name,
+            );
+            allResults.push(...annotated);
+          }
+        }
+        run.results = allResults.length > 0 ? (allResults as any) : null;
+        run.status = allResults.length > 0 ? RunStatus.DONE : RunStatus.FAILED;
+        if (!allResults.length) run.error = 'All document extractions failed';
+        run.progress.currentStep = 'complete';
+        run.finishedAt = new Date();
+      } else {
+        // Queue-based extraction
+        const extractionType =
+          run.extractionProvider === ExtractionProvider.LANGEXTRACT
+            ? 'langextract'
+            : 'llm';
+
+        // For unified mode, combine all source content into one job
+        if (run.processingMode === ProcessingMode.UNIFIED) {
+          const combinedMarkdown = run.sources
+            .map((s) => s.parsedContent)
+            .filter(Boolean)
+            .join('\n\n');
+
+          await this.queueService.addJob(
+            QueueName.EXTRACTION_REQUESTS,
+            'extract-data',
+            {
+              run_id: run.id,
+              content: { combined_markdown: combinedMarkdown },
+              schema: effectiveSchema,
+              system_prompt: extractor?.systemPrompt || '',
+              extraction_type: extractionType,
+              model_id: 'qwen3:14b',
+              examples: extractor?.fewShotExamples || [],
+            },
+          );
+        } else {
+          for (const source of sources) {
+            await this.queueService.addJob(
+              QueueName.EXTRACTION_REQUESTS,
+              'extract-data',
+              {
+                run_id: run.id,
+                document_id: source.id,
+                source_name: source.name,
+                content: { combined_markdown: source.parsedContent },
+                schema: effectiveSchema,
+                system_prompt: extractor?.systemPrompt || '',
+                extraction_type: extractionType,
+                model_id: 'qwen3:14b',
+                examples: extractor?.fewShotExamples || [],
+              },
+            );
+          }
+        }
+
+        this.addLog(
+          run,
+          'info',
+          `Extraction jobs queued for ${sources.length} source(s)`,
+        );
+      }
+
+      await this.runRepo.save(run);
+      await this.flushLogs(run.id);
+    }
+
+    const freshRun = await this.runRepo.findOne({
+      where: { id: run.id },
+      relations: ['extractor'],
+    });
+    const runToEmit = freshRun || run;
+
+    this.runsGateway.emitRunUpdated(run.id, runToEmit);
+    for (const source of sources) {
+      this.runsGateway.emitRunSourceUpdated(run.id, source);
+    }
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
       status: runToEmit.status,

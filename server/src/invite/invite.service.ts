@@ -165,7 +165,9 @@ export class InviteService {
     }
 
     if (invite.status !== InviteStatus.PENDING) {
-      throw new BadRequestException(`Cannot revoke invite with status: ${invite.status}`);
+      throw new BadRequestException(
+        `Cannot revoke invite with status: ${invite.status}`,
+      );
     }
 
     invite.status = InviteStatus.REVOKED;

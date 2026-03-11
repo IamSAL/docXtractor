@@ -93,6 +93,22 @@ export const RunsControllerRetryParams = zod.object({
 })
 
 /**
+ * @summary Batch retry specific sources with options
+ */
+export const RunsControllerRetrySourcesBatchParams = zod.object({
+  "id": zod.string()
+})
+
+export const runsControllerRetrySourcesBatchBodyModeDefault = `extraction`;
+
+export const RunsControllerRetrySourcesBatchBody = zod.object({
+  "sourceIds": zod.array(zod.string()).describe('IDs of sources to retry'),
+  "mode": zod.enum(['extraction', 'parse_and_extraction']).describe('Whether to retry extraction only, or re-parse and extract'),
+  "schemaVariantId": zod.string().optional().describe('Schema variant ID to use. Null = default schema.'),
+  "selectedFields": zod.array(zod.string()).optional().describe('Field names to include. Null = all fields.')
+})
+
+/**
  * @summary Retry a single failed source within a run
  */
 export const RunsControllerRetrySourceParams = zod.object({

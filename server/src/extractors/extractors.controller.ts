@@ -123,10 +123,7 @@ export class ExtractorsController {
     description: 'Variant added successfully.',
     type: Extractor,
   })
-  addVariant(
-    @Param('id') id: string,
-    @Body() dto: CreateSchemaVariantDto,
-  ) {
+  addVariant(@Param('id') id: string, @Body() dto: CreateSchemaVariantDto) {
     return this.extractorsService.addVariant(id, dto);
   }
 

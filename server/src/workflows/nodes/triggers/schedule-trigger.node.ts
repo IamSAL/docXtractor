@@ -34,8 +34,8 @@ export class ScheduleTriggerNode extends TriggerNode {
 
   execute(
     params: Record<string, any>,
-    _inputData: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    _context: ExecutionContext, // eslint-disable-line @typescript-eslint/no-unused-vars
+    _inputData: any,
+    _context: ExecutionContext,
   ): Promise<NodeExecutionResult> {
     // Schedule triggers pass timestamp as output
     return Promise.resolve(

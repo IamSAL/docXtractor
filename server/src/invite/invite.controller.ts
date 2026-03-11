@@ -31,20 +31,14 @@ export class InviteController {
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @Post()
-  async create(
-    @Body() dto: CreateInviteDto,
-    @GetUser() user: JWTPayload,
-  ) {
+  async create(@Body() dto: CreateInviteDto, @GetUser() user: JWTPayload) {
     return this.inviteService.create(dto, user.sub);
   }
 
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @Get()
-  async findAll(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  async findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
     return this.inviteService.findAll(
       page ? parseInt(page) : 1,
       limit ? parseInt(limit) : 20,
@@ -60,10 +54,7 @@ export class InviteController {
   @Public()
   @Post(':token/accept')
   @HttpCode(HttpStatus.CREATED)
-  async accept(
-    @Param('token') token: string,
-    @Body() dto: AcceptInviteDto,
-  ) {
+  async accept(@Param('token') token: string, @Body() dto: AcceptInviteDto) {
     const user = await this.inviteService.accept(token, dto);
     // Auto-login after accepting invite
     return this.authService.login(user);

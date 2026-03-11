@@ -45,8 +45,8 @@ export class WebhookActionNode extends ActionNode {
 
   execute(
     params: Record<string, any>,
-    _inputData: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    _context: ExecutionContext, // eslint-disable-line @typescript-eslint/no-unused-vars
+    _inputData: any,
+    _context: ExecutionContext,
   ): Promise<NodeExecutionResult> {
     try {
       // TODO: This will be implemented in Phase 10 with actual HTTP client

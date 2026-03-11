@@ -163,7 +163,9 @@ export class Run {
 
   // Schema customization: variant selection + field skipping
   @Column({ type: 'text', nullable: true })
-  @ApiPropertyOptional({ description: 'ID of schema variant used for this run' })
+  @ApiPropertyOptional({
+    description: 'ID of schema variant used for this run',
+  })
   variantId: string | null;
 
   @Column('jsonb', { nullable: true })
@@ -174,7 +176,9 @@ export class Run {
   skippedFields: string[] | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  @ApiPropertyOptional({ description: 'Reference sort configuration from uploaded XLSX' })
+  @ApiPropertyOptional({
+    description: 'Reference sort configuration from uploaded XLSX',
+  })
   sortConfig: SortConfig | null;
 
   // Workflow execution link

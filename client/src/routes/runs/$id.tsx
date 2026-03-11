@@ -5,7 +5,7 @@ import {
   useRunsControllerFindOne,
   getRunsControllerFindOneQueryKey,
   useRunsControllerRetry,
-  useRunsControllerRetrySource,
+  useRunsControllerRetrySourcesBatch,
   useRunsControllerUpdate,
   getRunsControllerFindAllQueryKey,
 } from "@/api/endpoints/runs/runs";
@@ -14,6 +14,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/lib/socket";
 import { toast } from "sonner";
 import { SpreadsheetView } from "@/components/SpreadsheetView";
+import {
+  RetryOptionsPopover,
+  type RetryOptionsResult,
+} from "@/components/modals/RetryOptionsModal";
 import {
   Tabs,
   TabsList,
@@ -31,7 +35,7 @@ function RunDetailComponent() {
   const { data, isLoading, error } = useRunsControllerFindOne(id);
   const queryClient = useQueryClient();
   const retryMutation = useRunsControllerRetry();
-  const retrySourceMutation = useRunsControllerRetrySource();
+  const retryBatchMutation = useRunsControllerRetrySourcesBatch();
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -186,15 +190,26 @@ function RunDetailComponent() {
     }
   };
 
-  const handleRetrySource = async (sourceId: string, sourceName: string) => {
+  const handleRetryConfirm = async (
+    sourceIds: string[],
+    result: RetryOptionsResult,
+  ) => {
     try {
-      await retrySourceMutation.mutateAsync({ id, sourceId });
-      toast.success(`Retrying source '${sourceName}'`);
+      await retryBatchMutation.mutateAsync({
+        id,
+        data: {
+          sourceIds,
+          mode: result.mode,
+          schemaVariantId: result.schemaVariantId,
+          selectedFields: result.selectedFields,
+        },
+      });
+      toast.success(`Retrying ${sourceIds.length} source(s)`);
       queryClient.invalidateQueries({
         queryKey: getRunsControllerFindAllQueryKey(),
       });
     } catch {
-      toast.error(`Failed to retry source '${sourceName}'`);
+      toast.error("Failed to retry");
     }
   };
 
@@ -456,6 +471,26 @@ function RunDetailComponent() {
                             results={run.results}
                             schema={run.extractor?.schema}
                             sortConfig={run.sortConfig}
+                            sources={run.sources?.map((s: any) => ({
+                              id: s.id,
+                              name: s.name,
+                            }))}
+                            onRetry={
+                              isTerminalState
+                                ? (sourceIds, result) =>
+                                    handleRetryConfirm(sourceIds, result)
+                                : undefined
+                            }
+                            retryConfig={
+                              isTerminalState
+                                ? {
+                                    variants: run?.extractor?.variants || [],
+                                    defaultSchema: run?.extractor?.schema || {},
+                                    currentVariantId: run?.variantId,
+                                  }
+                                : undefined
+                            }
+                            isRetrying={retryBatchMutation.isPending}
                           />
                         )}
                       </div>
@@ -495,6 +530,10 @@ function RunDetailComponent() {
                               results={run.results}
                               schema={run.extractor?.schema}
                               sortConfig={run.sortConfig}
+                              sources={run.sources?.map((s: any) => ({
+                                id: s.id,
+                                name: s.name,
+                              }))}
                             />
                           </div>
                         )}
@@ -514,11 +553,6 @@ function RunDetailComponent() {
                   </h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {run.sources?.map((source: any, idx: number) => {
-                      const isSourceFailed =
-                        source.status === "failed" ||
-                        source.extractionStatus === "failed";
-                      const canRetrySource = isSourceFailed && isTerminalState;
-
                       return (
                         <div
                           key={source.id || idx}
@@ -561,20 +595,27 @@ function RunDetailComponent() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            {canRetrySource && (
-                              <button
-                                type="button"
-                                className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-blue-100 transition-colors disabled:opacity-50"
-                                onClick={() =>
-                                  handleRetrySource(source.id, source.name)
+                            {isTerminalState && (
+                              <RetryOptionsPopover
+                                sourceNames={[source.name]}
+                                variants={run?.extractor?.variants || []}
+                                defaultSchema={run?.extractor?.schema || {}}
+                                currentVariantId={run?.variantId}
+                                onConfirm={(result) =>
+                                  handleRetryConfirm([source.id], result)
                                 }
-                                disabled={retrySourceMutation.isPending}
+                                disabled={retryBatchMutation.isPending}
                               >
-                                <span className="material-symbols-outlined text-[14px]">
-                                  replay
-                                </span>
-                                Retry
-                              </button>
+                                <button
+                                  type="button"
+                                  className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-blue-100 transition-colors disabled:opacity-50"
+                                >
+                                  <span className="material-symbols-outlined text-[14px]">
+                                    replay
+                                  </span>
+                                  Retry
+                                </button>
+                              </RetryOptionsPopover>
                             )}
                             <div
                               className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${
@@ -706,7 +747,7 @@ function RunDetailComponent() {
                     </button>
                   </Link>
                 )}
-                {(run.status === "failed" || run.status === "done") && (
+                {isTerminalState && (
                   <button
                     className="bg-blue-50 hover:bg-blue-100 text-blue-700 w-full py-3 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_#000000] transition-all"
                     type="button"
@@ -857,11 +898,28 @@ function ResultsSection({
   results,
   schema,
   sortConfig: initialSortConfig,
+  sources,
+  onRetry,
+  retryConfig,
+  isRetrying,
 }: {
   runId: string;
   results: Record<string, unknown>;
   schema?: any;
   sortConfig?: any;
+  sources?: { id: string; name: string }[];
+  onRetry?: (sourceIds: string[], result: RetryOptionsResult) => void;
+  retryConfig?: {
+    variants: {
+      id: string;
+      name: string;
+      schema: Record<string, any>;
+      isDefault: boolean;
+    }[];
+    defaultSchema: Record<string, any>;
+    currentVariantId?: string | null;
+  };
+  isRetrying?: boolean;
 }) {
   // Extract field order from schema if available
   const fieldOrder = schema?.fieldOrder as string[] | undefined;
@@ -968,10 +1026,14 @@ function ResultsSection({
         <TabsContent value="spreadsheet">
           <div className="excel-view">
             <SpreadsheetView
-              results={orderedResults}
+              results={orderedResults as Record<string, unknown>}
               fieldOrder={fieldOrder}
               sortConfig={initialSortConfig}
               onSortChange={handleSortChange}
+              sources={sources}
+              onRetry={onRetry}
+              retryConfig={retryConfig}
+              isRetrying={isRetrying}
             />
           </div>
         </TabsContent>

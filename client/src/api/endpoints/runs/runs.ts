@@ -23,6 +23,7 @@ import type {
 
 import type {
 	CreateRunDto,
+	RetrySourcesDto,
 	RunsControllerFindAllParams,
 	UpdateRunDto,
 } from "../../models";
@@ -838,6 +839,114 @@ export const useRunsControllerRetry = <TError = void, TContext = unknown>(
 > => {
 	return useMutation(
 		getRunsControllerRetryMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * @summary Batch retry specific sources with options
+ */
+export type runsControllerRetrySourcesBatchResponse200 = {
+	data: void;
+	status: 200;
+};
+
+export type runsControllerRetrySourcesBatchResponseSuccess =
+	runsControllerRetrySourcesBatchResponse200 & {
+		headers: Headers;
+	};
+
+export type runsControllerRetrySourcesBatchResponse =
+	runsControllerRetrySourcesBatchResponseSuccess;
+
+export const getRunsControllerRetrySourcesBatchUrl = (id: string) => {
+	return `/runs/${id}/sources/retry-batch`;
+};
+
+export const runsControllerRetrySourcesBatch = async (
+	id: string,
+	retrySourcesDto: RetrySourcesDto,
+	options?: RequestInit,
+): Promise<runsControllerRetrySourcesBatchResponse> => {
+	return HttpClient<runsControllerRetrySourcesBatchResponse>(
+		getRunsControllerRetrySourcesBatchUrl(id),
+		{
+			...options,
+			method: "POST",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(retrySourcesDto),
+		},
+	);
+};
+
+export const getRunsControllerRetrySourcesBatchMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof runsControllerRetrySourcesBatch>>,
+		TError,
+		{ id: string; data: RetrySourcesDto },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof runsControllerRetrySourcesBatch>>,
+	TError,
+	{ id: string; data: RetrySourcesDto },
+	TContext
+> => {
+	const mutationKey = ["runsControllerRetrySourcesBatch"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof runsControllerRetrySourcesBatch>>,
+		{ id: string; data: RetrySourcesDto }
+	> = (props) => {
+		const { id, data } = props ?? {};
+
+		return runsControllerRetrySourcesBatch(id, data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type RunsControllerRetrySourcesBatchMutationResult = NonNullable<
+	Awaited<ReturnType<typeof runsControllerRetrySourcesBatch>>
+>;
+export type RunsControllerRetrySourcesBatchMutationBody = RetrySourcesDto;
+export type RunsControllerRetrySourcesBatchMutationError = unknown;
+
+/**
+ * @summary Batch retry specific sources with options
+ */
+export const useRunsControllerRetrySourcesBatch = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof runsControllerRetrySourcesBatch>>,
+			TError,
+			{ id: string; data: RetrySourcesDto },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof runsControllerRetrySourcesBatch>>,
+	TError,
+	{ id: string; data: RetrySourcesDto },
+	TContext
+> => {
+	return useMutation(
+		getRunsControllerRetrySourcesBatchMutationOptions(options),
 		queryClient,
 	);
 };

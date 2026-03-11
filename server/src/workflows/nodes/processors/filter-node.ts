@@ -31,7 +31,7 @@ export class FilterNode extends ProcessorNode {
   execute(
     params: Record<string, any>,
     inputData: any,
-    _context: ExecutionContext, // eslint-disable-line @typescript-eslint/no-unused-vars
+    _context: ExecutionContext,
   ): Promise<NodeExecutionResult> {
     try {
       // Evaluate condition

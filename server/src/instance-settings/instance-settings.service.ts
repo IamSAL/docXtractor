@@ -101,7 +101,9 @@ export class InstanceSettingsService {
     return this.cachedTransporter;
   }
 
-  async testSmtp(recipientEmail?: string): Promise<{ success: boolean; error?: string }> {
+  async testSmtp(
+    recipientEmail?: string,
+  ): Promise<{ success: boolean; error?: string }> {
     const transporter = await this.getSmtpTransporter();
     if (!transporter) {
       return { success: false, error: 'SMTP is not configured' };

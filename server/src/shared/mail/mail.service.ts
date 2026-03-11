@@ -61,7 +61,11 @@ export class MailService {
         <p style="color: #666; font-size: 12px;">If you didn't expect this invitation, you can safely ignore this email.</p>
       </div>
     `;
-    return this.sendEmail(to, `You're invited to ${settings.instanceName}`, html);
+    return this.sendEmail(
+      to,
+      `You're invited to ${settings.instanceName}`,
+      html,
+    );
   }
 
   private async sendEmail(
