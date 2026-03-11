@@ -165,6 +165,52 @@ export class RunsService {
   }
 
   /**
+   * Merge new extraction result into a previous one (for selective-field retry).
+   * If previous exists, new fields overwrite old fields while preserving untouched fields.
+   */
+  private mergeExtractionResult(
+    previous: Record<string, unknown> | unknown[] | undefined,
+    current: any,
+  ): any {
+    if (!previous) return current;
+
+    // Both arrays (per-document mode typically returns arrays of row objects)
+    if (Array.isArray(previous) && Array.isArray(current)) {
+      // Merge row-by-row by index
+      const merged = [...previous] as Record<string, unknown>[];
+      for (let i = 0; i < current.length; i++) {
+        const oldRow = merged[i] || {};
+        const newRow = current[i] as Record<string, unknown>;
+        if (
+          typeof oldRow === 'object' &&
+          oldRow !== null &&
+          typeof newRow === 'object' &&
+          newRow !== null
+        ) {
+          merged[i] = { ...oldRow, ...newRow };
+        } else {
+          merged[i] = newRow ?? oldRow;
+        }
+      }
+      return merged;
+    }
+
+    // Both objects
+    if (
+      typeof previous === 'object' &&
+      !Array.isArray(previous) &&
+      typeof current === 'object' &&
+      !Array.isArray(current) &&
+      current !== null
+    ) {
+      return { ...previous, ...current };
+    }
+
+    // Incompatible shapes — just use the new result
+    return current;
+  }
+
+  /**
    * Create a new run and start processing.
    */
   async create(dto: CreateRunDto, userId: string): Promise<Run> {
@@ -818,7 +864,11 @@ export class RunsService {
 
       if (status === 'success') {
         source.extractionStatus = 'done';
-        source.extractionResult = result;
+        source.extractionResult = this.mergeExtractionResult(
+          source.previousExtractionResult,
+          result,
+        );
+        source.previousExtractionResult = undefined;
         this.addLog(
           run,
           'info',
@@ -827,6 +877,7 @@ export class RunsService {
       } else {
         source.extractionStatus = 'failed';
         source.extractionError = data.error || 'Extraction failed';
+        source.previousExtractionResult = undefined;
         this.addLog(
           run,
           'error',
@@ -1296,6 +1347,11 @@ export class RunsService {
     if (dto.mode === RetryMode.PARSE_AND_EXTRACTION) {
       // Reset sources fully and re-parse
       for (const source of sources) {
+        if (dto.selectedFields?.length && source.extractionResult) {
+          source.previousExtractionResult = source.extractionResult;
+        } else {
+          source.previousExtractionResult = undefined;
+        }
         source.status = 'parsing';
         source.error = undefined;
         source.parsedContent = undefined;
@@ -1351,6 +1407,12 @@ export class RunsService {
       }
 
       for (const source of sources) {
+        // If retrying with selected fields, preserve old result for merging
+        if (dto.selectedFields?.length && source.extractionResult) {
+          source.previousExtractionResult = source.extractionResult;
+        } else {
+          source.previousExtractionResult = undefined;
+        }
         source.extractionStatus = 'extracting';
         source.extractionError = undefined;
         source.extractionResult = undefined;
@@ -1393,7 +1455,11 @@ export class RunsService {
               'qwen3:14b',
             );
             source.extractionStatus = 'done';
-            source.extractionResult = result.data;
+            source.extractionResult = this.mergeExtractionResult(
+              source.previousExtractionResult,
+              result.data,
+            );
+            source.previousExtractionResult = undefined;
             run.progress.extracted = (run.progress.extracted || 0) + 1;
             this.addLog(
               run,

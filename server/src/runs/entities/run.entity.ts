@@ -54,6 +54,8 @@ export interface RunSource {
   extractionError?: string;
   // Flag used during per-source retry to only trigger extraction for retried sources
   isRetrying?: boolean;
+  // Stored during selective-field retry so completion handler can merge new fields into old result
+  previousExtractionResult?: Record<string, unknown> | unknown[];
 }
 
 export interface RunProgress {
