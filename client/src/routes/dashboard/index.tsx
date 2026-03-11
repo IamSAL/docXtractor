@@ -25,7 +25,7 @@ function RouteComponent() {
     useExtractorsControllerFindAll();
 
   const logout = useLogout();
-  const stats = (statsData as any)?.data;
+  const stats = statsData?.data;
   const extractors = extractorsData?.data || [];
 
   const systemStats = stats?.systemStats || { ram: 0, cpu: 0, storage: 0 };

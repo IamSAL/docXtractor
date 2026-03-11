@@ -434,14 +434,37 @@ export class RunsService {
 
     this.runsGateway.emitRunSourceUpdated(run.id, source);
 
+    // PER_DOCUMENT mode: start extraction immediately for each parsed source
+    if (
+      run.processingMode === ProcessingMode.PER_DOCUMENT &&
+      status === 'success'
+    ) {
+      // Transition run to EXTRACTING on first parsed source
+      if (run.status !== RunStatus.EXTRACTING) {
+        run.status = RunStatus.EXTRACTING;
+        run.progress!.currentStep = 'extracting';
+        run.progress!.extracted = 0;
+        run.progress!.extractionTotal = run.sources.filter(
+          (s) => s.status !== 'failed',
+        ).length;
+      }
+
+      const extractor = await this.extractorRepo.findOne({
+        where: { id: run.extractorId },
+      });
+
+      // Clear isRetrying flag
+      if (source.isRetrying) source.isRetrying = undefined;
+
+      await this.queueSingleExtraction(run, source, extractor);
+    }
+
     // Check if all sources are parsed
     const allParsed = run.sources.every(
       (s) => s.status === 'parsed' || s.status === 'failed',
     );
     if (allParsed) {
-      this.logger.log(
-        `🎯 All documents parsed for run ${run.id}, starting extraction`,
-      );
+      this.logger.log(`🎯 All documents parsed for run ${run.id}`);
 
       const parsedSources = run.sources.filter((s) => s.status === 'parsed');
       const failedCount = run.sources.filter(
@@ -453,39 +476,40 @@ export class RunsService {
         `All documents parsed (${parsedSources.length} success, ${failedCount} failed)`,
       );
 
-      if (parsedSources.length === 0) {
-        run.status = RunStatus.FAILED;
-        run.error = 'No documents were successfully parsed';
-        run.finishedAt = new Date();
-        this.addLog(
-          run,
-          'error',
-          'No documents parsed successfully, run failed',
-        );
+      if (run.processingMode === ProcessingMode.PER_DOCUMENT) {
+        // Update extractionTotal now that we know the final count
+        run.progress!.extractionTotal = parsedSources.length;
+
+        if (parsedSources.length === 0) {
+          run.status = RunStatus.FAILED;
+          run.error = 'No documents were successfully parsed';
+          run.finishedAt = new Date();
+          this.addLog(
+            run,
+            'error',
+            'No documents parsed successfully, run failed',
+          );
+        }
+        // Otherwise, extractions are already in-flight
       } else {
-        run.status = RunStatus.EXTRACTING;
-        run.progress!.currentStep = 'extracting';
-
-        // Get extractor configuration
-        const extractor = await this.extractorRepo.findOne({
-          where: { id: run.extractorId },
-        });
-
-        if (run.processingMode === ProcessingMode.PER_DOCUMENT) {
-          // Check if this is a retry — only extract retried sources
-          const retryingSources = parsedSources.filter((s) => s.isRetrying);
-          const sourcesToExtract =
-            retryingSources.length > 0 ? retryingSources : parsedSources;
-
-          // Clear isRetrying flags
-          for (const s of retryingSources) {
-            s.isRetrying = undefined;
-          }
-
-          // BATCH MODE: Extract each document independently
-          await this.handleBatchExtraction(run, sourcesToExtract, extractor);
+        // UNIFIED MODE: wait for all parsed, then extract
+        if (parsedSources.length === 0) {
+          run.status = RunStatus.FAILED;
+          run.error = 'No documents were successfully parsed';
+          run.finishedAt = new Date();
+          this.addLog(
+            run,
+            'error',
+            'No documents parsed successfully, run failed',
+          );
         } else {
-          // UNIFIED MODE: Combine all docs and extract once
+          run.status = RunStatus.EXTRACTING;
+          run.progress!.currentStep = 'extracting';
+
+          const extractor = await this.extractorRepo.findOne({
+            where: { id: run.extractorId },
+          });
+
           // Clear any isRetrying flags
           for (const s of parsedSources) {
             s.isRetrying = undefined;
@@ -780,6 +804,149 @@ export class RunsService {
       this.logger.log(
         `✅ ${parsedSources.length} batch extraction jobs added to ${QueueName.EXTRACTION_REQUESTS} queue`,
       );
+    }
+  }
+
+  /**
+   * Queue extraction for a single source (used for incremental per-document extraction).
+   */
+  private async queueSingleExtraction(
+    run: Run,
+    source: RunSource,
+    extractor: Extractor | null,
+  ) {
+    source.extractionStatus = 'extracting';
+
+    if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+      // Ollama: run inline (async, non-blocking for the caller)
+      this.extractSingleWithOllama(run, source, extractor).catch((err) =>
+        this.logger.error(
+          `Ollama extraction failed for source ${source.id}: ${err.message}`,
+        ),
+      );
+    } else {
+      const extractionType =
+        run.extractionProvider === ExtractionProvider.LANGEXTRACT
+          ? 'langextract'
+          : 'llm';
+
+      const extractionPayload = {
+        run_id: run.id,
+        document_id: source.id,
+        source_name: source.name,
+        content: { combined_markdown: source.parsedContent },
+        schema: this.resolveEffectiveSchema(
+          extractor,
+          run.variantId,
+          run.skippedFields,
+        ),
+        system_prompt: extractor?.systemPrompt || '',
+        extraction_type: extractionType,
+        model_id: 'qwen3:14b',
+        examples: extractor?.fewShotExamples || [],
+      };
+
+      await this.queueService.addJob(
+        QueueName.EXTRACTION_REQUESTS,
+        'extract-data',
+        extractionPayload,
+      );
+      this.addLog(run, 'info', `Extraction job queued for '${source.name}'`);
+    }
+  }
+
+  /**
+   * Run Ollama extraction for a single source and handle completion inline.
+   */
+  private async extractSingleWithOllama(
+    run: Run,
+    source: RunSource,
+    extractor: Extractor | null,
+  ) {
+    try {
+      const result = await this.ollamaService.extract(
+        source.parsedContent!,
+        this.resolveEffectiveSchema(
+          extractor,
+          run.variantId,
+          run.skippedFields,
+        ),
+        extractor?.systemPrompt || '',
+        'qwen3:14b',
+      );
+
+      source.extractionStatus = 'done';
+      source.extractionResult = result.data;
+
+      const annotatedRows = this.annotateResultWithSource(
+        result.data,
+        source.name,
+      );
+
+      if (!run.results) run.results = [] as any;
+      (run.results as unknown as Record<string, unknown>[]).push(
+        ...annotatedRows,
+      );
+      run.progress!.extracted = (run.progress!.extracted || 0) + 1;
+
+      if (!run.metrics)
+        run.metrics = { totalInputTokens: 0, totalOutputTokens: 0 };
+      run.metrics.totalInputTokens =
+        (run.metrics.totalInputTokens || 0) + result.usage.totalTokens;
+
+      this.addLog(
+        run,
+        'info',
+        `Extraction for '${source.name}' completed (${result.usage.totalTokens} tokens)`,
+      );
+
+      await this.runRepo.save(run);
+      this.runsGateway.emitRunSourceUpdated(run.id, source);
+      this.runsGateway.emitRunUpdated(run.id, run);
+
+      // Check if all extractions are done
+      this.checkOllamaBatchCompletion(run);
+    } catch (error) {
+      source.extractionStatus = 'failed';
+      source.extractionError = error.message;
+      run.progress!.extracted = (run.progress!.extracted || 0) + 1;
+      this.addLog(
+        run,
+        'error',
+        `Extraction failed for '${source.name}': ${error.message}`,
+      );
+      await this.runRepo.save(run);
+      this.runsGateway.emitRunSourceUpdated(run.id, source);
+      this.runsGateway.emitRunUpdated(run.id, run);
+
+      this.checkOllamaBatchCompletion(run);
+    }
+  }
+
+  private async checkOllamaBatchCompletion(run: Run) {
+    const extractedCount = run.progress!.extracted || 0;
+    const extractionTotal = run.progress!.extractionTotal || 0;
+    if (extractedCount >= extractionTotal && extractionTotal > 0) {
+      if (
+        run.results &&
+        (run.results as unknown as Record<string, unknown>[]).length > 0
+      ) {
+        run.status = RunStatus.DONE;
+      } else {
+        run.status = RunStatus.FAILED;
+        run.error = 'All document extractions failed';
+      }
+      run.progress!.currentStep = 'complete';
+      run.finishedAt = new Date();
+      const durationMs =
+        run.finishedAt.getTime() - (run.startedAt?.getTime() || 0);
+      this.addLog(
+        run,
+        'info',
+        `Batch extraction complete in ${Math.round(durationMs / 1000)}s`,
+      );
+      await this.runRepo.save(run);
+      this.runsGateway.emitRunUpdated(run.id, run);
     }
   }
 

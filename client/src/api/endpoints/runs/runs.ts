@@ -23,7 +23,9 @@ import type {
 
 import type {
 	CreateRunDto,
+	PaginatedRunsDto,
 	RetrySourcesDto,
+	Run,
 	RunsControllerFindAllParams,
 	UpdateRunDto,
 } from "../../models";
@@ -36,7 +38,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Create a new extraction run
  */
 export type runsControllerCreateResponse201 = {
-	data: void;
+	data: Run;
 	status: 201;
 };
 
@@ -139,7 +141,7 @@ export const useRunsControllerCreate = <TError = unknown, TContext = unknown>(
  * @summary Get all runs with pagination and filtering
  */
 export type runsControllerFindAllResponse200 = {
-	data: void;
+	data: PaginatedRunsDto;
 	status: 200;
 };
 
@@ -334,7 +336,7 @@ export function useRunsControllerFindAll<
  * @summary Get a single run by ID
  */
 export type runsControllerFindOneResponse200 = {
-	data: void;
+	data: Run;
 	status: 200;
 };
 
@@ -529,7 +531,7 @@ export function useRunsControllerFindOne<
  * @summary Update a run
  */
 export type runsControllerUpdateResponse200 = {
-	data: void;
+	data: Run;
 	status: 200;
 };
 
@@ -734,7 +736,7 @@ export const useRunsControllerRemove = <TError = unknown, TContext = unknown>(
  * @summary Retry a failed or cancelled run
  */
 export type runsControllerRetryResponse200 = {
-	data: void;
+	data: Run;
 	status: 200;
 };
 
@@ -846,7 +848,7 @@ export const useRunsControllerRetry = <TError = void, TContext = unknown>(
  * @summary Batch retry specific sources with options
  */
 export type runsControllerRetrySourcesBatchResponse200 = {
-	data: void;
+	data: Run;
 	status: 200;
 };
 
@@ -954,7 +956,7 @@ export const useRunsControllerRetrySourcesBatch = <
  * @summary Retry a single failed source within a run
  */
 export type runsControllerRetrySourceResponse200 = {
-	data: void;
+	data: Run;
 	status: 200;
 };
 

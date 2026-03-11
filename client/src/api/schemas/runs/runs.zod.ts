@@ -45,11 +45,120 @@ export const RunsControllerFindAllQueryParams = zod.object({
   "search": zod.string().optional().describe('Search term for run ID or name')
 })
 
+export const RunsControllerFindAllResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.string(),
+  "extractorId": zod.string(),
+  "userId": zod.string(),
+  "sources": zod.array(zod.string()),
+  "processingMode": zod.enum(['unified', 'per_document']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
+  "progress": zod.object({
+
+}).optional(),
+  "results": zod.object({
+
+}).optional(),
+  "metrics": zod.object({
+
+}).optional(),
+  "logs": zod.array(zod.string()),
+  "error": zod.object({
+
+}).optional(),
+  "confidence": zod.object({
+
+}).optional(),
+  "autorunId": zod.object({
+
+}).optional(),
+  "isAutorun": zod.boolean(),
+  "variantId": zod.object({
+
+}).optional().describe('ID of schema variant used for this run'),
+  "skippedFields": zod.object({
+
+}).optional().describe('Field names excluded from extraction'),
+  "sortConfig": zod.object({
+
+}).optional().describe('Reference sort configuration from uploaded XLSX'),
+  "workflowExecutionId": zod.object({
+
+}).optional(),
+  "startedAt": zod.object({
+
+}).optional(),
+  "finishedAt": zod.object({
+
+}).optional(),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "statusCounts": zod.object({
+  "done": zod.number(),
+  "failed": zod.number()
+})
+})
+
 /**
  * @summary Get a single run by ID
  */
 export const RunsControllerFindOneParams = zod.object({
   "id": zod.string()
+})
+
+export const RunsControllerFindOneResponse = zod.object({
+  "id": zod.string(),
+  "extractorId": zod.string(),
+  "userId": zod.string(),
+  "sources": zod.array(zod.string()),
+  "processingMode": zod.enum(['unified', 'per_document']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
+  "progress": zod.object({
+
+}).optional(),
+  "results": zod.object({
+
+}).optional(),
+  "metrics": zod.object({
+
+}).optional(),
+  "logs": zod.array(zod.string()),
+  "error": zod.object({
+
+}).optional(),
+  "confidence": zod.object({
+
+}).optional(),
+  "autorunId": zod.object({
+
+}).optional(),
+  "isAutorun": zod.boolean(),
+  "variantId": zod.object({
+
+}).optional().describe('ID of schema variant used for this run'),
+  "skippedFields": zod.object({
+
+}).optional().describe('Field names excluded from extraction'),
+  "sortConfig": zod.object({
+
+}).optional().describe('Reference sort configuration from uploaded XLSX'),
+  "workflowExecutionId": zod.object({
+
+}).optional(),
+  "startedAt": zod.object({
+
+}).optional(),
+  "finishedAt": zod.object({
+
+}).optional(),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
 })
 
 /**
@@ -78,6 +187,56 @@ export const RunsControllerUpdateBody = zod.object({
 }).optional().describe('Reference sort configuration')
 })
 
+export const RunsControllerUpdateResponse = zod.object({
+  "id": zod.string(),
+  "extractorId": zod.string(),
+  "userId": zod.string(),
+  "sources": zod.array(zod.string()),
+  "processingMode": zod.enum(['unified', 'per_document']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
+  "progress": zod.object({
+
+}).optional(),
+  "results": zod.object({
+
+}).optional(),
+  "metrics": zod.object({
+
+}).optional(),
+  "logs": zod.array(zod.string()),
+  "error": zod.object({
+
+}).optional(),
+  "confidence": zod.object({
+
+}).optional(),
+  "autorunId": zod.object({
+
+}).optional(),
+  "isAutorun": zod.boolean(),
+  "variantId": zod.object({
+
+}).optional().describe('ID of schema variant used for this run'),
+  "skippedFields": zod.object({
+
+}).optional().describe('Field names excluded from extraction'),
+  "sortConfig": zod.object({
+
+}).optional().describe('Reference sort configuration from uploaded XLSX'),
+  "workflowExecutionId": zod.object({
+
+}).optional(),
+  "startedAt": zod.object({
+
+}).optional(),
+  "finishedAt": zod.object({
+
+}).optional(),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
+
 /**
  * @summary Delete a run
  */
@@ -90,6 +249,56 @@ export const RunsControllerRemoveParams = zod.object({
  */
 export const RunsControllerRetryParams = zod.object({
   "id": zod.string()
+})
+
+export const RunsControllerRetryResponse = zod.object({
+  "id": zod.string(),
+  "extractorId": zod.string(),
+  "userId": zod.string(),
+  "sources": zod.array(zod.string()),
+  "processingMode": zod.enum(['unified', 'per_document']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
+  "progress": zod.object({
+
+}).optional(),
+  "results": zod.object({
+
+}).optional(),
+  "metrics": zod.object({
+
+}).optional(),
+  "logs": zod.array(zod.string()),
+  "error": zod.object({
+
+}).optional(),
+  "confidence": zod.object({
+
+}).optional(),
+  "autorunId": zod.object({
+
+}).optional(),
+  "isAutorun": zod.boolean(),
+  "variantId": zod.object({
+
+}).optional().describe('ID of schema variant used for this run'),
+  "skippedFields": zod.object({
+
+}).optional().describe('Field names excluded from extraction'),
+  "sortConfig": zod.object({
+
+}).optional().describe('Reference sort configuration from uploaded XLSX'),
+  "workflowExecutionId": zod.object({
+
+}).optional(),
+  "startedAt": zod.object({
+
+}).optional(),
+  "finishedAt": zod.object({
+
+}).optional(),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
 })
 
 /**
@@ -108,11 +317,111 @@ export const RunsControllerRetrySourcesBatchBody = zod.object({
   "selectedFields": zod.array(zod.string()).optional().describe('Field names to include. Null = all fields.')
 })
 
+export const RunsControllerRetrySourcesBatchResponse = zod.object({
+  "id": zod.string(),
+  "extractorId": zod.string(),
+  "userId": zod.string(),
+  "sources": zod.array(zod.string()),
+  "processingMode": zod.enum(['unified', 'per_document']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
+  "progress": zod.object({
+
+}).optional(),
+  "results": zod.object({
+
+}).optional(),
+  "metrics": zod.object({
+
+}).optional(),
+  "logs": zod.array(zod.string()),
+  "error": zod.object({
+
+}).optional(),
+  "confidence": zod.object({
+
+}).optional(),
+  "autorunId": zod.object({
+
+}).optional(),
+  "isAutorun": zod.boolean(),
+  "variantId": zod.object({
+
+}).optional().describe('ID of schema variant used for this run'),
+  "skippedFields": zod.object({
+
+}).optional().describe('Field names excluded from extraction'),
+  "sortConfig": zod.object({
+
+}).optional().describe('Reference sort configuration from uploaded XLSX'),
+  "workflowExecutionId": zod.object({
+
+}).optional(),
+  "startedAt": zod.object({
+
+}).optional(),
+  "finishedAt": zod.object({
+
+}).optional(),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
+
 /**
  * @summary Retry a single failed source within a run
  */
 export const RunsControllerRetrySourceParams = zod.object({
   "id": zod.string(),
   "sourceId": zod.string()
+})
+
+export const RunsControllerRetrySourceResponse = zod.object({
+  "id": zod.string(),
+  "extractorId": zod.string(),
+  "userId": zod.string(),
+  "sources": zod.array(zod.string()),
+  "processingMode": zod.enum(['unified', 'per_document']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
+  "progress": zod.object({
+
+}).optional(),
+  "results": zod.object({
+
+}).optional(),
+  "metrics": zod.object({
+
+}).optional(),
+  "logs": zod.array(zod.string()),
+  "error": zod.object({
+
+}).optional(),
+  "confidence": zod.object({
+
+}).optional(),
+  "autorunId": zod.object({
+
+}).optional(),
+  "isAutorun": zod.boolean(),
+  "variantId": zod.object({
+
+}).optional().describe('ID of schema variant used for this run'),
+  "skippedFields": zod.object({
+
+}).optional().describe('Field names excluded from extraction'),
+  "sortConfig": zod.object({
+
+}).optional().describe('Reference sort configuration from uploaded XLSX'),
+  "workflowExecutionId": zod.object({
+
+}).optional(),
+  "startedAt": zod.object({
+
+}).optional(),
+  "finishedAt": zod.object({
+
+}).optional(),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
 })
 

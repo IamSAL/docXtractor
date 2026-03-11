@@ -94,10 +94,10 @@ function RunsComponent() {
   const deleteMutation = useRunsControllerRemove();
   const retryMutation = useRunsControllerRetry();
 
-  const runs = (data as any)?.data?.data || [];
-  const total = (data as any)?.data?.total || 0;
+  const runs = data?.data?.data || [];
+  const total = data?.data?.total || 0;
   const totalPages = Math.ceil(total / 10);
-  const statusCounts = (data as any)?.data?.statusCounts || {
+  const statusCounts = data?.data?.statusCounts || {
     done: 0,
     failed: 0,
   };

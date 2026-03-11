@@ -93,7 +93,7 @@ function RunDetailComponent() {
     };
   }, [id, queryClient]);
 
-  const run = (data as any)?.data;
+  const run = data?.data;
 
   // Compute source statistics
   const sourceStats = useMemo(() => {
