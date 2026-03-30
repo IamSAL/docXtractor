@@ -29,9 +29,14 @@ async def process_job(job: Job, token: str = None):
     data = job.data
     logs = []
     doc_name = data.get("name", "unknown")
+    run_id = data.get("run_id")
     try:
-        logger.info(f"📥 Received job {job.id} for run: {data.get('run_id')} doc: {data.get('document_id')}")
-        logger.info(f"Job data: {data}")
+        # Check if run was cancelled/retried before we start expensive work
+        if run_id and await bullmq_client.is_run_cancelled(run_id):
+            logger.info(f"⏭️ Skipping job {job.id} — run {run_id} was cancelled/retried")
+            return {"status": "skipped", "reason": "run_cancelled"}
+
+        logger.info(f"📥 Received job {job.id} for run: {run_id} doc: {data.get('document_id')}")
 
         doc_type = data.get("type", "file")
         logger.info(f"Document type: {doc_type}")
@@ -46,6 +51,7 @@ async def process_job(job: Job, token: str = None):
                 event = {
                     "run_id": data.get("run_id"),
                     "document_id": data.get("document_id"),
+                    "retry_generation": data.get("retry_generation", 0),
                     "status": "failed",
                     "error": "No URL provided",
                     "logs": logs,
@@ -74,6 +80,7 @@ async def process_job(job: Job, token: str = None):
                 event = {
                     "run_id": data.get("run_id"),
                     "document_id": data.get("document_id"),
+                    "retry_generation": data.get("retry_generation", 0),
                     "status": "failed",
                     "error": "No file_key found",
                     "logs": logs,
@@ -91,6 +98,11 @@ async def process_job(job: Job, token: str = None):
             )
             logger.info(f"✅ File document processed successfully")
 
+        # Check again after processing — run may have been cancelled while we were working
+        if run_id and await bullmq_client.is_run_cancelled(run_id):
+            logger.info(f"⏭️ Discarding result for job {job.id} — run {run_id} was cancelled/retried during processing")
+            return {"status": "skipped", "reason": "run_cancelled"}
+
         logs.append(_make_log("info", "File downloaded, starting document parsing"))
         token_count = result["token_count"]
         content_length = len(result["markdown_content"])
@@ -100,6 +112,7 @@ async def process_job(job: Job, token: str = None):
         event = {
             "run_id": data.get("run_id"),
             "document_id": data.get("document_id"),
+            "retry_generation": data.get("retry_generation", 0),
             "status": "success",
             "markdown_content": result["markdown_content"],
             "token_count": result["token_count"],
@@ -119,6 +132,7 @@ async def process_job(job: Job, token: str = None):
         event = {
             "run_id": data.get("run_id"),
             "document_id": data.get("document_id"),
+            "retry_generation": data.get("retry_generation", 0),
             "status": "failed",
             "error": str(e),
             "logs": logs,

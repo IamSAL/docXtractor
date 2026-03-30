@@ -82,6 +82,23 @@ export class RunsService {
   // Serialize concurrent extraction completions per run to prevent race conditions
   private extractionLocks: Map<string, Promise<void>> = new Map();
 
+  /**
+   * Serialize async operations per run to prevent concurrent Ollama
+   * completion handlers from clobbering each other's DB writes.
+   */
+  private async serializeOllamaCompletion(
+    runId: string,
+    fn: () => Promise<void>,
+  ): Promise<void> {
+    const existingLock = this.extractionLocks.get(runId) || Promise.resolve();
+    const newLock = existingLock.then(fn);
+    this.extractionLocks.set(
+      runId,
+      newLock.catch(() => {}),
+    );
+    await newLock;
+  }
+
   private addLog(
     run: Run,
     level: 'info' | 'warn' | 'error',
@@ -380,6 +397,24 @@ export class RunsService {
     const source = run.sources.find((s) => s.id === document_id);
     if (!source) return;
 
+    // Ignore stale results from a previous attempt using generation counter
+    const expectedGeneration = source.retryGeneration || 0;
+    const receivedGeneration = data.retry_generation ?? 0;
+    if (receivedGeneration < expectedGeneration) {
+      this.logger.warn(
+        `Ignoring stale parsed result for source ${document_id} in run ${run_id} ` +
+          `(generation ${receivedGeneration} < expected ${expectedGeneration})`,
+      );
+      return;
+    }
+    // Also ignore if source was reset to 'pending' (full run retry)
+    if (source.status === 'pending') {
+      this.logger.warn(
+        `Ignoring stale parsed result for source ${document_id} in run ${run_id} (source is pending — was retried)`,
+      );
+      return;
+    }
+
     // Process any logs sent by the parser worker
     if (data.logs && Array.isArray(data.logs)) {
       for (const workerLog of data.logs) {
@@ -444,9 +479,9 @@ export class RunsService {
         run.status = RunStatus.EXTRACTING;
         run.progress!.currentStep = 'extracting';
         run.progress!.extracted = 0;
-        run.progress!.extractionTotal = run.sources.filter(
-          (s) => s.status !== 'failed',
-        ).length;
+        // Sentinel: extractionTotal=0 prevents premature completion checks.
+        // The real total is set once all parsing finishes (see allParsed block below).
+        run.progress!.extractionTotal = 0;
       }
 
       const extractor = await this.extractorRepo.findOne({
@@ -489,6 +524,11 @@ export class RunsService {
             'error',
             'No documents parsed successfully, run failed',
           );
+        } else if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+          // For Ollama: some extractions may have already completed before
+          // extractionTotal was set. Save the real total and trigger a check.
+          await this.runRepo.save(run);
+          await this.checkOllamaBatchCompletion(run);
         }
         // Otherwise, extractions are already in-flight
       } else {
@@ -774,8 +814,10 @@ export class RunsService {
         `Queuing ${parsedSources.length} batch extraction jobs with ${run.extractionProvider} provider`,
       );
 
-      for (const source of parsedSources) {
-        const extractionPayload = {
+      // Fix 7: bulk-queue all extraction jobs at once for maximum parallelism
+      const extractionJobs = parsedSources.map((source) => ({
+        name: 'extract-data',
+        data: {
           run_id: run.id,
           document_id: source.id,
           source_name: source.name,
@@ -791,15 +833,16 @@ export class RunsService {
           extraction_type: extractionType,
           model_id: 'qwen3:14b',
           examples: extractor?.fewShotExamples || [],
-        };
+        },
+      }));
 
-        await this.queueService.addJob(
-          QueueName.EXTRACTION_REQUESTS,
-          'extract-data',
-          extractionPayload,
-        );
-        this.addLog(run, 'info', `Extraction job queued for '${source.name}'`);
-      }
+      await this.queueService.addBulk(
+        QueueName.EXTRACTION_REQUESTS,
+        extractionJobs,
+      );
+      parsedSources.forEach((source) =>
+        this.addLog(run, 'info', `Extraction job queued for '${source.name}'`),
+      );
 
       this.logger.log(
         `✅ ${parsedSources.length} batch extraction jobs added to ${QueueName.EXTRACTION_REQUESTS} queue`,
@@ -819,10 +862,45 @@ export class RunsService {
 
     if (run.extractionProvider === ExtractionProvider.OLLAMA) {
       // Ollama: run inline (async, non-blocking for the caller)
-      this.extractSingleWithOllama(run, source, extractor).catch((err) =>
-        this.logger.error(
-          `Ollama extraction failed for source ${source.id}: ${err.message}`,
-        ),
+      this.extractSingleWithOllama(run, source, extractor).catch(
+        async (err) => {
+          this.logger.error(
+            `Ollama extraction failed (outer) for source ${source.id}: ${err.message}`,
+          );
+          // Safety net: ensure the source reaches terminal state even if inner catch failed
+          try {
+            await this.serializeOllamaCompletion(run.id, async () => {
+              const freshRun = await this.runRepo.findOne({
+                where: { id: run.id },
+              });
+              if (!freshRun) return;
+              const failedSource = freshRun.sources.find(
+                (s) => s.id === source.id,
+              );
+              if (
+                failedSource &&
+                failedSource.extractionStatus === 'extracting'
+              ) {
+                failedSource.extractionStatus = 'failed';
+                failedSource.extractionError =
+                  err.message || 'Extraction failed unexpectedly';
+                freshRun.progress!.extracted =
+                  (freshRun.progress!.extracted || 0) + 1;
+                await this.runRepo.save(freshRun);
+                this.runsGateway.emitRunSourceUpdated(
+                  freshRun.id,
+                  failedSource,
+                );
+                this.runsGateway.emitRunUpdated(freshRun.id, freshRun);
+                await this.checkOllamaBatchCompletion(freshRun);
+              }
+            });
+          } catch (innerErr) {
+            this.logger.error(
+              `Recovery failed for source ${source.id}: ${(innerErr as Error).message}`,
+            );
+          }
+        },
       );
     } else {
       const extractionType =
@@ -857,14 +935,19 @@ export class RunsService {
 
   /**
    * Run Ollama extraction for a single source and handle completion inline.
+   * The Ollama HTTP call runs concurrently; only DB writes are serialized.
    */
   private async extractSingleWithOllama(
     run: Run,
     source: RunSource,
     extractor: Extractor | null,
   ) {
+    // Run the Ollama call outside the lock so multiple sources extract concurrently
+    let extractionResult: any;
+    let extractionError: Error | null = null;
+
     try {
-      const result = await this.ollamaService.extract(
+      extractionResult = await this.ollamaService.extract(
         source.parsedContent!,
         this.resolveEffectiveSchema(
           extractor,
@@ -874,59 +957,70 @@ export class RunsService {
         extractor?.systemPrompt || '',
         'qwen3:14b',
       );
-
-      source.extractionStatus = 'done';
-      source.extractionResult = result.data;
-
-      const annotatedRows = this.annotateResultWithSource(
-        result.data,
-        source.name,
-      );
-
-      if (!run.results) run.results = [] as any;
-      (run.results as unknown as Record<string, unknown>[]).push(
-        ...annotatedRows,
-      );
-      run.progress!.extracted = (run.progress!.extracted || 0) + 1;
-
-      if (!run.metrics)
-        run.metrics = { totalInputTokens: 0, totalOutputTokens: 0 };
-      run.metrics.totalInputTokens =
-        (run.metrics.totalInputTokens || 0) + result.usage.totalTokens;
-
-      this.addLog(
-        run,
-        'info',
-        `Extraction for '${source.name}' completed (${result.usage.totalTokens} tokens)`,
-      );
-
-      await this.runRepo.save(run);
-      this.runsGateway.emitRunSourceUpdated(run.id, source);
-      this.runsGateway.emitRunUpdated(run.id, run);
-
-      // Check if all extractions are done
-      this.checkOllamaBatchCompletion(run);
     } catch (error) {
-      source.extractionStatus = 'failed';
-      source.extractionError = error.message;
-      run.progress!.extracted = (run.progress!.extracted || 0) + 1;
-      this.addLog(
-        run,
-        'error',
-        `Extraction failed for '${source.name}': ${error.message}`,
-      );
-      await this.runRepo.save(run);
-      this.runsGateway.emitRunSourceUpdated(run.id, source);
-      this.runsGateway.emitRunUpdated(run.id, run);
-
-      this.checkOllamaBatchCompletion(run);
+      extractionError = error;
     }
+
+    // Serialize the DB read-modify-write + completion check
+    await this.serializeOllamaCompletion(run.id, async () => {
+      const freshRun = await this.runRepo.findOne({
+        where: { id: run.id },
+      });
+      if (!freshRun) return;
+
+      const freshSource = freshRun.sources.find((s) => s.id === source.id);
+      if (!freshSource) return;
+
+      if (extractionError) {
+        freshSource.extractionStatus = 'failed';
+        freshSource.extractionError = extractionError.message;
+        this.addLog(
+          freshRun,
+          'error',
+          `Extraction failed for '${freshSource.name}': ${extractionError.message}`,
+        );
+      } else {
+        freshSource.extractionStatus = 'done';
+        freshSource.extractionResult = extractionResult.data;
+
+        const annotatedRows = this.annotateResultWithSource(
+          extractionResult.data,
+          freshSource.name,
+        );
+        if (!freshRun.results) freshRun.results = [] as any;
+        (freshRun.results as unknown as Record<string, unknown>[]).push(
+          ...annotatedRows,
+        );
+
+        if (!freshRun.metrics)
+          freshRun.metrics = { totalInputTokens: 0, totalOutputTokens: 0 };
+        freshRun.metrics.totalInputTokens =
+          (freshRun.metrics.totalInputTokens || 0) +
+          extractionResult.usage.totalTokens;
+
+        this.addLog(
+          freshRun,
+          'info',
+          `Extraction for '${freshSource.name}' completed (${extractionResult.usage.totalTokens} tokens)`,
+        );
+      }
+
+      freshRun.progress!.extracted =
+        (freshRun.progress!.extracted || 0) + 1;
+
+      await this.runRepo.save(freshRun);
+      this.runsGateway.emitRunSourceUpdated(freshRun.id, freshSource);
+      this.runsGateway.emitRunUpdated(freshRun.id, freshRun);
+
+      await this.checkOllamaBatchCompletion(freshRun);
+    });
   }
 
   private async checkOllamaBatchCompletion(run: Run) {
     const extractedCount = run.progress!.extracted || 0;
     const extractionTotal = run.progress!.extractionTotal || 0;
-    if (extractedCount >= extractionTotal && extractionTotal > 0) {
+    // extractionTotal=0 is a sentinel meaning "not all parsing is done yet"
+    if (extractionTotal > 0 && extractedCount >= extractionTotal) {
       if (
         run.results &&
         (run.results as unknown as Record<string, unknown>[]).length > 0
@@ -945,8 +1039,24 @@ export class RunsService {
         'info',
         `Batch extraction complete in ${Math.round(durationMs / 1000)}s`,
       );
+
       await this.runRepo.save(run);
-      this.runsGateway.emitRunUpdated(run.id, run);
+      await this.flushLogs(run.id);
+
+      // Refetch from DB for consistent WebSocket emission
+      const freshRun = await this.runRepo.findOne({
+        where: { id: run.id },
+        relations: ['extractor'],
+      });
+      this.runsGateway.emitRunUpdated(run.id, freshRun || run);
+      this.runsGateway.emitRunsListUpdated({
+        runId: run.id,
+        status: (freshRun || run).status,
+        progress: (freshRun || run).progress,
+      });
+
+      // Clean up serialization lock
+      this.extractionLocks.delete(run.id);
     }
   }
 
@@ -1021,6 +1131,8 @@ export class RunsService {
         'info',
         `Run finished in ${Math.round(durationMs / 1000)}s`,
       );
+      // Fix 4: clean up lock for unified mode (prevents leak)
+      this.extractionLocks.delete(run_id);
     } else {
       // PER_DOCUMENT mode: accumulate per-source results
       const source = run.sources.find((s) => s.id === document_id);
@@ -1161,26 +1273,42 @@ export class RunsService {
       `Resetting ${run.sources.length} sources and re-queuing`,
     );
 
+    // Cancel stale jobs from previous attempt before re-queuing
+    await this.queueService.removeJobsForRun(
+      QueueName.UPLOADED_DOCUMENTS,
+      run.id,
+    );
+    await this.queueService.removeJobsForRun(
+      QueueName.EXTRACTION_REQUESTS,
+      run.id,
+    );
+    await this.queueService.clearRunCancellation(run.id);
+
     await this.runRepo.save(run);
     await this.flushLogs(run.id);
 
-    // Re-queue documents
-    for (const source of run.sources) {
+    // Re-queue documents: increment retryGeneration per source so stale results
+    // from the previous attempt are rejected by handleDocumentParsed (Fix 6)
+    // Fix 7: bulk-queue all parse jobs at once
+    const parseJobs = run.sources.map((source) => {
       source.status = 'parsing';
+      source.retryGeneration = (source.retryGeneration || 0) + 1;
       this.addLog(run, 'info', `Queuing document '${source.name}' for parsing`);
-      await this.queueService.addJob(
-        QueueName.UPLOADED_DOCUMENTS,
-        'parse-document',
-        {
+      return {
+        name: 'parse-document',
+        data: {
           run_id: run.id,
           document_id: source.id,
           type: source.type,
           file_key: source.fileKey,
           url: source.url,
           name: source.name,
+          retry_generation: source.retryGeneration,
         },
-      );
-    }
+      };
+    });
+
+    await this.queueService.addBulk(QueueName.UPLOADED_DOCUMENTS, parseJobs);
 
     run.status = RunStatus.PARSING;
     run.progress.currentStep = 'parsing';
@@ -1265,6 +1393,10 @@ export class RunsService {
         currentStep: 'parsing',
       };
 
+      // Fix 6: increment generation so stale results from the previous attempt
+      // are rejected by handleDocumentParsed
+      source.retryGeneration = (source.retryGeneration || 0) + 1;
+
       this.addLog(run, 'info', `Retrying parse for source '${source.name}'`);
 
       await this.runRepo.save(run);
@@ -1281,6 +1413,7 @@ export class RunsService {
           file_key: source.fileKey,
           url: source.url,
           name: source.name,
+          retry_generation: source.retryGeneration,
         },
       );
     } else {
@@ -1741,6 +1874,9 @@ export class RunsService {
 
   async remove(id: string, userId: string) {
     const run = await this.findOne(id, userId);
+    // Cancel any in-flight or queued jobs for this run
+    await this.queueService.removeJobsForRun(QueueName.UPLOADED_DOCUMENTS, id);
+    await this.queueService.removeJobsForRun(QueueName.EXTRACTION_REQUESTS, id);
     return this.runRepo.remove(run);
   }
 }

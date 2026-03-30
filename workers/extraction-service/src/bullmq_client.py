@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 from bullmq import Queue, Worker, Job
+from redis.asyncio import Redis as AsyncRedis
 from typing import Callable, Any, Awaitable
 
 logger = logging.getLogger(__name__)
@@ -11,6 +12,16 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6380")
 class BullMQClient:
     def __init__(self):
         self._queues = {}
+        self._redis = None
+
+    async def _get_redis(self) -> AsyncRedis:
+        if self._redis is None:
+            self._redis = AsyncRedis.from_url(REDIS_URL, decode_responses=True)
+        return self._redis
+
+    async def is_run_cancelled(self, run_id: str) -> bool:
+        redis = await self._get_redis()
+        return await redis.exists(f"run:cancelled:{run_id}") == 1
 
     def get_queue(self, name: str) -> Queue:
         if name not in self._queues:

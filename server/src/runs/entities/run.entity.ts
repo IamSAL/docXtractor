@@ -56,6 +56,8 @@ export interface RunSource {
   isRetrying?: boolean;
   // Stored during selective-field retry so completion handler can merge new fields into old result
   previousExtractionResult?: Record<string, unknown> | unknown[];
+  // Monotonically increasing counter to reject stale parse results after retry
+  retryGeneration?: number;
 }
 
 export interface RunProgress {

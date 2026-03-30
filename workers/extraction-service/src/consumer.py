@@ -30,8 +30,14 @@ async def process_job(job: Job, token: str = None):
     logs = []
     document_id = data.get("document_id")  # Present in batch/per_document mode
     source_name = data.get("source_name")  # Present in batch/per_document mode
+    run_id = data.get("run_id")
     try:
-        logger.info(f"📥 Received extraction request job {job.id} for run: {data.get('run_id')}")
+        # Check if run was cancelled/retried before starting expensive extraction
+        if run_id and await bullmq_client.is_run_cancelled(run_id):
+            logger.info(f"⏭️ Skipping extraction job {job.id} — run {run_id} was cancelled/retried")
+            return {"status": "skipped", "reason": "run_cancelled"}
+
+        logger.info(f"📥 Received extraction request job {job.id} for run: {run_id}")
         logger.info(f"Job data keys: {list(data.keys())}")
 
         content_block = data.get("content", {})

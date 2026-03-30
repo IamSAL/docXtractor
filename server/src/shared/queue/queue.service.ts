@@ -38,6 +38,28 @@ export class QueueService {
     });
   }
 
+  async addBulk(
+    queueName: QueueName,
+    jobs: { name: string; data: any; opts?: any }[],
+  ) {
+    const queue = this.getQueue(queueName);
+    if (!queue) {
+      throw new Error(`Queue ${queueName} not found`);
+    }
+    this.logger.log(`Adding ${jobs.length} jobs in bulk to queue ${queueName}`);
+    return await queue.addBulk(
+      jobs.map((j) => ({
+        name: j.name,
+        data: j.data,
+        opts: {
+          removeOnComplete: true,
+          removeOnFail: 1000,
+          ...j.opts,
+        },
+      })),
+    );
+  }
+
   private getQueue(queueName: QueueName): Queue | null {
     switch (queueName) {
       case QueueName.UPLOADED_DOCUMENTS:
@@ -52,6 +74,54 @@ export class QueueService {
         return this.workflowExecutionsQueue;
       default:
         return null;
+    }
+  }
+
+  /**
+   * Remove all waiting jobs in a queue that belong to a specific run.
+   * Active (in-progress) jobs can't be removed, but we mark the run
+   * as cancelled in Redis so workers can skip them.
+   */
+  async removeJobsForRun(queueName: QueueName, runId: string) {
+    const queue = this.getQueue(queueName);
+    if (!queue) return;
+
+    const waiting = await queue.getJobs(['waiting', 'delayed', 'prioritized']);
+    let removed = 0;
+    for (const job of waiting) {
+      if (job.data?.run_id === runId) {
+        try {
+          await job.remove();
+          removed++;
+        } catch {
+          // job may have started processing between getJobs and remove — ignore
+        }
+      }
+    }
+    if (removed > 0) {
+      this.logger.log(
+        `Removed ${removed} waiting jobs for run ${runId} from ${queueName}`,
+      );
+    }
+
+    // Mark run as cancelled in Redis so active workers can check and skip
+    const redis = await queue.client;
+    if (redis) {
+      // Short TTL — just long enough for in-flight jobs to finish
+      await redis.set(`run:cancelled:${runId}`, '1', 'EX', 600);
+    }
+  }
+
+  /**
+   * Clear the cancellation mark for a run (e.g. when retrying).
+   * Workers check this key — removing it allows new jobs to proceed.
+   */
+  async clearRunCancellation(runId: string) {
+    const queue = this.getQueue(QueueName.UPLOADED_DOCUMENTS);
+    if (!queue) return;
+    const redis = await queue.client;
+    if (redis) {
+      await redis.del(`run:cancelled:${runId}`);
     }
   }
 
