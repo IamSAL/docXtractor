@@ -10,12 +10,49 @@ export interface OllamaExtractionResult {
   };
 }
 
+class Semaphore {
+  private tasks: (() => void)[] = [];
+  private activeCount: number = 0;
+
+  constructor(private concurrency: number) {}
+
+  async acquire(): Promise<void> {
+    if (this.activeCount < this.concurrency) {
+      this.activeCount++;
+      return;
+    }
+    return new Promise((resolve) => {
+      this.tasks.push(resolve);
+    });
+  }
+
+  release(): void {
+    if (this.tasks.length > 0) {
+      const next = this.tasks.shift();
+      if (next) next();
+    } else {
+      this.activeCount--;
+    }
+  }
+
+  async run<T>(fn: () => Promise<T>): Promise<T> {
+    await this.acquire();
+    try {
+      return await fn();
+    } finally {
+      this.release();
+    }
+  }
+}
+
 @Injectable()
 export class OllamaService {
   private readonly logger = new Logger(OllamaService.name);
   private readonly client: Ollama;
   private readonly defaultModel: string;
   private readonly generationModel: string;
+
+  private readonly semaphore: Semaphore;
 
   constructor(private configService: ConfigService) {
     const host = this.configService.get<string>(
@@ -30,9 +67,15 @@ export class OllamaService {
       'OLLAMA_GENERATION_MODEL',
       'qwen3:14b',
     );
+    const maxConcurrency = this.configService.get<number>(
+      'OLLAMA_MAX_CONCURRENCY',
+      2,
+    );
+    this.semaphore = new Semaphore(maxConcurrency);
+
     this.client = new Ollama({ host });
     this.logger.log(
-      `Ollama client initialized: host=${host}, extractionModel=${this.defaultModel}, generationModel=${this.generationModel}`,
+      `Ollama client initialized: host=${host}, concurrency=${maxConcurrency}`,
     );
   }
 
@@ -42,82 +85,81 @@ export class OllamaService {
     systemPrompt: string,
     _model?: string,
   ): Promise<OllamaExtractionResult> {
-    // const modelId = _model || this.defaultModel;
-    const modelId = 'gpt-oss:120b-cloud';
+    return this.semaphore.run(async () => {
+      const modelId = 'gpt-oss:120b-cloud';
 
-    // Build field descriptions from schema
-    const fieldsDesc = this.buildFieldsDescription(schema);
+      // Build field descriptions from schema
+      const fieldsDesc = this.buildFieldsDescription(schema);
 
-    // Build the prompt
-    const instruction = systemPrompt
-      ? `${systemPrompt}\n\nFields to extract:\n${fieldsDesc}\n\nReturn a valid JSON object matching this structure.`
-      : `Extract the following fields from the document text.\nReference the exact text where possible.\n\nFields to extract:\n${fieldsDesc}\n\nReturn a valid JSON object matching this structure.`;
+      // Build the prompt
+      const instruction = systemPrompt
+        ? `${systemPrompt}\n\nFields to extract:\n${fieldsDesc}\n\nReturn a valid JSON object matching this structure.`
+        : `Extract the following fields from the document text.\nReference the exact text where possible.\n\nFields to extract:\n${fieldsDesc}\n\nReturn a valid JSON object matching this structure.`;
 
-    const fullPrompt = `${instruction}\n\nDocument Content:\n${content}`;
+      const fullPrompt = `${instruction}\n\nDocument Content:\n${content}`;
 
-    this.logger.log(
-      `Running Ollama extraction, mode: ${modelId}, host: ${this.configService.get<string>(
-        'OLLAMA_HOST',
-        'http://localhost:11434',
-      )}`,
-    );
+      this.logger.log(`Running Ollama extraction, mode: ${modelId}`);
 
-    const maxRetries = this.configService.get<number>(
-      'OLLAMA_EXTRACTION_MAX_RETRIES',
-      3,
-    );
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const response = await this.client.chat({
-          model: modelId,
-          messages: [{ role: 'user', content: fullPrompt }],
-          format: schema,
-        });
-        this.logger.debug(`Ollama response: ${response.message.content}`);
-        const resultData = JSON.parse(
-          jsonrepair(response.message.content),
-        ) as Record<string, unknown>;
+      const maxRetries = this.configService.get<number>(
+        'OLLAMA_EXTRACTION_MAX_RETRIES',
+        3,
+      );
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const response = await this.client.chat({
+            model: modelId,
+            messages: [{ role: 'user', content: fullPrompt }],
+            format: schema,
+          });
+          this.logger.debug(`Ollama response: ${response.message.content}`);
+          const resultData = JSON.parse(
+            jsonrepair(response.message.content),
+          ) as Record<string, unknown>;
 
-        const totalTokens =
-          (response.prompt_eval_count || 0) + (response.eval_count || 0);
+          const totalTokens =
+            (response.prompt_eval_count || 0) + (response.eval_count || 0);
 
-        this.logger.log(`Ollama extraction complete: tokens=${totalTokens}`);
+          this.logger.log(`Ollama extraction complete: tokens=${totalTokens}`);
 
-        return {
-          data: resultData,
-          usage: { totalTokens },
-        };
-      } catch (error: any) {
-        this.logger.error(
-          `Ollama extraction failed (attempt ${attempt}/${maxRetries}): ${error}`,
-        );
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        const isRateLimit =
-          errorMessage.toLowerCase().includes('too many concurrent requests') ||
-          errorMessage.toLowerCase().includes('429');
-
-        if (isRateLimit) {
-          this.logger.warn(
-            `Rate limit or concurrency error hit, backing off and retrying...`,
+          return {
+            data: resultData,
+            usage: { totalTokens },
+          };
+        } catch (error: any) {
+          this.logger.error(
+            `Ollama extraction failed (attempt ${attempt}/${maxRetries}): ${error}`,
           );
-          // Decrement attempt so we retry indefinitely for this specific error
-          attempt--;
-          // Backoff between 3s and 8s
-          await new Promise((resolve) =>
-            setTimeout(resolve, 3000 + Math.random() * 5000),
-          );
-          continue;
-        }
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          const isRateLimit =
+            errorMessage
+              .toLowerCase()
+              .includes('too many concurrent requests') ||
+            errorMessage.toLowerCase().includes('429');
 
-        if (attempt === maxRetries) {
-          throw error;
+          if (isRateLimit) {
+            this.logger.warn(
+              `Rate limit or concurrency error hit, backing off and retrying...`,
+            );
+            // Decrement attempt so we retry indefinitely for this specific error
+            attempt--;
+            // Backoff between 3s and 8s
+            await new Promise((resolve) =>
+              setTimeout(resolve, 3000 + Math.random() * 5000),
+            );
+            continue;
+          }
+
+          if (attempt === maxRetries) {
+            throw error;
+          }
+          // Wait before retrying
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
         }
-        // Wait before retrying
-        await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
       }
-    }
-    // Unreachable, but satisfies TypeScript
-    throw new Error('Ollama extraction failed after retries');
+      // Unreachable, but satisfies TypeScript
+      throw new Error('Ollama extraction failed after retries');
+    });
   }
 
   /**
@@ -128,65 +170,70 @@ export class OllamaService {
     prompt: string,
     model?: string,
   ): Promise<Record<string, unknown>> {
-    const modelId = model || this.generationModel;
+    return this.semaphore.run(async () => {
+      const modelId = model || this.generationModel;
 
-    this.logger.log(
-      `Running Ollama generation: model=${modelId}, prompt_length=${prompt.length} ,prompt=${prompt}`,
-    );
+      this.logger.log(
+        `Running Ollama generation: model=${modelId}, prompt_length=${prompt.length} ,prompt=${prompt}`,
+      );
 
-    const maxRetries = this.configService.get<number>(
-      'OLLAMA_EXTRACTION_MAX_RETRIES',
-      3,
-    );
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const response = await this.client.chat({
-          model: modelId,
-          messages: [{ role: 'user', content: prompt }],
-          format: 'json',
-        });
+      const maxRetries = this.configService.get<number>(
+        'OLLAMA_EXTRACTION_MAX_RETRIES',
+        3,
+      );
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const response = await this.client.chat({
+            model: modelId,
+            messages: [{ role: 'user', content: prompt }],
+            format: 'json',
+          });
 
-        this.logger.debug(
-          `Ollama generation response: ${response.message.content}`,
-        );
-
-        const result = JSON.parse(
-          jsonrepair(response.message.content),
-        ) as Record<string, unknown>;
-
-        const totalTokens =
-          (response.prompt_eval_count || 0) + (response.eval_count || 0);
-
-        this.logger.log(`Ollama generation complete: tokens=${totalTokens}`);
-
-        return result;
-      } catch (error: any) {
-        this.logger.error(
-          `Ollama generation failed (attempt ${attempt}/${maxRetries}): ${error}`,
-        );
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        const isRateLimit =
-          errorMessage.toLowerCase().includes('too many concurrent requests') ||
-          errorMessage.toLowerCase().includes('429');
-
-        if (isRateLimit) {
-          this.logger.warn(
-            `Rate limit or concurrency error hit in generation, backing off and retrying...`,
+          this.logger.debug(
+            `Ollama generation response: ${response.message.content}`,
           );
-          attempt--;
-          await new Promise((resolve) =>
-            setTimeout(resolve, 3000 + Math.random() * 5000),
-          );
-          continue;
-        }
 
-        if (attempt === maxRetries) {
-          throw error;
+          const result = JSON.parse(
+            jsonrepair(response.message.content),
+          ) as Record<string, unknown>;
+
+          const totalTokens =
+            (response.prompt_eval_count || 0) + (response.eval_count || 0);
+
+          this.logger.log(`Ollama generation complete: tokens=${totalTokens}`);
+
+          return result;
+        } catch (error: any) {
+          this.logger.error(
+            `Ollama generation failed (attempt ${attempt}/${maxRetries}): ${error}`,
+          );
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          const isRateLimit =
+            errorMessage
+              .toLowerCase()
+              .includes('too many concurrent requests') ||
+            errorMessage.toLowerCase().includes('429');
+
+          if (isRateLimit) {
+            this.logger.warn(
+              `Rate limit or concurrency error hit in generation, backing off and retrying...`,
+            );
+            attempt--;
+            await new Promise((resolve) =>
+              setTimeout(resolve, 3000 + Math.random() * 5000),
+            );
+            continue;
+          }
+
+          if (attempt === maxRetries) {
+            throw error;
+          }
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
         }
-        await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
       }
-    }
-    throw new Error('Ollama generation failed after retries');
+      throw new Error('Ollama generation failed after retries');
+    });
   }
 
   /**
