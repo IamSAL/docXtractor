@@ -35,10 +35,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'docXtractor',
       },
     ],
     links: [
+      {
+        rel: 'icon',
+        href: '/logo.svg',
+      },
       {
         rel: 'stylesheet',
         href: appCss,
