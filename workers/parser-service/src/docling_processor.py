@@ -27,25 +27,26 @@ s3_client = boto3.client(
     aws_secret_access_key=MINIO_SECRET_KEY
 )
 
-_thread_local = threading.local()
+_converters: dict = {}
+_converters_lock = threading.Lock()
 
 
 def _get_converter(backend: str = "dlparse_v2") -> DocumentConverter:
-    attr = f"converter_{backend}"
-    if not hasattr(_thread_local, attr):
-        pipeline_options = PdfPipelineOptions(
-            do_ocr=False,
-            do_table_structure=True,
-            pdf_backend=backend,
-        )
-        converter = DocumentConverter(
-            allowed_formats=[InputFormat.PDF],
-            format_options={
-                InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
-            }
-        )
-        setattr(_thread_local, attr, converter)
-    return getattr(_thread_local, attr)
+    if backend not in _converters:
+        with _converters_lock:
+            if backend not in _converters:
+                pipeline_options = PdfPipelineOptions(
+                    do_ocr=False,
+                    do_table_structure=True,
+                    pdf_backend=backend,
+                )
+                _converters[backend] = DocumentConverter(
+                    allowed_formats=[InputFormat.PDF],
+                    format_options={
+                        InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+                    }
+                )
+    return _converters[backend]
 
 
 def _convert_with_fallback(name: str, file_bytes: bytes):
