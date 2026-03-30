@@ -3,6 +3,7 @@ fastapi
 uvicorn
 bullmq
 docling
+pymupdf
 python-dotenv
 boto3
 watchfiles

@@ -54,3 +54,4 @@ misc
 .venv
 workers/**/src/__pycache__/
 client/.output
+workers/**/**/test
