@@ -4,7 +4,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from .consumer import consume
-from .docling_processor import _get_converter
+from .parser_engine import get_engine
 
 # Configure Logging
 LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()
@@ -16,11 +16,11 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup — pre-warm document converters before accepting jobs
-    logger.info("Pre-warming document converters...")
-    await asyncio.to_thread(_get_converter, "dlparse_v2")
-    await asyncio.to_thread(_get_converter, "pypdfium2")
-    logger.info("Converters ready, starting consumer...")
+    # Startup — initialize engine and optional warm-up
+    engine = get_engine()
+    logger.info(f"Warming up parser engine: {engine.name}")
+    await asyncio.to_thread(engine.warm_up)
+    logger.info("Engine ready, starting consumer...")
     task = asyncio.create_task(consume())
     yield
     # Shutdown
@@ -35,4 +35,5 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "parser-service"}
+    engine = get_engine()
+    return {"status": "ok", "service": "parser-service", "engine": engine.name}

@@ -165,8 +165,10 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=docxtractor-documents
-      - PARSER_CONCURRENCY=4
+      - PARSER_CONCURRENCY=8
       - DNNL_VERBOSE=0
+      - PARSER_ENGINE=docling
+      - PARSE_CACHE_ENABLED=false
     networks:
       - docxtractor-network
     command: uvicorn src.main:app --host 0.0.0.0 --port 8001

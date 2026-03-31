@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6380")
 CACHE_TTL = int(os.getenv("PARSE_CACHE_TTL", str(60 * 60 * 24 * 7)))  # 7 days default
+CACHE_ENABLED = os.getenv("PARSE_CACHE_ENABLED", "true").lower() == "true"
 CACHE_PREFIX = "parse_cache:"
 
 _redis_client = None
@@ -30,6 +31,8 @@ def compute_file_hash(file_path: str) -> str:
 
 
 def get_cached_result(file_hash: str) -> dict | None:
+    if not CACHE_ENABLED:
+        return None
     try:
         data = _get_redis().get(f"{CACHE_PREFIX}{file_hash}")
         if data:
@@ -41,6 +44,8 @@ def get_cached_result(file_hash: str) -> dict | None:
 
 
 def set_cached_result(file_hash: str, result: dict):
+    if not CACHE_ENABLED:
+        return
     try:
         _get_redis().setex(
             f"{CACHE_PREFIX}{file_hash}",

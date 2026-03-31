@@ -148,12 +148,14 @@ services:
       createbuckets:
         condition: service_completed_successfully
     environment:
+      - PARSE_CACHE_ENABLED=false
+      - PARSER_ENGINE=docling # markitdown | docling | pymupdf
       - REDIS_URL=redis://redis:6380
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=docxtractor-documents
-      - PARSER_CONCURRENCY=3
+      - PARSER_CONCURRENCY=8
       - DNNL_VERBOSE=0
     networks:
       - docxtractor-network
