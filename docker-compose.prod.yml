@@ -220,10 +220,10 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=docxtractor-documents
-      - PARSER_CONCURRENCY=2
+      - PARSER_CONCURRENCY=1
       - DNNL_VERBOSE=0
       - PARSER_ENGINE=docling
-      - PARSE_CACHE_ENABLED=false
+      - PARSE_CACHE_ENABLED=true
       - LOG_LEVEL=INFO
       - PYTHONWARNINGS=ignore
       - PYTORCH_NO_NNPACK=1
