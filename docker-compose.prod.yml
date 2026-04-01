@@ -207,8 +207,6 @@ services:
     build:
       context: ./workers/parser-service
     restart: unless-stopped
-    deploy:
-      replicas: 2
     depends_on:
       redis:
         condition: service_healthy
@@ -222,11 +220,11 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=docxtractor-documents
-      - PARSER_CONCURRENCY=1
+      - PARSER_CONCURRENCY=2
       - DNNL_VERBOSE=0
       - PARSER_ENGINE=docling
       - PARSE_CACHE_ENABLED=false
-      - LOG_LEVEL=WARNING
+      - LOG_LEVEL=INFO
       - PYTHONWARNINGS=ignore
       - PYTORCH_NO_NNPACK=1
       - PYTORCH_NNPACK_ENABLED=0
