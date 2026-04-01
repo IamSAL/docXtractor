@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Ollama } from 'ollama';
 import { jsonrepair } from 'jsonrepair';
@@ -8,6 +13,12 @@ export interface OllamaExtractionResult {
   usage: {
     totalTokens: number;
   };
+}
+
+interface OllamaNode {
+  client: Ollama;
+  host: string;
+  healthy: boolean;
 }
 
 class Semaphore {
@@ -46,26 +57,56 @@ class Semaphore {
 }
 
 @Injectable()
-export class OllamaService {
+export class OllamaService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(OllamaService.name);
-  private readonly client: Ollama;
+  private readonly pool: OllamaNode[];
   private readonly defaultModel: string;
   private readonly generationModel: string;
-
   private readonly semaphore: Semaphore;
+  private nextIndex = 0;
+  private healthCheckInterval: ReturnType<typeof setInterval>;
 
   constructor(private configService: ConfigService) {
-    const host = this.configService.get<string>(
+    // Parse hosts: OLLAMA_HOSTS (comma-separated) takes priority over OLLAMA_HOST
+    const hostsStr = this.configService.get<string>('OLLAMA_HOSTS', '');
+    const singleHost = this.configService.get<string>(
       'OLLAMA_HOST',
       'http://ollama:11434',
     );
+    const hosts = hostsStr
+      ? hostsStr
+          .split(',')
+          .map((h) => h.trim())
+          .filter(Boolean)
+      : [singleHost];
+
+    // Parse API keys: OLLAMA_API_KEYS (comma-separated, one per host) or OLLAMA_API_KEY (shared)
+    const apiKeysStr = this.configService.get<string>('OLLAMA_API_KEYS', '');
+    const sharedApiKey = this.configService.get<string>('OLLAMA_API_KEY', '');
+    const apiKeys = apiKeysStr
+      ? apiKeysStr.split(',').map((k) => k.trim())
+      : [];
+
+    this.pool = hosts.map((host, i) => {
+      const apiKey = apiKeys[i] || sharedApiKey;
+      const headers: Record<string, string> = {};
+      if (apiKey) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
+      return {
+        client: new Ollama({ host, headers }),
+        host,
+        healthy: true,
+      };
+    });
+
     this.defaultModel = this.configService.get<string>(
       'OLLAMA_DEFAULT_MODEL',
-      'qwen3:14b',
+      'gpt-oss:120b-cloud',
     );
     this.generationModel = this.configService.get<string>(
       'OLLAMA_GENERATION_MODEL',
-      'qwen3:14b',
+      'gpt-oss:120b-cloud',
     );
     const maxConcurrency = this.configService.get<number>(
       'OLLAMA_MAX_CONCURRENCY',
@@ -73,10 +114,102 @@ export class OllamaService {
     );
     this.semaphore = new Semaphore(maxConcurrency);
 
-    this.client = new Ollama({ host });
     this.logger.log(
-      `Ollama client initialized: host=${host}, concurrency=${maxConcurrency}`,
+      `Ollama pool initialized: ${this.pool.length} instance(s) [${hosts.join(', ')}], concurrency=${maxConcurrency}`,
     );
+
+    // Health check: every 30s, probe unhealthy nodes
+    this.healthCheckInterval = setInterval(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      () => this.runHealthChecks(),
+      30_000,
+    );
+  }
+
+  async onModuleInit() {
+    const modelsToEnsure = new Set([this.defaultModel, this.generationModel]);
+    this.logger.log(
+      `Ensuring models are available: ${[...modelsToEnsure].join(', ')}`,
+    );
+
+    for (const node of this.pool) {
+      for (const model of modelsToEnsure) {
+        try {
+          // Check if model already exists on this node
+          const { models } = await node.client.list();
+          const exists = models.some(
+            (m) => m.name === model || m.name === `${model}:latest`,
+          );
+          if (exists) {
+            this.logger.log(
+              `Model '${model}' already available on ${node.host}`,
+            );
+            continue;
+          }
+
+          this.logger.log(`Pulling model '${model}' on ${node.host}...`);
+          await node.client.pull({ model });
+          this.logger.log(
+            `Model '${model}' pulled successfully on ${node.host}`,
+          );
+        } catch (error) {
+          this.logger.warn(
+            `Failed to pull model '${model}' on ${node.host}: ${error}. It may need to be pulled manually.`,
+          );
+        }
+      }
+    }
+  }
+
+  onModuleDestroy() {
+    clearInterval(this.healthCheckInterval);
+  }
+
+  private getNextNode(): OllamaNode {
+    const poolSize = this.pool.length;
+    for (let i = 0; i < poolSize; i++) {
+      const idx = this.nextIndex % poolSize;
+      this.nextIndex = (this.nextIndex + 1) % poolSize;
+      if (this.pool[idx].healthy) {
+        return this.pool[idx];
+      }
+    }
+    // All unhealthy — try the next one anyway (it may have recovered)
+    const fallback = this.pool[this.nextIndex % poolSize];
+    this.nextIndex = (this.nextIndex + 1) % poolSize;
+    this.logger.warn(`All Ollama nodes unhealthy, attempting ${fallback.host}`);
+    return fallback;
+  }
+
+  private markUnhealthy(node: OllamaNode) {
+    if (node.healthy) {
+      node.healthy = false;
+      this.logger.warn(`Ollama node marked unhealthy: ${node.host}`);
+    }
+  }
+
+  private isConnectionError(error: any): boolean {
+    const msg = error instanceof Error ? error.message : String(error);
+    return (
+      msg.includes('ECONNREFUSED') ||
+      msg.includes('ECONNRESET') ||
+      msg.includes('ETIMEDOUT') ||
+      msg.includes('fetch failed') ||
+      msg.includes('socket hang up')
+    );
+  }
+
+  private async runHealthChecks() {
+    for (const node of this.pool) {
+      if (node.healthy) continue;
+      try {
+        await node.client.list();
+        node.healthy = true;
+        this.logger.log(`Ollama node recovered: ${node.host}`);
+      } catch {
+        // Still unhealthy
+      }
+    }
   }
 
   async extract(
@@ -86,7 +219,7 @@ export class OllamaService {
     _model?: string,
   ): Promise<OllamaExtractionResult> {
     return this.semaphore.run(async () => {
-      const modelId = 'gpt-oss:120b-cloud';
+      const modelId = _model || this.defaultModel;
 
       // Build field descriptions from schema
       const fieldsDesc = this.buildFieldsDescription(schema);
@@ -105,8 +238,9 @@ export class OllamaService {
         3,
       );
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        const node = this.getNextNode();
         try {
-          const response = await this.client.chat({
+          const response = await node.client.chat({
             model: modelId,
             messages: [{ role: 'user', content: fullPrompt }],
             format: schema,
@@ -119,7 +253,9 @@ export class OllamaService {
           const totalTokens =
             (response.prompt_eval_count || 0) + (response.eval_count || 0);
 
-          this.logger.log(`Ollama extraction complete: tokens=${totalTokens}`);
+          this.logger.log(
+            `Ollama extraction complete: tokens=${totalTokens}, node=${node.host}`,
+          );
 
           return {
             data: resultData,
@@ -127,8 +263,13 @@ export class OllamaService {
           };
         } catch (error: any) {
           this.logger.error(
-            `Ollama extraction failed (attempt ${attempt}/${maxRetries}): ${error}`,
+            `Ollama extraction failed (attempt ${attempt}/${maxRetries}, node=${node.host}): ${error}`,
           );
+
+          if (this.isConnectionError(error)) {
+            this.markUnhealthy(node);
+          }
+
           const errorMessage =
             error instanceof Error ? error.message : String(error);
           const isRateLimit =
@@ -141,9 +282,7 @@ export class OllamaService {
             this.logger.warn(
               `Rate limit or concurrency error hit, backing off and retrying...`,
             );
-            // Decrement attempt so we retry indefinitely for this specific error
             attempt--;
-            // Backoff between 3s and 8s
             await new Promise((resolve) =>
               setTimeout(resolve, 3000 + Math.random() * 5000),
             );
@@ -153,11 +292,9 @@ export class OllamaService {
           if (attempt === maxRetries) {
             throw error;
           }
-          // Wait before retrying
           await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
         }
       }
-      // Unreachable, but satisfies TypeScript
       throw new Error('Ollama extraction failed after retries');
     });
   }
@@ -174,7 +311,7 @@ export class OllamaService {
       const modelId = model || this.generationModel;
 
       this.logger.log(
-        `Running Ollama generation: model=${modelId}, prompt_length=${prompt.length} ,prompt=${prompt}`,
+        `Running Ollama generation: model=${modelId}, prompt_length=${prompt.length}`,
       );
 
       const maxRetries = this.configService.get<number>(
@@ -182,8 +319,9 @@ export class OllamaService {
         3,
       );
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        const node = this.getNextNode();
         try {
-          const response = await this.client.chat({
+          const response = await node.client.chat({
             model: modelId,
             messages: [{ role: 'user', content: prompt }],
             format: 'json',
@@ -200,13 +338,20 @@ export class OllamaService {
           const totalTokens =
             (response.prompt_eval_count || 0) + (response.eval_count || 0);
 
-          this.logger.log(`Ollama generation complete: tokens=${totalTokens}`);
+          this.logger.log(
+            `Ollama generation complete: tokens=${totalTokens}, node=${node.host}`,
+          );
 
           return result;
         } catch (error: any) {
           this.logger.error(
-            `Ollama generation failed (attempt ${attempt}/${maxRetries}): ${error}`,
+            `Ollama generation failed (attempt ${attempt}/${maxRetries}, node=${node.host}): ${error}`,
           );
+
+          if (this.isConnectionError(error)) {
+            this.markUnhealthy(node);
+          }
+
           const errorMessage =
             error instanceof Error ? error.message : String(error);
           const isRateLimit =

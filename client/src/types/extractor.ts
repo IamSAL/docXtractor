@@ -53,5 +53,5 @@ export const defaultExtractorFormValues: ExtractorFormData = {
   citationIncludeBbox: false,
   citationIncludeParagraphId: false,
   contextWindow: "128k",
-  defaultModel: "qwen3:14b",
+  defaultModel: "gpt-oss:120b-cloud",
 };

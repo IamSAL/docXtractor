@@ -34,14 +34,29 @@ services:
       timeout: 5s
       retries: 5
 
-  ollama:
+  ollama1:
     image: alpine/ollama:latest
-    container_name: docxtractor-ollama
+    container_name: docxtractor-ollama1
     restart: unless-stopped
+    environment:
+      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-}
     volumes:
-      - ollama_data:/root/.ollama
+      - ollama1_data:/root/.ollama
     ports:
       - "11434:11434"
+    networks:
+      - docxtractor-network
+
+  ollama2:
+    image: alpine/ollama:latest
+    container_name: docxtractor-ollama2
+    restart: unless-stopped
+    environment:
+      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-}
+    volumes:
+      - ollama2_data:/root/.ollama
+    ports:
+      - "11435:11434"
     networks:
       - docxtractor-network
 
@@ -66,9 +81,10 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=docxtractor-documents
-      - OLLAMA_HOST=http://ollama:11434
-      - OLLAMA_DEFAULT_MODEL=qwen3:14b
-      - OLLAMA_GENERATION_MODEL=qwen3:14b
+      - OLLAMA_HOSTS=http://ollama1:11434,http://ollama2:11434
+      - OLLAMA_HOST=http://ollama1:11434
+      - OLLAMA_DEFAULT_MODEL=gpt-oss:120b-cloud
+      - OLLAMA_GENERATION_MODEL=gpt-oss:120b-cloud
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET:-docxtractor-dev-access-secret}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-docxtractor-dev-refresh-secret}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET:-docxtractor-dev-reset-secret}
@@ -82,7 +98,9 @@ services:
         condition: service_healthy
       createbuckets:
         condition: service_completed_successfully
-      ollama:
+      ollama1:
+        condition: service_started
+      ollama2:
         condition: service_started
     networks:
       - docxtractor-network
@@ -139,7 +157,6 @@ services:
   parser-service:
     build:
       context: ./workers/parser-service
-    container_name: docxtractor-parser
     depends_on:
       redis:
         condition: service_healthy
@@ -155,8 +172,12 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=docxtractor-documents
-      - PARSER_CONCURRENCY=8
+      - PARSER_CONCURRENCY=1
       - DNNL_VERBOSE=0
+      - LOG_LEVEL=INFO
+      - PYTHONWARNINGS=ignore
+      - PYTORCH_NO_NNPACK=1
+      - TF_CPP_MIN_LOG_LEVEL=3
     networks:
       - docxtractor-network
     volumes:
@@ -182,8 +203,11 @@ services:
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
-      - LANGEXTRACT_MODEL_URL=http://ollama:11434
+      - LANGEXTRACT_MODEL_URL=http://ollama1:11434
       - EXTRACTION_CONCURRENCY=3
+      - LOG_LEVEL=INFO
+      - PYTHONWARNINGS=ignore
+      - TF_CPP_MIN_LOG_LEVEL=3
     networks:
       - docxtractor-network
     volumes:
@@ -193,7 +217,8 @@ services:
 volumes:
   postgres_data:
   minio_data:
-  ollama_data:
+  ollama1_data:
+  ollama2_data:
 
 networks:
   docxtractor-network:

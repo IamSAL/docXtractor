@@ -67,14 +67,58 @@ services:
     networks:
       - docxtractor-network
 
-  ollama:
+  ollama1:
     image: ollama/ollama:latest
-    container_name: docxtractor-ollama
+    container_name: docxtractor-ollama1
     restart: unless-stopped
     volumes:
-      - ollama_data:/root/.ollama
+      - ollama1_data:/root/.ollama
     ports:
       - "11434:11434"
+    networks:
+      - docxtractor-network
+
+  ollama2:
+    image: ollama/ollama:latest
+    container_name: docxtractor-ollama2
+    restart: unless-stopped
+    volumes:
+      - ollama2_data:/root/.ollama
+    ports:
+      - "11435:11434"
+    networks:
+      - docxtractor-network
+
+  ollama3:
+    image: ollama/ollama:latest
+    container_name: docxtractor-ollama3
+    restart: unless-stopped
+    volumes:
+      - ollama3_data:/root/.ollama
+    ports:
+      - "11436:11434"
+    networks:
+      - docxtractor-network
+
+  ollama4:
+    image: ollama/ollama:latest
+    container_name: docxtractor-ollama4
+    restart: unless-stopped
+    volumes:
+      - ollama4_data:/root/.ollama
+    ports:
+      - "11437:11434"
+    networks:
+      - docxtractor-network
+
+  ollama5:
+    image: ollama/ollama:latest
+    container_name: docxtractor-ollama5
+    restart: unless-stopped
+    volumes:
+      - ollama5_data:/root/.ollama
+    ports:
+      - "11438:11434"
     networks:
       - docxtractor-network
 
@@ -104,9 +148,12 @@ services:
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET}
       - FRONTEND_URL=${FRONTEND_URL:-https://docxtractor.sk-salman.com}
-      - OLLAMA_HOST=http://ollama:11434
-      - OLLAMA_DEFAULT_MODEL=${OLLAMA_DEFAULT_MODEL:-qwen3:14b}
-      - OLLAMA_GENERATION_MODEL=${OLLAMA_GENERATION_MODEL:-qwen3:14b}
+      - OLLAMA_HOSTS=http://ollama1:11434,http://ollama2:11434,http://ollama3:11434,http://ollama4:11434,http://ollama5:11434
+      - OLLAMA_HOST=http://ollama1:11434
+      - OLLAMA_DEFAULT_MODEL=${OLLAMA_DEFAULT_MODEL:-gpt-oss:120b-cloud}
+      - OLLAMA_GENERATION_MODEL=${OLLAMA_GENERATION_MODEL:-gpt-oss:120b-cloud}
+      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-base_key}
+      - OLLAMA_API_KEYS=${OLLAMA_API_KEYS:-key1,key2}
       - SWAGGER_USER=${SWAGGER_USER:-admin}
       - SWAGGER_PASS=${SWAGGER_PASS:-admin}
       - THROTTLER_TTL=${THROTTLER_TTL:-60000}
@@ -121,7 +168,15 @@ services:
         condition: service_healthy
       createbuckets:
         condition: service_completed_successfully
-      ollama:
+      ollama1:
+        condition: service_started
+      ollama2:
+        condition: service_started
+      ollama3:
+        condition: service_started
+      ollama4:
+        condition: service_started
+      ollama5:
         condition: service_started
     networks:
       - docxtractor-network
@@ -150,7 +205,6 @@ services:
     image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-parser:latest
     build:
       context: ./workers/parser-service
-    container_name: docxtractor-parser
     restart: unless-stopped
     depends_on:
       redis:
@@ -169,6 +223,10 @@ services:
       - DNNL_VERBOSE=0
       - PARSER_ENGINE=docling
       - PARSE_CACHE_ENABLED=false
+      - LOG_LEVEL=WARNING
+      - PYTHONWARNINGS=ignore
+      - PYTORCH_NO_NNPACK=1
+      - TF_CPP_MIN_LOG_LEVEL=3
     networks:
       - docxtractor-network
     command: uvicorn src.main:app --host 0.0.0.0 --port 8001
@@ -186,7 +244,7 @@ services:
         condition: service_started
       createbuckets:
         condition: service_completed_successfully
-      ollama:
+      ollama1:
         condition: service_started
     environment:
       - REDIS_URL=redis://docxtractor-redis:6379
@@ -196,8 +254,11 @@ services:
       - MINIO_BUCKET=docxtractor-documents
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - LANGEXTRACT_API_KEY=${LANGEXTRACT_API_KEY}
-      - LANGEXTRACT_MODEL_URL=http://ollama:11434
+      - LANGEXTRACT_MODEL_URL=http://ollama1:11434
       - EXTRACTION_CONCURRENCY=${EXTRACTION_CONCURRENCY:-3}
+      - LOG_LEVEL=WARNING
+      - PYTHONWARNINGS=ignore
+      - TF_CPP_MIN_LOG_LEVEL=3
     networks:
       - docxtractor-network
     command: uvicorn src.main:app --host 0.0.0.0 --port 8002
@@ -206,7 +267,11 @@ volumes:
   postgres_data:
   minio_data:
   redis_data:
-  ollama_data:
+  ollama1_data:
+  ollama2_data:
+  ollama3_data:
+  ollama4_data:
+  ollama5_data:
 
 networks:
   docxtractor-network:

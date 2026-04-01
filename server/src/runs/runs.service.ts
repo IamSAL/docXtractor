@@ -596,7 +596,7 @@ export class RunsService {
             run.skippedFields,
           ),
           extractor?.systemPrompt || '',
-          'qwen3:14b',
+          'gpt-oss:120b-cloud',
         );
 
         run.status = RunStatus.DONE;
@@ -653,12 +653,12 @@ export class RunsService {
         ),
         system_prompt: extractor?.systemPrompt || '',
         extraction_type: extractionType,
-        model_id: 'qwen3:14b',
+        model_id: 'gpt-oss:120b-cloud',
         examples: extractor?.fewShotExamples || [],
       };
 
       this.logger.log(
-        `📤 Sending extraction job: type=${extractionType}, model=${'qwen3:14b'}`,
+        `📤 Sending extraction job: type=${extractionType}, model=${'gpt-oss:120b-cloud'}`,
       );
 
       await this.queueService.addJob(
@@ -741,7 +741,7 @@ export class RunsService {
         ),
         system_prompt: extractor?.systemPrompt || '',
         extraction_type: extractionType,
-        model_id: 'qwen3:14b',
+        model_id: 'gpt-oss:120b-cloud',
         examples: extractor?.fewShotExamples || [],
       };
 
@@ -776,7 +776,7 @@ export class RunsService {
           run.skippedFields,
         ),
         extractor?.systemPrompt || '',
-        'qwen3:14b',
+        'gpt-oss:120b-cloud',
       );
     } catch (error) {
       extractionError = error;
@@ -1298,7 +1298,7 @@ export class RunsService {
               run.skippedFields,
             ),
             extractor?.systemPrompt || '',
-            'qwen3:14b',
+            'gpt-oss:120b-cloud',
           );
 
           source.extractionStatus = 'done';
@@ -1369,7 +1369,7 @@ export class RunsService {
             ),
             system_prompt: extractor?.systemPrompt || '',
             extraction_type: extractionType,
-            model_id: 'qwen3:14b',
+            model_id: 'gpt-oss:120b-cloud',
             examples: extractor?.fewShotExamples || [],
           },
         );
@@ -1572,7 +1572,7 @@ export class RunsService {
               source.parsedContent!,
               effectiveSchema,
               extractor?.systemPrompt || '',
-              'qwen3:14b',
+              'gpt-oss:120b-cloud',
             );
             source.extractionStatus = 'done';
             source.extractionResult = this.mergeExtractionResult(
@@ -1638,7 +1638,7 @@ export class RunsService {
               schema: effectiveSchema,
               system_prompt: extractor?.systemPrompt || '',
               extraction_type: extractionType,
-              model_id: 'qwen3:14b',
+              model_id: 'gpt-oss:120b-cloud',
               examples: extractor?.fewShotExamples || [],
             },
           );
@@ -1655,7 +1655,7 @@ export class RunsService {
                 schema: effectiveSchema,
                 system_prompt: extractor?.systemPrompt || '',
                 extraction_type: extractionType,
-                model_id: 'qwen3:14b',
+                model_id: 'gpt-oss:120b-cloud',
                 examples: extractor?.fewShotExamples || [],
               },
             );

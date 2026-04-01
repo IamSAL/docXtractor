@@ -24,6 +24,7 @@ DO_TABLE_STRUCTURE = os.getenv("DO_TABLE_STRUCTURE", "true").lower() == "true"
 PDF_CHUNK_WORKERS = int(os.getenv("PDF_CHUNK_WORKERS", "4"))
 PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "8"))
 _THREADS_PER_DOC = int(os.getenv("THREADS_PER_DOC", str(max(1, (os.cpu_count() or 4) // max(1, PARSER_CONCURRENCY)))))
+#_THREADS_PER_DOC = 1
 
 
 class DoclingEngine(ParserEngine):

@@ -115,15 +115,25 @@ jobs:
             echo "Waiting for services to become healthy..."
             sleep 15
 
-            # Verify critical containers are running
-            for container in docxtractor-server docxtractor-client docxtractor-db docxtractor-redis docxtractor-parser docxtractor-extractor docxtractor-ollama; do
+            # Verify critical services are running
+            # Fixed-name containers
+            for container in docxtractor-server docxtractor-client docxtractor-db docxtractor-redis docxtractor-extractor; do
               if ! docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
                 echo "ERROR: ${container} is not running!"
                 docker logs "${container}" --tail 30 2>&1 || true
                 exit 1
               fi
             done
-            echo "All containers are running."
+
+            # Scaled/renamed services (match by prefix)
+            for prefix in parser-service ollama; do
+              if ! docker compose -f docker-compose.prod.yml ps --status running --format '{{.Name}}' | grep -q "${prefix}"; then
+                echo "ERROR: No running instances of ${prefix}!"
+                docker compose -f docker-compose.prod.yml logs "${prefix}" --tail 30 2>&1 || true
+                exit 1
+              fi
+            done
+            echo "All services are running."
 
             # Cleanup old images and build cache
             docker image prune -f

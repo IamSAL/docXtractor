@@ -76,7 +76,7 @@ Key modules:
 - **`FilesModule`** — File upload, MinIO storage
 - **`QueueModule`** (`shared/queue/`) — Global BullMQ setup for all 4 queues
 - **`AuthModule`** — JWT + Google OAuth, guards, strategies
-- **`OllamaModule`** (`shared/ollama/`) — Global Ollama client (model: `qwen3:14b`)
+- **`OllamaModule`** (`shared/ollama/`) — Global Ollama client (model: `gpt-oss:120b-cloud`)
 - **`MailModule`** (`shared/mail/`) — Email sending via Brevo (SendGrid) SMTP
 
 Key entities:
@@ -169,7 +169,7 @@ Copy `server/env.example` to `server/.env`. Key variables:
 - `DATABASE_URL` — PostgreSQL connection string
 - `JWT_SECRET`, `JWT_REFRESH_SECRET`
 - `REDIS_HOST`, `REDIS_PORT` (default: `localhost:6380`)
-- `OLLAMA_HOST`, `OLLAMA_DEFAULT_MODEL` (default: `qwen3:14b`)
+- `OLLAMA_HOST`, `OLLAMA_DEFAULT_MODEL` (default: `gpt-oss:120b-cloud`)
 - `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASS` — Brevo SMTP for transactional email
 - `GOOGLE_CLIENT_ID/SECRET` — OAuth
 
