@@ -158,6 +158,7 @@ services:
       - SWAGGER_PASS=${SWAGGER_PASS:-admin}
       - THROTTLER_TTL=${THROTTLER_TTL:-60000}
       - THROTTLER_LIMIT=${THROTTLER_LIMIT:-100}
+      - OLLAMA_MAX_CONCURRENCY=10
     # Optional: mount a custom seed file to pre-populate extractors on first run
     # volumes:
     #   - ./extractors.json:/app/seed/extractors.json:ro
@@ -206,6 +207,8 @@ services:
     build:
       context: ./workers/parser-service
     restart: unless-stopped
+    deploy:
+      replicas: 2
     depends_on:
       redis:
         condition: service_healthy
@@ -219,14 +222,17 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=docxtractor-documents
-      - PARSER_CONCURRENCY=8
+      - PARSER_CONCURRENCY=1
       - DNNL_VERBOSE=0
       - PARSER_ENGINE=docling
       - PARSE_CACHE_ENABLED=false
       - LOG_LEVEL=WARNING
       - PYTHONWARNINGS=ignore
       - PYTORCH_NO_NNPACK=1
+      - PYTORCH_NNPACK_ENABLED=0
       - TF_CPP_MIN_LOG_LEVEL=3
+      - TORCH_CPP_LOG_LEVEL=ERROR
+      - OMP_NUM_THREADS=2
     networks:
       - docxtractor-network
     command: uvicorn src.main:app --host 0.0.0.0 --port 8001
