@@ -32,28 +32,42 @@ class ParserEngine(ABC):
         pass
 
 
-_engine_instance: ParserEngine | None = None
+_engine_registry: dict[str, ParserEngine] = {}
+_registry_lock = __import__("threading").Lock()
 
 
-def get_engine() -> ParserEngine:
-    """Return the singleton parser engine based on PARSER_ENGINE env var."""
-    global _engine_instance
-    if _engine_instance is not None:
-        return _engine_instance
-
-    engine_name = os.getenv("PARSER_ENGINE", "docling").lower()
-
-    if engine_name == "markitdown":
-        from .engines.markitdown_engine import MarkItDownEngine
-        _engine_instance = MarkItDownEngine()
-    elif engine_name == "docling":
-        from .engines.docling_engine import DoclingEngine
-        _engine_instance = DoclingEngine()
-    elif engine_name == "pymupdf":
-        from .engines.pymupdf_engine import PyMuPdfEngine
-        _engine_instance = PyMuPdfEngine()
+def get_engine(engine_name: str | None = None) -> ParserEngine:
+    """Return the parser engine for the given name. Lazy-initializes on first use."""
+    if engine_name is None:
+        engine_name = os.getenv("PARSER_ENGINE", "docling").lower()
     else:
-        raise ValueError(f"Unknown parser engine: {engine_name}. Choose from: markitdown, docling, pymupdf")
+        engine_name = engine_name.lower()
 
-    logger.info(f"Parser engine initialized: {_engine_instance.name}")
-    return _engine_instance
+    if engine_name in _engine_registry:
+        return _engine_registry[engine_name]
+
+    with _registry_lock:
+        if engine_name in _engine_registry:
+            return _engine_registry[engine_name]
+
+        if engine_name == "markitdown":
+            from .engines.markitdown_engine import MarkItDownEngine
+            engine = MarkItDownEngine()
+        elif engine_name == "docling":
+            from .engines.docling_engine import DoclingEngine
+            engine = DoclingEngine()
+        elif engine_name == "pymupdf":
+            from .engines.pymupdf_engine import PyMuPdfEngine
+            engine = PyMuPdfEngine()
+        elif engine_name == "opendataloader":
+            from .engines.opendataloader_engine import OpenDataLoaderEngine
+            engine = OpenDataLoaderEngine()
+        else:
+            raise ValueError(
+                f"Unknown parser engine: {engine_name}. "
+                "Choose from: docling, markitdown, pymupdf, opendataloader"
+            )
+
+        logger.info(f"Parser engine initialized: {engine.name}")
+        _engine_registry[engine_name] = engine
+        return engine
