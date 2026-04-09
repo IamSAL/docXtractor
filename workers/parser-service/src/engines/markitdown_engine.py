@@ -20,7 +20,7 @@ class MarkItDownEngine(ParserEngine):
 
     def parse_bytes(self, file_bytes: bytes, file_name: str) -> ParseResult:
         file_hash = sha256(file_bytes).hexdigest()
-        cached = get_cached_result(file_hash)
+        cached = get_cached_result(file_hash, self.name)
         if cached:
             logger.info(f"Cache hit for {file_name} (hash={file_hash[:12]})")
             return ParseResult(**cached)
@@ -46,7 +46,7 @@ class MarkItDownEngine(ParserEngine):
         set_cached_result(file_hash, {
             "markdown_content": parse_result.markdown_content,
             "token_count": parse_result.token_count,
-        })
+        }, self.name)
 
         return parse_result
 
@@ -60,7 +60,7 @@ class MarkItDownEngine(ParserEngine):
         file_bytes = response.content
 
         file_hash = sha256(file_bytes).hexdigest()
-        cached = get_cached_result(file_hash)
+        cached = get_cached_result(file_hash, self.name)
         if cached:
             logger.info(f"Cache hit for URL {url}")
             return ParseResult(**cached)
@@ -91,6 +91,6 @@ class MarkItDownEngine(ParserEngine):
         set_cached_result(file_hash, {
             "markdown_content": parse_result.markdown_content,
             "token_count": parse_result.token_count,
-        })
+        }, self.name)
 
         return parse_result

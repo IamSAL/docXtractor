@@ -75,7 +75,7 @@ class DoclingEngine(ParserEngine):
 
     def parse_bytes(self, file_bytes: bytes, file_name: str) -> ParseResult:
         file_hash = sha256(file_bytes).hexdigest()
-        cached = get_cached_result(file_hash)
+        cached = get_cached_result(file_hash, self.name)
         if cached:
             return ParseResult(**cached)
 
@@ -109,7 +109,7 @@ class DoclingEngine(ParserEngine):
         set_cached_result(file_hash, {
             "markdown_content": parse_result.markdown_content,
             "token_count": parse_result.token_count,
-        })
+        }, self.name)
         return parse_result
 
     def parse_url(self, url: str) -> ParseResult:
@@ -124,7 +124,7 @@ class DoclingEngine(ParserEngine):
                     f.write(chunk)
 
             file_hash = compute_file_hash(local_path)
-            cached = get_cached_result(file_hash)
+            cached = get_cached_result(file_hash, self.name)
             if cached:
                 os.remove(local_path)
                 return ParseResult(**cached)
@@ -140,7 +140,7 @@ class DoclingEngine(ParserEngine):
             set_cached_result(file_hash, {
                 "markdown_content": parse_result.markdown_content,
                 "token_count": parse_result.token_count,
-            })
+            }, self.name)
             return parse_result
 
         except Exception as e:

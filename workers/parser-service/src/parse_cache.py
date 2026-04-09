@@ -30,28 +30,30 @@ def compute_file_hash(file_path: str) -> str:
     return sha256.hexdigest()
 
 
-def get_cached_result(file_hash: str) -> dict | None:
+def get_cached_result(file_hash: str, engine_name: str = "docling") -> dict | None:
     if not CACHE_ENABLED:
         return None
     try:
-        data = _get_redis().get(f"{CACHE_PREFIX}{file_hash}")
+        key = f"{CACHE_PREFIX}{engine_name}:{file_hash}"
+        data = _get_redis().get(key)
         if data:
-            logger.info(f"Cache HIT for hash {file_hash[:12]}...")
+            logger.info(f"Cache HIT for {engine_name}:{file_hash[:12]}...")
             return json.loads(data)
     except Exception as e:
         logger.warning(f"Cache lookup failed: {e}")
     return None
 
 
-def set_cached_result(file_hash: str, result: dict):
+def set_cached_result(file_hash: str, result: dict, engine_name: str = "docling"):
     if not CACHE_ENABLED:
         return
     try:
+        key = f"{CACHE_PREFIX}{engine_name}:{file_hash}"
         _get_redis().setex(
-            f"{CACHE_PREFIX}{file_hash}",
+            key,
             CACHE_TTL,
             json.dumps(result),
         )
-        logger.info(f"Cached result for hash {file_hash[:12]}... (TTL={CACHE_TTL}s)")
+        logger.info(f"Cached result for {engine_name}:{file_hash[:12]}... (TTL={CACHE_TTL}s)")
     except Exception as e:
         logger.warning(f"Cache store failed: {e}")
