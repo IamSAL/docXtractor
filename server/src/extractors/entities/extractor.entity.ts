@@ -96,6 +96,18 @@ export class Extractor {
     | 'human_review'
     | 'conservative';
 
+  @ApiPropertyOptional({
+    enum: ['docling', 'markitdown', 'pymupdf', 'opendataloader'],
+    default: 'docling',
+    description: 'Parser engine used for document parsing',
+  })
+  @Column({
+    type: 'enum',
+    enum: ['docling', 'markitdown', 'pymupdf', 'opendataloader'],
+    default: 'docling',
+  })
+  parserEngine: 'docling' | 'markitdown' | 'pymupdf' | 'opendataloader';
+
   @ApiPropertyOptional({ default: false })
   @Column({ default: false })
   citationEnabled: boolean;

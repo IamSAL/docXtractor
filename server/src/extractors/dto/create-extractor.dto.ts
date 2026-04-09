@@ -126,6 +126,15 @@ export class CreateExtractorDto {
     | 'human_review'
     | 'conservative';
 
+  @ApiPropertyOptional({
+    enum: ['docling', 'markitdown', 'pymupdf', 'opendataloader'],
+    default: 'docling',
+    description: 'Parser engine used for document parsing',
+  })
+  @IsEnum(['docling', 'markitdown', 'pymupdf', 'opendataloader'])
+  @IsOptional()
+  parserEngine?: 'docling' | 'markitdown' | 'pymupdf' | 'opendataloader';
+
   @ApiPropertyOptional({ default: false })
   @IsBoolean()
   @IsOptional()
