@@ -10,3 +10,4 @@ boto3
 watchfiles
 requests
 redis
+opendataloader-pdf
