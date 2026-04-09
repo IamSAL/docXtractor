@@ -32,6 +32,9 @@ export interface ExtractorFormData {
   // Extraction Settings - Model Parameters
   contextWindow: string;
   defaultModel: string;
+
+  // Parser Engine
+  parserEngine: "docling" | "markitdown" | "pymupdf" | "opendataloader";
 }
 
 export const defaultExtractorFormValues: ExtractorFormData = {
@@ -54,4 +57,5 @@ export const defaultExtractorFormValues: ExtractorFormData = {
   citationIncludeParagraphId: false,
   contextWindow: "128k",
   defaultModel: "gpt-oss:120b-cloud",
+  parserEngine: "docling",
 };

@@ -10,6 +10,57 @@ export function ExtractionSettings({ showHeader = true }: ExtractionSettingsProp
     const { control, formState: { errors } } = useFormContext<ExtractorFormData>()
     return (
         <div className="flex flex-col gap-6">
+            {/* Parser Engine */}
+            <div className="bg-surface-light xdark:bg-surface-dark border-2 border-border-light xdark:border-border-dark rounded-xl p-6 shadow-sm">
+                {showHeader && (
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-primary/20 rounded-lg text-text-main xdark:text-primary">
+                            <span className="material-symbols-outlined">description</span>
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold text-text-main xdark:text-white leading-tight">
+                                Parser Engine
+                            </h2>
+                            <p className="text-xs text-text-sub xdark:text-gray-400">
+                                Choose how documents are converted to text before extraction.
+                            </p>
+                        </div>
+                    </div>
+                )}
+                {!showHeader && (
+                    <div className="mb-4">
+                        <h3 className="text-sm font-bold text-text-main xdark:text-white flex items-center gap-2">
+                            <span className="material-symbols-outlined text-primary text-[18px]">description</span>
+                            Parser Engine
+                        </h3>
+                    </div>
+                )}
+                <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-text-main xdark:text-gray-300">
+                        Engine
+                    </label>
+                    <Controller
+                        name="parserEngine"
+                        control={control}
+                        render={({ field }) => (
+                            <select
+                                className="inset-input w-full appearance-none bg-[#f3f4f6] xdark:bg-[#1a190e] border border-border-light xdark:border-border-dark rounded-lg px-4 py-3 text-text-main xdark:text-white font-medium text-sm focus:border-primary focus:ring-0"
+                                {...field}
+                            >
+                                <option value="docling">Docling (AI-Powered, Best Accuracy)</option>
+                                <option value="opendataloader">OpenDataLoader (Fast, 20+ pages/sec)</option>
+                                <option value="markitdown">MarkItDown (Lightweight, Multi-Format)</option>
+                                <option value="pymupdf">PyMuPDF (Basic Text Extraction)</option>
+                            </select>
+                        )}
+                    />
+                    <p className="text-[11px] text-text-sub flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[12px]">info</span>
+                        Docling is slower but most accurate. OpenDataLoader is fastest for simple PDFs.
+                    </p>
+                </div>
+            </div>
+
             {/* Consensus Voting */}
             <div className="bg-surface-light xdark:bg-surface-dark border-2 border-border-light xdark:border-border-dark rounded-xl p-6 shadow-sm">
                 {showHeader && (
