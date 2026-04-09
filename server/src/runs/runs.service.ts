@@ -292,6 +292,7 @@ export class RunsService {
           file_key: source.fileKey,
           url: source.url,
           name: source.name,
+          parser_engine: extractor.parserEngine,
         },
       );
 
