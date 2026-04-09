@@ -7,6 +7,7 @@
  */
 import type { FewShotExampleDto } from "./fewShotExampleDto";
 import type { UpdateExtractorDtoConflictResolution } from "./updateExtractorDtoConflictResolution";
+import type { UpdateExtractorDtoParserEngine } from "./updateExtractorDtoParserEngine";
 import type { UpdateExtractorDtoSchema } from "./updateExtractorDtoSchema";
 
 export interface UpdateExtractorDto {
@@ -25,6 +26,8 @@ export interface UpdateExtractorDto {
 	 */
 	confidenceThreshold?: number;
 	conflictResolution?: UpdateExtractorDtoConflictResolution;
+	/** Parser engine used for document parsing */
+	parserEngine?: UpdateExtractorDtoParserEngine;
 	citationEnabled?: boolean;
 	citationIncludePdfPage?: boolean;
 	citationIncludeBbox?: boolean;

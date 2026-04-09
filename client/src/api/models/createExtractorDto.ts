@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { CreateExtractorDtoConflictResolution } from "./createExtractorDtoConflictResolution";
+import type { CreateExtractorDtoParserEngine } from "./createExtractorDtoParserEngine";
 import type { CreateExtractorDtoSchema } from "./createExtractorDtoSchema";
 import type { FewShotExampleDto } from "./fewShotExampleDto";
 
@@ -25,6 +26,8 @@ export interface CreateExtractorDto {
 	 */
 	confidenceThreshold?: number;
 	conflictResolution?: CreateExtractorDtoConflictResolution;
+	/** Parser engine used for document parsing */
+	parserEngine?: CreateExtractorDtoParserEngine;
 	citationEnabled?: boolean;
 	citationIncludePdfPage?: boolean;
 	citationIncludeBbox?: boolean;

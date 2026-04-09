@@ -7,6 +7,7 @@
  */
 import type { ExtractorConflictResolution } from "./extractorConflictResolution";
 import type { ExtractorFewShotExamplesItem } from "./extractorFewShotExamplesItem";
+import type { ExtractorParserEngine } from "./extractorParserEngine";
 import type { ExtractorSchema } from "./extractorSchema";
 import type { ExtractorVariantsItem } from "./extractorVariantsItem";
 
@@ -22,6 +23,8 @@ export interface Extractor {
 	consensusEnabled?: boolean;
 	confidenceThreshold?: number;
 	conflictResolution?: ExtractorConflictResolution;
+	/** Parser engine used for document parsing */
+	parserEngine?: ExtractorParserEngine;
 	citationEnabled?: boolean;
 	citationIncludePdfPage?: boolean;
 	citationIncludeBbox?: boolean;

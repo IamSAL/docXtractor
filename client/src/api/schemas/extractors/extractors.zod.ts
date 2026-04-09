@@ -15,7 +15,7 @@ export const extractorsControllerCreateBodyConsensusEnabledDefault = false;expor
 export const extractorsControllerCreateBodyConfidenceThresholdMin = 0;
 export const extractorsControllerCreateBodyConfidenceThresholdMax = 100;
 
-export const extractorsControllerCreateBodyConflictResolutionDefault = `majority`;export const extractorsControllerCreateBodyCitationEnabledDefault = false;export const extractorsControllerCreateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerCreateBodyCitationIncludeBboxDefault = false;export const extractorsControllerCreateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerCreateBodyContextWindowDefault = `128k`;export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerCreateBodyConflictResolutionDefault = `majority`;export const extractorsControllerCreateBodyParserEngineDefault = `docling`;export const extractorsControllerCreateBodyCitationEnabledDefault = false;export const extractorsControllerCreateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerCreateBodyCitationIncludeBboxDefault = false;export const extractorsControllerCreateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerCreateBodyContextWindowDefault = `128k`;export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerCreateBody = zod.object({
   "name": zod.string().describe('The name of the extractor'),
@@ -40,6 +40,7 @@ export const ExtractorsControllerCreateBody = zod.object({
   "consensusEnabled": zod.boolean().default(extractorsControllerCreateBodyConsensusEnabledDefault),
   "confidenceThreshold": zod.number().min(extractorsControllerCreateBodyConfidenceThresholdMin).max(extractorsControllerCreateBodyConfidenceThresholdMax).default(extractorsControllerCreateBodyConfidenceThresholdDefault),
   "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerCreateBodyConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerCreateBodyParserEngineDefault).describe('Parser engine used for document parsing'),
   "citationEnabled": zod.boolean().default(extractorsControllerCreateBodyCitationEnabledDefault),
   "citationIncludePdfPage": zod.boolean().default(extractorsControllerCreateBodyCitationIncludePdfPageDefault),
   "citationIncludeBbox": zod.boolean().default(extractorsControllerCreateBodyCitationIncludeBboxDefault),
@@ -51,7 +52,7 @@ export const ExtractorsControllerCreateBody = zod.object({
 /**
  * @summary Get all extractors
  */
-export const extractorsControllerFindAllResponseConsensusEnabledDefault = false;export const extractorsControllerFindAllResponseConfidenceThresholdDefault = 85;export const extractorsControllerFindAllResponseConflictResolutionDefault = `majority`;export const extractorsControllerFindAllResponseCitationEnabledDefault = false;export const extractorsControllerFindAllResponseCitationIncludePdfPageDefault = false;export const extractorsControllerFindAllResponseCitationIncludeBboxDefault = false;export const extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerFindAllResponseContextWindowDefault = `128k`;export const extractorsControllerFindAllResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerFindAllResponseConsensusEnabledDefault = false;export const extractorsControllerFindAllResponseConfidenceThresholdDefault = 85;export const extractorsControllerFindAllResponseConflictResolutionDefault = `majority`;export const extractorsControllerFindAllResponseParserEngineDefault = `docling`;export const extractorsControllerFindAllResponseCitationEnabledDefault = false;export const extractorsControllerFindAllResponseCitationIncludePdfPageDefault = false;export const extractorsControllerFindAllResponseCitationIncludeBboxDefault = false;export const extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerFindAllResponseContextWindowDefault = `128k`;export const extractorsControllerFindAllResponseDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerFindAllResponseItem = zod.object({
   "id": zod.string(),
@@ -71,6 +72,7 @@ export const ExtractorsControllerFindAllResponseItem = zod.object({
   "consensusEnabled": zod.boolean().default(extractorsControllerFindAllResponseConsensusEnabledDefault),
   "confidenceThreshold": zod.number().default(extractorsControllerFindAllResponseConfidenceThresholdDefault),
   "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerFindAllResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerFindAllResponseParserEngineDefault).describe('Parser engine used for document parsing'),
   "citationEnabled": zod.boolean().default(extractorsControllerFindAllResponseCitationEnabledDefault),
   "citationIncludePdfPage": zod.boolean().default(extractorsControllerFindAllResponseCitationIncludePdfPageDefault),
   "citationIncludeBbox": zod.boolean().default(extractorsControllerFindAllResponseCitationIncludeBboxDefault),
@@ -103,7 +105,7 @@ export const ExtractorsControllerFindOneParams = zod.object({
   "id": zod.string()
 })
 
-export const extractorsControllerFindOneResponseConsensusEnabledDefault = false;export const extractorsControllerFindOneResponseConfidenceThresholdDefault = 85;export const extractorsControllerFindOneResponseConflictResolutionDefault = `majority`;export const extractorsControllerFindOneResponseCitationEnabledDefault = false;export const extractorsControllerFindOneResponseCitationIncludePdfPageDefault = false;export const extractorsControllerFindOneResponseCitationIncludeBboxDefault = false;export const extractorsControllerFindOneResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerFindOneResponseContextWindowDefault = `128k`;export const extractorsControllerFindOneResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerFindOneResponseConsensusEnabledDefault = false;export const extractorsControllerFindOneResponseConfidenceThresholdDefault = 85;export const extractorsControllerFindOneResponseConflictResolutionDefault = `majority`;export const extractorsControllerFindOneResponseParserEngineDefault = `docling`;export const extractorsControllerFindOneResponseCitationEnabledDefault = false;export const extractorsControllerFindOneResponseCitationIncludePdfPageDefault = false;export const extractorsControllerFindOneResponseCitationIncludeBboxDefault = false;export const extractorsControllerFindOneResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerFindOneResponseContextWindowDefault = `128k`;export const extractorsControllerFindOneResponseDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerFindOneResponse = zod.object({
   "id": zod.string(),
@@ -123,6 +125,7 @@ export const ExtractorsControllerFindOneResponse = zod.object({
   "consensusEnabled": zod.boolean().default(extractorsControllerFindOneResponseConsensusEnabledDefault),
   "confidenceThreshold": zod.number().default(extractorsControllerFindOneResponseConfidenceThresholdDefault),
   "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerFindOneResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerFindOneResponseParserEngineDefault).describe('Parser engine used for document parsing'),
   "citationEnabled": zod.boolean().default(extractorsControllerFindOneResponseCitationEnabledDefault),
   "citationIncludePdfPage": zod.boolean().default(extractorsControllerFindOneResponseCitationIncludePdfPageDefault),
   "citationIncludeBbox": zod.boolean().default(extractorsControllerFindOneResponseCitationIncludeBboxDefault),
@@ -144,7 +147,7 @@ export const extractorsControllerUpdateBodyConsensusEnabledDefault = false;expor
 export const extractorsControllerUpdateBodyConfidenceThresholdMin = 0;
 export const extractorsControllerUpdateBodyConfidenceThresholdMax = 100;
 
-export const extractorsControllerUpdateBodyConflictResolutionDefault = `majority`;export const extractorsControllerUpdateBodyCitationEnabledDefault = false;export const extractorsControllerUpdateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateBodyCitationIncludeBboxDefault = false;export const extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateBodyContextWindowDefault = `128k`;export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerUpdateBodyConflictResolutionDefault = `majority`;export const extractorsControllerUpdateBodyParserEngineDefault = `docling`;export const extractorsControllerUpdateBodyCitationEnabledDefault = false;export const extractorsControllerUpdateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateBodyCitationIncludeBboxDefault = false;export const extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateBodyContextWindowDefault = `128k`;export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerUpdateBody = zod.object({
   "name": zod.string().optional().describe('The name of the extractor'),
@@ -169,6 +172,7 @@ export const ExtractorsControllerUpdateBody = zod.object({
   "consensusEnabled": zod.boolean().default(extractorsControllerUpdateBodyConsensusEnabledDefault),
   "confidenceThreshold": zod.number().min(extractorsControllerUpdateBodyConfidenceThresholdMin).max(extractorsControllerUpdateBodyConfidenceThresholdMax).default(extractorsControllerUpdateBodyConfidenceThresholdDefault),
   "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateBodyConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerUpdateBodyParserEngineDefault).describe('Parser engine used for document parsing'),
   "citationEnabled": zod.boolean().default(extractorsControllerUpdateBodyCitationEnabledDefault),
   "citationIncludePdfPage": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludePdfPageDefault),
   "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludeBboxDefault),
@@ -177,7 +181,7 @@ export const ExtractorsControllerUpdateBody = zod.object({
   "defaultModel": zod.string().default(extractorsControllerUpdateBodyDefaultModelDefault)
 })
 
-export const extractorsControllerUpdateResponseConsensusEnabledDefault = false;export const extractorsControllerUpdateResponseConfidenceThresholdDefault = 85;export const extractorsControllerUpdateResponseConflictResolutionDefault = `majority`;export const extractorsControllerUpdateResponseCitationEnabledDefault = false;export const extractorsControllerUpdateResponseCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateResponseCitationIncludeBboxDefault = false;export const extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateResponseContextWindowDefault = `128k`;export const extractorsControllerUpdateResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerUpdateResponseConsensusEnabledDefault = false;export const extractorsControllerUpdateResponseConfidenceThresholdDefault = 85;export const extractorsControllerUpdateResponseConflictResolutionDefault = `majority`;export const extractorsControllerUpdateResponseParserEngineDefault = `docling`;export const extractorsControllerUpdateResponseCitationEnabledDefault = false;export const extractorsControllerUpdateResponseCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateResponseCitationIncludeBboxDefault = false;export const extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateResponseContextWindowDefault = `128k`;export const extractorsControllerUpdateResponseDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerUpdateResponse = zod.object({
   "id": zod.string(),
@@ -197,6 +201,7 @@ export const ExtractorsControllerUpdateResponse = zod.object({
   "consensusEnabled": zod.boolean().default(extractorsControllerUpdateResponseConsensusEnabledDefault),
   "confidenceThreshold": zod.number().default(extractorsControllerUpdateResponseConfidenceThresholdDefault),
   "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerUpdateResponseParserEngineDefault).describe('Parser engine used for document parsing'),
   "citationEnabled": zod.boolean().default(extractorsControllerUpdateResponseCitationEnabledDefault),
   "citationIncludePdfPage": zod.boolean().default(extractorsControllerUpdateResponseCitationIncludePdfPageDefault),
   "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateResponseCitationIncludeBboxDefault),
@@ -251,7 +256,7 @@ export const ExtractorsControllerUpdateVariantBody = zod.object({
   "isDefault": zod.boolean().default(extractorsControllerUpdateVariantBodyIsDefaultDefault)
 })
 
-export const extractorsControllerUpdateVariantResponseConsensusEnabledDefault = false;export const extractorsControllerUpdateVariantResponseConfidenceThresholdDefault = 85;export const extractorsControllerUpdateVariantResponseConflictResolutionDefault = `majority`;export const extractorsControllerUpdateVariantResponseCitationEnabledDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateVariantResponseContextWindowDefault = `128k`;export const extractorsControllerUpdateVariantResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerUpdateVariantResponseConsensusEnabledDefault = false;export const extractorsControllerUpdateVariantResponseConfidenceThresholdDefault = 85;export const extractorsControllerUpdateVariantResponseConflictResolutionDefault = `majority`;export const extractorsControllerUpdateVariantResponseParserEngineDefault = `docling`;export const extractorsControllerUpdateVariantResponseCitationEnabledDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateVariantResponseContextWindowDefault = `128k`;export const extractorsControllerUpdateVariantResponseDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerUpdateVariantResponse = zod.object({
   "id": zod.string(),
@@ -271,6 +276,7 @@ export const ExtractorsControllerUpdateVariantResponse = zod.object({
   "consensusEnabled": zod.boolean().default(extractorsControllerUpdateVariantResponseConsensusEnabledDefault),
   "confidenceThreshold": zod.number().default(extractorsControllerUpdateVariantResponseConfidenceThresholdDefault),
   "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateVariantResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerUpdateVariantResponseParserEngineDefault).describe('Parser engine used for document parsing'),
   "citationEnabled": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationEnabledDefault),
   "citationIncludePdfPage": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefault),
   "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault),
@@ -289,7 +295,7 @@ export const ExtractorsControllerDeleteVariantParams = zod.object({
   "variantId": zod.string()
 })
 
-export const extractorsControllerDeleteVariantResponseConsensusEnabledDefault = false;export const extractorsControllerDeleteVariantResponseConfidenceThresholdDefault = 85;export const extractorsControllerDeleteVariantResponseConflictResolutionDefault = `majority`;export const extractorsControllerDeleteVariantResponseCitationEnabledDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerDeleteVariantResponseContextWindowDefault = `128k`;export const extractorsControllerDeleteVariantResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerDeleteVariantResponseConsensusEnabledDefault = false;export const extractorsControllerDeleteVariantResponseConfidenceThresholdDefault = 85;export const extractorsControllerDeleteVariantResponseConflictResolutionDefault = `majority`;export const extractorsControllerDeleteVariantResponseParserEngineDefault = `docling`;export const extractorsControllerDeleteVariantResponseCitationEnabledDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerDeleteVariantResponseContextWindowDefault = `128k`;export const extractorsControllerDeleteVariantResponseDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerDeleteVariantResponse = zod.object({
   "id": zod.string(),
@@ -309,6 +315,7 @@ export const ExtractorsControllerDeleteVariantResponse = zod.object({
   "consensusEnabled": zod.boolean().default(extractorsControllerDeleteVariantResponseConsensusEnabledDefault),
   "confidenceThreshold": zod.number().default(extractorsControllerDeleteVariantResponseConfidenceThresholdDefault),
   "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerDeleteVariantResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerDeleteVariantResponseParserEngineDefault).describe('Parser engine used for document parsing'),
   "citationEnabled": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationEnabledDefault),
   "citationIncludePdfPage": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefault),
   "citationIncludeBbox": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault),
