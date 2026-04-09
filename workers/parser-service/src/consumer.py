@@ -44,7 +44,8 @@ async def process_job(job: Job, token: str = None):
     logs = []
     doc_name = data.get("name", "unknown")
     run_id = data.get("run_id")
-    engine = get_engine()
+    engine_name = data.get("parser_engine")
+    engine = get_engine(engine_name)
 
     try:
         # Check if run was cancelled/retried before we start expensive work
