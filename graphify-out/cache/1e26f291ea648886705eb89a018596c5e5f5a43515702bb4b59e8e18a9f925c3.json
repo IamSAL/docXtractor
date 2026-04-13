@@ -1,0 +1,1 @@
+{"nodes": [{"id": "orval_config", "label": "orval.config.ts", "file_type": "code", "source_file": "client/orval.config.ts", "source_location": "L1"}], "edges": [{"source": "orval_config", "target": "orval", "relation": "imports_from", "confidence": "EXTRACTED", "source_file": "client/orval.config.ts", "source_location": "L1", "weight": 1.0}]}

@@ -1,0 +1,1 @@
+{"nodes": [{"id": "cookie_storage", "label": "cookie-storage.ts", "file_type": "code", "source_file": "client/src/lib/cookie-storage.ts", "source_location": "L1"}], "edges": [{"source": "cookie_storage", "target": "middleware", "relation": "imports_from", "confidence": "EXTRACTED", "source_file": "client/src/lib/cookie-storage.ts", "source_location": "L1", "weight": 1.0}]}

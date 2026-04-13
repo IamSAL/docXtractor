@@ -1,0 +1,1 @@
+{"nodes": [{"id": "ai_devtools", "label": "ai-devtools.tsx", "file_type": "code", "source_file": "client/src/lib/ai-devtools.tsx", "source_location": "L1"}], "edges": [{"source": "ai_devtools", "target": "react_ai_devtools", "relation": "imports_from", "confidence": "EXTRACTED", "source_file": "client/src/lib/ai-devtools.tsx", "source_location": "L1", "weight": 1.0}]}

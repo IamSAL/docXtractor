@@ -1,0 +1,1 @@
+{"nodes": [{"id": "de", "label": "de.ts", "file_type": "code", "source_file": "client/src/components/jsonjoy/i18n/locales/de.ts", "source_location": "L1"}], "edges": [{"source": "de", "target": "translation_keys_ts", "relation": "imports_from", "confidence": "EXTRACTED", "source_file": "client/src/components/jsonjoy/i18n/locales/de.ts", "source_location": "L1", "weight": 1.0}]}
