@@ -41,19 +41,19 @@ export function RunExtractorSettings() {
                                     <input
                                         type="radio"
                                         className="peer sr-only"
-                                        checked={field.value === 'ollama'}
-                                        onChange={() => field.onChange('ollama')}
+                                        checked={field.value === 'freellm'}
+                                        onChange={() => field.onChange('freellm')}
                                     />
-                                    <div className={`bg-white border-2 border-black p-3 pr-4 flex gap-3 transition-all ${field.value === 'ollama' ? 'shadow-hard-sm' : 'opacity-60 hover:opacity-100'}`}>
-                                        <div className={`absolute left-0 top-0 bottom-0 w-2 bg-primary border-r-2 border-black ${field.value === 'ollama' ? 'block' : 'hidden'}`}></div>
+                                    <div className={`bg-white border-2 border-black p-3 pr-4 flex gap-3 transition-all ${field.value === 'freellm' ? 'shadow-hard-sm' : 'opacity-60 hover:opacity-100'}`}>
+                                        <div className={`absolute left-0 top-0 bottom-0 w-2 bg-primary border-r-2 border-black ${field.value === 'freellm' ? 'block' : 'hidden'}`}></div>
                                         <div className="pl-2 flex-1">
                                             <div className="flex items-center justify-between mb-1">
-                                                <span className="font-bold text-sm">Ollama (Local Model)</span>
-                                                <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center ${field.value === 'ollama' ? 'bg-black' : ''}`}>
+                                                <span className="font-bold text-sm">FreeLLM (Cloud AI)</span>
+                                                <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center ${field.value === 'freellm' ? 'bg-black' : ''}`}>
                                                     <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                                                 </div>
                                             </div>
-                                            <p className="text-xs text-gray-500 leading-tight">Use a local Ollama model (NuExtract) for private, on-device extraction.</p>
+                                            <p className="text-xs text-gray-500 leading-tight">Use FreeLLM gateway (Groq, Gemini, Mistral, Cerebras) for extraction.</p>
                                         </div>
                                     </div>
                                 </label>

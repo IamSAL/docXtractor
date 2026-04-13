@@ -126,7 +126,7 @@ jobs:
             done
 
             # Scaled/renamed services (match by prefix)
-            for prefix in parser-service ollama; do
+            for prefix in parser-service freellm; do
               if ! docker compose -f docker-compose.prod.yml ps --status running --format '{{.Name}}' | grep -q "${prefix}"; then
                 echo "ERROR: No running instances of ${prefix}!"
                 docker compose -f docker-compose.prod.yml logs "${prefix}" --tail 30 2>&1 || true

@@ -207,7 +207,7 @@ function LandingPage() {
                     <span className="material-symbols-outlined text-green-600">
                       check_circle
                     </span>{" "}
-                    Local AI with Ollama
+                    Cloud AI with FreeLLM
                   </li>
                   <li className="flex items-center gap-2 font-bold">
                     <span className="material-symbols-outlined text-green-600">

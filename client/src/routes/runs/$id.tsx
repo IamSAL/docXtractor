@@ -53,7 +53,7 @@ function RunDetailComponent() {
       const terminalStatuses = ["done", "failed", "review"];
       if (terminalStatuses.includes(updatedRun?.status)) {
         // For terminal states, force a fresh fetch instead of trusting the
-        // socket payload. With Ollama (slower, sequential), the "done" event
+        // socket payload. With LLM extraction (slower models), the "done" event
         // can fire before all results are fully committed to the DB, so the
         // payload may be partial. A re-fetch guarantees complete data.
         queryClient.invalidateQueries({

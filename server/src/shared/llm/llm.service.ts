@@ -25,10 +25,7 @@ export class LlmService {
       ),
       apiKey: 'freellm',
     });
-    this.defaultModel = configService.get<string>(
-      'LLM_DEFAULT_MODEL',
-      'free-smart',
-    );
+    this.defaultModel = configService.get<string>('LLM_DEFAULT_MODEL', 'free');
     this.maxRetries = configService.get<number>('LLM_MAX_RETRIES', 3);
 
     this.logger.log(
@@ -140,7 +137,7 @@ export class LlmService {
   private buildFieldsDescription(schema: Record<string, any>): string {
     // Legacy format: { fields: [{ name, type, description }] }
     if (schema.fields && Array.isArray(schema.fields)) {
-      return (schema.fields as any[])
+      return schema.fields
         .map((f) => `- ${f.name} (${f.type}): ${f.description || ''}`)
         .join('\n');
     }

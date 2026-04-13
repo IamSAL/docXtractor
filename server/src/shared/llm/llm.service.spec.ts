@@ -20,7 +20,7 @@ function getMockCreate(): jest.Mock {
 
 const mockConfigGet = jest.fn((key: string, def?: any) => {
   if (key === 'FREELLM_BASE_URL') return 'http://freellm:3000/v1';
-  if (key === 'LLM_DEFAULT_MODEL') return 'free-smart';
+  if (key === 'LLM_DEFAULT_MODEL') return 'free';
   if (key === 'LLM_MAX_RETRIES') return 3;
   return def;
 });
@@ -57,7 +57,7 @@ describe('LlmService', () => {
       expect(result).toEqual({ name: 'test' });
       expect(mockCreate).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: 'free-smart',
+          model: 'free',
           response_format: { type: 'json_object' },
           messages: [{ role: 'user', content: 'describe something' }],
         }),
@@ -81,7 +81,9 @@ describe('LlmService', () => {
     it('throws after all retries exhausted', async () => {
       mockCreate.mockRejectedValue(new Error('persistent error'));
 
-      await expect(service.generate('test')).rejects.toThrow('persistent error');
+      await expect(service.generate('test')).rejects.toThrow(
+        'persistent error',
+      );
       expect(mockCreate).toHaveBeenCalledTimes(3);
     });
 
@@ -110,11 +112,17 @@ describe('LlmService', () => {
 
     it('returns extracted data with token count', async () => {
       mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: '{"invoice_number":"INV-001","amount":100}' } }],
+        choices: [
+          { message: { content: '{"invoice_number":"INV-001","amount":100}' } },
+        ],
         usage: { total_tokens: 150 },
       });
 
-      const result = await service.extract('invoice text', schema, 'extract invoice fields');
+      const result = await service.extract(
+        'invoice text',
+        schema,
+        'extract invoice fields',
+      );
 
       expect(result.data).toEqual({ invoice_number: 'INV-001', amount: 100 });
       expect(result.usage.totalTokens).toBe(150);
@@ -162,7 +170,9 @@ describe('LlmService', () => {
 
       expect(result.data).toEqual({ total: '100' });
       const callArg = mockCreate.mock.calls[0][0];
-      expect(callArg.messages[0].content).toContain('- total (string): Total value');
+      expect(callArg.messages[0].content).toContain(
+        '- total (string): Total value',
+      );
     });
   });
 });

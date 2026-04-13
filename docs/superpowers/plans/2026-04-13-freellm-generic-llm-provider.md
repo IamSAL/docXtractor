@@ -14,28 +14,29 @@
 
 ## File Map
 
-| Action | Path | Purpose |
-|--------|------|---------|
-| Create | `server/src/shared/llm/llm.service.ts` | LLM client wrapping OpenAI SDK |
-| Create | `server/src/shared/llm/llm.module.ts` | Global NestJS module exporting LlmService |
-| Create | `server/src/shared/llm/llm.service.spec.ts` | Unit tests for LlmService |
-| Delete | `server/src/shared/ollama/ollama.service.ts` | Replaced by llm.service.ts |
-| Delete | `server/src/shared/ollama/ollama.module.ts` | Replaced by llm.module.ts |
-| Modify | `server/src/app.module.ts` | Swap OllamaModule → LlmModule |
-| Modify | `server/src/runs/entities/run.entity.ts` | OLLAMA → FREELLM in ExtractionProvider enum |
-| Modify | `server/src/runs/runs.service.ts` | OllamaService → LlmService, enum refs, method rename |
-| Modify | `server/src/extractors/extractors.service.ts` | OllamaService → LlmService |
-| Modify | `server/env.example` | Replace OLLAMA_* with FREELLM_* vars |
-| Modify | `docker-compose.yml` | Remove ollama1/2, add freellm service |
-| Modify | `docker-compose.prod.yml` | Remove ollama1-5, add freellm service |
-| Modify | `workers/extraction-service/requirements.txt` | Remove google-generativeai, add openai |
-| Modify | `workers/extraction-service/src/extractor.py` | Replace genai with openai client |
+| Action | Path                                          | Purpose                                              |
+| ------ | --------------------------------------------- | ---------------------------------------------------- |
+| Create | `server/src/shared/llm/llm.service.ts`        | LLM client wrapping OpenAI SDK                       |
+| Create | `server/src/shared/llm/llm.module.ts`         | Global NestJS module exporting LlmService            |
+| Create | `server/src/shared/llm/llm.service.spec.ts`   | Unit tests for LlmService                            |
+| Delete | `server/src/shared/ollama/ollama.service.ts`  | Replaced by llm.service.ts                           |
+| Delete | `server/src/shared/ollama/ollama.module.ts`   | Replaced by llm.module.ts                            |
+| Modify | `server/src/app.module.ts`                    | Swap OllamaModule → LlmModule                        |
+| Modify | `server/src/runs/entities/run.entity.ts`      | OLLAMA → FREELLM in ExtractionProvider enum          |
+| Modify | `server/src/runs/runs.service.ts`             | OllamaService → LlmService, enum refs, method rename |
+| Modify | `server/src/extractors/extractors.service.ts` | OllamaService → LlmService                           |
+| Modify | `server/env.example`                          | Replace OLLAMA*\* with FREELLM*\* vars               |
+| Modify | `docker-compose.yml`                          | Remove ollama1/2, add freellm service                |
+| Modify | `docker-compose.prod.yml`                     | Remove ollama1-5, add freellm service                |
+| Modify | `workers/extraction-service/requirements.txt` | Remove google-generativeai, add openai               |
+| Modify | `workers/extraction-service/src/extractor.py` | Replace genai with openai client                     |
 
 ---
 
 ## Task 1: Install npm dependencies
 
 **Files:**
+
 - Modify: `server/package.json` (via pnpm)
 
 - [ ] **Step 1: Add openai package, remove ollama**
@@ -67,6 +68,7 @@ git commit -m "chore(server): replace ollama npm package with openai"
 ## Task 2: Create LlmService (TDD)
 
 **Files:**
+
 - Create: `server/src/shared/llm/llm.service.spec.ts`
 - Create: `server/src/shared/llm/llm.service.ts`
 - Create: `server/src/shared/llm/llm.module.ts`
@@ -82,7 +84,7 @@ mkdir -p server/src/shared/llm
 Create `server/src/shared/llm/llm.service.spec.ts`:
 
 ```typescript
-jest.mock('openai', () => {
+jest.mock("openai", () => {
   const mockCreate = jest.fn();
   return {
     default: jest.fn().mockImplementation(() => ({
@@ -92,20 +94,20 @@ jest.mock('openai', () => {
   };
 });
 
-import OpenAI from 'openai';
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { LlmService } from './llm.service';
+import OpenAI from "openai";
+import { Test, TestingModule } from "@nestjs/testing";
+import { ConfigService } from "@nestjs/config";
+import { LlmService } from "./llm.service";
 
 function getMockCreate(): jest.Mock {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return (require('openai') as any).__mockCreate as jest.Mock;
+  return (require("openai") as any).__mockCreate as jest.Mock;
 }
 
 const mockConfigGet = jest.fn((key: string, def?: any) => {
-  if (key === 'FREELLM_BASE_URL') return 'http://freellm:3000/v1';
-  if (key === 'LLM_DEFAULT_MODEL') return 'free-smart';
-  if (key === 'LLM_MAX_RETRIES') return 3;
+  if (key === "FREELLM_BASE_URL") return "http://freellm:3000/v1";
+  if (key === "LLM_DEFAULT_MODEL") return "free";
+  if (key === "LLM_MAX_RETRIES") return 3;
   return def;
 });
 
@@ -119,7 +121,7 @@ async function buildService(): Promise<LlmService> {
   return module.get<LlmService>(LlmService);
 }
 
-describe('LlmService', () => {
+describe("LlmService", () => {
   let service: LlmService;
   let mockCreate: jest.Mock;
 
@@ -129,124 +131,134 @@ describe('LlmService', () => {
     mockCreate = getMockCreate();
   });
 
-  describe('generate()', () => {
-    it('returns parsed JSON from chat response', async () => {
+  describe("generate()", () => {
+    it("returns parsed JSON from chat response", async () => {
       mockCreate.mockResolvedValueOnce({
         choices: [{ message: { content: '{"name":"test"}' } }],
         usage: { total_tokens: 42 },
       });
 
-      const result = await service.generate('describe something');
+      const result = await service.generate("describe something");
 
-      expect(result).toEqual({ name: 'test' });
+      expect(result).toEqual({ name: "test" });
       expect(mockCreate).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: 'free-smart',
-          response_format: { type: 'json_object' },
-          messages: [{ role: 'user', content: 'describe something' }],
+          model: "free",
+          response_format: { type: "json_object" },
+          messages: [{ role: "user", content: "describe something" }],
         }),
       );
     });
 
-    it('retries on transient failure then returns result', async () => {
+    it("retries on transient failure then returns result", async () => {
       mockCreate
-        .mockRejectedValueOnce(new Error('connection error'))
+        .mockRejectedValueOnce(new Error("connection error"))
         .mockResolvedValueOnce({
           choices: [{ message: { content: '{"ok":true}' } }],
           usage: { total_tokens: 10 },
         });
 
-      const result = await service.generate('test prompt');
+      const result = await service.generate("test prompt");
 
       expect(result).toEqual({ ok: true });
       expect(mockCreate).toHaveBeenCalledTimes(2);
     });
 
-    it('throws after all retries exhausted', async () => {
-      mockCreate.mockRejectedValue(new Error('persistent error'));
+    it("throws after all retries exhausted", async () => {
+      mockCreate.mockRejectedValue(new Error("persistent error"));
 
-      await expect(service.generate('test')).rejects.toThrow('persistent error');
+      await expect(service.generate("test")).rejects.toThrow(
+        "persistent error",
+      );
       expect(mockCreate).toHaveBeenCalledTimes(3);
     });
 
-    it('uses model override when provided', async () => {
+    it("uses model override when provided", async () => {
       mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: '{}' } }],
+        choices: [{ message: { content: "{}" } }],
         usage: { total_tokens: 5 },
       });
 
-      await service.generate('test', 'groq/llama-3.3-70b-versatile');
+      await service.generate("test", "groq/llama-3.3-70b-versatile");
 
       expect(mockCreate).toHaveBeenCalledWith(
-        expect.objectContaining({ model: 'groq/llama-3.3-70b-versatile' }),
+        expect.objectContaining({ model: "groq/llama-3.3-70b-versatile" }),
       );
     });
   });
 
-  describe('extract()', () => {
+  describe("extract()", () => {
     const schema = {
-      type: 'object',
+      type: "object",
       properties: {
-        invoice_number: { type: 'string', description: 'Invoice ID' },
-        amount: { type: 'number', description: 'Total amount' },
+        invoice_number: { type: "string", description: "Invoice ID" },
+        amount: { type: "number", description: "Total amount" },
       },
     };
 
-    it('returns extracted data with token count', async () => {
+    it("returns extracted data with token count", async () => {
       mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: '{"invoice_number":"INV-001","amount":100}' } }],
+        choices: [
+          { message: { content: '{"invoice_number":"INV-001","amount":100}' } },
+        ],
         usage: { total_tokens: 150 },
       });
 
-      const result = await service.extract('invoice text', schema, 'extract invoice fields');
+      const result = await service.extract(
+        "invoice text",
+        schema,
+        "extract invoice fields",
+      );
 
-      expect(result.data).toEqual({ invoice_number: 'INV-001', amount: 100 });
+      expect(result.data).toEqual({ invoice_number: "INV-001", amount: 100 });
       expect(result.usage.totalTokens).toBe(150);
       expect(mockCreate).toHaveBeenCalledWith(
-        expect.objectContaining({ response_format: { type: 'json_object' } }),
+        expect.objectContaining({ response_format: { type: "json_object" } }),
       );
     });
 
-    it('includes systemPrompt in the request message', async () => {
+    it("includes systemPrompt in the request message", async () => {
       mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: '{}' } }],
+        choices: [{ message: { content: "{}" } }],
         usage: { total_tokens: 5 },
       });
 
-      await service.extract('content', schema, 'Be precise and accurate');
+      await service.extract("content", schema, "Be precise and accurate");
 
       const callArg = mockCreate.mock.calls[0][0];
-      expect(callArg.messages[0].content).toContain('Be precise and accurate');
+      expect(callArg.messages[0].content).toContain("Be precise and accurate");
     });
 
-    it('uses model override when provided', async () => {
+    it("uses model override when provided", async () => {
       mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: '{}' } }],
+        choices: [{ message: { content: "{}" } }],
         usage: { total_tokens: 5 },
       });
 
-      await service.extract('content', schema, '', 'gemini/gemini-2.5-flash');
+      await service.extract("content", schema, "", "gemini/gemini-2.5-flash");
 
       expect(mockCreate).toHaveBeenCalledWith(
-        expect.objectContaining({ model: 'gemini/gemini-2.5-flash' }),
+        expect.objectContaining({ model: "gemini/gemini-2.5-flash" }),
       );
     });
 
-    it('handles legacy fields schema format', async () => {
+    it("handles legacy fields schema format", async () => {
       mockCreate.mockResolvedValueOnce({
         choices: [{ message: { content: '{"total":"100"}' } }],
         usage: { total_tokens: 20 },
       });
 
       const legacySchema = {
-        fields: [{ name: 'total', type: 'string', description: 'Total value' }],
+        fields: [{ name: "total", type: "string", description: "Total value" }],
       };
 
-      const result = await service.extract('text', legacySchema, '');
+      const result = await service.extract("text", legacySchema, "");
 
-      expect(result.data).toEqual({ total: '100' });
+      expect(result.data).toEqual({ total: "100" });
       const callArg = mockCreate.mock.calls[0][0];
-      expect(callArg.messages[0].content).toContain('- total (string): Total value');
+      expect(callArg.messages[0].content).toContain(
+        "- total (string): Total value",
+      );
     });
   });
 });
@@ -265,10 +277,10 @@ Expected: FAIL with `Cannot find module './llm.service'`
 Create `server/src/shared/llm/llm.service.ts`:
 
 ```typescript
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import OpenAI from 'openai';
-import { jsonrepair } from 'jsonrepair';
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import OpenAI from "openai";
+import { jsonrepair } from "jsonrepair";
 
 export interface LlmExtractionResult {
   data: Record<string, unknown>;
@@ -287,19 +299,16 @@ export class LlmService {
   constructor(private readonly configService: ConfigService) {
     this.client = new OpenAI({
       baseURL: configService.get<string>(
-        'FREELLM_BASE_URL',
-        'http://freellm:3000/v1',
+        "FREELLM_BASE_URL",
+        "http://freellm:3000/v1",
       ),
-      apiKey: 'freellm',
+      apiKey: "freellm",
     });
-    this.defaultModel = configService.get<string>(
-      'LLM_DEFAULT_MODEL',
-      'free-smart',
-    );
-    this.maxRetries = configService.get<number>('LLM_MAX_RETRIES', 3);
+    this.defaultModel = configService.get<string>("LLM_DEFAULT_MODEL", "free");
+    this.maxRetries = configService.get<number>("LLM_MAX_RETRIES", 3);
 
     this.logger.log(
-      `LlmService initialized: baseURL=${configService.get('FREELLM_BASE_URL', 'http://freellm:3000/v1')}, defaultModel=${this.defaultModel}`,
+      `LlmService initialized: baseURL=${configService.get("FREELLM_BASE_URL", "http://freellm:3000/v1")}, defaultModel=${this.defaultModel}`,
     );
   }
 
@@ -324,11 +333,11 @@ export class LlmService {
       try {
         const response = await this.client.chat.completions.create({
           model: modelId,
-          messages: [{ role: 'user', content: fullPrompt }],
-          response_format: { type: 'json_object' },
+          messages: [{ role: "user", content: fullPrompt }],
+          response_format: { type: "json_object" },
         });
 
-        const raw = response.choices[0].message.content ?? '{}';
+        const raw = response.choices[0].message.content ?? "{}";
         this.logger.debug(`LLM response: ${raw}`);
         const resultData = JSON.parse(jsonrepair(raw)) as Record<
           string,
@@ -344,7 +353,7 @@ export class LlmService {
         );
 
         if (error?.status === 429) {
-          this.logger.warn('Rate limit hit, backing off...');
+          this.logger.warn("Rate limit hit, backing off...");
           attempt--;
           await new Promise((resolve) =>
             setTimeout(resolve, 3000 + Math.random() * 5000),
@@ -356,7 +365,7 @@ export class LlmService {
         await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
       }
     }
-    throw new Error('LLM extraction failed after retries');
+    throw new Error("LLM extraction failed after retries");
   }
 
   async generate(
@@ -372,11 +381,11 @@ export class LlmService {
       try {
         const response = await this.client.chat.completions.create({
           model: modelId,
-          messages: [{ role: 'user', content: prompt }],
-          response_format: { type: 'json_object' },
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" },
         });
 
-        const raw = response.choices[0].message.content ?? '{}';
+        const raw = response.choices[0].message.content ?? "{}";
         this.logger.debug(`LLM generation response: ${raw}`);
         const result = JSON.parse(jsonrepair(raw)) as Record<string, unknown>;
         const totalTokens = response.usage?.total_tokens ?? 0;
@@ -389,7 +398,7 @@ export class LlmService {
         );
 
         if (error?.status === 429) {
-          this.logger.warn('Rate limit hit, backing off...');
+          this.logger.warn("Rate limit hit, backing off...");
           attempt--;
           await new Promise((resolve) =>
             setTimeout(resolve, 3000 + Math.random() * 5000),
@@ -401,26 +410,26 @@ export class LlmService {
         await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
       }
     }
-    throw new Error('LLM generation failed after retries');
+    throw new Error("LLM generation failed after retries");
   }
 
   private buildFieldsDescription(schema: Record<string, any>): string {
     // Legacy format: { fields: [{ name, type, description }] }
     if (schema.fields && Array.isArray(schema.fields)) {
       return (schema.fields as any[])
-        .map((f) => `- ${f.name} (${f.type}): ${f.description || ''}`)
-        .join('\n');
+        .map((f) => `- ${f.name} (${f.type}): ${f.description || ""}`)
+        .join("\n");
     }
 
     // JSON Schema format: { type: 'object', properties: { ... } }
-    if (schema.properties && typeof schema.properties === 'object') {
+    if (schema.properties && typeof schema.properties === "object") {
       return Object.entries(schema.properties)
         .map(([name, prop]: [string, any]) => {
-          const type = prop.type || 'string';
-          const desc = prop.description || '';
+          const type = prop.type || "string";
+          const desc = prop.description || "";
           return `- ${name} (${type}): ${desc}`;
         })
-        .join('\n');
+        .join("\n");
     }
 
     return JSON.stringify(schema, null, 2);
@@ -433,8 +442,8 @@ export class LlmService {
 Create `server/src/shared/llm/llm.module.ts`:
 
 ```typescript
-import { Global, Module } from '@nestjs/common';
-import { LlmService } from './llm.service';
+import { Global, Module } from "@nestjs/common";
+import { LlmService } from "./llm.service";
 
 @Global()
 @Module({
@@ -465,6 +474,7 @@ git commit -m "feat(server): add LlmModule with OpenAI-compatible client (FreeLL
 ## Task 3: Update AppModule
 
 **Files:**
+
 - Modify: `server/src/app.module.ts`
 
 - [ ] **Step 1: Replace OllamaModule import with LlmModule**
@@ -472,13 +482,13 @@ git commit -m "feat(server): add LlmModule with OpenAI-compatible client (FreeLL
 In `server/src/app.module.ts`, replace:
 
 ```typescript
-import { OllamaModule } from './shared/ollama/ollama.module';
+import { OllamaModule } from "./shared/ollama/ollama.module";
 ```
 
 with:
 
 ```typescript
-import { LlmModule } from './shared/llm/llm.module';
+import { LlmModule } from "./shared/llm/llm.module";
 ```
 
 And in the `imports` array, replace `OllamaModule` with `LlmModule`.
@@ -504,6 +514,7 @@ git commit -m "feat(server): wire LlmModule into AppModule"
 ## Task 4: Rename ExtractionProvider enum
 
 **Files:**
+
 - Modify: `server/src/runs/entities/run.entity.ts`
 
 - [ ] **Step 1: Update the enum definition**
@@ -512,9 +523,9 @@ In `server/src/runs/entities/run.entity.ts`, replace:
 
 ```typescript
 export enum ExtractionProvider {
-  DOCLO = 'doclo', // Default: internal @doclo/flows
-  LANGEXTRACT = 'langextract', // Future: external Python worker
-  OLLAMA = 'ollama', // Local Ollama model (runs in NestJS server)
+  DOCLO = "doclo", // Default: internal @doclo/flows
+  LANGEXTRACT = "langextract", // Future: external Python worker
+  OLLAMA = "ollama", // Local Ollama model (runs in NestJS server)
 }
 ```
 
@@ -522,9 +533,9 @@ with:
 
 ```typescript
 export enum ExtractionProvider {
-  DOCLO = 'doclo',
-  LANGEXTRACT = 'langextract',
-  FREELLM = 'freellm', // Generic LLM via FreeLLM gateway
+  DOCLO = "doclo",
+  LANGEXTRACT = "langextract",
+  FREELLM = "freellm", // Generic LLM via FreeLLM gateway
 }
 ```
 
@@ -549,6 +560,7 @@ git commit -m "feat(server): rename ExtractionProvider.OLLAMA to FREELLM"
 ## Task 5: Update runs.service.ts
 
 **Files:**
+
 - Modify: `server/src/runs/runs.service.ts`
 
 - [ ] **Step 1: Update the OllamaService import**
@@ -556,13 +568,13 @@ git commit -m "feat(server): rename ExtractionProvider.OLLAMA to FREELLM"
 In `server/src/runs/runs.service.ts`, replace:
 
 ```typescript
-import { OllamaService } from '../shared/ollama/ollama.service';
+import { OllamaService } from "../shared/ollama/ollama.service";
 ```
 
 with:
 
 ```typescript
-import { LlmService } from '../shared/llm/llm.service';
+import { LlmService } from "../shared/llm/llm.service";
 ```
 
 - [ ] **Step 2: Update constructor injection**
@@ -609,13 +621,13 @@ Find lines containing `'🦙 Running Ollama` or `'Starting extraction with ollam
 ```typescript
 // Replace:
 this.logger.log(`🦙 Running Ollama extraction for run ${run.id}`);
-this.addLog(run, 'info', 'Starting extraction with ollama provider');
-this.addLog(run, 'info', 'Running Ollama extraction...');
+this.addLog(run, "info", "Starting extraction with ollama provider");
+this.addLog(run, "info", "Running Ollama extraction...");
 
 // With:
 this.logger.log(`Running LLM extraction for run ${run.id}`);
-this.addLog(run, 'info', 'Starting extraction with freellm provider');
-this.addLog(run, 'info', 'Running LLM extraction...');
+this.addLog(run, "info", "Starting extraction with freellm provider");
+this.addLog(run, "info", "Running LLM extraction...");
 ```
 
 - [ ] **Step 7: Verify build passes**
@@ -647,6 +659,7 @@ git commit -m "feat(server): replace OllamaService with LlmService in RunsServic
 ## Task 6: Update extractors.service.ts
 
 **Files:**
+
 - Modify: `server/src/extractors/extractors.service.ts`
 
 - [ ] **Step 1: Update the import**
@@ -654,13 +667,13 @@ git commit -m "feat(server): replace OllamaService with LlmService in RunsServic
 In `server/src/extractors/extractors.service.ts`, replace:
 
 ```typescript
-import { OllamaService } from '../shared/ollama/ollama.service';
+import { OllamaService } from "../shared/ollama/ollama.service";
 ```
 
 with:
 
 ```typescript
-import { LlmService } from '../shared/llm/llm.service';
+import { LlmService } from "../shared/llm/llm.service";
 ```
 
 - [ ] **Step 2: Update constructor injection**
@@ -711,7 +724,7 @@ git commit -m "feat(server): replace OllamaService with LlmService in Extractors
 
 ## Task 7: DB migration — rename enum value
 
-> **IMPORTANT:** Run this SQL *before* restarting the server with the new code. If the server starts before this runs, TypeORM's sync will fail for any rows with `extractionProvider = 'ollama'`.
+> **IMPORTANT:** Run this SQL _before_ restarting the server with the new code. If the server starts before this runs, TypeORM's sync will fail for any rows with `extractionProvider = 'ollama'`.
 
 **Files:** None (manual SQL on the running database)
 
@@ -754,6 +767,7 @@ Expected: No rows show `ollama`.
 ## Task 8: Delete old OllamaModule files
 
 **Files:**
+
 - Delete: `server/src/shared/ollama/ollama.service.ts`
 - Delete: `server/src/shared/ollama/ollama.module.ts`
 
@@ -786,6 +800,7 @@ git commit -m "chore(server): delete OllamaModule (replaced by LlmModule)"
 ## Task 9: Update docker-compose.yml
 
 **Files:**
+
 - Modify: `docker-compose.yml`
 
 - [ ] **Step 1: Remove ollama services and volumes**
@@ -797,20 +812,20 @@ Remove the entire `ollama1` and `ollama2` service blocks. Remove `ollama1_data` 
 Add after the `redis` service block:
 
 ```yaml
-  freellm:
-    image: ghcr.io/devansh-365/freellm:latest
-    container_name: docxtractor-freellm
-    restart: unless-stopped
-    ports:
-      - "3002:3000"
-    environment:
-      - GROQ_API_KEY=${GROQ_API_KEY:-}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
-      - CEREBRAS_API_KEY=${CEREBRAS_API_KEY:-}
-      - NVIDIA_API_KEY=${NVIDIA_API_KEY:-}
-    networks:
-      - docxtractor-network
+freellm:
+  image: ghcr.io/devansh-365/freellm:latest
+  container_name: docxtractor-freellm
+  restart: unless-stopped
+  ports:
+    - "3002:3000"
+  environment:
+    - GROQ_API_KEY=${GROQ_API_KEY:-}
+    - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
+    - CEREBRAS_API_KEY=${CEREBRAS_API_KEY:-}
+    - NVIDIA_API_KEY=${NVIDIA_API_KEY:-}
+  networks:
+    - docxtractor-network
 ```
 
 - [ ] **Step 3: Update server environment variables**
@@ -818,17 +833,17 @@ Add after the `redis` service block:
 In the `server` service `environment:` block, replace:
 
 ```yaml
-      - OLLAMA_HOSTS=http://ollama1:11434,http://ollama2:11434
-      - OLLAMA_HOST=http://ollama1:11434
-      - OLLAMA_DEFAULT_MODEL=gpt-oss:120b-cloud
-      - OLLAMA_GENERATION_MODEL=gpt-oss:120b-cloud
+- OLLAMA_HOSTS=http://ollama1:11434,http://ollama2:11434
+- OLLAMA_HOST=http://ollama1:11434
+- OLLAMA_DEFAULT_MODEL=free
+- OLLAMA_GENERATION_MODEL=free
 ```
 
 with:
 
 ```yaml
-      - FREELLM_BASE_URL=http://freellm:3000/v1
-      - LLM_DEFAULT_MODEL=free-smart
+- FREELLM_BASE_URL=http://freellm:3000/v1
+- LLM_DEFAULT_MODEL=free
 ```
 
 - [ ] **Step 4: Update server depends_on**
@@ -836,17 +851,17 @@ with:
 In the `server` service `depends_on:` block, remove:
 
 ```yaml
-      ollama1:
-        condition: service_started
-      ollama2:
-        condition: service_started
+ollama1:
+  condition: service_started
+ollama2:
+  condition: service_started
 ```
 
 Add:
 
 ```yaml
-      freellm:
-        condition: service_started
+freellm:
+  condition: service_started
 ```
 
 - [ ] **Step 5: Update extraction-service environment variables**
@@ -854,14 +869,14 @@ Add:
 In the `extraction-service` service `environment:` block, replace:
 
 ```yaml
-      - LANGEXTRACT_MODEL_URL=http://ollama1:11434
+- LANGEXTRACT_MODEL_URL=http://ollama1:11434
 ```
 
 with:
 
 ```yaml
-      - FREELLM_BASE_URL=http://freellm:3000/v1
-      - LLM_DEFAULT_MODEL=free-smart
+- FREELLM_BASE_URL=http://freellm:3000/v1
+- LLM_DEFAULT_MODEL=free
 ```
 
 Also remove `extraction-service`'s `depends_on` entry for `ollama1` if present.
@@ -886,6 +901,7 @@ git commit -m "feat(docker): replace ollama1/2 with freellm service in docker-co
 ## Task 10: Update docker-compose.prod.yml
 
 **Files:**
+
 - Modify: `docker-compose.prod.yml`
 
 - [ ] **Step 1: Remove all 5 ollama service blocks**
@@ -897,18 +913,18 @@ Remove `ollama1`, `ollama2`, `ollama3`, `ollama4`, `ollama5` service blocks. Rem
 Add after the `redis` service block:
 
 ```yaml
-  freellm:
-    image: ghcr.io/devansh-365/freellm:latest
-    container_name: docxtractor-freellm
-    restart: unless-stopped
-    environment:
-      - GROQ_API_KEY=${GROQ_API_KEY}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
-      - CEREBRAS_API_KEY=${CEREBRAS_API_KEY:-}
-      - NVIDIA_API_KEY=${NVIDIA_API_KEY:-}
-    networks:
-      - docxtractor-network
+freellm:
+  image: ghcr.io/devansh-365/freellm:latest
+  container_name: docxtractor-freellm
+  restart: unless-stopped
+  environment:
+    - GROQ_API_KEY=${GROQ_API_KEY}
+    - GEMINI_API_KEY=${GEMINI_API_KEY}
+    - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+    - CEREBRAS_API_KEY=${CEREBRAS_API_KEY:-}
+    - NVIDIA_API_KEY=${NVIDIA_API_KEY:-}
+  networks:
+    - docxtractor-network
 ```
 
 - [ ] **Step 3: Update server environment variables**
@@ -916,20 +932,20 @@ Add after the `redis` service block:
 In the `server` service `environment:` block, replace:
 
 ```yaml
-      - OLLAMA_HOSTS=http://ollama1:11434,http://ollama2:11434,http://ollama3:11434,http://ollama4:11434,http://ollama5:11434
-      - OLLAMA_HOST=http://ollama1:11434
-      - OLLAMA_DEFAULT_MODEL=${OLLAMA_DEFAULT_MODEL:-gpt-oss:120b-cloud}
-      - OLLAMA_GENERATION_MODEL=${OLLAMA_GENERATION_MODEL:-gpt-oss:120b-cloud}
-      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-base_key}
-      - OLLAMA_API_KEYS=${OLLAMA_API_KEYS:-key1,key2}
-      - OLLAMA_MAX_CONCURRENCY=10
+- OLLAMA_HOSTS=http://ollama1:11434,http://ollama2:11434,http://ollama3:11434,http://ollama4:11434,http://ollama5:11434
+- OLLAMA_HOST=http://ollama1:11434
+- OLLAMA_DEFAULT_MODEL=${OLLAMA_DEFAULT_MODEL:-free}
+- OLLAMA_GENERATION_MODEL=${OLLAMA_GENERATION_MODEL:-free}
+- OLLAMA_API_KEY=${OLLAMA_API_KEY:-base_key}
+- OLLAMA_API_KEYS=${OLLAMA_API_KEYS:-key1,key2}
+- OLLAMA_MAX_CONCURRENCY=10
 ```
 
 with:
 
 ```yaml
-      - FREELLM_BASE_URL=http://freellm:3000/v1
-      - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free-smart}
+- FREELLM_BASE_URL=http://freellm:3000/v1
+- LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
 ```
 
 - [ ] **Step 4: Update server depends_on**
@@ -937,8 +953,8 @@ with:
 In the `server` service `depends_on:` block, remove all `ollama1` through `ollama5` entries. Add:
 
 ```yaml
-      freellm:
-        condition: service_started
+freellm:
+  condition: service_started
 ```
 
 - [ ] **Step 5: Update extraction-service environment variables**
@@ -946,16 +962,16 @@ In the `server` service `depends_on:` block, remove all `ollama1` through `ollam
 Replace:
 
 ```yaml
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - LANGEXTRACT_API_KEY=${LANGEXTRACT_API_KEY}
-      - LANGEXTRACT_MODEL_URL=http://ollama1:11434
+- GOOGLE_API_KEY=${GOOGLE_API_KEY}
+- LANGEXTRACT_API_KEY=${LANGEXTRACT_API_KEY}
+- LANGEXTRACT_MODEL_URL=http://ollama1:11434
 ```
 
 with:
 
 ```yaml
-      - FREELLM_BASE_URL=http://freellm:3000/v1
-      - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free-smart}
+- FREELLM_BASE_URL=http://freellm:3000/v1
+- LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
 ```
 
 Also remove the `ollama1: condition: service_started` entry from `extraction-service`'s `depends_on:` block.
@@ -980,6 +996,7 @@ git commit -m "feat(docker): replace ollama1-5 with freellm service in docker-co
 ## Task 11: Update server/env.example
 
 **Files:**
+
 - Modify: `server/env.example`
 
 - [ ] **Step 1: Replace Ollama section**
@@ -989,8 +1006,8 @@ Replace:
 ```
 # Ollama
 OLLAMA_HOST=http://localhost:11434
-OLLAMA_DEFAULT_MODEL=gpt-oss:120b-cloud
-OLLAMA_GENERATION_MODEL=gpt-oss:120b-cloud
+OLLAMA_DEFAULT_MODEL=free
+OLLAMA_GENERATION_MODEL=free
 ```
 
 with:
@@ -998,7 +1015,7 @@ with:
 ```
 # FreeLLM — add at least one provider API key
 FREELLM_BASE_URL=http://freellm:3000/v1
-LLM_DEFAULT_MODEL=free-smart
+LLM_DEFAULT_MODEL=free
 # GROQ_API_KEY=
 # GEMINI_API_KEY=
 # MISTRAL_API_KEY=
@@ -1028,6 +1045,7 @@ git commit -m "chore(server): update env.example for FreeLLM provider"
 ## Task 12: Update Python extraction-service
 
 **Files:**
+
 - Modify: `workers/extraction-service/requirements.txt`
 - Modify: `workers/extraction-service/src/extractor.py`
 
@@ -1072,7 +1090,7 @@ def patched_parse_output(self, text, *args, **kwargs):
 FormatHandler.parse_output = patched_parse_output
 
 FREELLM_BASE_URL = os.getenv("FREELLM_BASE_URL", "http://freellm:3000/v1")
-LLM_DEFAULT_MODEL = os.getenv("LLM_DEFAULT_MODEL", "free-smart")
+LLM_DEFAULT_MODEL = os.getenv("LLM_DEFAULT_MODEL", "free")
 
 _llm_client = OpenAI(
     base_url=FREELLM_BASE_URL,
@@ -1238,6 +1256,7 @@ git commit -m "feat(extraction-service): replace google-generativeai with openai
 ## Task 13: Regenerate frontend API client
 
 **Files:**
+
 - Modify: `client/src/api/models/` (auto-generated by Orval)
 
 The `ExtractionProvider` enum value changed from `'ollama'` to `'freellm'`. Orval regenerates this from the Swagger spec.

@@ -354,7 +354,7 @@ export const TemplateWizardModal = NiceModal.create(() => {
         description:
           err?.response?.data?.message ||
           err?.message ||
-          "Check that Ollama is running",
+          "Check that FreeLLM is running",
       });
     } finally {
       setAiGenerating(false);
@@ -546,7 +546,7 @@ export const TemplateWizardModal = NiceModal.create(() => {
                             Generate with AI
                           </h3>
                           <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-purple-400 bg-purple-100 text-purple-700">
-                            Ollama
+                            FreeLLM
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 mb-2">
@@ -653,7 +653,7 @@ export const TemplateWizardModal = NiceModal.create(() => {
                     </div>
                     <div>
                       <h2 className="text-xl font-bold">Generate with AI</h2>
-                      <p className="text-xs text-gray-500">Powered by Ollama</p>
+                      <p className="text-xs text-gray-500">Powered by FreeLLM</p>
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 mb-4">

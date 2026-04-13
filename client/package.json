@@ -40,7 +40,6 @@
     "@tanstack/ai-anthropic": "latest",
     "@tanstack/ai-client": "latest",
     "@tanstack/ai-gemini": "latest",
-    "@tanstack/ai-ollama": "latest",
     "@tanstack/ai-openai": "latest",
     "@tanstack/ai-react": "latest",
     "@tanstack/match-sorter-utils": "^8.19.4",

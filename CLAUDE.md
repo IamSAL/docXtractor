@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-DocXtractor is a full-stack document data extraction platform. Users define **Extractors** (schema + system prompt), upload files/URLs, trigger **Runs** that parse documents and extract structured JSON data using AI models (Gemini, Ollama/Qwen).
+DocXtractor is a full-stack document data extraction platform. Users define **Extractors** (schema + system prompt), upload files/URLs, trigger **Runs** that parse documents and extract structured JSON data using AI models via FreeLLM (Groq, Gemini, Mistral, Cerebras).
 
 ## Commands
 
@@ -14,7 +14,7 @@ DocXtractor is a full-stack document data extraction platform. Users define **Ex
 docker-compose up -d --build
 ```
 
-Ollama is NOT in docker-compose — it must run on the host. Containers access it via `host.docker.internal:11434`.
+FreeLLM runs as a Docker service alongside everything else.
 
 ### NestJS Server (`server/`)
 
@@ -70,18 +70,18 @@ Upload (file/URL)
 
 Key modules:
 
-- **`ExtractorsModule`** — CRUD for extractor configs; calls Ollama to generate schemas from natural language
-- **`RunsModule`** — Core orchestration: creates runs, dispatches queue jobs, handles callbacks, emits WebSocket events, stores logs to MinIO. In batch mode with Ollama provider, extractions run in parallel using `Promise.allSettled`
+- **`ExtractorsModule`** — CRUD for extractor configs; calls FreeLLM to generate schemas from natural language
+- **`RunsModule`** — Core orchestration: creates runs, dispatches queue jobs, handles callbacks, emits WebSocket events, stores logs to MinIO. In batch mode with FreeLLM provider, extractions run in parallel using `Promise.allSettled`
 - **`RunsGateway`** — Socket.IO WebSocket gateway (`/runs` namespace)
 - **`FilesModule`** — File upload, MinIO storage
 - **`QueueModule`** (`shared/queue/`) — Global BullMQ setup for all 4 queues
 - **`AuthModule`** — JWT + Google OAuth, guards, strategies
-- **`OllamaModule`** (`shared/ollama/`) — Global Ollama client (model: `gpt-oss:120b-cloud`)
+- **`LlmModule`** (`shared/llm/`) — Global LLM client via FreeLLM (model: `free`)
 - **`MailModule`** (`shared/mail/`) — Email sending via Brevo (SendGrid) SMTP
 
 Key entities:
 
-- **`Extractor`**: `schema` (JSONB), `systemPrompt`, `fewShotExamples` (JSONB), `extractionProvider` enum (`doclo` | `langextract` | `ollama`)
+- **`Extractor`**: `schema` (JSONB), `systemPrompt`, `fewShotExamples` (JSONB), `extractionProvider` enum (`doclo` | `langextract` | `freellm`)
 - **`Run`**: `status` enum (`pending`→`queued`→`parsing`→`extracting`→`done`/`failed`/`cancelled`/`review`), `sources` (JSONB array with per-source parse status), `extractionResult` (JSONB), `processingMode` (`unified` | `per_document`)
 - **`File`**: `storageKey`, `bucket`, `status` enum, `metadata` (JSONB) — stored in MinIO
 - **`User`**: UUID PK, `email`, `passwordHash`, `googleId`, `role` (user/admin), `isEmailVerified`
@@ -94,11 +94,11 @@ Key entities:
 
 ### BullMQ Queues
 
-| Queue Name | Producer | Consumer |
-|---|---|---|
-| `uploaded-documents` | NestJS RunsService | Python parser-service |
-| `parsed-documents` | Python parser-service | NestJS ParsedDocumentsConsumer |
-| `extraction-requests` | NestJS RunsService | Python extraction-service |
+| Queue Name             | Producer                  | Consumer                           |
+| ---------------------- | ------------------------- | ---------------------------------- |
+| `uploaded-documents`   | NestJS RunsService        | Python parser-service              |
+| `parsed-documents`     | Python parser-service     | NestJS ParsedDocumentsConsumer     |
+| `extraction-requests`  | NestJS RunsService        | Python extraction-service          |
 | `extraction-completed` | Python extraction-service | NestJS ExtractionCompletedConsumer |
 
 Queue names are defined in `server/src/shared/queue/queue-names.ts`. NestJS consumers extend `WorkerHost` in `queue-consumers.ts`. Python workers use the `bullmq` Python package directly with Redis URL.
@@ -121,7 +121,7 @@ Queue names are defined in `server/src/shared/queue/queue-names.ts`. NestJS cons
 ### Python Workers
 
 - **`parser-service`** (`:8001`): Receives jobs from `uploaded-documents` queue. Uses Docling + RapidOCR to convert documents/URLs to Markdown. Fetches files from MinIO via boto3. **Parallel processing**: Concurrency configurable via `PARSER_CONCURRENCY` env var (default: 4).
-- **`extraction-service`** (`:8002`): Receives jobs from `extraction-requests` queue. Two modes: direct Google Gemini API (`gemini-2.0-flash-exp`) or LangExtract library (supports local Ollama). Returns structured JSON. **Parallel processing**: Concurrency configurable via `EXTRACTION_CONCURRENCY` env var (default: 3).
+- **`extraction-service`** (`:8002`): Receives jobs from `extraction-requests` queue. Uses OpenAI-compatible client pointed at FreeLLM gateway, or LangExtract library. Returns structured JSON. **Parallel processing**: Concurrency configurable via `EXTRACTION_CONCURRENCY` env var (default: 3).
 
 ### WebSocket Events (`/runs` namespace)
 
@@ -131,17 +131,17 @@ Queue names are defined in `server/src/shared/queue/queue-names.ts`. NestJS cons
 
 ### Infrastructure Ports
 
-| Service            | Port  |
-| ------------------ | ----- |
-| React Client       | 5174  |
-| NestJS API         | 3001  |
-| PostgreSQL         | 5433  |
-| Redis (BullMQ)     | 6380  |
-| MinIO API          | 9005  |
-| MinIO Console      | 9006  |
-| Parser Service     | 8001  |
-| Extraction Service | 8002  |
-| Ollama             | 11434 |
+| Service            | Port |
+| ------------------ | ---- |
+| React Client       | 5174 |
+| NestJS API         | 3001 |
+| PostgreSQL         | 5433 |
+| Redis (BullMQ)     | 6380 |
+| MinIO API          | 9005 |
+| MinIO Console      | 9006 |
+| Parser Service     | 8001 |
+| Extraction Service | 8002 |
+| FreeLLM            | 3002 |
 
 ## Development Patterns
 
@@ -169,8 +169,8 @@ Copy `server/env.example` to `server/.env`. Key variables:
 - `DATABASE_URL` — PostgreSQL connection string
 - `JWT_SECRET`, `JWT_REFRESH_SECRET`
 - `REDIS_HOST`, `REDIS_PORT` (default: `localhost:6380`)
-- `OLLAMA_HOST`, `OLLAMA_DEFAULT_MODEL` (default: `gpt-oss:120b-cloud`)
+- `FREELLM_BASE_URL` (default: `http://freellm:3002/v1`), `LLM_DEFAULT_MODEL` (default: `free`)
 - `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASS` — Brevo SMTP for transactional email
 - `GOOGLE_CLIENT_ID/SECRET` — OAuth
 
-The extraction-service needs its own `.env` with `GOOGLE_API_KEY` and `LANGEXTRACT_API_KEY`.
+The extraction-service needs its own `.env` with `FREELLM_BASE_URL` and `LANGEXTRACT_API_KEY`.

@@ -597,7 +597,7 @@ export class RunsService {
             run.skippedFields,
           ),
           extractor?.systemPrompt || '',
-          'gpt-oss:120b-cloud',
+          'free',
         );
 
         run.status = RunStatus.DONE;
@@ -654,12 +654,12 @@ export class RunsService {
         ),
         system_prompt: extractor?.systemPrompt || '',
         extraction_type: extractionType,
-        model_id: 'gpt-oss:120b-cloud',
+        model_id: 'free',
         examples: extractor?.fewShotExamples || [],
       };
 
       this.logger.log(
-        `📤 Sending extraction job: type=${extractionType}, model=${'gpt-oss:120b-cloud'}`,
+        `📤 Sending extraction job: type=${extractionType}, model=${'free'}`,
       );
 
       await this.queueService.addJob(
@@ -684,46 +684,41 @@ export class RunsService {
 
     if (run.extractionProvider === ExtractionProvider.FREELLM) {
       // LLM: run inline (async, non-blocking for the caller)
-      this.extractSingleWithLlm(run, source, extractor).catch(
-        async (err) => {
-          this.logger.error(
-            `LLM extraction failed (outer) for source ${source.id}: ${err.message}`,
-          );
-          // Safety net: ensure the source reaches terminal state even if inner catch failed
-          try {
-            await this.serializeLlmCompletion(run.id, async () => {
-              const freshRun = await this.runRepo.findOne({
-                where: { id: run.id },
-              });
-              if (!freshRun) return;
-              const failedSource = freshRun.sources.find(
-                (s) => s.id === source.id,
-              );
-              if (
-                failedSource &&
-                failedSource.extractionStatus === 'extracting'
-              ) {
-                failedSource.extractionStatus = 'failed';
-                failedSource.extractionError =
-                  err.message || 'Extraction failed unexpectedly';
-                freshRun.progress!.extracted =
-                  (freshRun.progress!.extracted || 0) + 1;
-                await this.runRepo.save(freshRun);
-                this.runsGateway.emitRunSourceUpdated(
-                  freshRun.id,
-                  failedSource,
-                );
-                this.runsGateway.emitRunUpdated(freshRun.id, freshRun);
-                await this.checkLlmBatchCompletion(freshRun);
-              }
+      this.extractSingleWithLlm(run, source, extractor).catch(async (err) => {
+        this.logger.error(
+          `LLM extraction failed (outer) for source ${source.id}: ${err.message}`,
+        );
+        // Safety net: ensure the source reaches terminal state even if inner catch failed
+        try {
+          await this.serializeLlmCompletion(run.id, async () => {
+            const freshRun = await this.runRepo.findOne({
+              where: { id: run.id },
             });
-          } catch (innerErr) {
-            this.logger.error(
-              `Recovery failed for source ${source.id}: ${(innerErr as Error).message}`,
+            if (!freshRun) return;
+            const failedSource = freshRun.sources.find(
+              (s) => s.id === source.id,
             );
-          }
-        },
-      );
+            if (
+              failedSource &&
+              failedSource.extractionStatus === 'extracting'
+            ) {
+              failedSource.extractionStatus = 'failed';
+              failedSource.extractionError =
+                err.message || 'Extraction failed unexpectedly';
+              freshRun.progress!.extracted =
+                (freshRun.progress!.extracted || 0) + 1;
+              await this.runRepo.save(freshRun);
+              this.runsGateway.emitRunSourceUpdated(freshRun.id, failedSource);
+              this.runsGateway.emitRunUpdated(freshRun.id, freshRun);
+              await this.checkLlmBatchCompletion(freshRun);
+            }
+          });
+        } catch (innerErr) {
+          this.logger.error(
+            `Recovery failed for source ${source.id}: ${(innerErr as Error).message}`,
+          );
+        }
+      });
     } else {
       const extractionType =
         run.extractionProvider === ExtractionProvider.LANGEXTRACT
@@ -742,7 +737,7 @@ export class RunsService {
         ),
         system_prompt: extractor?.systemPrompt || '',
         extraction_type: extractionType,
-        model_id: 'gpt-oss:120b-cloud',
+        model_id: 'free',
         examples: extractor?.fewShotExamples || [],
       };
 
@@ -777,7 +772,7 @@ export class RunsService {
           run.skippedFields,
         ),
         extractor?.systemPrompt || '',
-        'gpt-oss:120b-cloud',
+        'free',
       );
     } catch (error) {
       extractionError = error;
@@ -1299,7 +1294,7 @@ export class RunsService {
               run.skippedFields,
             ),
             extractor?.systemPrompt || '',
-            'gpt-oss:120b-cloud',
+            'free',
           );
 
           source.extractionStatus = 'done';
@@ -1370,7 +1365,7 @@ export class RunsService {
             ),
             system_prompt: extractor?.systemPrompt || '',
             extraction_type: extractionType,
-            model_id: 'gpt-oss:120b-cloud',
+            model_id: 'free',
             examples: extractor?.fewShotExamples || [],
           },
         );
@@ -1573,7 +1568,7 @@ export class RunsService {
               source.parsedContent!,
               effectiveSchema,
               extractor?.systemPrompt || '',
-              'gpt-oss:120b-cloud',
+              'free',
             );
             source.extractionStatus = 'done';
             source.extractionResult = this.mergeExtractionResult(
@@ -1639,7 +1634,7 @@ export class RunsService {
               schema: effectiveSchema,
               system_prompt: extractor?.systemPrompt || '',
               extraction_type: extractionType,
-              model_id: 'gpt-oss:120b-cloud',
+              model_id: 'free',
               examples: extractor?.fewShotExamples || [],
             },
           );
@@ -1656,7 +1651,7 @@ export class RunsService {
                 schema: effectiveSchema,
                 system_prompt: extractor?.systemPrompt || '',
                 extraction_type: extractionType,
-                model_id: 'gpt-oss:120b-cloud',
+                model_id: 'free',
                 examples: extractor?.fewShotExamples || [],
               },
             );

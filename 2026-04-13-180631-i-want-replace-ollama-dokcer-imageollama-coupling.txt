@@ -84,7 +84,7 @@ https://github.com/Devansh-365/freellm as a sub image on my docker and use that
    models). Do you want to:
 
   a) Keep local Ollama as a backend within FreeLLM (FreeLLM still talks to a
-  local Ollama instance for gpt-oss:120b-cloud)
+  local Ollama instance for free)
 
   b) Drop Ollama entirely — use only cloud providers through FreeLLM (Groq,
   Gemini, Mistral, Cerebras, NIM)
@@ -106,15 +106,15 @@ https://github.com/Devansh-365/freellm as a sub image on my docker and use that
 
 ⏺ Last question:
 
-  Current default model is gpt-oss:120b-cloud (custom Ollama model). With
-  FreeLLM you'd use meta-models like free-fast, free-smart, or specific provider
+  Current default model is free (custom Ollama model). With
+  FreeLLM you'd use meta-models like free-fast, free, or specific provider
    models like groq/llama-3.3-70b-versatile, gemini/gemini-2.5-flash.
 
   What default model do you want configured?
 
   a) free-fast — lowest latency, rotates Groq/Cerebras/Gemini/NIM
 
-  b) free-smart — most capable first (Gemini, NIM, Groq, Mistral)
+  b) free — most capable first (Gemini, NIM, Groq, Mistral)
 
   c) Specific model (tell me which)
 
@@ -199,12 +199,12 @@ https://github.com/Devansh-365/freellm as a sub image on my docker and use that
 
   Update server env vars:
   FREELLM_BASE_URL=http://freellm:3000/v1
-  LLM_DEFAULT_MODEL=free-smart
+  LLM_DEFAULT_MODEL=free
   LLM_MAX_CONCURRENCY=5
 
   Update extraction-service env:
   FREELLM_BASE_URL=http://freellm:3000/v1
-  LLM_DEFAULT_MODEL=free-smart
+  LLM_DEFAULT_MODEL=free
 
   Does this infrastructure section look right?
 
@@ -233,7 +233,7 @@ https://github.com/Devansh-365/freellm as a sub image on my docker and use that
   'http://freellm:3000/v1'),
         apiKey: 'freellm', // FreeLLM doesn't validate this
       });
-      this.defaultModel = configService.get('LLM_DEFAULT_MODEL', 'free-smart');
+      this.defaultModel = configService.get('LLM_DEFAULT_MODEL', 'free');
     }
 
     async extract(content, schema, systemPrompt, model?):
@@ -316,7 +316,7 @@ https://github.com/Devansh-365/freellm as a sub image on my docker and use that
   )
 
   response = client.chat.completions.create(
-      model=os.getenv("LLM_DEFAULT_MODEL", "free-smart"),
+      model=os.getenv("LLM_DEFAULT_MODEL", "free"),
       messages=[{"role": "user", "content": full_prompt}],
       response_format={"type": "json_object"},
   )
@@ -362,7 +362,7 @@ https://github.com/Devansh-365/freellm as a sub image on my docker and use that
 
 ⏺ Now the spec self-review. Found one inconsistency: Section 2 references
   LLM_GENERATION_MODEL env var but Section 1 only defines LLM_DEFAULT_MODEL.
-  Since both use free-smart, I'll simplify to one var for both purposes.
+  Since both use free, I'll simplify to one var for both purposes.
 
 ⏺ Update(docs/superpowers/specs/2026-04-13-freellm-generic-llm-provider-design.m
         d)
@@ -370,9 +370,9 @@ https://github.com/Devansh-365/freellm as a sub image on my docker and use that
       93        apiKey: 'freellm',
       94      });
       95      this.defaultModel = configService.get('LLM_DEFAULT_MODEL', 
-          'free-smart');
+          'free');
       96 -    this.generationModel = configService.get('LLM_GENERATION_MO
-         -DEL', 'free-smart');                                           
+         -DEL', 'free');                                           
       96    }
       97  
       98    async extract(content, schema, systemPrompt, model?): Promise
@@ -382,7 +382,7 @@ https://github.com/Devansh-365/freellm as a sub image on my docker and use that
         d)
   ⎿  Added 1 line
        95      this.defaultModel = configService.get('LLM_DEFAULT_MODEL',
-            'free-smart');
+            'free');
        96    }
        97  
        98 +  // Both use this.defaultModel when model param is omitted   

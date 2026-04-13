@@ -54,7 +54,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
         description:
           err?.response?.data?.message ||
           err?.message ||
-          "Check that Ollama is running",
+          "Check that FreeLLM is running",
       });
     } finally {
       setAiGenerating(false);

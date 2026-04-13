@@ -3,7 +3,7 @@ fastapi
 uvicorn
 bullmq
 langextract
-google-generativeai
+openai
 python-dotenv
 boto3
 pydantic

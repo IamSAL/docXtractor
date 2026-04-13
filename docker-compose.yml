@@ -34,31 +34,26 @@ services:
       timeout: 5s
       retries: 5
 
-  ollama1:
-    image: alpine/ollama:latest
-    container_name: docxtractor-ollama1
+  freellm:
+    image: ghcr.io/devansh-365/freellm:latest
+    container_name: docxtractor-freellm
     restart: unless-stopped
-    environment:
-      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-}
-    volumes:
-      - ollama1_data:/root/.ollama
     ports:
-      - "11434:11434"
+      - "3002:3000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      - CEREBRAS_API_KEY=${CEREBRAS_API_KEY}
+      # - FREELLM_API_KEY=abcdefgh123gsk456kh
+      # - FREELLM_TOKEN_SECRET=kjdhajkshdj7hdkjahsjkdhkjahsh786avsdbnvas
     networks:
       - docxtractor-network
-
-  ollama2:
-    image: alpine/ollama:latest
-    container_name: docxtractor-ollama2
-    restart: unless-stopped
-    environment:
-      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-}
-    volumes:
-      - ollama2_data:/root/.ollama
-    ports:
-      - "11435:11434"
-    networks:
-      - docxtractor-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/v1/models"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   server:
     build:
@@ -81,10 +76,8 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=docxtractor-documents
-      - OLLAMA_HOSTS=http://ollama1:11434,http://ollama2:11434
-      - OLLAMA_HOST=http://ollama1:11434
-      - OLLAMA_DEFAULT_MODEL=gpt-oss:120b-cloud
-      - OLLAMA_GENERATION_MODEL=gpt-oss:120b-cloud
+      - FREELLM_BASE_URL=http://freellm:3000/v1
+      - LLM_DEFAULT_MODEL=free
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET:-docxtractor-dev-access-secret}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-docxtractor-dev-refresh-secret}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET:-docxtractor-dev-reset-secret}
@@ -98,10 +91,6 @@ services:
         condition: service_healthy
       createbuckets:
         condition: service_completed_successfully
-      ollama1:
-        condition: service_started
-      ollama2:
-        condition: service_started
     networks:
       - docxtractor-network
     command: pnpm run start:dev
@@ -203,7 +192,8 @@ services:
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
-      - LANGEXTRACT_MODEL_URL=http://ollama1:11434
+      - FREELLM_BASE_URL=http://freellm:3000/v1
+      - LLM_DEFAULT_MODEL=free
       - EXTRACTION_CONCURRENCY=3
       - LOG_LEVEL=INFO
       - PYTHONWARNINGS=ignore
@@ -217,8 +207,6 @@ services:
 volumes:
   postgres_data:
   minio_data:
-  ollama1_data:
-  ollama2_data:
 
 networks:
   docxtractor-network:

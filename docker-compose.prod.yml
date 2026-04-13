@@ -67,60 +67,24 @@ services:
     networks:
       - docxtractor-network
 
-  ollama1:
-    image: ollama/ollama:latest
-    container_name: docxtractor-ollama1
+  freellm:
+    image: ghcr.io/devansh-365/freellm:latest
+    container_name: docxtractor-freellm
     restart: unless-stopped
-    volumes:
-      - ollama1_data:/root/.ollama
     ports:
-      - "11434:11434"
+      - "3002:3000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
+      - CEREBRAS_API_KEY=${CEREBRAS_API_KEY:-}
     networks:
       - docxtractor-network
-
-  ollama2:
-    image: ollama/ollama:latest
-    container_name: docxtractor-ollama2
-    restart: unless-stopped
-    volumes:
-      - ollama2_data:/root/.ollama
-    ports:
-      - "11435:11434"
-    networks:
-      - docxtractor-network
-
-  ollama3:
-    image: ollama/ollama:latest
-    container_name: docxtractor-ollama3
-    restart: unless-stopped
-    volumes:
-      - ollama3_data:/root/.ollama
-    ports:
-      - "11436:11434"
-    networks:
-      - docxtractor-network
-
-  ollama4:
-    image: ollama/ollama:latest
-    container_name: docxtractor-ollama4
-    restart: unless-stopped
-    volumes:
-      - ollama4_data:/root/.ollama
-    ports:
-      - "11437:11434"
-    networks:
-      - docxtractor-network
-
-  ollama5:
-    image: ollama/ollama:latest
-    container_name: docxtractor-ollama5
-    restart: unless-stopped
-    volumes:
-      - ollama5_data:/root/.ollama
-    ports:
-      - "11438:11434"
-    networks:
-      - docxtractor-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/v1/models"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   server:
     image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-server:latest
@@ -148,17 +112,12 @@ services:
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET}
       - FRONTEND_URL=${FRONTEND_URL:-https://docxtractor.sk-salman.com}
-      - OLLAMA_HOSTS=http://ollama1:11434,http://ollama2:11434,http://ollama3:11434,http://ollama4:11434,http://ollama5:11434
-      - OLLAMA_HOST=http://ollama1:11434
-      - OLLAMA_DEFAULT_MODEL=${OLLAMA_DEFAULT_MODEL:-gpt-oss:120b-cloud}
-      - OLLAMA_GENERATION_MODEL=${OLLAMA_GENERATION_MODEL:-gpt-oss:120b-cloud}
-      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-base_key}
-      - OLLAMA_API_KEYS=${OLLAMA_API_KEYS:-key1,key2}
+      - FREELLM_BASE_URL=http://freellm:3000/v1
+      - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - SWAGGER_USER=${SWAGGER_USER:-admin}
       - SWAGGER_PASS=${SWAGGER_PASS:-admin}
       - THROTTLER_TTL=${THROTTLER_TTL:-60000}
       - THROTTLER_LIMIT=${THROTTLER_LIMIT:-100}
-      - OLLAMA_MAX_CONCURRENCY=10
     # Optional: mount a custom seed file to pre-populate extractors on first run
     # volumes:
     #   - ./extractors.json:/app/seed/extractors.json:ro
@@ -169,16 +128,8 @@ services:
         condition: service_healthy
       createbuckets:
         condition: service_completed_successfully
-      ollama1:
-        condition: service_started
-      ollama2:
-        condition: service_started
-      ollama3:
-        condition: service_started
-      ollama4:
-        condition: service_started
-      ollama5:
-        condition: service_started
+      freellm:
+        condition: service_healthy
     networks:
       - docxtractor-network
 
@@ -248,8 +199,6 @@ services:
         condition: service_started
       createbuckets:
         condition: service_completed_successfully
-      ollama1:
-        condition: service_started
     environment:
       - REDIS_URL=redis://docxtractor-redis:6379
       - MINIO_ENDPOINT=http://minio:9000
@@ -257,8 +206,8 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=docxtractor-documents
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - LANGEXTRACT_API_KEY=${LANGEXTRACT_API_KEY}
-      - LANGEXTRACT_MODEL_URL=http://ollama1:11434
+      - FREELLM_BASE_URL=http://freellm:3000/v1
+      - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - EXTRACTION_CONCURRENCY=${EXTRACTION_CONCURRENCY:-3}
       - LOG_LEVEL=WARNING
       - PYTHONWARNINGS=ignore
@@ -271,11 +220,6 @@ volumes:
   postgres_data:
   minio_data:
   redis_data:
-  ollama1_data:
-  ollama2_data:
-  ollama3_data:
-  ollama4_data:
-  ollama5_data:
 
 networks:
   docxtractor-network:
