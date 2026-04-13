@@ -83,10 +83,10 @@ export class RunsService {
   private extractionLocks: Map<string, Promise<void>> = new Map();
 
   /**
-   * Serialize async operations per run to prevent concurrent Ollama
+   * Serialize async operations per run to prevent concurrent LLM
    * completion handlers from clobbering each other's DB writes.
    */
-  private async serializeOllamaCompletion(
+  private async serializeLlmCompletion(
     runId: string,
     fn: () => Promise<void>,
   ): Promise<void> {
@@ -526,10 +526,10 @@ export class RunsService {
             'No documents parsed successfully, run failed',
           );
         } else if (run.extractionProvider === ExtractionProvider.FREELLM) {
-          // For Ollama: some extractions may have already completed before
+          // For LLM: some extractions may have already completed before
           // extractionTotal was set. Save the real total and trigger a check.
           await this.runRepo.save(run);
-          await this.checkOllamaBatchCompletion(run);
+          await this.checkLlmBatchCompletion(run);
         }
         // Otherwise, extractions are already in-flight
       } else {
@@ -585,9 +585,9 @@ export class RunsService {
       .join('\n\n');
 
     if (run.extractionProvider === ExtractionProvider.FREELLM) {
-      this.logger.log(`🦙 Running Ollama extraction for run ${run.id}`);
-      this.addLog(run, 'info', 'Starting extraction with ollama provider');
-      this.addLog(run, 'info', 'Running Ollama extraction...');
+      this.logger.log(`🦙 Running LLM extraction for run ${run.id}`);
+      this.addLog(run, 'info', 'Starting extraction with freellm provider');
+      this.addLog(run, 'info', 'Running LLM extraction...');
       try {
         const result = await this.llmService.extract(
           combinedMarkdown,
@@ -608,7 +608,7 @@ export class RunsService {
         };
         run.progress!.currentStep = 'complete';
         run.finishedAt = new Date();
-        this.logger.log(`✅ Ollama extraction complete for run ${run.id}`);
+        this.logger.log(`✅ LLM extraction complete for run ${run.id}`);
         this.addLog(
           run,
           'info',
@@ -623,11 +623,11 @@ export class RunsService {
         );
       } catch (error) {
         this.logger.error(
-          `Ollama extraction failed for run ${run.id}: ${error.message}`,
+          `LLM extraction failed for run ${run.id}: ${error.message}`,
         );
-        this.addLog(run, 'error', `Ollama extraction failed: ${error.message}`);
+        this.addLog(run, 'error', `LLM extraction failed: ${error.message}`);
         run.status = RunStatus.FAILED;
-        run.error = error.message || 'Ollama extraction failed';
+        run.error = error.message || 'LLM extraction failed';
         run.finishedAt = new Date();
       }
     } else {
@@ -683,15 +683,15 @@ export class RunsService {
     source.extractionStatus = 'extracting';
 
     if (run.extractionProvider === ExtractionProvider.FREELLM) {
-      // Ollama: run inline (async, non-blocking for the caller)
-      this.extractSingleWithOllama(run, source, extractor).catch(
+      // LLM: run inline (async, non-blocking for the caller)
+      this.extractSingleWithLlm(run, source, extractor).catch(
         async (err) => {
           this.logger.error(
-            `Ollama extraction failed (outer) for source ${source.id}: ${err.message}`,
+            `LLM extraction failed (outer) for source ${source.id}: ${err.message}`,
           );
           // Safety net: ensure the source reaches terminal state even if inner catch failed
           try {
-            await this.serializeOllamaCompletion(run.id, async () => {
+            await this.serializeLlmCompletion(run.id, async () => {
               const freshRun = await this.runRepo.findOne({
                 where: { id: run.id },
               });
@@ -714,7 +714,7 @@ export class RunsService {
                   failedSource,
                 );
                 this.runsGateway.emitRunUpdated(freshRun.id, freshRun);
-                await this.checkOllamaBatchCompletion(freshRun);
+                await this.checkLlmBatchCompletion(freshRun);
               }
             });
           } catch (innerErr) {
@@ -756,15 +756,15 @@ export class RunsService {
   }
 
   /**
-   * Run Ollama extraction for a single source and handle completion inline.
-   * The Ollama HTTP call runs concurrently; only DB writes are serialized.
+   * Run LLM extraction for a single source and handle completion inline.
+   * The LLM HTTP call runs concurrently; only DB writes are serialized.
    */
-  private async extractSingleWithOllama(
+  private async extractSingleWithLlm(
     run: Run,
     source: RunSource,
     extractor: Extractor | null,
   ) {
-    // Run the Ollama call outside the lock so multiple sources extract concurrently
+    // Run the LLM call outside the lock so multiple sources extract concurrently
     let extractionResult: any;
     let extractionError: Error | null = null;
 
@@ -784,7 +784,7 @@ export class RunsService {
     }
 
     // Serialize the DB read-modify-write + completion check
-    await this.serializeOllamaCompletion(run.id, async () => {
+    await this.serializeLlmCompletion(run.id, async () => {
       const freshRun = await this.runRepo.findOne({
         where: { id: run.id },
       });
@@ -833,11 +833,11 @@ export class RunsService {
       this.runsGateway.emitRunSourceUpdated(freshRun.id, freshSource);
       this.runsGateway.emitRunUpdated(freshRun.id, freshRun);
 
-      await this.checkOllamaBatchCompletion(freshRun);
+      await this.checkLlmBatchCompletion(freshRun);
     });
   }
 
-  private async checkOllamaBatchCompletion(run: Run) {
+  private async checkLlmBatchCompletion(run: Run) {
     const extractedCount = run.progress!.extracted || 0;
     const extractionTotal = run.progress!.extractionTotal || 0;
     // extractionTotal=0 is a sentinel meaning "not all parsing is done yet"
@@ -1278,7 +1278,7 @@ export class RunsService {
       });
 
       if (run.extractionProvider === ExtractionProvider.FREELLM) {
-        // Ollama: run inline extraction, then rebuild merged results
+        // LLM: run inline extraction, then rebuild merged results
         await this.runRepo.save(run);
         await this.flushLogs(run.id);
 
@@ -1566,7 +1566,7 @@ export class RunsService {
         await this.runRepo.save(run);
         await this.flushLogs(run.id);
 
-        // Run inline Ollama extraction for each source
+        // Run inline LLM extraction for each source
         for (const source of sources) {
           try {
             const result = await this.llmService.extract(
