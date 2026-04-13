@@ -15,7 +15,7 @@ import {
   UpdateSchemaVariantDto,
 } from './dto/schema-variant.dto';
 import { Extractor, SchemaVariant } from './entities/extractor.entity';
-import { OllamaService } from '../shared/ollama/ollama.service';
+import { LlmService } from '../shared/llm/llm.service';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -29,7 +29,7 @@ export class ExtractorsService implements OnModuleInit {
   constructor(
     @InjectRepository(Extractor)
     private readonly extractorRepository: Repository<Extractor>,
-    private readonly ollamaService: OllamaService,
+    private readonly llmService: LlmService,
   ) {}
 
   async onModuleInit() {
@@ -202,7 +202,7 @@ Return ONLY a JSON object with this exact structure:
 }`;
 
     this.logger.log(`Generating schema for: ${description}`);
-    const result = await this.ollamaService.generate(prompt);
+    const result = await this.llmService.generate(prompt);
 
     // Extract schema from response - handle both wrapped and unwrapped
     const schema = (result.schema as Record<string, any>) || result;
@@ -259,7 +259,7 @@ Requirements for systemPrompt:
 - Include domain-specific extraction guidance`;
 
     this.logger.log(`Generating extractor for: ${description}`);
-    const result = await this.ollamaService.generate(prompt);
+    const result = await this.llmService.generate(prompt);
 
     const name = (result.name as string) || 'Generated Extractor';
     const extractorDescription = (result.description as string) || description;
