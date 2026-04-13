@@ -74,10 +74,12 @@ services:
     ports:
       - "3002:3000"
     environment:
-      - GROQ_API_KEY=${GROQ_API_KEY:-}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
-      - CEREBRAS_API_KEY=${CEREBRAS_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      - CEREBRAS_API_KEY=${CEREBRAS_API_KEY}
+      # - FREELLM_API_KEY=abcdefgh123gsk456kh
+      # - FREELLM_TOKEN_SECRET=kjdhajkshdj7hdkjahsjkdhkjahsh786avsdbnvas
     networks:
       - docxtractor-network
     healthcheck:
@@ -128,8 +130,6 @@ services:
         condition: service_healthy
       createbuckets:
         condition: service_completed_successfully
-      freellm:
-        condition: service_healthy
     networks:
       - docxtractor-network
 
