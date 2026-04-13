@@ -27,7 +27,7 @@ import { QueueName } from '../shared/queue/queue-names';
 import { FilesService } from '../files/files.service';
 import { StorageService } from '../files/storage.service';
 import { RunsGateway } from './runs.gateway';
-import { OllamaService } from '../shared/ollama/ollama.service';
+import { LlmService } from '../shared/llm/llm.service';
 
 @Injectable()
 export class RunsService {
@@ -40,7 +40,7 @@ export class RunsService {
     private filesService: FilesService,
     private storageService: StorageService,
     private runsGateway: RunsGateway,
-    private ollamaService: OllamaService,
+    private llmService: LlmService,
     private configService: ConfigService,
   ) {}
 
@@ -525,7 +525,7 @@ export class RunsService {
             'error',
             'No documents parsed successfully, run failed',
           );
-        } else if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+        } else if (run.extractionProvider === ExtractionProvider.FREELLM) {
           // For Ollama: some extractions may have already completed before
           // extractionTotal was set. Save the real total and trigger a check.
           await this.runRepo.save(run);
@@ -584,12 +584,12 @@ export class RunsService {
       .filter(Boolean)
       .join('\n\n');
 
-    if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+    if (run.extractionProvider === ExtractionProvider.FREELLM) {
       this.logger.log(`🦙 Running Ollama extraction for run ${run.id}`);
       this.addLog(run, 'info', 'Starting extraction with ollama provider');
       this.addLog(run, 'info', 'Running Ollama extraction...');
       try {
-        const result = await this.ollamaService.extract(
+        const result = await this.llmService.extract(
           combinedMarkdown,
           this.resolveEffectiveSchema(
             extractor,
@@ -682,7 +682,7 @@ export class RunsService {
   ) {
     source.extractionStatus = 'extracting';
 
-    if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+    if (run.extractionProvider === ExtractionProvider.FREELLM) {
       // Ollama: run inline (async, non-blocking for the caller)
       this.extractSingleWithOllama(run, source, extractor).catch(
         async (err) => {
@@ -769,7 +769,7 @@ export class RunsService {
     let extractionError: Error | null = null;
 
     try {
-      extractionResult = await this.ollamaService.extract(
+      extractionResult = await this.llmService.extract(
         source.parsedContent!,
         this.resolveEffectiveSchema(
           extractor,
@@ -1277,7 +1277,7 @@ export class RunsService {
         where: { id: run.extractorId },
       });
 
-      if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+      if (run.extractionProvider === ExtractionProvider.FREELLM) {
         // Ollama: run inline extraction, then rebuild merged results
         await this.runRepo.save(run);
         await this.flushLogs(run.id);
@@ -1291,7 +1291,7 @@ export class RunsService {
         this.runsGateway.emitRunSourceUpdated(run.id, source);
 
         try {
-          const result = await this.ollamaService.extract(
+          const result = await this.llmService.extract(
             source.parsedContent!,
             this.resolveEffectiveSchema(
               extractor,
@@ -1562,14 +1562,14 @@ export class RunsService {
         `Batch retry (extraction-only) for ${sources.length} source(s)`,
       );
 
-      if (run.extractionProvider === ExtractionProvider.OLLAMA) {
+      if (run.extractionProvider === ExtractionProvider.FREELLM) {
         await this.runRepo.save(run);
         await this.flushLogs(run.id);
 
         // Run inline Ollama extraction for each source
         for (const source of sources) {
           try {
-            const result = await this.ollamaService.extract(
+            const result = await this.llmService.extract(
               source.parsedContent!,
               effectiveSchema,
               extractor?.systemPrompt || '',
