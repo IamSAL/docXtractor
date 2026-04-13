@@ -22,7 +22,7 @@ import { FilesModule } from './files/files.module';
 import { RunsModule } from './runs/runs.module';
 import { QueueModule } from './shared/queue/queue.module';
 import { DashboardModule } from './dashboard/dashboard.module';
-import { OllamaModule } from './shared/ollama/ollama.module';
+import { LlmModule } from './shared/llm/llm.module';
 import { MailModule } from './shared/mail/mail.module';
 import { WorkflowsModule } from './workflows/workflows.module';
 
@@ -88,7 +88,7 @@ if (process.env.ENABLE_RATE_LIMITING === 'true') {
 
     DashboardModule,
 
-    OllamaModule,
+    LlmModule,
 
     WorkflowsModule,
   ],
