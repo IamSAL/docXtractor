@@ -41,9 +41,12 @@ def unload_engines() -> None:
     import gc
     with _registry_lock:
         for engine in _engine_registry.values():
-            # DoclingEngine keeps DocumentConverter instances; drop them explicitly
-            if hasattr(engine, "_converters"):
-                engine._converters.clear()
+            # DoclingEngine: terminate subprocess so OS reclaims model memory
+            if hasattr(engine, "_process") and engine._process is not None:
+                if engine._process.is_alive():
+                    engine._process.terminate()
+                    engine._process.join(timeout=5)
+                engine._process = None
         _engine_registry.clear()
     gc.collect()
     logger.info("Engine registry cleared — memory released")
