@@ -23,7 +23,7 @@ export class LlmService {
         'FREELLM_BASE_URL',
         'http://freellm:3000/v1',
       ),
-      apiKey: 'freellm',
+      apiKey: configService.get<string>('FREELLM_API_KEY', 'freellm'),
     });
     this.defaultModel = configService.get<string>('LLM_DEFAULT_MODEL', 'free');
     this.maxRetries = configService.get<number>('LLM_MAX_RETRIES', 3);

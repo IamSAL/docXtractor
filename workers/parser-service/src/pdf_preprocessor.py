@@ -40,6 +40,7 @@ def preprocess_pdf(file_bytes: bytes) -> bytes:
         doc.close()
 
         result = output.getvalue()
+        output.close()
         orig_kb = len(file_bytes) // 1024
         new_kb = len(result) // 1024
         if new_kb < orig_kb:
@@ -78,6 +79,7 @@ def split_pdf_into_chunks(file_bytes: bytes, chunk_size: int) -> list[bytes]:
             chunk_doc.close()
             src.close()
             chunks.append(buf.getvalue())
+            buf.close()
 
         logger.info(
             f"Split {total_pages}-page PDF into {len(chunks)} chunks "

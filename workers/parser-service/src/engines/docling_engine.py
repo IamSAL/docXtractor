@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 DO_TABLE_STRUCTURE = os.getenv("DO_TABLE_STRUCTURE", "true").lower() == "true"
 PDF_CHUNK_WORKERS = int(os.getenv("PDF_CHUNK_WORKERS", "4"))
-PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "8"))
+PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "2"))
 _THREADS_PER_DOC = int(os.getenv("THREADS_PER_DOC", str(max(1, (os.cpu_count() or 4) // max(1, PARSER_CONCURRENCY)))))
 #_THREADS_PER_DOC = 1
 
@@ -56,16 +56,24 @@ class DoclingEngine(ParserEngine):
 
     def _convert_with_fallback(self, name: str, file_bytes: bytes):
         try:
-            source = DocumentStream(name=name, stream=io.BytesIO(file_bytes))
-            return self._get_converter("dlparse_v2").convert(source)
+            buf = io.BytesIO(file_bytes)
+            source = DocumentStream(name=name, stream=buf)
+            result = self._get_converter("dlparse_v2").convert(source)
+            buf.close()
+            return result
         except ConversionError as e:
             logger.warning(f"dlparse_v2 failed ({e}), retrying with pypdfium2 backend")
-            source = DocumentStream(name=name, stream=io.BytesIO(file_bytes))
-            return self._get_converter("pypdfium2").convert(source)
+            buf = io.BytesIO(file_bytes)
+            source = DocumentStream(name=name, stream=buf)
+            result = self._get_converter("pypdfium2").convert(source)
+            buf.close()
+            return result
 
     def _convert_chunk(self, chunk_bytes: bytes, name: str, chunk_idx: int) -> str:
         result = self._convert_with_fallback(f"{name}_chunk{chunk_idx}", chunk_bytes)
-        return result.document.export_to_markdown()
+        markdown = result.document.export_to_markdown()
+        del result
+        return markdown
 
     def warm_up(self) -> None:
         logger.info("Pre-warming Docling converters...")
@@ -84,23 +92,31 @@ class DoclingEngine(ParserEngine):
 
         if PDF_CHUNK_SIZE > 0:
             chunks = split_pdf_into_chunks(file_bytes, PDF_CHUNK_SIZE)
+            del file_bytes  # chunks own their own bytes now; release original
         else:
-            chunks = [file_bytes]
+            chunks = None
 
-        if len(chunks) > 1:
+        if chunks is not None and len(chunks) > 1:
             logger.info(f"Processing {len(chunks)} chunks in parallel (workers={PDF_CHUNK_WORKERS})")
             with concurrent.futures.ThreadPoolExecutor(max_workers=PDF_CHUNK_WORKERS) as executor:
                 futures = {
                     executor.submit(self._convert_chunk, chunk, file_name, i): i
                     for i, chunk in enumerate(chunks)
                 }
+                del chunks  # free chunk bytes as futures are submitted
                 results_by_idx = {}
                 for f in concurrent.futures.as_completed(futures):
                     results_by_idx[futures[f]] = f.result()
             markdown_content = "\n\n".join(results_by_idx[i] for i in sorted(results_by_idx))
+            del results_by_idx
         else:
+            if chunks is not None:
+                file_bytes = chunks[0]
+                del chunks
             result = self._convert_with_fallback(file_name, file_bytes)
+            del file_bytes
             markdown_content = result.document.export_to_markdown()
+            del result
 
         parse_result = ParseResult(
             markdown_content=markdown_content,
@@ -129,9 +145,13 @@ class DoclingEngine(ParserEngine):
                 os.remove(local_path)
                 return ParseResult(**cached)
 
-            result = self._convert_with_fallback(local_path, open(local_path, "rb").read())
-            markdown_content = result.document.export_to_markdown()
+            with open(local_path, "rb") as fh:
+                raw_bytes = fh.read()
             os.remove(local_path)
+            result = self._convert_with_fallback(local_path, raw_bytes)
+            del raw_bytes
+            markdown_content = result.document.export_to_markdown()
+            del result
 
             parse_result = ParseResult(
                 markdown_content=markdown_content,

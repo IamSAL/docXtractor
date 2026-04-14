@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import time
 from datetime import datetime, timezone
 from .bullmq_client import bullmq_client
 from .extractor import run_extraction
@@ -11,6 +12,9 @@ logger = logging.getLogger(__name__)
 QUEUE_REQUESTS = "extraction-requests"
 QUEUE_COMPLETED = "extraction-completed"
 EXTRACTION_CONCURRENCY = int(os.getenv("EXTRACTION_CONCURRENCY", "3"))
+IDLE_SHUTDOWN_SECONDS = int(os.getenv("IDLE_SHUTDOWN_MINUTES", "15")) * 60
+
+_last_activity: float = time.monotonic()
 
 
 def _make_log(level, message):
@@ -26,6 +30,9 @@ async def process_job(job: Job, token: str = None):
     """
     Process an extraction job from BullMQ.
     """
+    global _last_activity
+    _last_activity = time.monotonic()
+
     data = job.data
     logs = []
     document_id = data.get("document_id")  # Present in batch/per_document mode
@@ -121,12 +128,30 @@ async def process_job(job: Job, token: str = None):
         await bullmq_client.add_job(QUEUE_COMPLETED, "extraction-completed", event)
         raise e
 
+async def _idle_watcher():
+    if IDLE_SHUTDOWN_SECONDS <= 0:
+        return
+    import gc
+    logger.info(f"Idle GC enabled: will trim memory after {IDLE_SHUTDOWN_SECONDS // 60} min of inactivity")
+    trimmed = False
+    while True:
+        await asyncio.sleep(60)
+        idle = time.monotonic() - _last_activity
+        if idle >= IDLE_SHUTDOWN_SECONDS and not trimmed:
+            logger.info(f"No jobs for {idle / 60:.1f} min — running GC to trim memory")
+            gc.collect()
+            trimmed = True
+        elif idle < IDLE_SHUTDOWN_SECONDS and trimmed:
+            trimmed = False
+
+
 async def consume():
     """
     Main entry point for starting the worker.
     """
     logger.info(f"Starting BullMQ worker for queue {QUEUE_REQUESTS} (concurrency={EXTRACTION_CONCURRENCY})")
     worker = bullmq_client.create_worker(QUEUE_REQUESTS, process_job, concurrency=EXTRACTION_CONCURRENCY)
+    idle_task = asyncio.create_task(_idle_watcher())
 
     try:
         while True:
@@ -134,4 +159,5 @@ async def consume():
     except asyncio.CancelledError:
         logger.info("Worker cancelled")
     finally:
+        idle_task.cancel()
         await worker.close()

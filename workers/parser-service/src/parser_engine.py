@@ -36,6 +36,19 @@ _engine_registry: dict[str, ParserEngine] = {}
 _registry_lock = __import__("threading").Lock()
 
 
+def unload_engines() -> None:
+    """Evict all cached engine instances to free RAM. Next call to get_engine() re-initializes."""
+    import gc
+    with _registry_lock:
+        for engine in _engine_registry.values():
+            # DoclingEngine keeps DocumentConverter instances; drop them explicitly
+            if hasattr(engine, "_converters"):
+                engine._converters.clear()
+        _engine_registry.clear()
+    gc.collect()
+    logger.info("Engine registry cleared — memory released")
+
+
 def get_engine(engine_name: str | None = None) -> ParserEngine:
     """Return the parser engine for the given name. Lazy-initializes on first use."""
     if engine_name is None:

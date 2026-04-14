@@ -1,7 +1,9 @@
 import asyncio
+import gc
 import io
 import logging
 import os
+import time
 from datetime import datetime, timezone
 from .bullmq_client import bullmq_client
 from .parser_engine import get_engine
@@ -12,7 +14,10 @@ logger = logging.getLogger(__name__)
 
 QUEUE_UPLOADED = "uploaded-documents"
 QUEUE_PARSED = "parsed-documents"
-PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "8"))
+PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "2"))
+IDLE_SHUTDOWN_SECONDS = int(os.getenv("IDLE_SHUTDOWN_MINUTES", "15")) * 60
+
+_last_activity: float = time.monotonic()
 
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "http://localhost:9000")
 MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "minioadmin")
@@ -40,6 +45,9 @@ async def process_job(job: Job, token: str = None):
     """
     Process a single job from BullMQ.
     """
+    global _last_activity
+    _last_activity = time.monotonic()
+
     data = job.data
     logs = []
     doc_name = data.get("name", "unknown")
@@ -108,8 +116,11 @@ async def process_job(job: Job, token: str = None):
             s3_client.download_fileobj(MINIO_BUCKET, file_key, file_stream)
             file_stream.seek(0)
             file_bytes = file_stream.read()
+            file_stream.close()
+            del file_stream
 
             result = await asyncio.to_thread(engine.parse_bytes, file_bytes, doc_name)
+            del file_bytes
             logger.info(f"✅ File document processed successfully")
 
         # Check again after processing — run may have been cancelled while we were working
@@ -130,10 +141,13 @@ async def process_job(job: Job, token: str = None):
             "token_count": result.token_count,
             "logs": logs,
         }
+        del result
 
         logger.info(f"📤 Sending parsed result to queue: {QUEUE_PARSED}")
         await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+        del event
         logger.info(f"✅ Processed and produced result for {data.get('document_id')}")
+        gc.collect()
         return {"status": "success"}
 
     except Exception as e:
@@ -150,7 +164,26 @@ async def process_job(job: Job, token: str = None):
         }
         logger.info(f"📤 Sending failure event to queue: {QUEUE_PARSED}")
         await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+        gc.collect()
         raise e
+
+async def _idle_watcher():
+    if IDLE_SHUTDOWN_SECONDS <= 0:
+        return
+    from .parser_engine import unload_engines
+    logger.info(f"Idle unload enabled: will release models after {IDLE_SHUTDOWN_SECONDS // 60} min of inactivity")
+    unloaded = False
+    while True:
+        await asyncio.sleep(60)
+        idle = time.monotonic() - _last_activity
+        if idle >= IDLE_SHUTDOWN_SECONDS and not unloaded:
+            logger.info(f"No jobs for {idle / 60:.1f} min — unloading parser models to free RAM")
+            await asyncio.to_thread(unload_engines)
+            unloaded = True
+        elif idle < IDLE_SHUTDOWN_SECONDS and unloaded:
+            # Job arrived after unload — reset flag so we unload again next idle period
+            unloaded = False
+
 
 async def consume():
     """
@@ -158,6 +191,7 @@ async def consume():
     """
     logger.info(f"Starting BullMQ worker for queue {QUEUE_UPLOADED} (concurrency={PARSER_CONCURRENCY})")
     worker = bullmq_client.create_worker(QUEUE_UPLOADED, process_job, concurrency=PARSER_CONCURRENCY)
+    idle_task = asyncio.create_task(_idle_watcher())
     try:
         # Keep the coroutine alive while the worker runs
         while True:
@@ -165,4 +199,5 @@ async def consume():
     except asyncio.CancelledError:
         logger.info("Worker cancelled")
     finally:
+        idle_task.cancel()
         await worker.close()

@@ -17,11 +17,12 @@ def patched_parse_output(self, text, *args, **kwargs):
 FormatHandler.parse_output = patched_parse_output
 
 FREELLM_BASE_URL = os.getenv("FREELLM_BASE_URL", "http://freellm:3000/v1")
+FREELLM_API_KEY = os.getenv("FREELLM_API_KEY", "freellm")
 LLM_DEFAULT_MODEL = os.getenv("LLM_DEFAULT_MODEL", "free")
 
 _llm_client = OpenAI(
     base_url=FREELLM_BASE_URL,
-    api_key="freellm",
+    api_key=FREELLM_API_KEY,
 )
 
 def run_extraction(
@@ -146,7 +147,7 @@ def run_langextract_extraction(
             examples=lx_examples,
             model_id=model_id,
             model_url=FREELLM_BASE_URL,
-            api_key="freellm",
+            api_key=FREELLM_API_KEY,
             fence_output=False,
             use_schema_constraints=False
         )

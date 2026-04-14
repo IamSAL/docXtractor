@@ -45,8 +45,8 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - MISTRAL_API_KEY=${MISTRAL_API_KEY}
       - CEREBRAS_API_KEY=${CEREBRAS_API_KEY}
-      # - FREELLM_API_KEY=abcdefgh123gsk456kh
-      # - FREELLM_TOKEN_SECRET=kjdhajkshdj7hdkjahsjkdhkjahsh786avsdbnvas
+      - FREELLM_API_KEY=${FREELLM_API_KEY}
+      - FREELLM_TOKEN_SECRET=${FREELLM_TOKEN_SECRET}
     networks:
       - docxtractor-network
     healthcheck:
@@ -77,6 +77,7 @@ services:
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=docxtractor-documents
       - FREELLM_BASE_URL=http://freellm:3000/v1
+      - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=free
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET:-docxtractor-dev-access-secret}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-docxtractor-dev-refresh-secret}
@@ -193,6 +194,7 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - FREELLM_BASE_URL=http://freellm:3000/v1
+      - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=free
       - EXTRACTION_CONCURRENCY=3
       - LOG_LEVEL=INFO

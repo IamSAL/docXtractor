@@ -78,8 +78,8 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - MISTRAL_API_KEY=${MISTRAL_API_KEY}
       - CEREBRAS_API_KEY=${CEREBRAS_API_KEY}
-      # - FREELLM_API_KEY=abcdefgh123gsk456kh
-      # - FREELLM_TOKEN_SECRET=kjdhajkshdj7hdkjahsjkdhkjahsh786avsdbnvas
+      - FREELLM_API_KEY=${FREELLM_API_KEY}
+      - FREELLM_TOKEN_SECRET=${FREELLM_TOKEN_SECRET}
     networks:
       - docxtractor-network
     healthcheck:
@@ -115,6 +115,7 @@ services:
       - JWT_RESET_SECRET=${JWT_RESET_SECRET}
       - FRONTEND_URL=${FRONTEND_URL:-https://docxtractor.sk-salman.com}
       - FREELLM_BASE_URL=http://freellm:3000/v1
+      - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - SWAGGER_USER=${SWAGGER_USER:-admin}
       - SWAGGER_PASS=${SWAGGER_PASS:-admin}
@@ -207,6 +208,7 @@ services:
       - MINIO_BUCKET=docxtractor-documents
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - FREELLM_BASE_URL=http://freellm:3000/v1
+      - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - EXTRACTION_CONCURRENCY=${EXTRACTION_CONCURRENCY:-3}
       - LOG_LEVEL=WARNING
