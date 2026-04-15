@@ -18,6 +18,10 @@ export class QueueService {
     private readonly extractionCompletedQueue: Queue,
     @InjectQueue(QueueName.WORKFLOW_EXECUTIONS)
     private readonly workflowExecutionsQueue: Queue,
+    @InjectQueue(QueueName.EXAMPLE_SOURCE_PARSE_REQUESTS)
+    private readonly exampleSourceParseRequestsQueue: Queue,
+    @InjectQueue(QueueName.EXAMPLE_SOURCE_PARSE_COMPLETED)
+    private readonly exampleSourceParseCompletedQueue: Queue,
   ) {}
 
   async addJob(
@@ -72,6 +76,10 @@ export class QueueService {
         return this.extractionCompletedQueue;
       case QueueName.WORKFLOW_EXECUTIONS:
         return this.workflowExecutionsQueue;
+      case QueueName.EXAMPLE_SOURCE_PARSE_REQUESTS:
+        return this.exampleSourceParseRequestsQueue;
+      case QueueName.EXAMPLE_SOURCE_PARSE_COMPLETED:
+        return this.exampleSourceParseCompletedQueue;
       default:
         return null;
     }
