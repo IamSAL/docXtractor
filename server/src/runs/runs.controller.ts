@@ -46,7 +46,7 @@ export class RunsController {
   @ApiResponse({ status: 200, description: 'Returns the run', type: Run })
   @ApiResponse({ status: 404, description: 'Run not found' })
   findOne(@Param('id') id: string, @GetUser() user: JWTPayload) {
-    return this.runsService.findOne(id, user.sub);
+    return this.runsService.findOneForResponse(id, user.sub);
   }
 
   @Patch(':id')
