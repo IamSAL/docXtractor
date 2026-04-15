@@ -634,8 +634,23 @@ function RunDetailComponent() {
                                 </button>
                               </RetryOptionsPopover>
                             )}
-                            <div
-                              className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${
+                            {(() => {
+                              const isSourceLoading =
+                                source.status === "parsing" ||
+                                source.status === "pending" ||
+                                source.extractionStatus === "extracting" ||
+                                source.extractionStatus === "pending";
+                              const icon =
+                                source.extractionStatus === "done"
+                                  ? "check"
+                                  : source.extractionStatus === "failed" ||
+                                      source.status === "failed"
+                                    ? "close"
+                                    : source.status === "parsed" &&
+                                        !source.extractionStatus
+                                      ? "check"
+                                      : "progress_activity";
+                              const bg =
                                 source.extractionStatus === "done"
                                   ? "bg-green-400"
                                   : source.extractionStatus === "failed" ||
@@ -644,21 +659,19 @@ function RunDetailComponent() {
                                     : source.status === "parsed" &&
                                         !source.extractionStatus
                                       ? "bg-green-400"
-                                      : "bg-[#FFD700]"
-                              }`}
-                            >
-                              <span className="material-symbols-outlined text-[16px] font-black text-black">
-                                {source.extractionStatus === "done"
-                                  ? "check"
-                                  : source.extractionStatus === "failed" ||
-                                      source.status === "failed"
-                                    ? "close"
-                                    : source.status === "parsed" &&
-                                        !source.extractionStatus
-                                      ? "check"
-                                      : "progress_activity"}
-                              </span>
-                            </div>
+                                      : "bg-[#FFD700]";
+                              return (
+                                <div
+                                  className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${bg}`}
+                                >
+                                  <span
+                                    className={`material-symbols-outlined text-[16px] font-black text-black${isSourceLoading ? " animate-spin" : ""}`}
+                                  >
+                                    {icon}
+                                  </span>
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
                       );
