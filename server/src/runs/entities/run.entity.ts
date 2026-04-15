@@ -44,6 +44,7 @@ export interface RunSource {
   url?: string;
   fileId?: string;
   fileKey?: string; // S3/MinIO key for parser
+  fileUrl?: string;
   status: 'pending' | 'parsing' | 'parsed' | 'failed';
   error?: string;
   parsedContent?: string;

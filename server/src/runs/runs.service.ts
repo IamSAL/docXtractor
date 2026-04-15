@@ -374,6 +374,18 @@ export class RunsService {
       relations: ['extractor'],
     });
     if (!run) throw new NotFoundException('Run not found');
+
+    // Attach computed public URL for file-type sources so the client
+    // can embed the original PDF without needing to know MinIO's base URL.
+    if (run.sources) {
+      run.sources = run.sources.map((s) => ({
+        ...s,
+        fileUrl: s.fileKey
+          ? this.filesService.getPublicFileUrl(s.fileKey)
+          : undefined,
+      }));
+    }
+
     return run;
   }
 

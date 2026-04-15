@@ -132,4 +132,11 @@ export class FilesService {
       order: { createdAt: 'DESC' },
     });
   }
+
+  /**
+   * Compute the public URL for a file given its storage key.
+   */
+  getPublicFileUrl(fileKey: string): string {
+    return `${this.minioPublicUrl}/${fileKey}`;
+  }
 }
