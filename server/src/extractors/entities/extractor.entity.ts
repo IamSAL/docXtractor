@@ -12,7 +12,9 @@ export interface FewShotExampleSource {
   type: 'file' | 'url' | 'text';
   name: string;
   description: string;
-  content: string;
+  content: string;       // original: MinIO public URL for file, URL string for url, raw text for text
+  storageKey?: string;   // MinIO storage key for file type (e.g. "user-id/timestamp_file.pdf")
+  parsedContent?: string; // parsed markdown; populated async by background job for file/url types
 }
 
 export interface FewShotExample {
