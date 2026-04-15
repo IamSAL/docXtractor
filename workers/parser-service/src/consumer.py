@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 QUEUE_UPLOADED = "uploaded-documents"
 QUEUE_PARSED = "parsed-documents"
+QUEUE_EXAMPLE_PARSE_REQUESTS = "example-source-parse-requests"
+QUEUE_EXAMPLE_PARSE_COMPLETED = "example-source-parse-completed"
 PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "2"))
 IDLE_SHUTDOWN_SECONDS = int(os.getenv("IDLE_SHUTDOWN_MINUTES", "15")) * 60
 
@@ -185,19 +187,97 @@ async def _idle_watcher():
             unloaded = False
 
 
+async def process_example_source_job(job: Job, token: str = None):
+    """
+    Parse an example source (file from MinIO or URL) and push result
+    to the example-source-parse-completed queue.
+    """
+    global _last_activity
+    _last_activity = time.monotonic()
+
+    data = job.data
+    extractor_id = data.get("extractor_id")
+    example_id = data.get("example_id")
+    source_id = data.get("source_id")
+    source_type = data.get("type")
+    bucket = data.get("bucket", MINIO_BUCKET)
+
+    logger.info(
+        f"📥 Example source parse job {job.id}: extractor={extractor_id} "
+        f"example={example_id} source={source_id} type={source_type}"
+    )
+
+    try:
+        engine_name = data.get("parser_engine")
+        engine = get_engine(engine_name)
+
+        if source_type == "url":
+            url = data.get("url")
+            if not url:
+                raise ValueError("No url in job data for url-type source")
+            result = await asyncio.to_thread(engine.parse_url, url)
+
+        elif source_type == "file":
+            storage_key = data.get("storage_key")
+            if not storage_key:
+                raise ValueError("No storage_key in job data for file-type source")
+            file_stream = io.BytesIO()
+            s3_client.download_fileobj(bucket, storage_key, file_stream)
+            file_stream.seek(0)
+            file_bytes = file_stream.read()
+            file_stream.close()
+            del file_stream
+            result = await asyncio.to_thread(engine.parse_bytes, file_bytes, storage_key)
+            del file_bytes
+
+        else:
+            raise ValueError(f"Unsupported source type: {source_type}")
+
+        event = {
+            "extractor_id": extractor_id,
+            "example_id": example_id,
+            "source_id": source_id,
+            "status": "success",
+            "parsed_content": result.markdown_content,
+        }
+        del result
+
+    except Exception as e:
+        logger.error(f"❌ Example source parse failed: {e}", exc_info=True)
+        event = {
+            "extractor_id": extractor_id,
+            "example_id": example_id,
+            "source_id": source_id,
+            "status": "failed",
+            "error": str(e),
+        }
+
+    await bullmq_client.add_job(
+        QUEUE_EXAMPLE_PARSE_COMPLETED, "example-source-parsed", event
+    )
+    gc.collect()
+    return {"status": event["status"]}
+
+
 async def consume():
     """
-    Main entry point for starting the worker.
+    Main entry point for starting the workers.
     """
     logger.info(f"Starting BullMQ worker for queue {QUEUE_UPLOADED} (concurrency={PARSER_CONCURRENCY})")
     worker = bullmq_client.create_worker(QUEUE_UPLOADED, process_job, concurrency=PARSER_CONCURRENCY)
+
+    logger.info(f"Starting BullMQ worker for queue {QUEUE_EXAMPLE_PARSE_REQUESTS}")
+    example_worker = bullmq_client.create_worker(
+        QUEUE_EXAMPLE_PARSE_REQUESTS, process_example_source_job, concurrency=2
+    )
+
     idle_task = asyncio.create_task(_idle_watcher())
     try:
-        # Keep the coroutine alive while the worker runs
         while True:
             await asyncio.sleep(1)
     except asyncio.CancelledError:
-        logger.info("Worker cancelled")
+        logger.info("Workers cancelled")
     finally:
         idle_task.cancel()
         await worker.close()
+        await example_worker.close()
