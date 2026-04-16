@@ -25,6 +25,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { LlmModule } from './shared/llm/llm.module';
 import { MailModule } from './shared/mail/mail.module';
 import { WorkflowsModule } from './workflows/workflows.module';
+import { BackupModule } from './backup/backup.module';
 
 // Conditional imports based on rate limiting configuration
 const conditionalImports: DynamicModule[] = [];
@@ -91,6 +92,8 @@ if (process.env.ENABLE_RATE_LIMITING === 'true') {
     LlmModule,
 
     WorkflowsModule,
+
+    BackupModule,
   ],
   controllers: [AppController],
   providers: [

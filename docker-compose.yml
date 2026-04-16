@@ -84,8 +84,12 @@ services:
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-docxtractor-dev-refresh-secret}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET:-docxtractor-dev-reset-secret}
       - FRONTEND_URL=http://localhost:5174
+      - BACKUP_ENABLED=${BACKUP_ENABLED:-false}
+      - BACKUP_GDRIVE_REMOTE=${BACKUP_GDRIVE_REMOTE:-gdrive}
+      - BACKUP_GDRIVE_PATH=${BACKUP_GDRIVE_PATH:-docxtractor-backups}
     volumes:
       - ./server:/app
+      - ${HOME}/.config/rclone:/root/.config/rclone:ro
     depends_on:
       db:
         condition: service_healthy

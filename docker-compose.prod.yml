@@ -121,9 +121,11 @@ services:
       - SWAGGER_PASS=${SWAGGER_PASS:-admin}
       - THROTTLER_TTL=${THROTTLER_TTL:-60000}
       - THROTTLER_LIMIT=${THROTTLER_LIMIT:-100}
-    # Optional: mount a custom seed file to pre-populate extractors on first run
-    # volumes:
-    #   - ./extractors.json:/app/seed/extractors.json:ro
+      - BACKUP_ENABLED=${BACKUP_ENABLED:-true}
+      - BACKUP_GDRIVE_REMOTE=${BACKUP_GDRIVE_REMOTE:-gdrive}
+      - BACKUP_GDRIVE_PATH=${BACKUP_GDRIVE_PATH:-docxtractor-backups}
+    volumes:
+      - ${HOME}/.config/rclone:/root/.config/rclone:ro
     depends_on:
       db:
         condition: service_healthy
