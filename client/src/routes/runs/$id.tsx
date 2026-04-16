@@ -9,7 +9,7 @@ import {
   useRunsControllerUpdate,
   getRunsControllerFindAllQueryKey,
 } from "@/api/endpoints/runs/runs";
-import { useEffect, useRef, useMemo, useCallback } from "react";
+import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/lib/socket";
 import { toast } from "sonner";
@@ -24,6 +24,8 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/retroui/Tabs";
+import { Popover } from "@/components/retroui/Popover";
+import { ParseViewerDialog } from "@/components/modals/ParseViewerDialog";
 
 export const Route = createFileRoute("/runs/$id")({
   component: RunDetailComponent,
@@ -234,6 +236,9 @@ function RunDetailComponent() {
     run?.status === "done" ||
     run?.status === "failed" ||
     run?.status === "review";
+
+  const [viewerSourceId, setViewerSourceId] = useState<string | null>(null);
+  const viewerSource = run?.sources?.find((s: any) => s.id === viewerSourceId) ?? null;
 
   if (isLoading) {
     return (
@@ -612,6 +617,53 @@ function RunDetailComponent() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
+                            {source.parsedContent && (
+                              <Popover>
+                                <Popover.Trigger asChild>
+                                  <button
+                                    type="button"
+                                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-gray-700 bg-gray-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-gray-100 transition-colors"
+                                  >
+                                    <span className="material-symbols-outlined text-[14px]">
+                                      visibility
+                                    </span>
+                                    Parse
+                                  </button>
+                                </Popover.Trigger>
+                                <Popover.Content
+                                  className="w-80 border-2 border-black shadow-[4px_4px_0px_0px_#000000] bg-white p-0"
+                                  side="top"
+                                  align="end"
+                                >
+                                  <div className="border-b-2 border-black px-3 py-2 bg-gray-50 flex items-center justify-between">
+                                    <span className="text-[10px] font-black uppercase tracking-widest">
+                                      Parsed Output Preview
+                                    </span>
+                                    <span className="text-[10px] text-gray-400 font-mono">
+                                      {(source.parsedContent?.length ?? 0).toLocaleString()} chars
+                                    </span>
+                                  </div>
+                                  <pre className="p-3 text-[10px] font-mono leading-relaxed text-gray-700 whitespace-pre-wrap max-h-32 overflow-hidden">
+                                    {source.parsedContent.slice(0, 400)}
+                                    {source.parsedContent.length > 400 && (
+                                      <span className="text-gray-400">…</span>
+                                    )}
+                                  </pre>
+                                  <div className="border-t-2 border-black px-3 py-2">
+                                    <button
+                                      type="button"
+                                      className="w-full py-1.5 text-[10px] font-black uppercase tracking-wide text-white bg-black hover:bg-gray-800 transition-colors flex items-center justify-center gap-1.5"
+                                      onClick={() => setViewerSourceId(source.id)}
+                                    >
+                                      <span className="material-symbols-outlined text-[14px]">
+                                        open_in_full
+                                      </span>
+                                      View Full Side-by-Side
+                                    </button>
+                                  </div>
+                                </Popover.Content>
+                              </Popover>
+                            )}
                             {isTerminalState && (
                               <RetryOptionsPopover
                                 sourceNames={[source.name]}
@@ -919,6 +971,17 @@ function RunDetailComponent() {
           </div>
         </div>
       </div>
+      {viewerSource && (
+        <ParseViewerDialog
+          open={!!viewerSourceId}
+          onClose={() => setViewerSourceId(null)}
+          sourceName={viewerSource.name}
+          pdfUrl={viewerSource.fileUrl}
+          sourceUrl={viewerSource.url}
+          parsedContent={viewerSource.parsedContent ?? ""}
+          sourceType={viewerSource.type}
+        />
+      )}
     </AppLayout>
   );
 }
