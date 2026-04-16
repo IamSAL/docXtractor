@@ -25,6 +25,45 @@ _llm_client = OpenAI(
     api_key=FREELLM_API_KEY,
 )
 
+
+def _build_few_shot_block(examples: list) -> str:
+    """
+    Build a few-shot text block from fewShotExamples list.
+    Uses parsedContent for file/url sources, content for text sources.
+    Skips sources with no usable text.
+    """
+    if not examples:
+        return ""
+
+    blocks = []
+    for i, ex in enumerate(examples, 1):
+        source_parts = []
+        for src in ex.get("sources", []):
+            src_type = src.get("type", "text")
+            if src_type == "text":
+                text = src.get("content", "").strip()
+            else:
+                text = (src.get("parsedContent") or "").strip()
+            if text:
+                source_parts.append(text)
+
+        output = (ex.get("output") or "").strip()
+        if not source_parts and not output:
+            continue
+
+        combined = "\n\n---\n\n".join(source_parts) if source_parts else "(no input)"
+        blocks.append(f"Example {i}:\nInput:\n{combined}\nExpected Output:\n{output}")
+
+    if not blocks:
+        return ""
+
+    return (
+        "\n\nHere are examples of the expected extraction format:\n\n"
+        + "\n\n---\n\n".join(blocks)
+        + "\n\n"
+    )
+
+
 def run_extraction(
     content: str,
     schema_config: dict,
@@ -42,13 +81,14 @@ def run_extraction(
     if extraction_type == "langextract":
         return run_langextract_extraction(content, schema_config, resolved_model, examples)
     else:
-        return run_llm_extraction(content, schema_config, system_prompt, resolved_model)
+        return run_llm_extraction(content, schema_config, system_prompt, resolved_model, examples)
 
 def run_llm_extraction(
     content: str,
     schema_config: dict,
     system_prompt: str = "",
-    model_id: str = None
+    model_id: str = None,
+    examples: list = None,
 ) -> dict:
     """
     Uses FreeLLM (OpenAI-compatible gateway) for extraction.
@@ -77,7 +117,8 @@ def run_llm_extraction(
                 Return a valid JSON object matching this structure.
             """)
 
-        full_prompt = f"{prompt_instruction}\n\nDocument Content:\n{content}"
+        few_shot_block = _build_few_shot_block(examples)
+        full_prompt = f"{prompt_instruction}{few_shot_block}\nDocument Content:\n{content}"
 
         response = _llm_client.chat.completions.create(
             model=resolved_model,

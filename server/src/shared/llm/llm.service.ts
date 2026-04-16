@@ -10,6 +10,45 @@ export interface LlmExtractionResult {
   };
 }
 
+interface FewShotSource {
+  type?: string;
+  parsedContent?: string;
+  content?: string;
+}
+interface FewShotExample {
+  sources: FewShotSource[];
+  output: string;
+}
+
+function buildFewShotBlock(examples?: FewShotExample[]): string {
+  if (!examples?.length) return '';
+
+  const blocks = examples
+    .map((ex, i) => {
+      const sourceTexts = ex.sources
+        .map((s) => {
+          if (s.type === 'text') return (s.content || '').trim();
+          return (s.parsedContent || '').trim();
+        })
+        .filter((t) => t.length > 0);
+
+      const combinedInput = sourceTexts.join('\n\n---\n\n') || '(no input)';
+      const output = (ex.output || '').trim();
+      if (!sourceTexts.length && !output) return null;
+
+      return `Example ${i + 1}:\nInput:\n${combinedInput}\nExpected Output:\n${output}`;
+    })
+    .filter((b): b is string => b !== null);
+
+  if (!blocks.length) return '';
+
+  return (
+    '\n\nHere are examples of the expected extraction format:\n\n' +
+    blocks.join('\n\n---\n\n') +
+    '\n\n'
+  );
+}
+
 @Injectable()
 export class LlmService {
   private readonly logger = new Logger(LlmService.name);
@@ -43,6 +82,7 @@ export class LlmService {
     schema: Record<string, any>,
     systemPrompt: string,
     model?: string,
+    fewShotExamples?: FewShotExample[],
   ): Promise<LlmExtractionResult> {
     const modelId = model || this.defaultExtractionModel;
     const fieldsDesc = this.buildFieldsDescription(schema);
@@ -51,7 +91,8 @@ export class LlmService {
       ? `${systemPrompt}\n\nFields to extract:\n${fieldsDesc}\n\nReturn a valid JSON object matching this structure.`
       : `Extract the following fields from the document text.\nReference the exact text where possible.\n\nFields to extract:\n${fieldsDesc}\n\nReturn a valid JSON object matching this structure.`;
 
-    const fullPrompt = `${instruction}\n\nDocument Content:\n${content}`;
+    const fewShotBlock = buildFewShotBlock(fewShotExamples);
+    const fullPrompt = `${instruction}${fewShotBlock}\nDocument Content:\n${content}`;
 
     this.logger.log(`Running LLM extraction, model: ${modelId}`);
 

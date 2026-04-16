@@ -598,6 +598,7 @@ export class RunsService {
           ),
           extractor?.systemPrompt || '',
           'free',
+          extractor?.fewShotExamples,
         );
 
         run.status = RunStatus.DONE;
@@ -773,6 +774,7 @@ export class RunsService {
         ),
         extractor?.systemPrompt || '',
         'free',
+        extractor?.fewShotExamples,
       );
     } catch (error) {
       extractionError = error;
@@ -1295,6 +1297,7 @@ export class RunsService {
             ),
             extractor?.systemPrompt || '',
             'free',
+            extractor?.fewShotExamples,
           );
 
           source.extractionStatus = 'done';
@@ -1569,6 +1572,7 @@ export class RunsService {
               effectiveSchema,
               extractor?.systemPrompt || '',
               'free',
+              extractor?.fewShotExamples,
             );
             source.extractionStatus = 'done';
             source.extractionResult = this.mergeExtractionResult(
