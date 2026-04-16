@@ -9,7 +9,7 @@ import {
   useRunsControllerUpdate,
   getRunsControllerFindAllQueryKey,
 } from "@/api/endpoints/runs/runs";
-import { useEffect, useRef, useMemo, useCallback } from "react";
+import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/lib/socket";
 import { toast } from "sonner";
@@ -24,6 +24,8 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/retroui/Tabs";
+import { Popover } from "@/components/retroui/Popover";
+import { ParseViewerDialog } from "@/components/modals/ParseViewerDialog";
 
 export const Route = createFileRoute("/runs/$id")({
   component: RunDetailComponent,
@@ -64,7 +66,13 @@ function RunDetailComponent() {
           getRunsControllerFindOneQueryKey(id),
           (oldData: any) => {
             if (!oldData) return oldData;
-            return { ...oldData, data: updatedRun };
+            // Preserve computed fileUrl on each source — WS payload is raw DB object
+            const oldSources: any[] = oldData.data?.sources ?? [];
+            const mergedSources = updatedRun.sources?.map((s: any) => {
+              const old = oldSources.find((o: any) => o.id === s.id);
+              return { ...s, fileUrl: old?.fileUrl ?? s.fileUrl };
+            });
+            return { ...oldData, data: { ...updatedRun, sources: mergedSources } };
           },
         );
       }
@@ -76,9 +84,11 @@ function RunDetailComponent() {
         (oldData: any) => {
           if (!oldData || !oldData.data) return oldData;
           const run = oldData.data;
-          const sources = run.sources?.map((s: any) =>
-            s.id === updatedSource.id ? updatedSource : s,
-          );
+          const sources = run.sources?.map((s: any) => {
+            if (s.id !== updatedSource.id) return s;
+            // Preserve computed fileUrl — WS payload is raw DB object, no fileUrl
+            return { ...updatedSource, fileUrl: s.fileUrl ?? updatedSource.fileUrl };
+          });
           return { ...oldData, data: { ...run, sources } };
         },
       );
@@ -136,11 +146,6 @@ function RunDetailComponent() {
     if (step === "parsing" || status === "parsing") return 1;
     return 0;
   }, [run?.progress?.currentStep, run?.status]);
-
-  // Auto-scroll logs
-  // useEffect(() => {
-  //   logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  // }, [run?.logs?.length]);
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -234,6 +239,9 @@ function RunDetailComponent() {
     run?.status === "done" ||
     run?.status === "failed" ||
     run?.status === "review";
+
+  const [viewerSourceId, setViewerSourceId] = useState<string | null>(null);
+  const viewerSource = run?.sources?.find((s: any) => s.id === viewerSourceId) ?? null;
 
   if (isLoading) {
     return (
@@ -612,6 +620,53 @@ function RunDetailComponent() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
+                            {source.parsedContent && (
+                              <Popover>
+                                <Popover.Trigger asChild>
+                                  <button
+                                    type="button"
+                                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-gray-700 bg-gray-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-gray-100 transition-colors"
+                                  >
+                                    <span className="material-symbols-outlined text-[14px]">
+                                      visibility
+                                    </span>
+                                    Parse
+                                  </button>
+                                </Popover.Trigger>
+                                <Popover.Content
+                                  className="w-80 border-2 border-black shadow-[4px_4px_0px_0px_#000000] bg-white p-0"
+                                  side="top"
+                                  align="end"
+                                >
+                                  <div className="border-b-2 border-black px-3 py-2 bg-gray-50 flex items-center justify-between">
+                                    <span className="text-[10px] font-black uppercase tracking-widest">
+                                      Parsed Output Preview
+                                    </span>
+                                    <span className="text-[10px] text-gray-400 font-mono">
+                                      {(source.parsedContent?.length ?? 0).toLocaleString()} chars
+                                    </span>
+                                  </div>
+                                  <pre className="p-3 text-[10px] font-mono leading-relaxed text-gray-700 whitespace-pre-wrap max-h-32 overflow-hidden">
+                                    {source.parsedContent.slice(0, 400)}
+                                    {source.parsedContent.length > 400 && (
+                                      <span className="text-gray-400">…</span>
+                                    )}
+                                  </pre>
+                                  <div className="border-t-2 border-black px-3 py-2">
+                                    <button
+                                      type="button"
+                                      className="w-full py-1.5 text-[10px] font-black uppercase tracking-wide text-white bg-black hover:bg-gray-800 transition-colors flex items-center justify-center gap-1.5"
+                                      onClick={() => setViewerSourceId(source.id)}
+                                    >
+                                      <span className="material-symbols-outlined text-[14px]">
+                                        open_in_full
+                                      </span>
+                                      View Full Side-by-Side
+                                    </button>
+                                  </div>
+                                </Popover.Content>
+                              </Popover>
+                            )}
                             {isTerminalState && (
                               <RetryOptionsPopover
                                 sourceNames={[source.name]}
@@ -634,8 +689,23 @@ function RunDetailComponent() {
                                 </button>
                               </RetryOptionsPopover>
                             )}
-                            <div
-                              className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${
+                            {(() => {
+                              const isSourceLoading =
+                                source.status === "parsing" ||
+                                source.status === "pending" ||
+                                source.extractionStatus === "extracting" ||
+                                source.extractionStatus === "pending";
+                              const icon =
+                                source.extractionStatus === "done"
+                                  ? "check"
+                                  : source.extractionStatus === "failed" ||
+                                      source.status === "failed"
+                                    ? "close"
+                                    : source.status === "parsed" &&
+                                        !source.extractionStatus
+                                      ? "check"
+                                      : "progress_activity";
+                              const bg =
                                 source.extractionStatus === "done"
                                   ? "bg-green-400"
                                   : source.extractionStatus === "failed" ||
@@ -644,21 +714,19 @@ function RunDetailComponent() {
                                     : source.status === "parsed" &&
                                         !source.extractionStatus
                                       ? "bg-green-400"
-                                      : "bg-[#FFD700]"
-                              }`}
-                            >
-                              <span className="material-symbols-outlined text-[16px] font-black text-black">
-                                {source.extractionStatus === "done"
-                                  ? "check"
-                                  : source.extractionStatus === "failed" ||
-                                      source.status === "failed"
-                                    ? "close"
-                                    : source.status === "parsed" &&
-                                        !source.extractionStatus
-                                      ? "check"
-                                      : "progress_activity"}
-                              </span>
-                            </div>
+                                      : "bg-[#FFD700]";
+                              return (
+                                <div
+                                  className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${bg}`}
+                                >
+                                  <span
+                                    className={`material-symbols-outlined text-[16px] font-black text-black${isSourceLoading ? " animate-spin" : ""}`}
+                                  >
+                                    {icon}
+                                  </span>
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
                       );
@@ -906,6 +974,17 @@ function RunDetailComponent() {
           </div>
         </div>
       </div>
+      {viewerSource && (
+        <ParseViewerDialog
+          open={!!viewerSourceId}
+          onClose={() => setViewerSourceId(null)}
+          sourceName={viewerSource.name}
+          pdfUrl={viewerSource.fileUrl}
+          sourceUrl={viewerSource.url}
+          parsedContent={viewerSource.parsedContent ?? ""}
+          sourceType={viewerSource.type}
+        />
+      )}
     </AppLayout>
   );
 }

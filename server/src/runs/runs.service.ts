@@ -378,6 +378,24 @@ export class RunsService {
   }
 
   /**
+   * Like findOne, but annotates file-type sources with a computed fileUrl
+   * for client consumption. Do NOT use this for internal write operations —
+   * fileUrl must not be persisted to the sources JSONB column.
+   */
+  async findOneForResponse(id: string, userId: string): Promise<Run> {
+    const run = await this.findOne(id, userId);
+    return {
+      ...run,
+      sources: run.sources?.map((s) => ({
+        ...s,
+        fileUrl: s.fileKey
+          ? this.filesService.getPublicFileUrl(s.fileKey)
+          : undefined,
+      })),
+    } as Run;
+  }
+
+  /**
    * Handle document parsed event from parser-service
    */
   async handleDocumentParsed(data: any) {
