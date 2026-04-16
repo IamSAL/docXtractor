@@ -73,6 +73,7 @@ services:
       - REDIS_PORT=6380
       - REDIS_URL=redis://redis:6380
       - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_PUBLIC_URL=http://localhost:9005
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=docxtractor-documents

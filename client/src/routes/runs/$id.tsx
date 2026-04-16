@@ -66,7 +66,13 @@ function RunDetailComponent() {
           getRunsControllerFindOneQueryKey(id),
           (oldData: any) => {
             if (!oldData) return oldData;
-            return { ...oldData, data: updatedRun };
+            // Preserve computed fileUrl on each source — WS payload is raw DB object
+            const oldSources: any[] = oldData.data?.sources ?? [];
+            const mergedSources = updatedRun.sources?.map((s: any) => {
+              const old = oldSources.find((o: any) => o.id === s.id);
+              return { ...s, fileUrl: old?.fileUrl ?? s.fileUrl };
+            });
+            return { ...oldData, data: { ...updatedRun, sources: mergedSources } };
           },
         );
       }
@@ -78,9 +84,11 @@ function RunDetailComponent() {
         (oldData: any) => {
           if (!oldData || !oldData.data) return oldData;
           const run = oldData.data;
-          const sources = run.sources?.map((s: any) =>
-            s.id === updatedSource.id ? updatedSource : s,
-          );
+          const sources = run.sources?.map((s: any) => {
+            if (s.id !== updatedSource.id) return s;
+            // Preserve computed fileUrl — WS payload is raw DB object, no fileUrl
+            return { ...updatedSource, fileUrl: s.fileUrl ?? updatedSource.fileUrl };
+          });
           return { ...oldData, data: { ...run, sources } };
         },
       );
@@ -138,11 +146,6 @@ function RunDetailComponent() {
     if (step === "parsing" || status === "parsing") return 1;
     return 0;
   }, [run?.progress?.currentStep, run?.status]);
-
-  // Auto-scroll logs
-  // useEffect(() => {
-  //   logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  // }, [run?.logs?.length]);
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
