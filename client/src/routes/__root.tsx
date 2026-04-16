@@ -2,60 +2,60 @@ import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
 
-import Header from '../components/Header'
+import Header from "../components/Header";
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
-import AiDevtools from '../lib/ai-devtools'
+import AiDevtools from "../lib/ai-devtools";
 
-import StoreDevtools from '../lib/demo-store-devtools'
+import StoreDevtools from "../lib/demo-store-devtools";
 
-import appCss from '../styles.css?url'
+import appCss from "../styles.css?url";
 
-import type { QueryClient } from '@tanstack/react-query'
-import { Toaster } from '@/components/retroui/Sonner'
-import NiceModal from '@ebay/nice-modal-react'
+import type { QueryClient } from "@tanstack/react-query";
+import { Toaster } from "@/components/retroui/Sonner";
+import NiceModal from "@ebay/nice-modal-react";
 
 interface MyRouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'docXtractor',
+        title: "DocXtractor",
       },
     ],
     links: [
       {
-        rel: 'icon',
-        href: '/logo.svg',
+        rel: "icon",
+        href: "/logo.svg",
       },
       {
-        rel: 'stylesheet',
+        rel: "stylesheet",
         href: appCss,
       },
     ],
   }),
 
   shellComponent: RootDocument,
-})
+});
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className='light'>
+    <html lang="en" className="light">
       <head>
         <HeadContent />
 
@@ -64,17 +64,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script> */}
       </head>
-      <body className='bg-background-cream min-h-screen  flex text-black light'>
-        <NiceModal.Provider>
-          {children}
-        </NiceModal.Provider>
+      <body className="bg-background-cream min-h-screen  flex text-black light">
+        <NiceModal.Provider>{children}</NiceModal.Provider>
         <TanStackDevtools
           config={{
-            position: 'bottom-right',
+            position: "bottom-right",
           }}
           plugins={[
             {
-              name: 'Tanstack Router',
+              name: "Tanstack Router",
               render: <TanStackRouterDevtoolsPanel />,
             },
             TanStackQueryDevtools,
@@ -86,5 +84,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Toaster />
       </body>
     </html>
-  )
+  );
 }
