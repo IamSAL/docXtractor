@@ -92,9 +92,11 @@ export class LlmService {
       : `Extract the following fields from the document text.\nReference the exact text where possible.\n\nFields to extract:\n${fieldsDesc}\n\nReturn a valid JSON object matching this structure.`;
 
     const fewShotBlock = buildFewShotBlock(fewShotExamples);
-    const fullPrompt = `${instruction}${fewShotBlock}\nDocument Content:\n${content}`;
+    const fullPrompt = `${instruction}${fewShotBlock}\nDocument Content:\n${content}\nImportant, Your output structure must match 100% of this json schema:\n ${JSON.stringify(schema.properties)}`;
 
     this.logger.log(`Running LLM extraction, model: ${modelId}`);
+    this.logger.log('::::INPUT::::');
+    this.logger.log(fullPrompt);
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
@@ -105,14 +107,15 @@ export class LlmService {
         });
 
         const raw = response.choices[0].message.content ?? '{}';
-        this.logger.debug(`LLM response: ${raw}`);
+        this.logger.log('::::OUTPUT::::');
+        this.logger.debug(raw);
         const resultData = JSON.parse(jsonrepair(raw)) as Record<
           string,
           unknown
         >;
         const totalTokens = response.usage?.total_tokens ?? 0;
 
-        this.logger.log(`LLM extraction complete: tokens=${totalTokens}`);
+        this.logger.log(`LLM extraction complete:`, response);
         return { data: resultData, usage: { totalTokens } };
       } catch (error: any) {
         this.logger.error(

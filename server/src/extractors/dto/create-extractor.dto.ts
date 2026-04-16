@@ -37,6 +37,16 @@ export class FewShotExampleSourceDto {
   @IsString()
   @IsOptional()
   content?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  storageKey?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  parsedContent?: string;
 }
 
 export class FewShotExampleDto {

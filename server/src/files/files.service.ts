@@ -11,6 +11,7 @@ import { StorageService } from './storage.service';
 export class FilesService {
   private readonly logger = new Logger(FilesService.name);
   private readonly minioPublicUrl: string;
+  private readonly bucketName: string;
 
   constructor(
     @InjectRepository(File)
@@ -22,6 +23,8 @@ export class FilesService {
       this.configService.get<string>('MINIO_PUBLIC_URL') ||
       this.configService.get<string>('MINIO_ENDPOINT') ||
       'http://localhost:9000';
+    this.bucketName =
+      this.configService.get<string>('MINIO_BUCKET') || 'docxtractor-documents';
   }
 
   /**
@@ -65,7 +68,7 @@ export class FilesService {
     // Note: In a real app, the URL might be a signed URL or a proxy URL
     return {
       id: fileRecord.id,
-      url: `${this.minioPublicUrl}/${storageKey}`,
+      url: `${this.minioPublicUrl}/${this.bucketName}/${storageKey}`,
       storageKey,
     };
   }
@@ -137,6 +140,6 @@ export class FilesService {
    * Compute the public URL for a file given its storage key.
    */
   getPublicFileUrl(fileKey: string): string {
-    return `${this.minioPublicUrl}/${fileKey}`;
+    return `${this.minioPublicUrl}/${this.bucketName}/${fileKey}`;
   }
 }

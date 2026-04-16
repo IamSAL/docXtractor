@@ -72,7 +72,10 @@ function RunDetailComponent() {
               const old = oldSources.find((o: any) => o.id === s.id);
               return { ...s, fileUrl: old?.fileUrl ?? s.fileUrl };
             });
-            return { ...oldData, data: { ...updatedRun, sources: mergedSources } };
+            return {
+              ...oldData,
+              data: { ...updatedRun, sources: mergedSources },
+            };
           },
         );
       }
@@ -87,7 +90,10 @@ function RunDetailComponent() {
           const sources = run.sources?.map((s: any) => {
             if (s.id !== updatedSource.id) return s;
             // Preserve computed fileUrl — WS payload is raw DB object, no fileUrl
-            return { ...updatedSource, fileUrl: s.fileUrl ?? updatedSource.fileUrl };
+            return {
+              ...updatedSource,
+              fileUrl: s.fileUrl ?? updatedSource.fileUrl,
+            };
           });
           return { ...oldData, data: { ...run, sources } };
         },
@@ -241,7 +247,8 @@ function RunDetailComponent() {
     run?.status === "review";
 
   const [viewerSourceId, setViewerSourceId] = useState<string | null>(null);
-  const viewerSource = run?.sources?.find((s: any) => s.id === viewerSourceId) ?? null;
+  const viewerSource =
+    run?.sources?.find((s: any) => s.id === viewerSourceId) ?? null;
 
   if (isLoading) {
     return (
@@ -579,154 +586,125 @@ function RunDetailComponent() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {run.sources?.map((source: any, idx: number) => {
                       return (
-                        <div
-                          key={source.id || idx}
-                          className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-3 rounded-sm flex items-center justify-between group hover:translate-x-1 transition-transform"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`size-10 border-2 border-black rounded-sm flex items-center justify-center ${
-                                source.type === "file"
-                                  ? "bg-red-50"
-                                  : "bg-blue-50"
-                              }`}
-                            >
-                              <span
-                                className={`material-symbols-outlined ${
-                                  source.type === "file"
-                                    ? "text-red-600"
-                                    : "text-blue-600"
-                                }`}
-                              >
-                                {source.type === "file"
-                                  ? "picture_as_pdf"
-                                  : "link"}
-                              </span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="font-black text-xs uppercase tracking-tight text-black">
-                                {source.name}
-                              </span>
-                              <span className="text-[10px] font-bold text-gray-400">
-                                {source.type === "file" ? "File" : "URL"} •{" "}
-                                {source.status}
-                                {source.tokenCount
-                                  ? ` • ${source.tokenCount.toLocaleString()} tokens`
-                                  : ""}
-                                {source.extractionStatus
-                                  ? ` • Extraction: ${source.extractionStatus}`
-                                  : ""}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {source.parsedContent && (
-                              <Popover>
-                                <Popover.Trigger asChild>
-                                  <button
-                                    type="button"
-                                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-gray-700 bg-gray-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-gray-100 transition-colors"
-                                  >
-                                    <span className="material-symbols-outlined text-[14px]">
-                                      visibility
-                                    </span>
-                                    Parse
-                                  </button>
-                                </Popover.Trigger>
-                                <Popover.Content
-                                  className="w-80 border-2 border-black shadow-[4px_4px_0px_0px_#000000] bg-white p-0"
-                                  side="top"
-                                  align="end"
-                                >
-                                  <div className="border-b-2 border-black px-3 py-2 bg-gray-50 flex items-center justify-between">
-                                    <span className="text-[10px] font-black uppercase tracking-widest">
-                                      Parsed Output Preview
-                                    </span>
-                                    <span className="text-[10px] text-gray-400 font-mono">
-                                      {(source.parsedContent?.length ?? 0).toLocaleString()} chars
-                                    </span>
-                                  </div>
-                                  <pre className="p-3 text-[10px] font-mono leading-relaxed text-gray-700 whitespace-pre-wrap max-h-32 overflow-hidden">
-                                    {source.parsedContent.slice(0, 400)}
-                                    {source.parsedContent.length > 400 && (
-                                      <span className="text-gray-400">…</span>
-                                    )}
-                                  </pre>
-                                  <div className="border-t-2 border-black px-3 py-2">
-                                    <button
-                                      type="button"
-                                      className="w-full py-1.5 text-[10px] font-black uppercase tracking-wide text-white bg-black hover:bg-gray-800 transition-colors flex items-center justify-center gap-1.5"
-                                      onClick={() => setViewerSourceId(source.id)}
-                                    >
-                                      <span className="material-symbols-outlined text-[14px]">
-                                        open_in_full
-                                      </span>
-                                      View Full Side-by-Side
-                                    </button>
-                                  </div>
-                                </Popover.Content>
-                              </Popover>
-                            )}
-                            {isTerminalState && (
-                              <RetryOptionsPopover
-                                sourceNames={[source.name]}
-                                variants={run?.extractor?.variants || []}
-                                defaultSchema={run?.extractor?.schema || {}}
-                                currentVariantId={run?.variantId}
-                                onConfirm={(result) =>
-                                  handleRetryConfirm([source.id], result)
-                                }
-                                disabled={retryBatchMutation.isPending}
-                              >
-                                <button
-                                  type="button"
-                                  className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-blue-100 transition-colors disabled:opacity-50"
-                                >
-                                  <span className="material-symbols-outlined text-[14px]">
-                                    replay
-                                  </span>
-                                  Retry
-                                </button>
-                              </RetryOptionsPopover>
-                            )}
-                            {(() => {
-                              const isSourceLoading =
-                                source.status === "parsing" ||
-                                source.status === "pending" ||
-                                source.extractionStatus === "extracting" ||
-                                source.extractionStatus === "pending";
-                              const icon =
-                                source.extractionStatus === "done"
-                                  ? "check"
-                                  : source.extractionStatus === "failed" ||
-                                      source.status === "failed"
-                                    ? "close"
-                                    : source.status === "parsed" &&
-                                        !source.extractionStatus
-                                      ? "check"
-                                      : "progress_activity";
-                              const bg =
-                                source.extractionStatus === "done"
-                                  ? "bg-green-400"
-                                  : source.extractionStatus === "failed" ||
-                                      source.status === "failed"
-                                    ? "bg-red-500"
-                                    : source.status === "parsed" &&
-                                        !source.extractionStatus
-                                      ? "bg-green-400"
-                                      : "bg-[#FFD700]";
-                              return (
+                        <div>
+                          <div
+                            key={source.id || idx}
+                            className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-3 rounded-sm  group hover:translate-x-1 transition-transform flex flex-col gap-2"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
                                 <div
-                                  className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${bg}`}
+                                  className={`size-10 border-2 border-black rounded-sm flex items-center justify-center ${
+                                    source.type === "file"
+                                      ? "bg-red-50"
+                                      : "bg-blue-50"
+                                  }`}
                                 >
                                   <span
-                                    className={`material-symbols-outlined text-[16px] font-black text-black${isSourceLoading ? " animate-spin" : ""}`}
+                                    className={`material-symbols-outlined ${
+                                      source.type === "file"
+                                        ? "text-red-600"
+                                        : "text-blue-600"
+                                    }`}
                                   >
-                                    {icon}
+                                    {source.type === "file"
+                                      ? "picture_as_pdf"
+                                      : "link"}
                                   </span>
                                 </div>
-                              );
-                            })()}
+                                <div className="flex flex-col">
+                                  <span className="font-black text-xs uppercase tracking-tight text-black">
+                                    {source.name}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-gray-400">
+                                    {source.type === "file" ? "File" : "URL"} •{" "}
+                                    {source.status}
+                                    {source.tokenCount
+                                      ? ` • ${source.tokenCount.toLocaleString()} tokens`
+                                      : ""}
+                                    {source.extractionStatus
+                                      ? ` • Extraction: ${source.extractionStatus}`
+                                      : ""}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {(() => {
+                                  const isSourceLoading =
+                                    source.status === "parsing" ||
+                                    source.status === "pending" ||
+                                    source.extractionStatus === "extracting" ||
+                                    source.extractionStatus === "pending";
+                                  const icon =
+                                    source.extractionStatus === "done"
+                                      ? "check"
+                                      : source.extractionStatus === "failed" ||
+                                          source.status === "failed"
+                                        ? "close"
+                                        : source.status === "parsed" &&
+                                            !source.extractionStatus
+                                          ? "check"
+                                          : "progress_activity";
+                                  const bg =
+                                    source.extractionStatus === "done"
+                                      ? "bg-green-400"
+                                      : source.extractionStatus === "failed" ||
+                                          source.status === "failed"
+                                        ? "bg-red-500"
+                                        : source.status === "parsed" &&
+                                            !source.extractionStatus
+                                          ? "bg-green-400"
+                                          : "bg-[#FFD700]";
+                                  return (
+                                    <div
+                                      className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${bg}`}
+                                    >
+                                      <span
+                                        className={`material-symbols-outlined text-[16px] font-black text-black${isSourceLoading ? " animate-spin" : ""}`}
+                                      >
+                                        {icon}
+                                      </span>
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                            <div className="flex gap-4 ml-12">
+                              {source.parsedContent && (
+                                <button
+                                  onClick={() => setViewerSourceId(source.id)}
+                                  type="button"
+                                  className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-gray-700 bg-gray-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-gray-100 transition-colors"
+                                >
+                                  <span className="material-symbols-outlined text-[14px]">
+                                    visibility
+                                  </span>
+                                  View Parsed
+                                </button>
+                              )}
+                              {isTerminalState && (
+                                <RetryOptionsPopover
+                                  sourceNames={[source.name]}
+                                  variants={run?.extractor?.variants || []}
+                                  defaultSchema={run?.extractor?.schema || {}}
+                                  currentVariantId={run?.variantId}
+                                  onConfirm={(result) =>
+                                    handleRetryConfirm([source.id], result)
+                                  }
+                                  disabled={retryBatchMutation.isPending}
+                                >
+                                  <button
+                                    type="button"
+                                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-blue-100 transition-colors disabled:opacity-50"
+                                  >
+                                    <span className="material-symbols-outlined text-[14px]">
+                                      replay
+                                    </span>
+                                    Retry
+                                  </button>
+                                </RetryOptionsPopover>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );

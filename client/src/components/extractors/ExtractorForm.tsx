@@ -87,10 +87,15 @@ export function ExtractorForm({
       [successData.url]: successData.id,
     }));
 
-    return { url: successData.url, id: successData.id, storageKey: successData.storageKey as string | undefined };
+    return {
+      url: successData.url,
+      id: successData.id,
+      storageKey: successData.storageKey as string | undefined,
+    };
   };
 
   const handleActualSubmit = async (data: ExtractorFormData) => {
+    console.log("submitting", data);
     try {
       const filesToConfirm: string[] = [];
 
@@ -136,7 +141,11 @@ export function ExtractorForm({
     toast.info("System prompt reset to default");
   };
 
-  const submit = handleSubmit(handleActualSubmit);
+  const submit = handleSubmit(handleActualSubmit, (err) => {
+    Object.entries(err || {})?.map(([key, { message }]) =>
+      toast(key + ": " + message),
+    );
+  });
   const currentTitle = methods.watch("name");
   return (
     <FormProvider {...methods}>
