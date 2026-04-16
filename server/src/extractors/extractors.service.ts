@@ -14,7 +14,11 @@ import {
   CreateSchemaVariantDto,
   UpdateSchemaVariantDto,
 } from './dto/schema-variant.dto';
-import { Extractor, SchemaVariant } from './entities/extractor.entity';
+import {
+  Extractor,
+  FewShotExample,
+  SchemaVariant,
+} from './entities/extractor.entity';
 import { LlmService } from '../shared/llm/llm.service';
 import { QueueService } from '../shared/queue/queue.service';
 import { QueueName } from '../shared/queue/queue-names';
