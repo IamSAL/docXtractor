@@ -5,6 +5,12 @@ import textwrap
 from openai import OpenAI
 import langextract as lx
 from langextract.data import ExampleData, Extraction
+try:
+    from json_repair import repair_json
+except ImportError:
+    # Fallback: if json_repair not installed, use plain json
+    def repair_json(s, *args, **kwargs):
+        return s
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +89,30 @@ def run_extraction(
     else:
         return run_llm_extraction(content, schema_config, system_prompt, resolved_model, examples)
 
+
+def _build_fields_description(schema_config: dict) -> str:
+    """
+    Build a human-readable fields description from either:
+      - Legacy format: { "fields": [{"name", "type", "description"}] }
+      - JSON Schema format: { "properties": { "fieldName": {"type", "description"} } }
+    This mirrors the logic in NestJS LlmService.buildFieldsDescription().
+    """
+    # Legacy format
+    if schema_config.get('fields') and isinstance(schema_config['fields'], list):
+        return "\n".join(
+            f"- {f['name']} ({f.get('type', 'string')}): {f.get('description', '')}"
+            for f in schema_config['fields']
+        )
+    # JSON Schema format
+    props = schema_config.get('properties')
+    if props and isinstance(props, dict):
+        return "\n".join(
+            f"- {name} ({prop.get('type', 'string')}): {prop.get('description', '')}"
+            for name, prop in props.items()
+        )
+    return ""
+
+
 def run_llm_extraction(
     content: str,
     schema_config: dict,
@@ -96,10 +126,13 @@ def run_llm_extraction(
     try:
         resolved_model = model_id or LLM_DEFAULT_MODEL
 
-        fields_desc = "\n".join([
-            f"- {f['name']} ({f['type']}): {f.get('description', '')}"
+        fields_desc = _build_fields_description(schema_config)
+
+        # Build schema properties block for the JSON structure hint
+        schema_properties = schema_config.get('properties') or {
+            f['name']: {"type": f.get('type', 'string')}
             for f in schema_config.get('fields', [])
-        ])
+        }
 
         if system_prompt:
             prompt_instruction = (
@@ -118,7 +151,10 @@ def run_llm_extraction(
             """)
 
         few_shot_block = _build_few_shot_block(examples)
-        full_prompt = f"{prompt_instruction}{few_shot_block}\nDocument Content:\n{content}"
+        full_prompt = (
+            f"{prompt_instruction}{few_shot_block}\nDocument Content:\n{content}\n"
+            f"Important, Your output structure must match 100% of this json schema:\n {json.dumps(schema_properties)}"
+        )
 
         response = _llm_client.chat.completions.create(
             model=resolved_model,
@@ -126,7 +162,11 @@ def run_llm_extraction(
             response_format={"type": "json_object"},
         )
 
-        result_data = json.loads(response.choices[0].message.content)
+        raw_content = response.choices[0].message.content or "{}"
+        # Strip markdown fences if present, then use json_repair for robustness
+        if raw_content.startswith("```"):
+            raw_content = raw_content.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+        result_data = json.loads(repair_json(raw_content))
 
         return {
             "data": result_data,

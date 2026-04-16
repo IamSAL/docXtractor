@@ -13,6 +13,7 @@ import { useLogout } from "../../hooks/useAuth";
 import NiceModal from "@ebay/nice-modal-react";
 import { TemplateWizardModal } from "@/components/modals/TemplateWizardModal";
 import { RunExtractorModal } from "@/components/modals/RunExtractorModal";
+import { useAuthStore } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/dashboard/")({
   component: RouteComponent,
@@ -25,6 +26,8 @@ function RouteComponent() {
     useExtractorsControllerFindAll();
 
   const logout = useLogout();
+  const user = useAuthStore((s) => s.user);
+  const displayName = user?.name || user?.email?.split('@')[0] || 'User';
   const stats = statsData?.data;
   const extractors = extractorsData?.data || [];
 
@@ -84,14 +87,20 @@ function RouteComponent() {
               <Popover.Trigger asChild>
                 <button className="flex items-center gap-3 bg-white border-2 border-black px-3 py-2 shadow-hard cursor-pointer hover:translate-x-px hover:translate-y-px hover:shadow-hard-sm transition-all w-64 justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="size-8 rounded-full bg-gray-200 border-2 border-black overflow-hidden">
-                      <img
-                        alt="User Avatar"
-                        className="w-full h-full object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPRa7B_KjGMFnt-GCzDzmllIlNq0fMO_xCTH4d0fYwyc_IJKp07LtB5AGrmYPqvi9hQpkmohkTuz4ITA5l8veRzLJIst8FCZ6JPuEIUyzfNOVqVDJ1r8TExfdcEd0vCZU3M6S7whm5PgsSteLx_VGKtH5_JEgneb4f2k4FIayqvDPhFQOoV-YoAqES6kkjrTaU2jiPWONvx9Kpqh3dTRM214SvdixEShPXEKGqztGfTcplP7gJINAIrgZgR3n8KluuAr_zfjH5mcq8"
-                      />
+                    <div className="size-8 rounded-full bg-gray-200 border-2 border-black overflow-hidden flex items-center justify-center">
+                      {user?.avatarUrl ? (
+                        <img
+                          alt="User Avatar"
+                          className="w-full h-full object-cover"
+                          src={user.avatarUrl}
+                        />
+                      ) : (
+                        <span className="text-xs font-black text-gray-600">
+                          {displayName.charAt(0).toUpperCase()}
+                        </span>
+                      )}
                     </div>
-                    <span className="font-bold text-sm">Alex Designer</span>
+                    <span className="font-bold text-sm">{displayName}</span>
                   </div>
                   <span className="material-symbols-outlined">expand_more</span>
                 </button>

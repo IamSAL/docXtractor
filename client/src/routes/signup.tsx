@@ -159,7 +159,7 @@ function SignupComponent() {
                 </span>
               </div>
               <label className="text-xs text-stone-600 leading-tight pt-1 cursor-pointer select-none font-medium" htmlFor="terms">
-                I agree to the <Link to="." className="font-bold underline decoration-2 decoration-primary hover:text-black">Terms of Service</Link> and <Link to="." className="font-bold underline decoration-2 decoration-primary hover:text-black">Privacy Policy</Link>.
+                I agree to the <span className="font-bold underline decoration-2 decoration-primary">Terms of Service</span> and <span className="font-bold underline decoration-2 decoration-primary">Privacy Policy</span>.
               </label>
             </div>
             {errors.terms && (

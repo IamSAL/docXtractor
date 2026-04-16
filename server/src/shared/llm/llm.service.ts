@@ -100,6 +100,8 @@ export class LlmService {
 
     const validationRetries = 3;
     let lastValidationErrors = '';
+    const maxRateLimitRetries = 5;
+    let rateLimitRetries = 0;
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
@@ -160,11 +162,21 @@ export class LlmService {
         );
 
         if (error?.status === 429) {
-          this.logger.warn('Rate limit hit, backing off...');
-          attempt--;
-          await new Promise((resolve) =>
-            setTimeout(resolve, 3000 + Math.random() * 5000),
+          rateLimitRetries++;
+          if (rateLimitRetries > maxRateLimitRetries) {
+            this.logger.error(
+              `Rate limit retries exhausted (${maxRateLimitRetries}), giving up.`,
+            );
+            throw error;
+          }
+          const backoff =
+            Math.min(3000 * Math.pow(2, rateLimitRetries - 1), 60_000) +
+            Math.random() * 2000;
+          this.logger.warn(
+            `Rate limit hit (429), retry ${rateLimitRetries}/${maxRateLimitRetries} after ${Math.round(backoff)}ms...`,
           );
+          await new Promise((resolve) => setTimeout(resolve, backoff));
+          attempt--; // Don't consume a normal retry slot for 429s
           continue;
         }
 
@@ -183,6 +195,9 @@ export class LlmService {
     this.logger.log(
       `Running LLM generation: model=${modelId}, prompt_length=${prompt.length}`,
     );
+
+    const maxRateLimitRetries = 5;
+    let rateLimitRetries = 0;
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
@@ -205,11 +220,21 @@ export class LlmService {
         );
 
         if (error?.status === 429) {
-          this.logger.warn('Rate limit hit, backing off...');
-          attempt--;
-          await new Promise((resolve) =>
-            setTimeout(resolve, 3000 + Math.random() * 5000),
+          rateLimitRetries++;
+          if (rateLimitRetries > maxRateLimitRetries) {
+            this.logger.error(
+              `Rate limit retries exhausted (${maxRateLimitRetries}), giving up.`,
+            );
+            throw error;
+          }
+          const backoff =
+            Math.min(3000 * Math.pow(2, rateLimitRetries - 1), 60_000) +
+            Math.random() * 2000;
+          this.logger.warn(
+            `Rate limit hit (429), retry ${rateLimitRetries}/${maxRateLimitRetries} after ${Math.round(backoff)}ms...`,
           );
+          await new Promise((resolve) => setTimeout(resolve, backoff));
+          attempt--; // Don't consume a normal retry slot for 429s
           continue;
         }
 

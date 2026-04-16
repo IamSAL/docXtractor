@@ -13,9 +13,22 @@ let socket: Socket | null = null;
 
 export const getSocket = (): Socket => {
   if (!socket) {
+    // Try to get token from local storage (auth-store zustand persistence)
+    let token = undefined;
+    try {
+      const authStateStr = localStorage.getItem("auth-store");
+      if (authStateStr) {
+        const authState = JSON.parse(authStateStr);
+        token = authState?.state?.accessToken;
+      }
+    } catch (e) {
+      console.warn("Failed to parse auth token for socket", e);
+    }
+
     socket = io(SERVER_URL + "/runs", {
       transports: ["websocket"],
       autoConnect: true,
+      auth: { token },
     });
 
     socket.on("connect", () => {

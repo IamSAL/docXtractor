@@ -4,9 +4,10 @@ import {
   Get,
   Param,
   UseInterceptors,
+  Body,
+  BadRequestException,
   UploadedFile,
   UploadedFiles,
-  Body,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
@@ -16,18 +17,56 @@ import {
   ApiBody,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { FilesService } from './files.service';
-import { Public } from '../auth/decorators/public.decorators';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+
+const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
+
+const ALLOWED_MIME_TYPES = new Set([
+  'application/pdf',
+  'image/png',
+  'image/jpeg',
+  'image/jpg',
+  'image/webp',
+  'image/tiff',
+  'text/plain',
+  'text/csv',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+  'application/msword', // .doc
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+  'application/vnd.ms-excel', // .xls
+]);
+
+const multerOptions = {
+  limits: { fileSize: MAX_FILE_SIZE_BYTES },
+  fileFilter: (
+    _req: any,
+    file: Express.Multer.File,
+    cb: (err: Error | null, accept: boolean) => void,
+  ) => {
+    if (ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new BadRequestException(
+          `Unsupported file type: ${file.mimetype}. Allowed types: PDF, images (PNG/JPEG/WEBP/TIFF), plain text, CSV, Word and Excel documents.`,
+        ),
+        false,
+      );
+    }
+  },
+};
 
 @ApiTags('Files')
+@ApiBearerAuth()
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post('upload')
-  @Public()
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', multerOptions))
   @ApiOperation({
     summary: 'Upload a single file',
     description:
@@ -89,7 +128,7 @@ export class FilesController {
   })
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
-    @Body('userId') userId: string,
+    @GetUser('sub') userId: string,
     @Body('metadata') metadataStr?: string,
   ) {
     const metadata = metadataStr ? JSON.parse(metadataStr) : {};
@@ -97,8 +136,7 @@ export class FilesController {
   }
 
   @Post('upload-multiple')
-  @Public()
-  @UseInterceptors(FilesInterceptor('files', 10)) // Max 10 files
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions)) // Max 10 files, 50 MB each
   @ApiOperation({
     summary: 'Upload multiple files at once',
     description:
@@ -164,7 +202,7 @@ export class FilesController {
   })
   async uploadMultipleFiles(
     @UploadedFiles() files: Express.Multer.File[],
-    @Body('userId') userId: string,
+    @GetUser('sub') userId: string,
     @Body('metadata') metadataStr?: string,
   ) {
     const metadata = metadataStr ? JSON.parse(metadataStr) : {};
@@ -172,7 +210,6 @@ export class FilesController {
   }
 
   @Post('confirm')
-  @Public()
   @ApiOperation({
     summary: 'Confirm files (mark as completed)',
     description: 'Mark a list of files as completed/committed.',
@@ -194,13 +231,12 @@ export class FilesController {
   @ApiResponse({ status: 200, description: 'Files confirmed successfully' })
   async confirmFiles(
     @Body('fileIds') fileIds: string[],
-    @Body('userId') userId: string,
+    @GetUser('sub') userId: string,
   ) {
     return this.filesService.completeFiles(userId, fileIds);
   }
 
   @Get(':id')
-  @Public()
   @ApiOperation({
     summary: 'Get file metadata by ID',
     description:
@@ -232,12 +268,11 @@ export class FilesController {
     },
   })
   @ApiResponse({ status: 404, description: 'File not found or access denied' })
-  async getFile(@Param('id') fileId: string, @Body('userId') userId: string) {
+  async getFile(@Param('id') fileId: string, @GetUser('sub') userId: string) {
     return this.filesService.getFile(userId, fileId);
   }
 
   @Get()
-  @Public()
   @ApiOperation({
     summary: 'List all files for a user',
     description:
@@ -261,7 +296,7 @@ export class FilesController {
       },
     },
   })
-  async listFiles(@Body('userId') userId: string) {
+  async listFiles(@GetUser('sub') userId: string) {
     return this.filesService.listFiles(userId);
   }
 }

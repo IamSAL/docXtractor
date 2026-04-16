@@ -9,6 +9,8 @@ import {
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @WebSocketGateway({
   cors: {
@@ -28,8 +30,38 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private readonly logger = new Logger(RunsGateway.name);
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Client connected: ${client.id}`);
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  async handleConnection(client: Socket) {
+    try {
+      const token =
+        client.handshake.auth.token ||
+        client.handshake.headers.authorization?.split(' ')[1];
+
+      if (!token) {
+        this.logger.warn(
+          `Disconnecting client ${client.id}: No token provided`,
+        );
+        client.disconnect();
+        return;
+      }
+
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+      });
+
+      // Store user info in socket context
+      client.data.user = payload;
+      this.logger.log(`Client connected: ${client.id} (user: ${payload.sub})`);
+    } catch (e) {
+      this.logger.warn(
+        `Disconnecting client ${client.id}: Invalid token - ${e.message}`,
+      );
+      client.disconnect();
+    }
   }
 
   handleDisconnect(client: Socket) {
@@ -41,8 +73,11 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { runId: string },
     @ConnectedSocket() client: Socket,
   ) {
+    if (!client.data.user) {
+      this.logger.warn(`Unauthorized joinRun attempt from ${client.id}`);
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     const { runId } = data;
-    // this.logger.log(`Client ${client.id} joining run room: ${runId}`);
     client.join(`run:${runId}`);
     return { event: 'joinedRun', data: { runId } };
   }

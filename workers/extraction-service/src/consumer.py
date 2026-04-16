@@ -126,7 +126,9 @@ async def process_job(job: Job, token: str = None):
         }
         logger.info(f"📤 Sending failure event to queue: {QUEUE_COMPLETED}")
         await bullmq_client.add_job(QUEUE_COMPLETED, "extraction-completed", event)
-        raise e
+        # Return failure result — do NOT re-raise, which would cause BullMQ to
+        # retry the job and send duplicate failure events, corrupting progress counters.
+        return {"status": "error", "message": str(e)}
 
 async def _idle_watcher():
     if IDLE_SHUTDOWN_SECONDS <= 0:
