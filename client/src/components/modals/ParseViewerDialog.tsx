@@ -1,14 +1,16 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { Dialog } from "@/components/retroui/Dialog";
 
 // Configure pdf.js worker (bundled with react-pdf)
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-	"pdfjs-dist/build/pdf.worker.min.mjs",
-	import.meta.url,
-).toString();
+if (typeof window !== "undefined") {
+	pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+		"pdfjs-dist/build/pdf.worker.min.mjs",
+		import.meta.url,
+	).toString();
+}
 
 interface ParseViewerDialogProps {
 	open: boolean;
@@ -30,6 +32,7 @@ export function ParseViewerDialog({
 	sourceType,
 }: ParseViewerDialogProps) {
 	const [numPages, setNumPages] = useState<number>(0);
+	const [pageWidth, setPageWidth] = useState(400);
 	const leftRef = useRef<HTMLDivElement>(null);
 	const rightRef = useRef<HTMLDivElement>(null);
 	const isSyncing = useRef(false);
@@ -56,6 +59,14 @@ export function ParseViewerDialog({
 		requestAnimationFrame(() => {
 			isSyncing.current = false;
 		});
+	}, []);
+
+	useEffect(() => {
+		const update = () =>
+			setPageWidth(Math.min(800, window.innerWidth / 2 - 32));
+		update();
+		window.addEventListener("resize", update);
+		return () => window.removeEventListener("resize", update);
 	}, []);
 
 	const effectivePdfUrl = sourceType === "file" ? pdfUrl : sourceUrl;
@@ -150,7 +161,7 @@ export function ParseViewerDialog({
 											>
 												<Page
 													pageNumber={i + 1}
-													width={Math.min(800, window.innerWidth / 2 - 32)}
+													width={pageWidth}
 													renderTextLayer={true}
 													renderAnnotationLayer={false}
 												/>
