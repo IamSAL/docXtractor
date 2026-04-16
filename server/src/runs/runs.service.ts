@@ -615,7 +615,7 @@ export class RunsService {
             run.skippedFields,
           ),
           extractor?.systemPrompt || '',
-          'free',
+          undefined,
           extractor?.fewShotExamples,
         );
 
@@ -791,7 +791,7 @@ export class RunsService {
           run.skippedFields,
         ),
         extractor?.systemPrompt || '',
-        'free',
+        undefined,
         extractor?.fewShotExamples,
       );
     } catch (error) {
@@ -1314,7 +1314,7 @@ export class RunsService {
               run.skippedFields,
             ),
             extractor?.systemPrompt || '',
-            'free',
+            undefined,
             extractor?.fewShotExamples,
           );
 
@@ -1589,7 +1589,7 @@ export class RunsService {
               source.parsedContent!,
               effectiveSchema,
               extractor?.systemPrompt || '',
-              'free',
+              undefined,
               extractor?.fewShotExamples,
             );
             source.extractionStatus = 'done';
