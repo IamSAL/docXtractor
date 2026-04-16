@@ -1,0 +1,242 @@
+<!-- image -->
+
+## KEY INFORMATION DOCUMENT
+
+## PURPOSE
+
+This document provides you with key information about this investment product. It is not marketing material. The information is required by law to help you understand the nature, risks, costs, potential gains and losses of this product and to help you compare it with other products.
+
+## PRODUCT
+
+| Autocall            | Autocall                                                                                                                                               |
+|---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ISIN                | XS3191964041                                                                                                                                           |
+| Manufacturer        | BNP Paribas S.A. - www.bnpparibas.com - Call +33 (0)1 57 08 22 00 for more information Issuer: BNP Paribas Issuance B.V. - Guarantor: BNP Paribas S.A. |
+| Competent Authority | Autorité des marchés financiers (AMF) is responsible for supervising BNP Paribas S.A. in relation to this Key Information Document                     |
+| KID Production Date | 20 November 2025 10:36:41 CET                                                                                                                          |
+
+You are about to purchase a product that is not simple and may be difficult to understand.
+
+## WHAT IS THIS PRODUCT?
+
+## TYPE
+
+This product is a certificate, a transferable debt instrument. It has no capital protection against market risk at maturity.
+
+## TERM
+
+This product has a fixed term and will redeem on the Redemption Date unless redeemed early in accordance with the Automatic Early Redemption provisions below.
+
+## OBJECTIVES
+
+The objective of this product is to provide you with a return based on the performance of underlying shares (each share, an Underlying). The product may also pay coupon under predefined conditions in accordance with the Coupon provisions below.
+
+Unless the product has been redeemed early, the following provisions would apply. On the Redemption Date you will receive in respect of each certificate, in addition to any final payment of a coupon:
+
+1. If the Final Reference Price of the Worst-Performing Underlying is greater than or equal to 70% of its Initial Reference Price: a payment in cash of the Notional Amount.
+2. If the Final Reference Price of the Worst-Performing Underlying is less than 70% of its  Initial  Reference  Price:  delivery  of  the  number  of  shares  of  the  Worst-Performing Underlying (as determined below) plus a payment in cash in respect of any fraction of a share. In this case you will suffer a partial or total loss of the Notional Amount.
+
+## Where:
+
+- The Performance of an Underlying is the difference between its Final Reference Price and its Initial Reference Price, divided by its Initial Reference Price, expressed in absolute value.
+- The Worst-Performing Underlying is the Underlying that shows the lowest Final Reference Price when divided by its Initial Reference Price.
+- The Initial Reference Price of an Underlying is the closing price of that Underlying on the Strike Date.
+- The Final Reference Price of an Underlying is the closing price of that Underlying on the Redemption Valuation Date.
+- The number of shares of an underlying is the Notional Amount per certificate divided by 70% of its Initial Reference Price converted, if necessary, into the Product Currency using the applicable exchange rate on the Redemption Valuation Date.
+
+## PRODUCT DATA
+
+| Strike Date                   | 19 November 2025                                                                                                              |
+|-------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| Issue Date                    | 03 December 2025                                                                                                              |
+| Redemption Valuation Date     | 19 November 2029                                                                                                              |
+| Redemption Date (maturity)    | 03 December 2029                                                                                                              |
+| Coupon Valuation Date(s)      | 19 May 2026, 19 November 2026, 19 May 2027, 19 November 2027, 19 May 2028, 20 November 2028, 21 May 2029 and 19 November 2029 |
+| Conditional Coupon Barrier(s) | 70% of the Initial Reference Price                                                                                            |
+| Autocall Valuation Date(s)    | 19 November 2026, 19 May 2027, 19 November 2027, 19 May 2028, 20 November 2028 and 21 May 2029                                |
+| Autocall Barrier(s)           | 95%, 90%, 85%, 80%, 75% and 70% of the Initial Reference Price                                                                |
+
+Coupon: A conditional coupon is due for payment at the relevant Conditional Coupon Rate each time the following condition (Coupon Condition) is met: if, on a Coupon Valuation Date,  the  closing  price  of  each  underlying  is  greater  than  or  equal  to  the  relevant Conditional Coupon Barrier. Otherwise, the coupon is missed but not lost definitely. All missed coupons will accumulate and become payable only if the Coupon Condition is subsequently satisfied.
+
+Automatic Early Redemption: If, on any Autocall Valuation Date, the closing price of each underlying is greater than or equal to the relevant Autocall Barrier, the product will be redeemed  on  the  corresponding  Early  Redemption  Date.  You  will  receive  for  each certificate a payment in cash equal to the Notional Amount
+
+Issue Price
+
+Product Currency
+
+Notional Amount (per certificate)
+
+100%
+
+EUR
+
+EUR 1,000
+
+| Coupon Payment Date(s)     | 02 June 2026, 03 December 2026, 02 June 2027, 03 December 2027, 02 June 2028, 04 December 2028, 04 June 2029 and 03 December 2029   |
+|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| Conditional Coupon Rate(s) | 5% of the Notional Amount                                                                                                           |
+| Early Redemption Date(s)   | 03 December 2026, 02 June 2027, 03 December 2027, 02 June 2028, 04 December 2028 and 04 June 2029                                   |
+
+<!-- image -->
+
+Internal Ref.: CE4130AET
+
+URL: http://kid.bnpparibas.com/CE4130AET-B83B6-EN.pdf.
+
+| Underlying            | Bloomberg Code   | ISIN         |
+|-----------------------|------------------|--------------|
+| Safran SA             | SAF FP           | FR0000073272 |
+| Schneider Electric SE | SU FP            | FR0000121972 |
+| Airbus SE             | AIR FP           | NL0000235190 |
+| Air Liquide SA        | AI FP            | FR0000120073 |
+
+The product terms provide that if certain exceptional events occur (1) adjustments may be made to the product and/or (2) the Issuer of the product may terminate the product early. These events are specified in the product terms and principally relate to the Underlying(s), the product and the Issuer of the product. The return (if any) you receive on such early termination is likely to be different from the scenarios described above and may be less than the amount you invested.
+
+All redemptions described in this document (including potential gains) are calculated on the basis of the Notional Amount, excluding costs, social contributions and taxation applicable to this type of investment.
+
+## INTENDED RETAIL INVESTOR
+
+## This product has been designed for retail investors who:
+
+- have a medium term investment horizon (three to five years).
+- seek to invest in an income paying product, potentially to diversify their portfolio.
+- are able to bear losses up to the total of the Notional Amount and are aware of the possible early termination of the product.
+- have been informed or have sufficient knowledge of the financial markets, their functioning and their risks, and the asset class of the underlying.
+
+## WHAT ARE THE RISKS AND WHAT COULD I GET IN RETURN?
+
+## RISK INDICATOR
+
+<!-- image -->
+
+<!-- image -->
+
+<!-- image -->
+
+<!-- image -->
+
+Lower Risk
+
+<!-- image -->
+
+<!-- image -->
+
+Higher Risk
+
+The risk indicator assumes you keep the product for 5 years. The actual risk can vary significantly if you cash in at an early stage and you may get back less. You may not be able to sell your product easily or you may have to sell at a price that significantly impacts on how much you get back.
+
+<!-- image -->
+
+The summary risk indicator (SRI) is a guide to the level of risk of this product compared to other products. It shows how likely it is that the product will lose money because of movements in the markets or because we are not able to pay you.
+
+We have classified this product as 5 out of 7, which is a medium-high risk class.
+
+This rates the potential losses from future performance at a medium-high level, and poor market conditions are very unlikely to impact our capacity to pay you.
+
+You will receive payments in the product's currency, which may be different from your domestic currency. In this case, be aware of currency risk . The final return you will get depends on the exchange rate between the two currencies. This risk is not considered in the indicator shown above.
+
+This product does not include any protection from future market performance so you could lose some or all of your investment.
+
+If we are not able to pay you what is owed, you could lose your entire investment.
+
+For detailed information about all risks please refer to the risk sections of the legal documentation as specified in the section 'Other relevant information' below.
+
+## PERFORMANCE SCENARIOS
+
+What you will get from this product depends on future market performance. Market developments in the future are uncertain and cannot be accurately predicted. The scenarios shown are illustrations based on results from the past and on certain assumptions. Markets could develop very differently in the future.
+
+| Recommended Holding Period                                  | Until This may be different in each scenario and is indicated in the table. EUR 10,000   | the product is called or matures.                                                     | the product is called or matures.                                                     |
+|-------------------------------------------------------------|------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| Example Investment Scenarios                                | year                                                                                     | If you exit after 1                                                                   | If you exit at call or maturity                                                       |
+| Minimum                                                     | There is no minimum guaranteed return. You could lose some or all of your Investment.    | There is no minimum guaranteed return. You could lose some or all of your Investment. | There is no minimum guaranteed return. You could lose some or all of your Investment. |
+| Stress scenario (product ends after 03 December 2029)       | What you might get back after costs Average return each year                             | EUR 1,739 -82.61%                                                                     | EUR 2,368 -30.24%                                                                     |
+| Unfavourable scenario (product ends after 03 December 2029) | What you might get back after costs Average return each year                             | EUR 7,798 -22.02%                                                                     | EUR 5,597 -13.51%                                                                     |
+| Moderate scenario (product ends after 03 December 2026)     | What you might get back after costs Average return each year                             |                                                                                       | EUR 11,000 10.0%                                                                      |
+| Favourable scenario (product ends after 02 June 2028)       | What you might get back after costs Average return each year                             | EUR 10,999 9.99%                                                                      | EUR 12,500 9.35%                                                                      |
+
+The figures shown include all the costs of the product itself, but may not include all the costs that you pay to your advisor or distributor. The figures do not take into account your personal tax situation, which may also affect how much you get back.
+
+The stress scenario shows what you might get back in extreme market circumstances.
+
+The favourable, moderate and unfavourable scenarios represent possible outcomes, which have been calculated based on simulations using the reference assets' past performance over up to 5 past years.
+
+This product cannot be easily cashed in. If you exit the investment earlier than the recommended holding period you do not have a guarantee and you may have to pay extra costs.
+
+## WHAT HAPPENS IF THE MANUFACTURER IS UNABLE TO PAY OUT?
+
+Should the Issuer default or file for bankruptcy, you have the right to seek payment from the Guarantor pursuant to an unconditional and irrevocable guarantee of any amount due. Should the Guarantor also default, file for bankruptcy or in case of bail-in, you may suffer a loss up to the total amount invested.
+
+The product is not covered by any statutory investor compensation or guarantee scheme.
+
+Investors should note that BNP Paribas, acting as Guarantor, is licensed as a credit institution in France and as such is subject to the resolution regime introduced by the EU Bank Recovery and Resolution Directive of 15 May 2014. This regulation, among others, gives resolution authorities the power to amend the key terms of the guarantee, to reduce the amounts payable by the Guarantor under the terms of the guarantee (including a possible reduction to zero) and to convert the amounts due under the guarantee into shares or other securities or other obligations of the Guarantor. Restructuring may be imposed by resolution authorities to avoid bankruptcy. Investors may not be able to recover all or even part of
+
+<!-- image -->
+
+<!-- image -->
+
+the amount due under the product (if any) from the Guarantor under the guarantee or may receive a different security issued by the Guarantor in place of the amount (if any) due to the Investors under the product by the Issuer, which may be worth significantly less than the amount due to investors under the product at maturity.
+
+## WHAT ARE THE COSTS?
+
+The person advising on or selling you this product may charge you other costs. If so, this person will provide you with information about these costs and how they affect your investment.
+
+## COSTS OVER TIME
+
+The tables show the amounts that are taken from your investment to cover different types of costs. These amounts depend on how much you invest, how long you hold the product and how well the product does. The amounts shown here are illustrations based on an example investment amount and different possible investment periods:
+
+The duration of this product is uncertain as it may terminate at different times depending on how the market evolves. The amounts shown here consider two different scenarios (early call and maturity). In case you decide to exit before the product ends, exit costs may apply in addition to the amounts shown here.
+
+We have assumed:
+
+- EUR 10,000 is invested
+
+- A performance of the product that is consistent with each holding period shown.
+
+| Investment EUR 10,000   | If the product is called at the first possible December 2026   | If the product reaches   |
+|-------------------------|----------------------------------------------------------------|--------------------------|
+| Total costs             | EUR 158                                                        | EUR 158                  |
+| Annual cost impact (*)  | 1.77%                                                          | 0.41%                    |
+
+(*) This illustrates how costs reduce your return each year over the holding period. For example it shows that if you exit at maturity your average return per year is projected to be 2.82% before costs and 2.41% after costs.
+
+We may share part of the costs with the person selling you the product to cover the services they provide to you. They will inform you of the amount.
+
+## COMPOSITION OF COSTS
+
+| One-off costs upon entry or exit                            |                                                                                                                                                                    | If you exit after 1 year   |
+|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
+| Entry costs                                                 | 1.58% of the amount you pay in when entering this investment. These costs are already included in the price you pay.                                               | EUR 158                    |
+| Exit costs                                                  | 0.5%. These costs only apply if you exit your investment prior to the maturity of the product. The number indicated assumes that normal market conditions applies. | EUR 50                     |
+| Ongoing costs taken each year                               |                                                                                                                                                                    |                            |
+| Management fees and other administrative or operating costs | 0% of the notional of your investment per year.                                                                                                                    | EUR 0                      |
+| Transaction costs                                           | 0%                                                                                                                                                                 | EUR 0                      |
+| Incidental costs taken under specific conditions            | Incidental costs taken under specific conditions                                                                                                                   |                            |
+| Performance fees                                            | There is no performance fee for this product.                                                                                                                      | EUR 0                      |
+
+## HOW LONG SHOULD I HOLD IT AND CAN I TAKE MY MONEY OUT EARLY?
+
+Recommended holding period: until 03 December 2029, which corresponds to the product's maturity.
+
+However the duration of the product is not known in advance as it may be redeemed early.
+
+The objective of the product is to provide you with the redemption profile described under "What is this product?" above. This only applies if the product is held until maturity.
+
+Under normal market conditions, you may sell this product in the secondary market, at a price depending on the markets parameters prevailing at the time, which could put the invested amount at risk. Should you decide to resell, a fee of 0.50% will be deducted from the market price which could be increased under specific market condition.
+
+The 0.50% commission has been taken into account in the table. In addition, the distributor may charge additional costs in the event of an exit before the maturity.
+
+## HOW CAN I COMPLAIN?
+
+Any complaint regarding the conduct of the person advising on or selling the product can be submitted directly to that person.
+
+Any complaint regarding the product can be submitted by writing to the following address: BNP Paribas CLM Regulations - Client Engagement and Protection Regulations - Torre Ocidente Rua Galileu Galilei, 2, 13º, 1500-392, Lisboa, PORTUGAL, by sending an e-mail to cib.priips.complaints@bnpparibas.com, or by using the online form available at the following website https://kid.bnpparibas.com/cib/claim.
+
+## OTHER RELEVANT INFORMATION
+
+The information contained in this Key Information Document does not constitute a recommendation to buy or sell the product and is no substitute for individual consultation with your bank or advisor.
+
+For a further information on the product, including the risks involved, you should read the related legal documentation (prospectus / base prospectus and any supplement, and final terms), which is available free of charge from your financial advisor.
+
+This product may not be offered or sold, directly or indirectly, in the United States of America or to U.S. persons. The term "U.S. person" is defined in Regulation S under the U.S. Securities Act of 1933 (Securities Act). The offering of this product has not been registered under the Securities Act.
+
+<!-- image -->

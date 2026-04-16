@@ -16,6 +16,8 @@ import {
 } from './dto/schema-variant.dto';
 import { Extractor, SchemaVariant } from './entities/extractor.entity';
 import { LlmService } from '../shared/llm/llm.service';
+import { QueueService } from '../shared/queue/queue.service';
+import { QueueName } from '../shared/queue/queue-names';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -30,6 +32,7 @@ export class ExtractorsService implements OnModuleInit {
     @InjectRepository(Extractor)
     private readonly extractorRepository: Repository<Extractor>,
     private readonly llmService: LlmService,
+    private readonly queueService: QueueService,
   ) {}
 
   async onModuleInit() {
@@ -71,9 +74,56 @@ export class ExtractorsService implements OnModuleInit {
     return [];
   }
 
+  private async dispatchExampleSourceParseJobs(
+    extractorId: string,
+    fewShotExamples: FewShotExample[],
+    parserEngine: string,
+  ): Promise<void> {
+    const jobs: Array<{ name: string; data: any }> = [];
+
+    for (const example of fewShotExamples ?? []) {
+      for (const source of example.sources ?? []) {
+        if (source.type === 'text' || source.parsedContent) continue;
+
+        const jobData: Record<string, any> = {
+          extractor_id: extractorId,
+          example_id: example.id,
+          source_id: source.id,
+          type: source.type,
+          parser_engine: parserEngine,
+          bucket: process.env.MINIO_BUCKET || 'docxtractor',
+        };
+
+        if (source.type === 'url') {
+          jobData.url = source.content;
+        } else if (source.type === 'file') {
+          jobData.storage_key = source.storageKey;
+        }
+
+        jobs.push({ name: 'parse-example-source', data: jobData });
+      }
+    }
+
+    if (jobs.length === 0) return;
+
+    this.logger.log(
+      `Dispatching ${jobs.length} example source parse job(s) for extractor ${extractorId}`,
+    );
+    await this.queueService.addBulk(
+      QueueName.EXAMPLE_SOURCE_PARSE_REQUESTS,
+      jobs,
+    );
+  }
+
   async create(createExtractorDto: CreateExtractorDto): Promise<Extractor> {
     const extractor = this.extractorRepository.create(createExtractorDto);
-    return await this.extractorRepository.save(extractor);
+    const saved = await this.extractorRepository.save(extractor);
+    await this.dispatchExampleSourceParseJobs(
+      saved.id,
+      saved.fewShotExamples,
+      saved.parserEngine,
+    );
+    return saved;
   }
 
   async findAll(): Promise<Extractor[]> {
@@ -96,7 +146,13 @@ export class ExtractorsService implements OnModuleInit {
   ): Promise<Extractor> {
     const extractor = await this.findOne(id);
     this.extractorRepository.merge(extractor, updateExtractorDto);
-    return await this.extractorRepository.save(extractor);
+    const saved = await this.extractorRepository.save(extractor);
+    await this.dispatchExampleSourceParseJobs(
+      saved.id,
+      saved.fewShotExamples,
+      saved.parserEngine,
+    );
+    return saved;
   }
 
   async remove(id: string): Promise<void> {

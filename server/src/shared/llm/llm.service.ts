@@ -15,6 +15,7 @@ export class LlmService {
   private readonly logger = new Logger(LlmService.name);
   private readonly client: OpenAI;
   private readonly defaultModel: string;
+  private readonly defaultExtractionModel: string;
   private readonly maxRetries: number;
 
   constructor(private readonly configService: ConfigService) {
@@ -26,6 +27,10 @@ export class LlmService {
       apiKey: configService.get<string>('FREELLM_API_KEY', 'freellm'),
     });
     this.defaultModel = configService.get<string>('LLM_DEFAULT_MODEL', 'free');
+    this.defaultExtractionModel = configService.get<string>(
+      'LLM_EXTRACTION_MODEL',
+      'free-smart',
+    );
     this.maxRetries = configService.get<number>('LLM_MAX_RETRIES', 3);
 
     this.logger.log(
@@ -39,7 +44,7 @@ export class LlmService {
     systemPrompt: string,
     model?: string,
   ): Promise<LlmExtractionResult> {
-    const modelId = model || this.defaultModel;
+    const modelId = model || this.defaultExtractionModel;
     const fieldsDesc = this.buildFieldsDescription(schema);
 
     const instruction = systemPrompt

@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-03-31T19:08:02.645Z",
+  "total_files": 9,
+  "succeeded": 9,
+  "failed": 0,
+  "wall_time_s": 100.97,
+  "sum_of_individual_s": 557.15,
+  "avg_time_s": 61.91,
+  "total_tokens": 14451,
+  "total_input_size_kb": 1070,
+  "files": [
+    {
+      "file": "Acme Invoice.pdf",
+      "status": "success",
+      "elapsed_s": 4.67,
+      "tokens": 97,
+      "chars": 598,
+      "file_size_kb": 260
+    },
+    {
+      "file": "CE4130AET-B83B6-EN.pdf",
+      "status": "success",
+      "elapsed_s": 20.95,
+      "tokens": 2837,
+      "chars": 21755,
+      "file_size_kb": 120
+    },
+    {
+      "file": "CE4317CLV-C7FA0-EN.pdf",
+      "status": "success",
+      "elapsed_s": 35.41,
+      "tokens": 2288,
+      "chars": 17435,
+      "file_size_kb": 117
+    },
+    {
+      "file": "CE4374CLV-BE7E9-EN.pdf",
+      "status": "success",
+      "elapsed_s": 50.44,
+      "tokens": 2675,
+      "chars": 21492,
+      "file_size_kb": 119
+    },
+    {
+      "file": "CE4421CLV-F2020-EN.pdf",
+      "status": "success",
+      "elapsed_s": 64.1,
+      "tokens": 2629,
+      "chars": 20184,
+      "file_size_kb": 119
+    },
+    {
+      "file": "CE4474CLV-14F73-EN.pdf",
+      "status": "success",
+      "elapsed_s": 86.68,
+      "tokens": 2998,
+      "chars": 25063,
+      "file_size_kb": 122
+    },
+    {
+      "file": "N-JPM0015-2026VAC14IVL41P2607ADW_TERMS_AND_CONDITIONS.pdf",
+      "status": "success",
+      "elapsed_s": 95.24,
+      "tokens": 411,
+      "chars": 11111,
+      "file_size_kb": 64
+    },
+    {
+      "file": "N-JPM0015-2026VAC14TOP41C2607ADW_TERMS_AND_CONDITIONS.pdf",
+      "status": "success",
+      "elapsed_s": 98.78,
+      "tokens": 417,
+      "chars": 10989,
+      "file_size_kb": 64
+    },
+    {
+      "file": "sample-tax-invoice.pdf",
+      "status": "success",
+      "elapsed_s": 100.88,
+      "tokens": 99,
+      "chars": 774,
+      "file_size_kb": 85
+    }
+  ]
+}
