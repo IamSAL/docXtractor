@@ -98,6 +98,9 @@ export class LlmService {
     this.logger.log('::::INPUT::::');
     this.logger.log(fullPrompt);
 
+    const validationRetries = 3;
+    let lastValidationErrors = '';
+
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
         const response = await this.client.chat.completions.create({
@@ -115,8 +118,42 @@ export class LlmService {
         >;
         const totalTokens = response.usage?.total_tokens ?? 0;
 
-        this.logger.log(`LLM extraction complete:`, response);
-        return { data: resultData, usage: { totalTokens } };
+        // Validate result against schema
+        for (let vAttempt = 1; vAttempt <= validationRetries; vAttempt++) {
+          const { valid, errors } = this.validateAgainstSchema(
+            resultData,
+            schema,
+          );
+          if (valid) {
+            this.logger.log(`LLM extraction complete:`, response);
+            return { data: resultData, usage: { totalTokens } };
+          }
+
+          lastValidationErrors = errors;
+          this.logger.warn(
+            `Schema validation failed (attempt ${vAttempt}/${validationRetries}): ${errors}`,
+          );
+
+          if (vAttempt === validationRetries) break;
+
+          // Retry LLM with validation feedback
+          const correctionPrompt = `${fullPrompt}\n\nYour previous response failed schema validation with errors: ${errors}\nFix the JSON to match the schema exactly.`;
+          const correctionResponse = await this.client.chat.completions.create({
+            model: modelId,
+            messages: [{ role: 'user', content: correctionPrompt }],
+            response_format: { type: 'json_object' },
+          });
+          const correctedRaw =
+            correctionResponse.choices[0].message.content ?? '{}';
+          Object.assign(
+            resultData,
+            JSON.parse(jsonrepair(correctedRaw)) as Record<string, unknown>,
+          );
+        }
+
+        throw new Error(
+          `LLM response failed schema validation after ${validationRetries} attempts: ${lastValidationErrors}`,
+        );
       } catch (error: any) {
         this.logger.error(
           `LLM extraction failed (attempt ${attempt}/${this.maxRetries}): ${error}`,
@@ -181,6 +218,25 @@ export class LlmService {
       }
     }
     throw new Error('LLM generation failed after retries');
+  }
+
+  private validateAgainstSchema(
+    data: Record<string, unknown>,
+    schema: Record<string, any>,
+  ): { valid: boolean; errors: string } {
+    const expectedKeys: string[] = schema.properties
+      ? Object.keys(schema.properties)
+      : (schema.fields?.map((f: any) => f.name) ?? []);
+
+    if (!expectedKeys.length) return { valid: true, errors: '' };
+
+    const missingKeys = expectedKeys.filter((k) => !(k in data));
+    if (!missingKeys.length) return { valid: true, errors: '' };
+
+    return {
+      valid: false,
+      errors: `Missing keys: ${missingKeys.join(', ')}`,
+    };
   }
 
   private buildFieldsDescription(schema: Record<string, any>): string {
