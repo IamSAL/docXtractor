@@ -87,7 +87,7 @@ export function ExtractorForm({
       [successData.url]: successData.id,
     }));
 
-    return { url: successData.url, id: successData.id };
+    return { url: successData.url, id: successData.id, storageKey: successData.storageKey as string | undefined };
   };
 
   const handleActualSubmit = async (data: ExtractorFormData) => {

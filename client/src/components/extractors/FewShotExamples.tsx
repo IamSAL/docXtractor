@@ -18,6 +18,8 @@ export interface Source {
   name: string;
   description: string;
   content: string;
+  storageKey?: string;
+  parsedContent?: string;
 }
 
 export interface FewShotExample {
@@ -28,7 +30,7 @@ export interface FewShotExample {
 }
 
 interface FewShotExamplesProps {
-  onUploadFile?: (file: File) => Promise<{ url: string; id: string }>;
+  onUploadFile?: (file: File) => Promise<{ url: string; id: string; storageKey?: string }>;
 }
 
 export function FewShotExamples({ onUploadFile }: FewShotExamplesProps) {
@@ -124,7 +126,7 @@ interface FewShotExampleItemProps {
   example: any;
   index: number;
   onRemove: () => void;
-  onUploadFile?: (file: File) => Promise<{ url: string; id: string }>;
+  onUploadFile?: (file: File) => Promise<{ url: string; id: string; storageKey?: string }>;
 }
 
 function FewShotExampleItem({
@@ -169,6 +171,7 @@ function FewShotExampleItem({
           updateSource(sourceIndex, {
             ...newSource,
             content: result.url,
+            storageKey: result.storageKey,
             description: `${(file.size / 1024).toFixed(1)} KB`,
           });
         }
@@ -322,23 +325,37 @@ function FewShotExampleItem({
                             </span>
                           </div>
                           <div className="flex flex-col min-w-0 flex-1">
-                            {source.type === "url" ? (
-                              <input
-                                {...register(
-                                  `fewShotExamples.${index}.sources.${sIndex}.content` as any,
-                                )}
-                                placeholder="https://example.com/doc.pdf"
-                                className="text-sm font-bold bg-transparent border-none p-0 focus:ring-0 w-full placeholder:text-gray-300"
-                              />
-                            ) : source.type === "text" ? (
-                              <span className="text-xs font-bold uppercase text-yellow-600">
-                                Text Provider
-                              </span>
-                            ) : (
-                              <span className="text-sm font-bold truncate">
-                                {source.name}
-                              </span>
-                            )}
+                            <div className="flex items-center gap-1">
+                              {source.type === "url" ? (
+                                <input
+                                  {...register(
+                                    `fewShotExamples.${index}.sources.${sIndex}.content` as any,
+                                  )}
+                                  placeholder="https://example.com/doc.pdf"
+                                  className="text-sm font-bold bg-transparent border-none p-0 focus:ring-0 w-full placeholder:text-gray-300"
+                                />
+                              ) : source.type === "text" ? (
+                                <span className="text-xs font-bold uppercase text-yellow-600">
+                                  Text Provider
+                                </span>
+                              ) : (
+                                <span className="text-sm font-bold truncate">
+                                  {source.name}
+                                </span>
+                              )}
+                              {(source.type === "file" || source.type === "url") && (
+                                <span
+                                  className={cn(
+                                    "text-[9px] font-black uppercase px-1.5 py-0.5 rounded border shrink-0",
+                                    source.parsedContent
+                                      ? "bg-green-50 text-green-700 border-green-300"
+                                      : "bg-yellow-50 text-yellow-700 border-yellow-300",
+                                  )}
+                                >
+                                  {source.parsedContent ? "✓ PARSED" : "⏳ QUEUED"}
+                                </span>
+                              )}
+                            </div>
                             <span className="text-[9px] uppercase font-black text-gray-400">
                               {source.description}
                             </span>
