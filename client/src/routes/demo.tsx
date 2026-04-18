@@ -1,9 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import "jsonjoy-builder/styles.css";
 // @ts-ignore
 import { type JSONSchema, SchemaVisualEditor } from "jsonjoy-builder";
-import { AppLayout } from '@/components/AppLayout';
 
 export const Route = createFileRoute('/demo')({
     component: DemoComponent,
@@ -19,12 +18,20 @@ function DemoComponent() {
     });
 
     return (
-        <AppLayout>
-            <div className="p-8 w-full h-full overflow-y-auto bg-background-light dark:text-white">
+        <div className="min-h-screen bg-background-light dark:text-white">
+            <div className="sticky top-0 z-10 bg-white border-b-2 border-black px-6 py-3 flex items-center justify-between">
+                <Link to="/" className="flex items-center gap-2 font-black text-lg uppercase tracking-tight">
+                    ← DocXtractor
+                </Link>
+                <Link to="/login" className="text-sm font-bold underline">
+                    Sign In
+                </Link>
+            </div>
+            <div className="p-8 w-full h-full overflow-y-auto">
                 <div className="max-w-6xl mx-auto space-y-6">
                     <div>
                         <h1 className="text-3xl font-black mb-2">JSON Schema Builder</h1>
-                        <p className="text-text-secondary-light dark:text-text-secondary-dark">
+                        <p className="text-gray-600">
                             Visual editor for constructing JSON schemas.
                         </p>
                     </div>
@@ -53,6 +60,6 @@ function DemoComponent() {
                     </div>
                 </div>
             </div>
-        </AppLayout>
+        </div>
     )
 }
