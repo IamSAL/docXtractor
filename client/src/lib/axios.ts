@@ -34,8 +34,17 @@ AXIOS_INSTANCE.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle 401 errors (Unauthorized)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Handle 401 errors (Unauthorized) — skip auth endpoints so login/setup
+    // failures return the real server error instead of "No refresh token available"
+    const isAuthEndpoint =
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/admin-setup") ||
+      originalRequest.url?.includes("/auth/signup");
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint
+    ) {
       originalRequest._retry = true;
 
       try {
