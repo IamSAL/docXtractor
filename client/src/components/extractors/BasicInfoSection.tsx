@@ -2,6 +2,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Input } from '@/components/retroui/Input'
 import { Textarea } from '@/components/retroui/Textarea'
+import { Switch } from '@/components/retroui/Switch'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import type { ExtractorFormData } from '@/types/extractor'
@@ -132,6 +133,27 @@ export function BasicInfoSection({ onUploadFile }: BasicInfoSectionProps) {
                                 )}
                             />
                         </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-yellow-50 border-2 border-black rounded-lg">
+                        <div className="flex flex-col gap-0.5">
+                            <span className="text-sm font-semibold text-text-main-light">
+                                Make Public
+                            </span>
+                            <span className="text-xs text-text-secondary-light">
+                                Public extractors are visible as templates to all users
+                            </span>
+                        </div>
+                        <Controller
+                            name="isPublic"
+                            control={control}
+                            render={({ field }) => (
+                                <Switch
+                                    checked={field.value ?? false}
+                                    onCheckedChange={field.onChange}
+                                />
+                            )}
+                        />
                     </div>
                 </div>
             </AccordionContent>

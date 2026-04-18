@@ -4,8 +4,12 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
 } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { User } from '../../user/entities/user.entity';
 
 export interface FewShotExampleSource {
   id: string;
@@ -33,11 +37,25 @@ export interface SchemaVariant {
   createdAt: string;
 }
 
+@Index(['userId'])
 @Entity()
 export class Extractor {
   @ApiProperty({ example: '3fa85f64-5717-4562-b3fc-2c963f66afa6' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @ApiPropertyOptional()
+  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user?: User;
+
+  @ApiPropertyOptional()
+  @Column({ type: 'uuid', nullable: true })
+  userId?: string;
+
+  @ApiPropertyOptional({ default: false, description: 'Visible to all users as a template' })
+  @Column({ default: false })
+  isPublic: boolean;
 
   @ApiProperty({ example: 'Invoice Processor' })
   @Column()

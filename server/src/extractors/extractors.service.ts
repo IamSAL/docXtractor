@@ -2,6 +2,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  ForbiddenException,
   OnModuleInit,
   BadRequestException,
 } from '@nestjs/common';
@@ -45,7 +46,9 @@ export class ExtractorsService implements OnModuleInit {
       const seedData = this.loadSeedData();
       if (seedData.length > 0) {
         this.logger.log('No extractors found — seeding defaults...');
-        const extractors = this.extractorRepository.create(seedData);
+        const extractors = this.extractorRepository.create(
+          seedData.map((d: any) => ({ ...d, isPublic: true, userId: null })),
+        );
         await this.extractorRepository.save(extractors);
         this.logger.log(`Seeded ${extractors.length} default extractors`);
       }
@@ -119,8 +122,8 @@ export class ExtractorsService implements OnModuleInit {
     );
   }
 
-  async create(createExtractorDto: CreateExtractorDto): Promise<Extractor> {
-    const extractor = this.extractorRepository.create(createExtractorDto);
+  async create(createExtractorDto: CreateExtractorDto, userId: string): Promise<Extractor> {
+    const extractor = this.extractorRepository.create({ ...createExtractorDto, userId, isPublic: false });
     const saved = await this.extractorRepository.save(extractor);
     await this.dispatchExampleSourceParseJobs(
       saved.id,
@@ -130,16 +133,20 @@ export class ExtractorsService implements OnModuleInit {
     return saved;
   }
 
-  async findAll(): Promise<Extractor[]> {
+  async findAll(userId: string): Promise<Extractor[]> {
     return await this.extractorRepository.find({
+      where: [{ userId }, { isPublic: true }],
       order: { createdAt: 'DESC' },
     });
   }
 
-  async findOne(id: string): Promise<Extractor> {
+  async findOne(id: string, userId?: string): Promise<Extractor> {
     const extractor = await this.extractorRepository.findOne({ where: { id } });
     if (!extractor) {
       throw new NotFoundException(`Extractor with ID ${id} not found`);
+    }
+    if (userId && extractor.userId !== userId && !extractor.isPublic) {
+      throw new ForbiddenException('You do not have access to this extractor');
     }
     return extractor;
   }
@@ -147,8 +154,12 @@ export class ExtractorsService implements OnModuleInit {
   async update(
     id: string,
     updateExtractorDto: UpdateExtractorDto,
+    userId: string,
   ): Promise<Extractor> {
     const extractor = await this.findOne(id);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
     this.extractorRepository.merge(extractor, updateExtractorDto);
     const saved = await this.extractorRepository.save(extractor);
     await this.dispatchExampleSourceParseJobs(
@@ -159,7 +170,11 @@ export class ExtractorsService implements OnModuleInit {
     return saved;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, userId: string): Promise<void> {
+    const extractor = await this.findOne(id);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
     const result = await this.extractorRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Extractor with ID ${id} not found`);
@@ -171,8 +186,12 @@ export class ExtractorsService implements OnModuleInit {
   async addVariant(
     extractorId: string,
     dto: CreateSchemaVariantDto,
+    userId: string,
   ): Promise<Extractor> {
     const extractor = await this.findOne(extractorId);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
 
     if (extractor.variants.some((v) => v.name === dto.name)) {
       throw new BadRequestException('Variant name already exists');
@@ -201,8 +220,12 @@ export class ExtractorsService implements OnModuleInit {
     extractorId: string,
     variantId: string,
     dto: UpdateSchemaVariantDto,
+    userId: string,
   ): Promise<Extractor> {
     const extractor = await this.findOne(extractorId);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
     const variant = extractor.variants.find((v) => v.id === variantId);
 
     if (!variant) {
@@ -220,8 +243,12 @@ export class ExtractorsService implements OnModuleInit {
   async deleteVariant(
     extractorId: string,
     variantId: string,
+    userId: string,
   ): Promise<Extractor> {
     const extractor = await this.findOne(extractorId);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
     const index = extractor.variants.findIndex((v) => v.id === variantId);
 
     if (index === -1) {

@@ -105,6 +105,7 @@ export * from "./updateSchemaVariantDtoSchema";
 export * from "./updateUserDto";
 export * from "./updateUserDtoRole";
 export * from "./updateWorkflowDto";
+export * from "./user";
 export * from "./userControllerFindAllParams";
 export * from "./userControllerFindAllRole";
 export * from "./userResponseDto";

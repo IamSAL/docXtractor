@@ -10,9 +10,14 @@ import type { ExtractorFewShotExamplesItem } from "./extractorFewShotExamplesIte
 import type { ExtractorParserEngine } from "./extractorParserEngine";
 import type { ExtractorSchema } from "./extractorSchema";
 import type { ExtractorVariantsItem } from "./extractorVariantsItem";
+import type { User } from "./user";
 
 export interface Extractor {
 	id: string;
+	user?: User;
+	userId?: string;
+	/** Visible to all users as a template */
+	isPublic?: boolean;
 	name: string;
 	description?: string;
 	thumbnailUrl?: string;

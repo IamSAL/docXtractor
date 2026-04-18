@@ -25,6 +25,8 @@ import {
   GenerateExtractorDto,
 } from './dto/generate-extractor.dto';
 import { Extractor } from './entities/extractor.entity';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { JWTPayload } from '../shared/types/jwt-payload.types';
 
 @ApiTags('Extractors')
 @ApiBearerAuth()
@@ -39,8 +41,8 @@ export class ExtractorsController {
     description: 'The extractor has been successfully created.',
     type: Extractor,
   })
-  create(@Body() createExtractorDto: CreateExtractorDto) {
-    return this.extractorsService.create(createExtractorDto);
+  create(@Body() createExtractorDto: CreateExtractorDto, @GetUser() user: JWTPayload) {
+    return this.extractorsService.create(createExtractorDto, user.sub);
   }
 
   @Post('generate-schema')
@@ -75,8 +77,8 @@ export class ExtractorsController {
     description: 'Return all extractors.',
     type: [Extractor],
   })
-  findAll() {
-    return this.extractorsService.findAll();
+  findAll(@GetUser() user: JWTPayload) {
+    return this.extractorsService.findAll(user.sub);
   }
 
   @Get(':id')
@@ -86,8 +88,8 @@ export class ExtractorsController {
     description: 'Return the extractor.',
     type: Extractor,
   })
-  findOne(@Param('id') id: string) {
-    return this.extractorsService.findOne(id);
+  findOne(@Param('id') id: string, @GetUser() user: JWTPayload) {
+    return this.extractorsService.findOne(id, user.sub);
   }
 
   @Patch(':id')
@@ -100,8 +102,9 @@ export class ExtractorsController {
   update(
     @Param('id') id: string,
     @Body() updateExtractorDto: UpdateExtractorDto,
+    @GetUser() user: JWTPayload,
   ) {
-    return this.extractorsService.update(id, updateExtractorDto);
+    return this.extractorsService.update(id, updateExtractorDto, user.sub);
   }
 
   @Delete(':id')
@@ -110,8 +113,8 @@ export class ExtractorsController {
     status: 200,
     description: 'The extractor has been successfully deleted.',
   })
-  remove(@Param('id') id: string) {
-    return this.extractorsService.remove(id);
+  remove(@Param('id') id: string, @GetUser() user: JWTPayload) {
+    return this.extractorsService.remove(id, user.sub);
   }
 
   // --- Schema Variant Endpoints ---
@@ -123,8 +126,8 @@ export class ExtractorsController {
     description: 'Variant added successfully.',
     type: Extractor,
   })
-  addVariant(@Param('id') id: string, @Body() dto: CreateSchemaVariantDto) {
-    return this.extractorsService.addVariant(id, dto);
+  addVariant(@Param('id') id: string, @Body() dto: CreateSchemaVariantDto, @GetUser() user: JWTPayload) {
+    return this.extractorsService.addVariant(id, dto, user.sub);
   }
 
   @Patch(':id/variants/:variantId')
@@ -138,8 +141,9 @@ export class ExtractorsController {
     @Param('id') id: string,
     @Param('variantId') variantId: string,
     @Body() dto: UpdateSchemaVariantDto,
+    @GetUser() user: JWTPayload,
   ) {
-    return this.extractorsService.updateVariant(id, variantId, dto);
+    return this.extractorsService.updateVariant(id, variantId, dto, user.sub);
   }
 
   @Delete(':id/variants/:variantId')
@@ -152,7 +156,8 @@ export class ExtractorsController {
   deleteVariant(
     @Param('id') id: string,
     @Param('variantId') variantId: string,
+    @GetUser() user: JWTPayload,
   ) {
-    return this.extractorsService.deleteVariant(id, variantId);
+    return this.extractorsService.deleteVariant(id, variantId, user.sub);
   }
 }

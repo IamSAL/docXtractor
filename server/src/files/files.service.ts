@@ -34,12 +34,15 @@ export class FilesService {
     userId: string,
     file: Express.Multer.File,
     metadata?: Record<string, any>,
+    storageKeyPrefix?: string,
   ): Promise<{ id: string; url: string; storageKey: string }> {
-    // Generate user-scoped storage key
+    // Generate storage key (custom prefix or user-scoped default)
     const timestamp = Date.now();
     const uuid = uuidv4().split('-')[0];
     const sanitized = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storageKey = `${userId}/${timestamp}_${uuid}_${sanitized}`;
+    const storageKey = storageKeyPrefix
+      ? `${storageKeyPrefix}${timestamp}_${uuid}_${sanitized}`
+      : `${userId}/${timestamp}_${uuid}_${sanitized}`;
 
     // Upload to S3 with encryption
     await this.storageService.uploadFile(

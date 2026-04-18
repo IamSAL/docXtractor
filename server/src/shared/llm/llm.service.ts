@@ -95,8 +95,8 @@ export class LlmService {
     const fullPrompt = `${instruction}${fewShotBlock}\nDocument Content:\n${content}\nImportant, Your output structure must match 100% of this json schema:\n ${JSON.stringify(schema.properties)}`;
 
     this.logger.log(`Running LLM extraction, model: ${modelId}`);
-    this.logger.log('::::INPUT::::');
-    this.logger.log(fullPrompt);
+    this.logger.debug('::::INPUT::::');
+    this.logger.debug(fullPrompt);
 
     const validationRetries = 3;
     let lastValidationErrors = '';
@@ -114,6 +114,17 @@ export class LlmService {
         const raw = response.choices[0].message.content ?? '{}';
         this.logger.log('::::OUTPUT::::');
         this.logger.debug(raw);
+
+        const REFUSAL_PATTERNS = [
+          /sorry,?\s+i\s+(can'?t|cannot)/i,
+          /i\s+(can'?t|cannot)\s+(help|assist)/i,
+          /as an (ai|language model)/i,
+          /i('?m| am) not able to/i,
+        ];
+        if (REFUSAL_PATTERNS.some((p) => p.test(raw))) {
+          throw new Error(`LLM refused to extract: ${raw.slice(0, 120)}`);
+        }
+
         const resultData = JSON.parse(jsonrepair(raw)) as Record<
           string,
           unknown

@@ -1,10 +1,13 @@
 import asyncio
 import gc
 import io
+import ipaddress
 import logging
 import os
+import socket
 import time
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 from .bullmq_client import bullmq_client
 from .parser_engine import get_engine
 from bullmq import Job
@@ -32,6 +35,34 @@ s3_client = boto3.client(
     aws_access_key_id=MINIO_ACCESS_KEY,
     aws_secret_access_key=MINIO_SECRET_KEY,
 )
+
+_BLOCKED_NETWORKS = [
+    ipaddress.ip_network("127.0.0.0/8"),    # loopback
+    ipaddress.ip_network("10.0.0.0/8"),      # RFC1918
+    ipaddress.ip_network("172.16.0.0/12"),   # RFC1918
+    ipaddress.ip_network("192.168.0.0/16"),  # RFC1918
+    ipaddress.ip_network("169.254.0.0/16"),  # link-local / cloud metadata
+    ipaddress.ip_network("::1/128"),         # IPv6 loopback
+    ipaddress.ip_network("fc00::/7"),        # IPv6 ULA
+]
+
+
+def _check_ssrf(url: str) -> None:
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError(f"URL scheme '{parsed.scheme}' is not allowed")
+    hostname = parsed.hostname
+    if not hostname:
+        raise ValueError("URL has no hostname")
+    try:
+        resolved = socket.getaddrinfo(hostname, None)
+    except socket.gaierror as e:
+        raise ValueError(f"Could not resolve hostname '{hostname}': {e}")
+    for _family, _type, _proto, _canonname, sockaddr in resolved:
+        ip = ipaddress.ip_address(sockaddr[0])
+        for net in _BLOCKED_NETWORKS:
+            if ip in net:
+                raise ValueError(f"URL resolves to a blocked IP address: {ip}")
 
 
 def _make_log(level, message):
@@ -85,6 +116,22 @@ async def process_job(job: Job, token: str = None):
                 }
                 await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
                 return {"status": "error", "message": "No URL provided"}
+
+            # SSRF guard: reject internal/private IPs before fetching
+            try:
+                _check_ssrf(url)
+            except ValueError as ssrf_err:
+                logger.warning(f"🚫 SSRF check blocked URL '{url}': {ssrf_err}")
+                event = {
+                    "run_id": data.get("run_id"),
+                    "document_id": data.get("document_id"),
+                    "retry_generation": data.get("retry_generation", 0),
+                    "status": "failed",
+                    "error": f"URL blocked by security policy: {ssrf_err}",
+                    "logs": logs,
+                }
+                await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+                return {"status": "error", "message": str(ssrf_err)}
 
             # Process URL document
             logs.append(_make_log("info", f"Downloading URL: {url}"))
@@ -215,6 +262,7 @@ async def process_example_source_job(job: Job, token: str = None):
             url = data.get("url")
             if not url:
                 raise ValueError("No url in job data for url-type source")
+            _check_ssrf(url)
             result = await asyncio.to_thread(engine.parse_url, url)
 
         elif source_type == "file":
