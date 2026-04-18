@@ -40,7 +40,7 @@ const ALLOWED_MIME_TYPES = new Set([
 ]);
 
 const multerOptions = {
-  limits: { fileSize: MAX_FILE_SIZE_BYTES },
+  limits: { fileSize: MAX_FILE_SIZE_BYTES, fieldSize: 1 * 1024 * 1024 },
   fileFilter: (
     _req: any,
     file: Express.Multer.File,

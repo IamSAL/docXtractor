@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { cookieStorage } from "./cookie-storage";
 
 // Socket.IO needs the base origin (no /api path), since it connects via /socket.io/
 const SERVER_URL =
@@ -11,38 +12,49 @@ const SERVER_URL =
 
 let socket: Socket | null = null;
 
-export const getSocket = (): Socket => {
-  if (!socket) {
-    // Try to get token from local storage (auth-store zustand persistence)
-    let token = undefined;
-    try {
-      const authStateStr = localStorage.getItem("auth-store");
-      if (authStateStr) {
-        const authState = JSON.parse(authStateStr);
-        token = authState?.state?.accessToken;
-      }
-    } catch (e) {
-      console.warn("Failed to parse auth token for socket", e);
+const getTokenFromCookie = (): string | undefined => {
+  try {
+    const raw = cookieStorage.getItem("auth-storage");
+    if (raw) {
+      const parsed = JSON.parse(decodeURIComponent(raw));
+      return parsed?.state?.accessToken ?? undefined;
     }
-
-    socket = io(SERVER_URL + "/runs", {
-      transports: ["websocket"],
-      autoConnect: true,
-      auth: { token },
-    });
-
-    socket.on("connect", () => {
-      console.log("Socket scheduled connection established", socket?.id);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected");
-    });
-
-    socket.on("connect_error", (err: any) => {
-      console.error("Socket connection error:", err);
-    });
+  } catch {
+    // ignore parse errors
   }
+  return undefined;
+};
+
+export const getSocket = (token?: string): Socket => {
+  const resolvedToken = token ?? getTokenFromCookie();
+
+  if (socket) {
+    // If token changed and socket is disconnected, update auth and reconnect
+    if (resolvedToken && (socket.auth as any)?.token !== resolvedToken) {
+      socket.auth = { token: resolvedToken };
+      if (!socket.connected) socket.connect();
+    }
+    return socket;
+  }
+
+  socket = io(SERVER_URL + "/runs", {
+    transports: ["websocket"],
+    autoConnect: true,
+    auth: { token: resolvedToken },
+  });
+
+  socket.on("connect", () => {
+    console.log("Socket scheduled connection established", socket?.id);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected");
+  });
+
+  socket.on("connect_error", (err: any) => {
+    console.error("Socket connection error:", err);
+  });
+
   return socket;
 };
 

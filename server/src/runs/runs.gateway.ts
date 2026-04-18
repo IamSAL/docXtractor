@@ -95,7 +95,10 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('joinRunsList')
   handleJoinRunsList(@ConnectedSocket() client: Socket) {
-    // this.logger.log(`Client ${client.id} joining runs list room`);
+    if (!client.data.user) {
+      this.logger.warn(`Unauthorized joinRunsList attempt from ${client.id}`);
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     client.join('runs:list');
     return { event: 'joinedRunsList' };
   }
@@ -134,6 +137,10 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { workflowId: string },
     @ConnectedSocket() client: Socket,
   ) {
+    if (!client.data.user) {
+      this.logger.warn(`Unauthorized joinWorkflow attempt from ${client.id}`);
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     const { workflowId } = data;
     client.join(`workflow:${workflowId}`);
     return { event: 'joinedWorkflow', data: { workflowId } };
@@ -154,6 +161,10 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { executionId: string },
     @ConnectedSocket() client: Socket,
   ) {
+    if (!client.data.user) {
+      this.logger.warn(`Unauthorized joinWorkflowExecution attempt from ${client.id}`);
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     const { executionId } = data;
     client.join(`workflow-execution:${executionId}`);
     return { event: 'joinedWorkflowExecution', data: { executionId } };
@@ -171,6 +182,10 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('joinWorkflowsList')
   handleJoinWorkflowsList(@ConnectedSocket() client: Socket) {
+    if (!client.data.user) {
+      this.logger.warn(`Unauthorized joinWorkflowsList attempt from ${client.id}`);
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     client.join('workflows:list');
     return { event: 'joinedWorkflowsList' };
   }
