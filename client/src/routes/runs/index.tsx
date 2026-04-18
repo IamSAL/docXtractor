@@ -45,6 +45,7 @@ function RunsComponent() {
   const [search, setSearch] = useState("");
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showExtractorDropdown, setShowExtractorDropdown] = useState(false);
+  const [retryingRunId, setRetryingRunId] = useState<string | null>(null);
 
   // Fetch extractors for filter dropdown
   const { data: extractorsData } = useExtractorsControllerFindAll();
@@ -68,11 +69,17 @@ function RunsComponent() {
       });
     };
 
+    const handleReconnect = () => {
+      socket.emit("joinRunsList");
+    };
+
     socket.on("runs:list:updated", handleRunsListUpdated);
+    socket.io.on("reconnect", handleReconnect);
 
     return () => {
       socket.emit("leaveRunsList");
       socket.off("runs:list:updated", handleRunsListUpdated);
+      socket.io.off("reconnect", handleReconnect);
     };
   }, [queryClient]);
 
@@ -118,6 +125,7 @@ function RunsComponent() {
   };
 
   const handleRetry = async (id: string) => {
+    setRetryingRunId(id);
     try {
       await retryMutation.mutateAsync({ id });
       toast.success("Run restarted successfully");
@@ -127,6 +135,8 @@ function RunsComponent() {
     } catch (err) {
       toast.error("Failed to retry run");
       console.error(err);
+    } finally {
+      setRetryingRunId(null);
     }
   };
 
@@ -406,7 +416,7 @@ function RunsComponent() {
                           className="size-10 bg-white"
                           title="Retry"
                           onClick={() => handleRetry(run.id)}
-                          disabled={retryMutation.isPending}
+                          disabled={retryingRunId === run.id}
                         >
                           <span className="material-symbols-outlined text-[20px]">
                             replay

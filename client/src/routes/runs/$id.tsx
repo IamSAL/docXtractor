@@ -114,15 +114,25 @@ function RunDetailComponent() {
       );
     };
 
+    const handleReconnect = () => {
+      socket.emit("joinRun", { runId: id });
+      // Re-fetch to catch any events missed during the disconnect window
+      queryClient.invalidateQueries({
+        queryKey: getRunsControllerFindOneQueryKey(id),
+      });
+    };
+
     socket.on("run:updated", handleRunUpdated);
     socket.on("run:source:updated", handleSourceUpdated);
     socket.on("run:log", handleRunLog);
+    socket.io.on("reconnect", handleReconnect);
 
     return () => {
       socket.emit("leaveRun", { runId: id });
       socket.off("run:updated", handleRunUpdated);
       socket.off("run:source:updated", handleSourceUpdated);
       socket.off("run:log", handleRunLog);
+      socket.io.off("reconnect", handleReconnect);
     };
   }, [id, queryClient]);
 

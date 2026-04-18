@@ -80,6 +80,7 @@ function SetupComponent() {
         err?.response?.data?.message ||
           "Failed to create admin account. Please try again.",
       );
+    } finally {
       setIsLoading(false);
     }
   };

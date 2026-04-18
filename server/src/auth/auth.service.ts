@@ -266,7 +266,6 @@ export class AuthService {
     accessToken: string,
     refreshToken: string,
   ): Promise<string | boolean> {
-    console.log(accessToken, refreshToken);
     try {
       await this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
@@ -290,7 +289,8 @@ export class AuthService {
     if (!user) return; // Don't reveal if user doesn't exist
 
     const resetToken = this.generateResetToken(user.id, user.email);
-    console.log(resetToken);
+    // TODO: send reset email with resetToken
+    void resetToken;
 
     // Send email with reset token (implementation omitted)
   }
@@ -460,7 +460,6 @@ export class AuthService {
     otpHash: string | undefined,
     otp: string,
   ): Promise<boolean> {
-    console.log(otpExpiry ? otpExpiry < new Date() : true, otpHash ?? null);
     if (!otpHash || !otpExpiry || otpExpiry < new Date()) {
       return false;
     }

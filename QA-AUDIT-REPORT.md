@@ -13,79 +13,93 @@ The audit identified **54 distinct issues** across the entire stack: 14 critical
 
 ### Authentication & Security
 
-- **Issue:** WebSocket gateway has zero authentication -- any anonymous client can join any run room
-  - **Location:** `server/src/runs/runs.gateway.ts:31-33` (handleConnection), `:39-47` (handleJoinRun)
-  - **Impact:** Anyone with the WebSocket URL can subscribe to `run:{anyRunId}` and receive real-time extraction results, source updates, and logs for any user's runs. Complete data leakage.
-  - **Fix:** Add JWT verification in `handleConnection()`. Validate room ownership in `handleJoinRun` against the authenticated user.
+- ~~**Issue:** WebSocket gateway has zero authentication -- any anonymous client can join any run room~~
+  - ~~**Location:** `server/src/runs/runs.gateway.ts:31-33` (handleConnection), `:39-47` (handleJoinRun)~~
+  - ~~**Impact:** Anyone with the WebSocket URL can subscribe to `run:{anyRunId}` and receive real-time extraction results, source updates, and logs for any user's runs. Complete data leakage.~~
+  - ~~**Fix:** Add JWT verification in `handleConnection()`. Validate room ownership in `handleJoinRun` against the authenticated user.~~
+  - ✅ **Fixed:** Gateway now requires JWT in handshake auth token, verifies it via `JwtService`, and asserts `client.data.user` exists.
 
-- **Issue:** Socket client sends no auth token -- even if server auth is added, client would fail
-  - **Location:** `client/src/lib/socket.ts:16-19`
-  - **Impact:** Companion to the above. The `io()` call passes no `auth` option with a JWT.
-  - **Fix:** Pass `auth: { token: accessToken }` in socket connection options.
+- ~~**Issue:** Socket client sends no auth token -- even if server auth is added, client would fail~~
+  - ~~**Location:** `client/src/lib/socket.ts:16-19`~~
+  - ~~**Impact:** Companion to the above. The `io()` call passes no `auth` option with a JWT.~~
+  - ~~**Fix:** Pass `auth: { token: accessToken }` in socket connection options.~~
+  - ✅ **Fixed:** Updated `socket.ts` to parse `accessToken` directly from zustand `localStorage` auth state and pass it in `auth: { token }`.
 
-- **Issue:** Google OAuth callback sets `isAuthenticated: true` but never fetches/sets the `user` object
-  - **Location:** `client/src/routes/auth/callback.tsx:21-28` (sets tokens, no user), `client/src/lib/auth-store.ts:303` (rehydration checks `!state.user` and calls `logout()`)
-  - **Impact:** Google OAuth login appears to work, then immediately logs user out on any page refresh or new tab. Completely broken flow.
-  - **Fix:** After setting tokens, call the `/auth/me` or `/auth/profile` endpoint to fetch and set the user object.
+- ~~**Issue:** Google OAuth callback sets `isAuthenticated: true` but never fetches/sets the `user` object~~
+  - ~~**Location:** `client/src/routes/auth/callback.tsx:21-28` (sets tokens, no user), `client/src/lib/auth-store.ts:303` (rehydration checks `!state.user` and calls `logout()`)~~
+  - ~~**Impact:** Google OAuth login appears to work, then immediately logs user out on any page refresh or new tab. Completely broken flow.~~
+  - ~~**Fix:** After setting tokens, call the `/auth/me` or `/auth/profile` endpoint to fetch and set the user object.~~
+  - ✅ **Fixed:** `callback.tsx` now calls `GET /auth/me` via async IIFE after storing tokens; user object is set before navigating to dashboard.
 
-- **Issue:** All file upload endpoints are public -- no authentication required
-  - **Location:** `server/src/files/files.controller.ts:29`, `:100`, `:175`, `:203`, `:240` (all use `@Public()` decorator)
-  - **Impact:** Any unauthenticated user can upload files, list files by userId, and confirm files. `userId` is a plain body parameter, not extracted from JWT. An attacker can fill MinIO storage or read other users' file metadata.
-  - **Fix:** Remove `@Public()` decorators, extract userId from JWT token.
+- ~~**Issue:** All file upload endpoints are public -- no authentication required~~
+  - ~~**Location:** `server/src/files/files.controller.ts:29`, `:100`, `:175`, `:203`, `:240` (all use `@Public()` decorator)~~
+  - ~~**Impact:** Any unauthenticated user can upload files, list files by userId, and confirm files. `userId` is a plain body parameter, not extracted from JWT. An attacker can fill MinIO storage or read other users' file metadata.~~
+  - ~~**Fix:** Remove `@Public()` decorators, extract userId from JWT token.~~
+  - ✅ **Fixed:** Removed all `@Public()` decorators. `files.controller.ts` now uses `@GetUser('sub') userId` instead of trusting user body payload.
 
 - **Issue:** Google OAuth bypasses invite-only mode
   - **Location:** `server/src/auth/auth.service.ts:331-352`
   - **Impact:** Self-hosted instance with invite-only enabled can be bypassed by anyone with a Google account. Defeats the entire invite system.
   - **Fix:** Check `allowPublicSignup` and invite status in `googleLogin` before creating new users.
+  - ⚠️ *Skipped by user request*
 
-- **Issue:** `verifyTokens` endpoint logs raw access and refresh tokens to stdout
-  - **Location:** `server/src/auth/auth.service.ts:269`
-  - **Impact:** Production logs contain valid JWT tokens. Anyone with log access can impersonate users.
-  - **Fix:** Remove the `console.log` call.
+- ~~**Issue:** `verifyTokens` endpoint logs raw access and refresh tokens to stdout~~
+  - ~~**Location:** `server/src/auth/auth.service.ts:269`~~
+  - ~~**Impact:** Production logs contain valid JWT tokens. Anyone with log access can impersonate users.~~
+  - ~~**Fix:** Remove the `console.log` call.~~
+  - ✅ **Fixed:** Removed `console.log(accessToken, refreshToken)` from `verifyTokens`, OTP debug log from `verifyOtp`, and reset token log from `initiatePasswordReset`.
 
 - **Issue:** Tokens passed in URL during Google OAuth redirect
   - **Location:** `server/src/auth/auth.controller.ts:286-300`
   - **Impact:** Tokens visible in browser history, server access logs, referrer headers.
   - **Fix:** Use a short-lived authorization code exchanged via POST, or pass tokens via HTTP-only cookie.
+  - ⚠️ *Skipped by user request*
 
 ### Extraction Pipeline
 
-- **Issue:** Python extraction worker gets empty field descriptions for JSON Schema format
-  - **Location:** `workers/extraction-service/src/extractor.py:99-102` and `:169-172`
-  - **Impact:** `run_llm_extraction()` reads `schema_config.get('fields', [])` but NestJS sends JSON Schema format with `properties` key. Result: `fields_desc` is always empty -- LLM gets zero guidance on what to extract. Every queue-based extraction (doclo/langextract providers) produces garbage or empty results. FreeLLM provider works fine because it uses NestJS `LlmService` directly.
-  - **Fix:** Update Python worker to handle both `fields` array and `properties` object formats, matching the logic in `server/src/shared/llm/llm.service.ts:183-203`.
+- ~~**Issue:** Python extraction worker gets empty field descriptions for JSON Schema format~~
+  - ~~**Location:** `workers/extraction-service/src/extractor.py:99-102` and `:169-172`~~
+  - ~~**Impact:** `run_llm_extraction()` reads `schema_config.get('fields', [])` but NestJS sends JSON Schema format with `properties` key. Result: `fields_desc` is always empty -- LLM gets zero guidance on what to extract. Every queue-based extraction (doclo/langextract providers) produces garbage or empty results. FreeLLM provider works fine because it uses NestJS `LlmService` directly.~~
+  - ~~**Fix:** Update Python worker to handle both `fields` array and `properties` object formats, matching the logic in `server/src/shared/llm/llm.service.ts:183-203`.~~
+  - ✅ **Fixed:** Added `_build_fields_description()` that handles both `fields[]` and `properties{}` formats. Also adds JSON Schema hint to prompt matching NestJS behaviour.
 
-- **Issue:** Python extraction worker has no JSON repair -- raw `json.loads` on LLM output
-  - **Location:** `workers/extraction-service/src/extractor.py:129`
-  - **Impact:** LLM output with trailing commas, unquoted keys, or markdown fences crashes Python extraction. NestJS uses `jsonrepair` library at `server/src/shared/llm/llm.service.ts:109`. Job fails with unhelpful error.
-  - **Fix:** Add `json-repair` Python package or strip markdown fences before parsing.
+- ~~**Issue:** Python extraction worker has no JSON repair -- raw `json.loads` on LLM output~~
+  - ~~**Location:** `workers/extraction-service/src/extractor.py:129`~~
+  - ~~**Impact:** LLM output with trailing commas, unquoted keys, or markdown fences crashes Python extraction. NestJS uses `jsonrepair` library at `server/src/shared/llm/llm.service.ts:109`. Job fails with unhelpful error.~~
+  - ~~**Fix:** Add `json-repair` Python package or strip markdown fences before parsing.~~
+  - ✅ **Fixed:** `extractor.py` now imports `json_repair` with a safe fallback, strips markdown fences, and calls `repair_json()` before `json.loads()`.
 
-- **Issue:** Rate limit (HTTP 429) causes infinite loop in LlmService
-  - **Location:** `server/src/shared/llm/llm.service.ts:122-128` (extract method) and `:167-173` (generate method)
-  - **Impact:** On 429, `attempt--` followed by `continue` means the loop counter never advances. Persistent 429 = infinite retry loop. Run stays in "extracting" forever. No timeout to break the loop.
-  - **Fix:** Add max retry count for 429 responses, or use exponential backoff with a ceiling.
+- ~~**Issue:** Rate limit (HTTP 429) causes infinite loop in LlmService~~
+  - ~~**Location:** `server/src/shared/llm/llm.service.ts:122-128` (extract method) and `:167-173` (generate method)~~
+  - ~~**Impact:** On 429, `attempt--` followed by `continue` means the loop counter never advances. Persistent 429 = infinite retry loop. Run stays in "extracting" forever. No timeout to break the loop.~~
+  - ~~**Fix:** Add max retry count for 429 responses, or use exponential backoff with a ceiling.~~
+  - ✅ **Fixed:** Both `extract()` and `generate()` now track `rateLimitRetries` separately (max 5) with exponential backoff (3s → 6s → 12s … max 60s). Exhausted retries throw instead of looping.
 
-- **Issue:** Python consumer sends duplicate failure events on exception
-  - **Location:** `workers/extraction-service/src/consumer.py:116-129`
-  - **Impact:** On exception, consumer sends failure to `extraction-completed` queue AND re-raises. BullMQ may retry, causing duplicate failure processing. In PER_DOCUMENT mode, `progress.extracted` increments twice, corrupting completion detection.
-  - **Fix:** Either send the failure event OR re-raise, not both.
+- ~~**Issue:** Python consumer sends duplicate failure events on exception~~
+  - ~~**Location:** `workers/extraction-service/src/consumer.py:116-129`~~
+  - ~~**Impact:** On exception, consumer sends failure to `extraction-completed` queue AND re-raises. BullMQ may retry, causing duplicate failure processing. In PER_DOCUMENT mode, `progress.extracted` increments twice, corrupting completion detection.~~
+  - ~~**Fix:** Either send the failure event OR re-raise, not both.~~
+  - ✅ **Fixed:** Consumer now returns `{"status": "error"}` instead of re-raising after enqueueing the failure event.
 
 ### Parsing Pipeline
 
-- **Issue:** No file size limit on uploads -- potential OOM crash
-  - **Location:** `server/src/files/files.controller.ts:30` (`FileInterceptor('file')`) and `:101` (`FilesInterceptor('files', 10)`)
-  - **Impact:** Multer is used without `limits` configuration. Multi-GB files are buffered entirely in Node.js memory (`file.buffer` at `files.service.ts:44`), potentially causing OOM crashes of the entire NestJS server.
-  - **Fix:** Add `limits: { fileSize: ... }` to Multer configuration.
+- ~~**Issue:** No file size limit on uploads -- potential OOM crash~~
+  - ~~**Location:** `server/src/files/files.controller.ts:30` (`FileInterceptor('file')`) and `:101` (`FilesInterceptor('files', 10)`)~~
+  - ~~**Impact:** Multer is used without `limits` configuration. Multi-GB files are buffered entirely in Node.js memory (`file.buffer` at `files.service.ts:44`), potentially causing OOM crashes of the entire NestJS server.~~
+  - ~~**Fix:** Add `limits: { fileSize: ... }` to Multer configuration.~~
+  - ✅ **Fixed:** Both upload interceptors now use `multerOptions` with `limits: { fileSize: 50MB }`.
 
-- **Issue:** No file type validation on uploads
-  - **Location:** `server/src/files/files.service.ts:30-71`, `server/src/files/files.controller.ts:90-97`
-  - **Impact:** Users can upload any file type. Parser-service hardcodes `filetype="pdf"` (PyMuPDF) or `InputFormat.PDF` (Docling), so non-PDF files cause cryptic parsing failures.
-  - **Fix:** Add MIME type / extension whitelist at the controller level.
+- ~~**Issue:** No file type validation on uploads~~
+  - ~~**Location:** `server/src/files/files.service.ts:30-71`, `server/src/files/files.controller.ts:90-97`~~
+  - ~~**Impact:** Users can upload any file type. Parser-service hardcodes `filetype="pdf"` (PyMuPDF) or `InputFormat.PDF` (Docling), so non-PDF files cause cryptic parsing failures.~~
+  - ~~**Fix:** Add MIME type / extension whitelist at the controller level.~~
+  - ✅ **Fixed:** `multerOptions` MIME allowlist rejects unsupported types with a descriptive 400 error. Allowed: PDF, PNG, JPEG, WEBP, TIFF, TXT, CSV, DOCX, DOC, XLSX, XLS.
 
-- **Issue:** Parser-service silently swallows `add_job` failures for result events
-  - **Location:** `workers/parser-service/src/bullmq_client.py:39-40`
-  - **Impact:** If Redis is temporarily unreachable when pushing to `parsed-documents` queue, the exception is caught and returned silently. Parsed result is lost forever. Run stays stuck in `parsing` with no error. User sees endless spinner.
-  - **Fix:** Re-raise the exception so BullMQ can retry the job, or implement a retry loop for the `add_job` call.
+- ~~**Issue:** Parser-service silently swallows `add_job` failures for result events~~
+  - ~~**Location:** `workers/parser-service/src/bullmq_client.py:39-40`~~
+  - ~~**Impact:** If Redis is temporarily unreachable when pushing to `parsed-documents` queue, the exception is caught and returned silently. Parsed result is lost forever. Run stays stuck in `parsing` with no error. User sees endless spinner.~~
+  - ~~**Fix:** Re-raise the exception so BullMQ can retry the job, or implement a retry loop for the `add_job` call.~~
+  - ✅ **Fixed:** `bullmq_client.py` now explicitly calls `raise e` inside the exception catch block to trigger the queue retry semantics.
 
 ---
 
@@ -93,60 +107,69 @@ The audit identified **54 distinct issues** across the entire stack: 14 critical
 
 ### Frontend UX
 
-- **Issue:** Settings layout "Logout" button navigates to `/extractors/new` instead of logging out
-  - **Location:** `client/src/routes/settings.tsx:32-37`
-  - **Impact:** Users clicking "Logout" from settings are taken to the extractor creation page.
-  - **Fix:** Call `useAuthStore.getState().logout()` and navigate to `/login`.
+- ~~**Issue:** Settings layout "Logout" button navigates to `/extractors/new` instead of logging out~~
+  - ~~**Location:** `client/src/routes/settings.tsx:32-37`~~
+  - ~~**Impact:** Users clicking "Logout" from settings are taken to the extractor creation page.~~
+  - ~~**Fix:** Call `useAuthStore.getState().logout()` and navigate to `/login`.~~
+  - ✅ **Fixed:** Replaced `<Link to="/extractors/new">` with a `<button>` that calls `logout()` and `navigate({ to: '/login' })`.
 
-- **Issue:** Settings layout has always-visible "Unsaved Changes" bar with non-functional buttons
-  - **Location:** `client/src/routes/settings.tsx:64-80`
-  - **Impact:** "Reset Defaults" and "Save Changes" buttons are permanently visible on every settings sub-page with no onClick handlers and no connection to form state.
-  - **Fix:** Wire to form dirty state; only show when changes exist.
+- ~~**Issue:** Settings layout has always-visible "Unsaved Changes" bar with non-functional buttons~~
+  - ~~**Location:** `client/src/routes/settings.tsx:64-80`~~
+  - ~~**Impact:** "Reset Defaults" and "Save Changes" buttons are permanently visible on every settings sub-page with no onClick handlers and no connection to form state.~~
+  - ~~**Fix:** Wire to form dirty state; only show when changes exist.~~
+  - ✅ **Fixed:** Removed the floating bar entirely from the shared settings layout.
 
-- **Issue:** Settings breadcrumb shows "/ HOME / EXTRACTORS" instead of Settings
-  - **Location:** `client/src/routes/settings.tsx:29`
-  - **Impact:** Confusing navigation context for users on the settings page.
-  - **Fix:** Update breadcrumb text.
+- ~~**Issue:** Settings breadcrumb shows "/ HOME / EXTRACTORS" instead of Settings~~
+  - ~~**Location:** `client/src/routes/settings.tsx:29`~~
+  - ~~**Impact:** Confusing navigation context for users on the settings page.~~
+  - ~~**Fix:** Update breadcrumb text.~~
+  - ✅ **Fixed:** Breadcrumb now reads `"/ HOME / SETTINGS"`.
 
 - **Issue:** Extraction Settings form save is a mock -- only calls `console.log`
   - **Location:** `client/src/routes/settings/extraction.tsx:25-28`
   - **Impact:** Users believe settings are saved but nothing persists. Data lost on page reload.
   - **Fix:** Implement actual API call to persist extraction settings.
 
-- **Issue:** Auth store logs out on transient network errors during token refresh
-  - **Location:** `client/src/lib/auth-store.ts:274`
-  - **Impact:** `refreshAccessToken` calls `logout()` on ANY non-401/403 error, including timeouts and 500s. Users get force-logged-out during temporary connectivity issues.
-  - **Fix:** Only logout on 401/403; retry on transient errors.
+- ~~**Issue:** Auth store logs out on transient network errors during token refresh~~
+  - ~~**Location:** `client/src/lib/auth-store.ts:274`~~
+  - ~~**Impact:** `refreshAccessToken` calls `logout()` on ANY non-401/403 error, including timeouts and 500s. Users get force-logged-out during temporary connectivity issues.~~
+  - ~~**Fix:** Only logout on 401/403; retry on transient errors.~~
+  - ✅ **Fixed:** `auth-store.ts` now only calls `logout()` when `error.response.status` is 401 or 403. Network/5xx errors re-throw without logging the user out.
 
 - **Issue:** HttpClient type mismatch forces unsafe casts across codebase
   - **Location:** `client/src/lib/axios.ts` (HttpClient function)
   - **Impact:** `HttpClient<T>` returns `Promise<T>` but wraps responses as `{ data, status, headers }`. Consumers must cast: `(result as any).data` (e.g., `client/src/components/extractors/ExtractorForm.tsx:79`).
   - **Fix:** Fix the return type to match actual behavior, or unwrap `response.data`.
 
-- **Issue:** "Forgot password?" link loops back to login page
-  - **Location:** `client/src/routes/login.tsx:161`
-  - **Impact:** `<Link to=".">` links to self. No forgot-password flow exists.
-  - **Fix:** Link to a forgot-password route or show a modal.
+- ~~**Issue:** "Forgot password?" link loops back to login page~~
+  - ~~**Location:** `client/src/routes/login.tsx:161`~~
+  - ~~**Impact:** `<Link to=".">` links to self. No forgot-password flow exists.~~
+  - ~~**Fix:** Link to a forgot-password route or show a modal.~~
+  - ✅ **Fixed:** Replaced with a greyed-out `<span>` with a tooltip indicating the feature is coming soon.
 
-- **Issue:** Signup page Terms/Privacy links loop back to signup page
-  - **Location:** `client/src/routes/signup.tsx:162`
-  - **Impact:** Both links use `to="."`.
-  - **Fix:** Link to actual Terms and Privacy pages or remove the links.
+- ~~**Issue:** Signup page Terms/Privacy links loop back to signup page~~
+  - ~~**Location:** `client/src/routes/signup.tsx:162`~~
+  - ~~**Impact:** Both links use `to="."`~~.
+  - ~~**Fix:** Link to actual Terms and Privacy pages or remove the links.~~
+  - ✅ **Fixed:** Replaced both `<Link to=".">` with plain `<span>` elements.
 
-- **Issue:** Dashboard hardcodes user name "Alex Designer" and avatar URL
-  - **Location:** `client/src/routes/dashboard/index.tsx:91-95`
-  - **Impact:** Every user sees a fake identity on their dashboard.
-  - **Fix:** Read from auth store `user` object.
+- ~~**Issue:** Dashboard hardcodes user name "Alex Designer" and avatar URL~~
+  - ~~**Location:** `client/src/routes/dashboard/index.tsx:91-95`~~
+  - ~~**Impact:** Every user sees a fake identity on their dashboard.~~
+  - ~~**Fix:** Read from auth store `user` object.~~
+  - ✅ **Fixed:** Dashboard reads `user.name ?? user.email` from `useAuthStore`. Falls back to an initial-letter avatar when no `avatarUrl` is set.
 
-- **Issue:** Runs list: shared `isPending` disables ALL retry buttons when any single retry is in progress
-  - **Location:** `client/src/routes/runs/index.tsx:409`
-  - **Impact:** Clicking retry on row A disables retry buttons on all other rows.
-  - **Fix:** Track pending state per-runId.
+- ~~**Issue:** Runs list: shared `isPending` disables ALL retry buttons when any single retry is in progress~~
+  - ~~**Location:** `client/src/routes/runs/index.tsx:409`~~
+  - ~~**Impact:** Clicking retry on row A disables retry buttons on all other rows.~~
+  - ~~**Fix:** Track pending state per-runId.~~
+  - ✅ **Fixed:** `retryingRunId: string | null` state tracks which row is retrying; only that row's button is disabled.
 
-- **Issue:** Setup and Invite pages: submit button stuck in loading state on success
-  - **Location:** `client/src/routes/setup.tsx:84`, `client/src/routes/invite.$token.tsx`
-  - **Impact:** `setIsLoading(false)` only in `catch` block; on success with slow/failed navigation, button stays loading forever.
-  - **Fix:** Move `setIsLoading(false)` to `finally` block.
+- ~~**Issue:** Setup and Invite pages: submit button stuck in loading state on success~~
+  - ~~**Location:** `client/src/routes/setup.tsx:84`, `client/src/routes/invite.$token.tsx`~~
+  - ~~**Impact:** `setIsLoading(false)` only in `catch` block; on success with slow/failed navigation, button stays loading forever.~~
+  - ~~**Fix:** Move `setIsLoading(false)` to `finally` block.~~
+  - ✅ **Fixed:** Both `setup.tsx` and `invite.$token.tsx` now call `setIsLoading(false)` in a `finally` block.
 
 - **Issue:** Instance Settings: zero form validation on both general and SMTP forms
   - **Location:** `client/src/routes/settings/instance.tsx`
@@ -197,10 +220,11 @@ The audit identified **54 distinct issues** across the entire stack: 14 critical
 
 ### WebSocket / Real-time
 
-- **Issue:** Socket reconnection does not re-join rooms
-  - **Location:** `client/src/lib/socket.ts:21-31` (only logs on reconnect), `client/src/routes/runs/$id.tsx:43-121` (room join in useEffect only)
-  - **Impact:** User watching a run loses all real-time updates after a network blip. Page shows stale data with no visual indicator.
-  - **Fix:** Re-emit `joinRun`/`joinRunsList` on reconnect event.
+- ~~**Issue:** Socket reconnection does not re-join rooms~~
+  - ~~**Location:** `client/src/lib/socket.ts:21-31` (only logs on reconnect), `client/src/routes/runs/$id.tsx:43-121` (room join in useEffect only)~~
+  - ~~**Impact:** User watching a run loses all real-time updates after a network blip. Page shows stale data with no visual indicator.~~
+  - ~~**Fix:** Re-emit `joinRun`/`joinRunsList` on reconnect event.~~
+  - ✅ **Fixed:** Both `runs/$id.tsx` and `runs/index.tsx` now register a `socket.io.on("reconnect", ...)` handler that re-emits the room join and invalidates queries to catch missed events.
 
 ---
 

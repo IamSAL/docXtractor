@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/lib/auth-store";
+import { AXIOS_INSTANCE } from "@/lib/axios";
 
 export const Route = createFileRoute("/auth/callback")({
 	component: AuthCallbackComponent,
@@ -19,14 +20,26 @@ function AuthCallbackComponent() {
 		const refreshToken = params.get("refreshToken");
 
 		if (accessToken && refreshToken) {
-			// Store tokens from OAuth redirect
+			// Store tokens first so AXIOS_INSTANCE interceptors can use them
 			useAuthStore.setState({
 				accessToken,
 				refreshToken,
 				isAuthenticated: true,
 				error: null,
 			});
-			navigate({ to: "/dashboard", replace: true });
+			// Fetch the user object — required so rehydration doesn't log us out
+			(async () => {
+				try {
+					const res = await AXIOS_INSTANCE.get("/auth/me");
+					const user = res.data;
+					useAuthStore.setState({ user });
+					navigate({ to: "/dashboard", replace: true });
+				} catch {
+					// If /auth/me fails, clear state and go to login
+					useAuthStore.getState().logout();
+					navigate({ to: "/login", replace: true });
+				}
+			})();
 		} else {
 			// Missing tokens — redirect to login
 			navigate({ to: "/login", replace: true });

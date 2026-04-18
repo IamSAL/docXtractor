@@ -271,7 +271,12 @@ export const useAuthStore = create<AuthState>()(
             } catch (e) {}
           }
 
-          get().logout();
+          // Only log out on definitive auth failures (401/403).
+          // Transient errors (network timeout, 5xx) should not end the session.
+          const status = (error as any)?.response?.status;
+          if (status === 401 || status === 403) {
+            get().logout();
+          }
           throw error;
         }
       },

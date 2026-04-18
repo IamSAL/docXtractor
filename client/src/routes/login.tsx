@@ -157,12 +157,12 @@ function LoginComponent() {
               >
                 Password
               </label>
-              <Link
-                to="."
-                className="text-sm font-bold text-black hover:underline decoration-2 decoration-primary underline-offset-2 no-underline"
+              <span
+                className="text-sm font-bold text-gray-400 cursor-not-allowed select-none"
+                title="Password reset is not yet available"
               >
                 Forgot password?
-              </Link>
+              </span>
             </div>
             <Input
               id="password"

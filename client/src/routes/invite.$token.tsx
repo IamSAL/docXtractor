@@ -86,6 +86,7 @@ function InviteAcceptComponent() {
       setError(
         err?.response?.data?.message || "Failed to accept invite. Please try again.",
       );
+    } finally {
       setIsLoading(false);
     }
   };
