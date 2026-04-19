@@ -2,7 +2,7 @@ import asyncio
 import os
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from .consumer import consume
 from .parser_engine import get_engine
 
@@ -37,3 +37,10 @@ app = FastAPI(lifespan=lifespan)
 def health():
     engine = get_engine()
     return {"status": "ok", "service": "parser-service", "engine": engine.name}
+
+@app.post("/parse-file")
+async def parse_file(file: UploadFile = File(...)):
+    engine = get_engine()
+    content = await file.read()
+    result = await asyncio.to_thread(engine.parse_bytes, content, file.filename or "document")
+    return {"text": result.markdown_content[:8000]}

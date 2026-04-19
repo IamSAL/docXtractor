@@ -239,7 +239,11 @@ export class RunsService {
     if (!extractor) {
       throw new NotFoundException('Extractor not found');
     }
-    if (extractor.userId && extractor.userId !== userId && !extractor.isPublic) {
+    if (
+      extractor.userId &&
+      extractor.userId !== userId &&
+      !extractor.isPublic
+    ) {
       throw new ForbiddenException('You do not have access to this extractor');
     }
 

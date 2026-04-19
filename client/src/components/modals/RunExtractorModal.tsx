@@ -26,8 +26,8 @@ export const RunExtractorModal = NiceModal.create(
           <RunExtractorForm
             extractorId={propId}
             extractorName={propName}
-            onSuccess={() => {
-              modal.resolve("success");
+            onSuccess={(runId) => {
+              modal.resolve(runId);
               modal.hide();
             }}
             onClose={() => modal.hide()}

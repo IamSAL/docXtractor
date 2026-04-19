@@ -13,7 +13,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Public } from '../auth/decorators/public.decorators';
 import { DemoService } from './demo.service';
-import { DemoRunDto, DemoCaptureEmailDto, DemoClassifyDto } from './dto/demo.dto';
+import {
+  DemoRunDto,
+  DemoCaptureEmailDto,
+  DemoClassifyDto,
+} from './dto/demo.dto';
 
 const ALLOWED_MIMES = [
   'application/pdf',
@@ -51,10 +55,9 @@ export class DemoController {
     const classification = await this.demoService.classifyDocument(
       file.originalname,
     );
-    const suggestedExtractor =
-      await this.demoService.findPublicExtractorByType(
-        classification.suggestedType,
-      );
+    const suggestedExtractor = await this.demoService.findPublicExtractorByType(
+      classification.suggestedType,
+    );
 
     return {
       ...result,
@@ -88,10 +91,9 @@ export class DemoController {
     const classification = await this.demoService.classifyDocument(
       body.filename,
     );
-    const suggestedExtractor =
-      await this.demoService.findPublicExtractorByType(
-        classification.suggestedType,
-      );
+    const suggestedExtractor = await this.demoService.findPublicExtractorByType(
+      classification.suggestedType,
+    );
     const publicExtractors = await this.demoService.getPublicExtractors();
 
     return {

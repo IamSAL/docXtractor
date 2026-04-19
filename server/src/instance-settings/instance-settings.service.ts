@@ -51,12 +51,16 @@ export class InstanceSettingsService {
   }
 
   async isInitialized(): Promise<boolean> {
-    const count = await this.userRepository.count();
+    const count = await this.userRepository.count({
+      where: { role: 'admin' },
+    });
     return count > 0;
   }
 
-  async hasAnyUsers(): Promise<boolean> {
-    const count = await this.userRepository.count();
+  async hasAnyAdminUsers(): Promise<boolean> {
+    const count = await this.userRepository.count({
+      where: { role: 'admin' },
+    });
     return count > 0;
   }
 

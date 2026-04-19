@@ -11,3 +11,4 @@ watchfiles
 requests
 redis
 opendataloader-pdf
+python-multipart

@@ -6,6 +6,9 @@ export interface ExtractorFormData {
 	name: string;
 	thumbnailUrl?: string;
 	description: string;
+	category?: string;
+	icon?: string;
+	tags?: string[];
 
 	// Field Schema
 	schema: JSONSchema;
@@ -44,6 +47,9 @@ export const defaultExtractorFormValues: ExtractorFormData = {
 	name: "",
 	thumbnailUrl: "",
 	description: "",
+	category: "General",
+	icon: "description",
+	tags: [],
 	schema: {
 		type: "object",
 		properties: {},

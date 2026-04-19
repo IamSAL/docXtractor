@@ -36,7 +36,7 @@ interface RunExtractorFormProps {
   /** Pre-selected extractor name (shown when extractorId is provided) */
   extractorName?: string;
   /** Called after a successful run submission */
-  onSuccess?: () => void;
+  onSuccess?: (runId: string) => void;
   /** Called when the close/cancel button is clicked */
   onClose?: () => void;
   /** Additional CSS class for the outer form container */
@@ -171,7 +171,7 @@ export function RunExtractorForm({
           : {}),
       } as CreateRunDto;
 
-      await createRunMutation.mutateAsync({
+      const result = await createRunMutation.mutateAsync({
         data: dto,
       });
 
@@ -182,7 +182,7 @@ export function RunExtractorForm({
         queryKey: getRunsControllerFindAllQueryKey(),
       });
 
-      onSuccess?.();
+      onSuccess?.(result.data.id);
     } catch (error) {
       toast.error("Failed to start extraction run");
       console.error("Extraction error:", error);

@@ -16,8 +16,8 @@ export interface FewShotExampleSource {
   type: 'file' | 'url' | 'text';
   name: string;
   description: string;
-  content: string;       // original: MinIO public URL for file, URL string for url, raw text for text
-  storageKey?: string;   // MinIO storage key for file type (e.g. "user-id/timestamp_file.pdf")
+  content: string; // original: MinIO public URL for file, URL string for url, raw text for text
+  storageKey?: string; // MinIO storage key for file type (e.g. "user-id/timestamp_file.pdf")
   parsedContent?: string; // parsed markdown; populated async by background job for file/url types
 }
 
@@ -53,7 +53,10 @@ export class Extractor {
   @Column({ type: 'uuid', nullable: true })
   userId?: string;
 
-  @ApiPropertyOptional({ default: false, description: 'Visible to all users as a template' })
+  @ApiPropertyOptional({
+    default: false,
+    description: 'Visible to all users as a template',
+  })
   @Column({ default: false })
   isPublic: boolean;
 
@@ -68,6 +71,18 @@ export class Extractor {
   @ApiPropertyOptional({ example: 'https://example.com/thumb.png' })
   @Column({ type: 'text', nullable: true })
   thumbnailUrl: string;
+
+  @ApiPropertyOptional({ example: 'Financial', description: 'Template category for display' })
+  @Column({ type: 'text', nullable: true })
+  category?: string;
+
+  @ApiPropertyOptional({ example: 'receipt_long', description: 'Material Symbols icon name' })
+  @Column({ type: 'text', nullable: true })
+  icon?: string;
+
+  @ApiPropertyOptional({ type: [String], description: 'Display tags for templates' })
+  @Column('jsonb', { nullable: true })
+  tags?: string[];
 
   @ApiProperty({ example: { type: 'object', properties: {} } })
   @Column('jsonb')

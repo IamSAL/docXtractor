@@ -185,7 +185,9 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     if (!client.data.user) {
-      this.logger.warn(`Unauthorized joinWorkflowExecution attempt from ${client.id}`);
+      this.logger.warn(
+        `Unauthorized joinWorkflowExecution attempt from ${client.id}`,
+      );
       return { event: 'error', data: { message: 'Unauthorized' } };
     }
     const { executionId } = data;
@@ -206,7 +208,9 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('joinWorkflowsList')
   handleJoinWorkflowsList(@ConnectedSocket() client: Socket) {
     if (!client.data.user) {
-      this.logger.warn(`Unauthorized joinWorkflowsList attempt from ${client.id}`);
+      this.logger.warn(
+        `Unauthorized joinWorkflowsList attempt from ${client.id}`,
+      );
       return { event: 'error', data: { message: 'Unauthorized' } };
     }
     client.join('workflows:list');

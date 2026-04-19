@@ -6,7 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  HttpCode,
+  HttpStatus,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
+import { Public } from '../auth/decorators/public.decorators';
+import { PreviewExtractionDto } from './dto/preview-extraction.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -41,7 +51,10 @@ export class ExtractorsController {
     description: 'The extractor has been successfully created.',
     type: Extractor,
   })
-  create(@Body() createExtractorDto: CreateExtractorDto, @GetUser() user: JWTPayload) {
+  create(
+    @Body() createExtractorDto: CreateExtractorDto,
+    @GetUser() user: JWTPayload,
+  ) {
     return this.extractorsService.create(createExtractorDto, user.sub);
   }
 
@@ -67,7 +80,30 @@ export class ExtractorsController {
     description: 'The extractor configuration has been generated.',
   })
   generateExtractor(@Body() dto: GenerateExtractorDto) {
-    return this.extractorsService.generateExtractor(dto.description);
+    return this.extractorsService.generateExtractor(dto.description, dto.sampleText);
+  }
+
+  @Post('parse-preview')
+  @UseInterceptors(FileInterceptor('file'))
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Parse a file to text for preview purposes' })
+  @ApiResponse({ status: 200, description: 'Parsed text from file' })
+  parsePreview(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('No file provided');
+    return this.extractorsService.parsePreview(file.buffer, file.originalname);
+  }
+
+  @Post('preview-extraction')
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Preview extraction result using sample text (direct LLM, no queue)',
+  })
+  @ApiResponse({ status: 200, description: 'Preview extraction result' })
+  previewExtraction(@Body() dto: PreviewExtractionDto) {
+    return this.extractorsService.previewExtraction(dto);
   }
 
   @Get()
@@ -77,8 +113,8 @@ export class ExtractorsController {
     description: 'Return all extractors.',
     type: [Extractor],
   })
-  findAll(@GetUser() user: JWTPayload) {
-    return this.extractorsService.findAll(user.sub);
+  findAll(@GetUser() user: JWTPayload, @Query('scope') scope?: string) {
+    return this.extractorsService.findAll(user.sub, scope);
   }
 
   @Get(':id')
@@ -90,6 +126,19 @@ export class ExtractorsController {
   })
   findOne(@Param('id') id: string, @GetUser() user: JWTPayload) {
     return this.extractorsService.findOne(id, user.sub);
+  }
+
+  @Post(':id/clone')
+  @ApiOperation({
+    summary: 'Clone a public extractor into current user workspace',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Cloned extractor',
+    type: Extractor,
+  })
+  cloneExtractor(@Param('id') id: string, @GetUser() user: JWTPayload) {
+    return this.extractorsService.cloneExtractor(id, user.sub);
   }
 
   @Patch(':id')
@@ -126,7 +175,11 @@ export class ExtractorsController {
     description: 'Variant added successfully.',
     type: Extractor,
   })
-  addVariant(@Param('id') id: string, @Body() dto: CreateSchemaVariantDto, @GetUser() user: JWTPayload) {
+  addVariant(
+    @Param('id') id: string,
+    @Body() dto: CreateSchemaVariantDto,
+    @GetUser() user: JWTPayload,
+  ) {
     return this.extractorsService.addVariant(id, dto, user.sub);
   }
 

@@ -30,6 +30,7 @@ import { Route as SettingsApiKeysRouteImport } from './routes/settings/api-keys'
 import { Route as RunsNewRouteImport } from './routes/runs/new'
 import { Route as RunsIdRouteImport } from './routes/runs/$id'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as ExtractorsTemplatesRouteImport } from './routes/extractors/templates'
 import { Route as ExtractorsNewRouteImport } from './routes/extractors/new'
 import { Route as ExtractorsIdRouteImport } from './routes/extractors/$id'
 import { Route as AutorunsNewRouteImport } from './routes/autoruns/new'
@@ -147,6 +148,11 @@ const InviteTokenRoute = InviteTokenRouteImport.update({
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExtractorsTemplatesRoute = ExtractorsTemplatesRouteImport.update({
+  id: '/extractors/templates',
+  path: '/extractors/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExtractorsNewRoute = ExtractorsNewRouteImport.update({
   id: '/extractors/new',
   path: '/extractors/new',
@@ -215,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/autoruns/new': typeof AutorunsNewRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
+  '/extractors/templates': typeof ExtractorsTemplatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/runs/$id': typeof RunsIdRoute
   '/runs/new': typeof RunsNewRoute
@@ -247,6 +254,7 @@ export interface FileRoutesByTo {
   '/autoruns/new': typeof AutorunsNewRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
+  '/extractors/templates': typeof ExtractorsTemplatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/runs/$id': typeof RunsIdRoute
   '/runs/new': typeof RunsNewRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/autoruns/new': typeof AutorunsNewRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
+  '/extractors/templates': typeof ExtractorsTemplatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/runs/$id': typeof RunsIdRoute
   '/runs/new': typeof RunsNewRoute
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/autoruns/new'
     | '/extractors/$id'
     | '/extractors/new'
+    | '/extractors/templates'
     | '/invite/$token'
     | '/runs/$id'
     | '/runs/new'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/autoruns/new'
     | '/extractors/$id'
     | '/extractors/new'
+    | '/extractors/templates'
     | '/invite/$token'
     | '/runs/$id'
     | '/runs/new'
@@ -384,6 +395,7 @@ export interface FileRouteTypes {
     | '/autoruns/new'
     | '/extractors/$id'
     | '/extractors/new'
+    | '/extractors/templates'
     | '/invite/$token'
     | '/runs/$id'
     | '/runs/new'
@@ -419,6 +431,7 @@ export interface RootRouteChildren {
   AutorunsNewRoute: typeof AutorunsNewRoute
   ExtractorsIdRoute: typeof ExtractorsIdRoute
   ExtractorsNewRoute: typeof ExtractorsNewRoute
+  ExtractorsTemplatesRoute: typeof ExtractorsTemplatesRoute
   InviteTokenRoute: typeof InviteTokenRoute
   RunsIdRoute: typeof RunsIdRoute
   RunsNewRoute: typeof RunsNewRoute
@@ -582,6 +595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/extractors/templates': {
+      id: '/extractors/templates'
+      path: '/extractors/templates'
+      fullPath: '/extractors/templates'
+      preLoaderRoute: typeof ExtractorsTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/extractors/new': {
       id: '/extractors/new'
       path: '/extractors/new'
@@ -710,6 +730,7 @@ const rootRouteChildren: RootRouteChildren = {
   AutorunsNewRoute: AutorunsNewRoute,
   ExtractorsIdRoute: ExtractorsIdRoute,
   ExtractorsNewRoute: ExtractorsNewRoute,
+  ExtractorsTemplatesRoute: ExtractorsTemplatesRoute,
   InviteTokenRoute: InviteTokenRoute,
   RunsIdRoute: RunsIdRoute,
   RunsNewRoute: RunsNewRoute,

@@ -191,6 +191,8 @@ export function ExtractorForm({
                         extractorName: watch("name") || "Unnamed Extractor",
                         extractorId:
                           (initialData as any)?.id || "NEW-EXTRACTOR",
+                      }).then((runId) => {
+                        if (runId) navigate({ to: "/runs/$id", params: { id: runId as string } });
                       })
                     }
                   >

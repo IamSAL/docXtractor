@@ -25,8 +25,10 @@ import type {
 	CreateExtractorDto,
 	CreateSchemaVariantDto,
 	Extractor,
+	ExtractorsControllerFindAllParams,
 	GenerateExtractorDto,
 	GenerateSchemaDto,
+	PreviewExtractionDto,
 	UpdateExtractorDto,
 	UpdateSchemaVariantDto,
 } from "../../models";
@@ -158,15 +160,30 @@ export type extractorsControllerFindAllResponseSuccess =
 export type extractorsControllerFindAllResponse =
 	extractorsControllerFindAllResponseSuccess;
 
-export const getExtractorsControllerFindAllUrl = () => {
-	return `/extractors`;
+export const getExtractorsControllerFindAllUrl = (
+	params: ExtractorsControllerFindAllParams,
+) => {
+	const normalizedParams = new URLSearchParams();
+
+	Object.entries(params || {}).forEach(([key, value]) => {
+		if (value !== undefined) {
+			normalizedParams.append(key, value === null ? "null" : value.toString());
+		}
+	});
+
+	const stringifiedParams = normalizedParams.toString();
+
+	return stringifiedParams.length > 0
+		? `/extractors?${stringifiedParams}`
+		: `/extractors`;
 };
 
 export const extractorsControllerFindAll = async (
+	params: ExtractorsControllerFindAllParams,
 	options?: RequestInit,
 ): Promise<extractorsControllerFindAllResponse> => {
 	return HttpClient<extractorsControllerFindAllResponse>(
-		getExtractorsControllerFindAllUrl(),
+		getExtractorsControllerFindAllUrl(params),
 		{
 			...options,
 			method: "GET",
@@ -174,32 +191,37 @@ export const extractorsControllerFindAll = async (
 	);
 };
 
-export const getExtractorsControllerFindAllQueryKey = () => {
-	return [`/extractors`] as const;
+export const getExtractorsControllerFindAllQueryKey = (
+	params?: ExtractorsControllerFindAllParams,
+) => {
+	return [`/extractors`, ...(params ? [params] : [])] as const;
 };
 
 export const getExtractorsControllerFindAllQueryOptions = <
 	TData = Awaited<ReturnType<typeof extractorsControllerFindAll>>,
 	TError = unknown,
->(options?: {
-	query?: Partial<
-		UseQueryOptions<
-			Awaited<ReturnType<typeof extractorsControllerFindAll>>,
-			TError,
-			TData
-		>
-	>;
-	request?: SecondParameter<typeof HttpClient>;
-}) => {
+>(
+	params: ExtractorsControllerFindAllParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof extractorsControllerFindAll>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+) => {
 	const { query: queryOptions, request: requestOptions } = options ?? {};
 
 	const queryKey =
-		queryOptions?.queryKey ?? getExtractorsControllerFindAllQueryKey();
+		queryOptions?.queryKey ?? getExtractorsControllerFindAllQueryKey(params);
 
 	const queryFn: QueryFunction<
 		Awaited<ReturnType<typeof extractorsControllerFindAll>>
 	> = ({ signal }) =>
-		extractorsControllerFindAll({ signal, ...requestOptions });
+		extractorsControllerFindAll(params, { signal, ...requestOptions });
 
 	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
 		Awaited<ReturnType<typeof extractorsControllerFindAll>>,
@@ -217,6 +239,7 @@ export function useExtractorsControllerFindAll<
 	TData = Awaited<ReturnType<typeof extractorsControllerFindAll>>,
 	TError = unknown,
 >(
+	params: ExtractorsControllerFindAllParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<
@@ -243,6 +266,7 @@ export function useExtractorsControllerFindAll<
 	TData = Awaited<ReturnType<typeof extractorsControllerFindAll>>,
 	TError = unknown,
 >(
+	params: ExtractorsControllerFindAllParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<
@@ -269,6 +293,7 @@ export function useExtractorsControllerFindAll<
 	TData = Awaited<ReturnType<typeof extractorsControllerFindAll>>,
 	TError = unknown,
 >(
+	params: ExtractorsControllerFindAllParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<
@@ -291,6 +316,7 @@ export function useExtractorsControllerFindAll<
 	TData = Awaited<ReturnType<typeof extractorsControllerFindAll>>,
 	TError = unknown,
 >(
+	params: ExtractorsControllerFindAllParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<
@@ -305,7 +331,10 @@ export function useExtractorsControllerFindAll<
 ): UseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-	const queryOptions = getExtractorsControllerFindAllQueryOptions(options);
+	const queryOptions = getExtractorsControllerFindAllQueryOptions(
+		params,
+		options,
+	);
 
 	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
 		TData,
@@ -527,6 +556,216 @@ export const useExtractorsControllerGenerateExtractor = <
 > => {
 	return useMutation(
 		getExtractorsControllerGenerateExtractorMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * @summary Parse a file to text for preview purposes
+ */
+export type extractorsControllerParsePreviewResponse200 = {
+	data: void;
+	status: 200;
+};
+
+export type extractorsControllerParsePreviewResponseSuccess =
+	extractorsControllerParsePreviewResponse200 & {
+		headers: Headers;
+	};
+
+export type extractorsControllerParsePreviewResponse =
+	extractorsControllerParsePreviewResponseSuccess;
+
+export const getExtractorsControllerParsePreviewUrl = () => {
+	return `/extractors/parse-preview`;
+};
+
+export const extractorsControllerParsePreview = async (
+	options?: RequestInit,
+): Promise<extractorsControllerParsePreviewResponse> => {
+	return HttpClient<extractorsControllerParsePreviewResponse>(
+		getExtractorsControllerParsePreviewUrl(),
+		{
+			...options,
+			method: "POST",
+		},
+	);
+};
+
+export const getExtractorsControllerParsePreviewMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof extractorsControllerParsePreview>>,
+		TError,
+		void,
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof extractorsControllerParsePreview>>,
+	TError,
+	void,
+	TContext
+> => {
+	const mutationKey = ["extractorsControllerParsePreview"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof extractorsControllerParsePreview>>,
+		void
+	> = () => {
+		return extractorsControllerParsePreview(requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ExtractorsControllerParsePreviewMutationResult = NonNullable<
+	Awaited<ReturnType<typeof extractorsControllerParsePreview>>
+>;
+
+export type ExtractorsControllerParsePreviewMutationError = unknown;
+
+/**
+ * @summary Parse a file to text for preview purposes
+ */
+export const useExtractorsControllerParsePreview = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof extractorsControllerParsePreview>>,
+			TError,
+			void,
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof extractorsControllerParsePreview>>,
+	TError,
+	void,
+	TContext
+> => {
+	return useMutation(
+		getExtractorsControllerParsePreviewMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * @summary Preview extraction result using sample text (direct LLM, no queue)
+ */
+export type extractorsControllerPreviewExtractionResponse200 = {
+	data: void;
+	status: 200;
+};
+
+export type extractorsControllerPreviewExtractionResponseSuccess =
+	extractorsControllerPreviewExtractionResponse200 & {
+		headers: Headers;
+	};
+
+export type extractorsControllerPreviewExtractionResponse =
+	extractorsControllerPreviewExtractionResponseSuccess;
+
+export const getExtractorsControllerPreviewExtractionUrl = () => {
+	return `/extractors/preview-extraction`;
+};
+
+export const extractorsControllerPreviewExtraction = async (
+	previewExtractionDto: PreviewExtractionDto,
+	options?: RequestInit,
+): Promise<extractorsControllerPreviewExtractionResponse> => {
+	return HttpClient<extractorsControllerPreviewExtractionResponse>(
+		getExtractorsControllerPreviewExtractionUrl(),
+		{
+			...options,
+			method: "POST",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(previewExtractionDto),
+		},
+	);
+};
+
+export const getExtractorsControllerPreviewExtractionMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof extractorsControllerPreviewExtraction>>,
+		TError,
+		{ data: PreviewExtractionDto },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof extractorsControllerPreviewExtraction>>,
+	TError,
+	{ data: PreviewExtractionDto },
+	TContext
+> => {
+	const mutationKey = ["extractorsControllerPreviewExtraction"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof extractorsControllerPreviewExtraction>>,
+		{ data: PreviewExtractionDto }
+	> = (props) => {
+		const { data } = props ?? {};
+
+		return extractorsControllerPreviewExtraction(data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ExtractorsControllerPreviewExtractionMutationResult = NonNullable<
+	Awaited<ReturnType<typeof extractorsControllerPreviewExtraction>>
+>;
+export type ExtractorsControllerPreviewExtractionMutationBody =
+	PreviewExtractionDto;
+export type ExtractorsControllerPreviewExtractionMutationError = unknown;
+
+/**
+ * @summary Preview extraction result using sample text (direct LLM, no queue)
+ */
+export const useExtractorsControllerPreviewExtraction = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof extractorsControllerPreviewExtraction>>,
+			TError,
+			{ data: PreviewExtractionDto },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof extractorsControllerPreviewExtraction>>,
+	TError,
+	{ data: PreviewExtractionDto },
+	TContext
+> => {
+	return useMutation(
+		getExtractorsControllerPreviewExtractionMutationOptions(options),
 		queryClient,
 	);
 };
@@ -926,6 +1165,111 @@ export const useExtractorsControllerRemove = <
 > => {
 	return useMutation(
 		getExtractorsControllerRemoveMutationOptions(options),
+		queryClient,
+	);
+};
+/**
+ * @summary Clone a public extractor into current user workspace
+ */
+export type extractorsControllerCloneExtractorResponse201 = {
+	data: Extractor;
+	status: 201;
+};
+
+export type extractorsControllerCloneExtractorResponseSuccess =
+	extractorsControllerCloneExtractorResponse201 & {
+		headers: Headers;
+	};
+
+export type extractorsControllerCloneExtractorResponse =
+	extractorsControllerCloneExtractorResponseSuccess;
+
+export const getExtractorsControllerCloneExtractorUrl = (id: string) => {
+	return `/extractors/${id}/clone`;
+};
+
+export const extractorsControllerCloneExtractor = async (
+	id: string,
+	options?: RequestInit,
+): Promise<extractorsControllerCloneExtractorResponse> => {
+	return HttpClient<extractorsControllerCloneExtractorResponse>(
+		getExtractorsControllerCloneExtractorUrl(id),
+		{
+			...options,
+			method: "POST",
+		},
+	);
+};
+
+export const getExtractorsControllerCloneExtractorMutationOptions = <
+	TError = unknown,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof extractorsControllerCloneExtractor>>,
+		TError,
+		{ id: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof HttpClient>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof extractorsControllerCloneExtractor>>,
+	TError,
+	{ id: string },
+	TContext
+> => {
+	const mutationKey = ["extractorsControllerCloneExtractor"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof extractorsControllerCloneExtractor>>,
+		{ id: string }
+	> = (props) => {
+		const { id } = props ?? {};
+
+		return extractorsControllerCloneExtractor(id, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ExtractorsControllerCloneExtractorMutationResult = NonNullable<
+	Awaited<ReturnType<typeof extractorsControllerCloneExtractor>>
+>;
+
+export type ExtractorsControllerCloneExtractorMutationError = unknown;
+
+/**
+ * @summary Clone a public extractor into current user workspace
+ */
+export const useExtractorsControllerCloneExtractor = <
+	TError = unknown,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof extractorsControllerCloneExtractor>>,
+			TError,
+			{ id: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof HttpClient>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof extractorsControllerCloneExtractor>>,
+	TError,
+	{ id: string },
+	TContext
+> => {
+	return useMutation(
+		getExtractorsControllerCloneExtractorMutationOptions(options),
 		queryClient,
 	);
 };

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppLayout } from "../../components/AppLayout";
 import { Popover } from "../../components/retroui/Popover";
 import { Button } from "../../components/retroui/Button";
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/dashboard/")({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const { data: statsData, isLoading: statsLoading } =
     useDashboardControllerGetStats();
   const { data: extractorsData, isLoading: extractorsLoading } =
@@ -412,6 +413,8 @@ function RouteComponent() {
                             NiceModal.show(RunExtractorModal, {
                               extractorName: extractor.name,
                               extractorId: extractor.id,
+                            }).then((runId) => {
+                              if (runId) navigate({ to: "/runs/$id", params: { id: runId as string } });
                             });
                           }}
                           className="rounded-full border-2 border-black bg-white hover:bg-black hover:text-white text-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] w-10 h-10 p-0 flex items-center justify-center"

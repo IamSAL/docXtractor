@@ -97,8 +97,20 @@ export class BackupService implements OnModuleInit {
       // pg_dump → gzip (execFileSync avoids shell injection from DB config values)
       const dumpBuffer = execFileSync(
         'pg_dump',
-        ['-h', this.db.host, '-p', this.db.port, '-U', this.db.user, '-d', this.db.database],
-        { env: { ...process.env, PGPASSWORD: this.db.password }, timeout: 120_000 },
+        [
+          '-h',
+          this.db.host,
+          '-p',
+          this.db.port,
+          '-U',
+          this.db.user,
+          '-d',
+          this.db.database,
+        ],
+        {
+          env: { ...process.env, PGPASSWORD: this.db.password },
+          timeout: 120_000,
+        },
       );
       writeFileSync(localPath, gzipSync(dumpBuffer));
       this.logger.log(`[${tier}] Dump complete: ${filename}`);

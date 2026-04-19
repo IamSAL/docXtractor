@@ -21,6 +21,12 @@ export interface Extractor {
 	name: string;
 	description?: string;
 	thumbnailUrl?: string;
+	/** Template category for display */
+	category?: string;
+	/** Material Symbols icon name */
+	icon?: string;
+	/** Display tags for templates */
+	tags?: string[];
 	schema: ExtractorSchema;
 	systemPrompt: string;
 	fewShotExamples?: ExtractorFewShotExamplesItem[];

@@ -111,7 +111,6 @@ export const HttpClient = <T>(
   options: RequestInit & { params?: any; responseType?: any } = {},
 ): Promise<T> => {
   const { body, ...rest } = options;
-  const source = axios.CancelToken.source();
 
   const config: AxiosRequestConfig = {
     url,
@@ -119,20 +118,11 @@ export const HttpClient = <T>(
     ...rest,
     headers: rest.headers as any,
     signal: rest.signal || undefined,
-    // Provide a way to pass axios-specific config if needed via custom property or casting
-    cancelToken: source.token,
   };
 
-  const promise = AXIOS_INSTANCE(config).then((res) => ({
+  return AXIOS_INSTANCE(config).then((res) => ({
     data: res.data,
     status: res.status,
     headers: res.headers,
-  }));
-
-  // @ts-ignore
-  promise.cancel = () => {
-    source.cancel("Query was cancelled");
-  };
-
-  return promise as Promise<T>;
+  })) as Promise<T>;
 };

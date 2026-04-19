@@ -45,7 +45,7 @@ export class AuthService {
   }
 
   async adminSetup(dto: AdminSetupDto) {
-    const hasUsers = await this.instanceSettingsService.hasAnyUsers();
+    const hasUsers = await this.instanceSettingsService.hasAnyAdminUsers();
     if (hasUsers) {
       throw new ForbiddenException(
         'Instance is already initialized. Admin setup is no longer available.',

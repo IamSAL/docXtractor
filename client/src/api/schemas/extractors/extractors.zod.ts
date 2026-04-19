@@ -15,12 +15,15 @@ export const extractorsControllerCreateBodyConsensusEnabledDefault = false;expor
 export const extractorsControllerCreateBodyConfidenceThresholdMin = 0;
 export const extractorsControllerCreateBodyConfidenceThresholdMax = 100;
 
-export const extractorsControllerCreateBodyConflictResolutionDefault = `majority`;export const extractorsControllerCreateBodyParserEngineDefault = `docling`;export const extractorsControllerCreateBodyCitationEnabledDefault = false;export const extractorsControllerCreateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerCreateBodyCitationIncludeBboxDefault = false;export const extractorsControllerCreateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerCreateBodyContextWindowDefault = `128k`;export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerCreateBodyConflictResolutionDefault = `majority`;export const extractorsControllerCreateBodyParserEngineDefault = `docling`;export const extractorsControllerCreateBodyCitationEnabledDefault = false;export const extractorsControllerCreateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerCreateBodyCitationIncludeBboxDefault = false;export const extractorsControllerCreateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerCreateBodyContextWindowDefault = `128k`;export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o`;export const extractorsControllerCreateBodyIsPublicDefault = false;
 
 export const ExtractorsControllerCreateBody = zod.object({
   "name": zod.string().describe('The name of the extractor'),
   "description": zod.string().optional().describe('The description of the extractor'),
   "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional(),
+  "icon": zod.string().optional(),
+  "tags": zod.array(zod.string()).optional(),
   "schema": zod.object({
 
 }),
@@ -48,12 +51,17 @@ export const ExtractorsControllerCreateBody = zod.object({
   "citationIncludeBbox": zod.boolean().default(extractorsControllerCreateBodyCitationIncludeBboxDefault),
   "citationIncludeParagraphId": zod.boolean().default(extractorsControllerCreateBodyCitationIncludeParagraphIdDefault),
   "contextWindow": zod.string().default(extractorsControllerCreateBodyContextWindowDefault),
-  "defaultModel": zod.string().default(extractorsControllerCreateBodyDefaultModelDefault)
+  "defaultModel": zod.string().default(extractorsControllerCreateBodyDefaultModelDefault),
+  "isPublic": zod.boolean().default(extractorsControllerCreateBodyIsPublicDefault).describe('Make this extractor visible as a template to all users')
 })
 
 /**
  * @summary Get all extractors
  */
+export const ExtractorsControllerFindAllQueryParams = zod.object({
+  "scope": zod.string()
+})
+
 export const extractorsControllerFindAllResponseIsPublicDefault = false;export const extractorsControllerFindAllResponseConsensusEnabledDefault = false;export const extractorsControllerFindAllResponseConfidenceThresholdDefault = 85;export const extractorsControllerFindAllResponseConflictResolutionDefault = `majority`;export const extractorsControllerFindAllResponseParserEngineDefault = `docling`;export const extractorsControllerFindAllResponseCitationEnabledDefault = false;export const extractorsControllerFindAllResponseCitationIncludePdfPageDefault = false;export const extractorsControllerFindAllResponseCitationIncludeBboxDefault = false;export const extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerFindAllResponseContextWindowDefault = `128k`;export const extractorsControllerFindAllResponseDefaultModelDefault = `gpt-4o`;
 
 export const ExtractorsControllerFindAllResponseItem = zod.object({
@@ -66,6 +74,9 @@ export const ExtractorsControllerFindAllResponseItem = zod.object({
   "name": zod.string(),
   "description": zod.string().optional(),
   "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
   "schema": zod.object({
 
 }),
@@ -101,8 +112,28 @@ export const ExtractorsControllerGenerateSchemaBody = zod.object({
 /**
  * @summary Generate a full extractor configuration from a description using AI
  */
+export const extractorsControllerGenerateExtractorBodySampleTextMax = 3000;
+
+
+
 export const ExtractorsControllerGenerateExtractorBody = zod.object({
-  "description": zod.string().describe('A description of the extractor to generate, including what documents it processes and what data to extract')
+  "description": zod.string().describe('A description of the extractor to generate, including what documents it processes and what data to extract'),
+  "sampleText": zod.string().max(extractorsControllerGenerateExtractorBodySampleTextMax).optional().describe('Sample document text to improve field inference (max 3000 chars)')
+})
+
+/**
+ * @summary Preview extraction result using sample text (direct LLM, no queue)
+ */
+export const extractorsControllerPreviewExtractionBodySampleTextMax = 2000;
+
+
+
+export const ExtractorsControllerPreviewExtractionBody = zod.object({
+  "schema": zod.object({
+
+}).describe('JSON schema to extract against'),
+  "systemPrompt": zod.string().describe('System prompt for the LLM'),
+  "sampleText": zod.string().max(extractorsControllerPreviewExtractionBodySampleTextMax).optional().describe('Sample document text (max 2000 chars)')
 })
 
 /**
@@ -124,6 +155,9 @@ export const ExtractorsControllerFindOneResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().optional(),
   "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
   "schema": zod.object({
 
 }),
@@ -159,12 +193,15 @@ export const extractorsControllerUpdateBodyConsensusEnabledDefault = false;expor
 export const extractorsControllerUpdateBodyConfidenceThresholdMin = 0;
 export const extractorsControllerUpdateBodyConfidenceThresholdMax = 100;
 
-export const extractorsControllerUpdateBodyConflictResolutionDefault = `majority`;export const extractorsControllerUpdateBodyParserEngineDefault = `docling`;export const extractorsControllerUpdateBodyCitationEnabledDefault = false;export const extractorsControllerUpdateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateBodyCitationIncludeBboxDefault = false;export const extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateBodyContextWindowDefault = `128k`;export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerUpdateBodyConflictResolutionDefault = `majority`;export const extractorsControllerUpdateBodyParserEngineDefault = `docling`;export const extractorsControllerUpdateBodyCitationEnabledDefault = false;export const extractorsControllerUpdateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateBodyCitationIncludeBboxDefault = false;export const extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateBodyContextWindowDefault = `128k`;export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o`;export const extractorsControllerUpdateBodyIsPublicDefault = false;
 
 export const ExtractorsControllerUpdateBody = zod.object({
   "name": zod.string().optional().describe('The name of the extractor'),
   "description": zod.string().optional().describe('The description of the extractor'),
   "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional(),
+  "icon": zod.string().optional(),
+  "tags": zod.array(zod.string()).optional(),
   "schema": zod.object({
 
 }).optional(),
@@ -192,7 +229,8 @@ export const ExtractorsControllerUpdateBody = zod.object({
   "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludeBboxDefault),
   "citationIncludeParagraphId": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault),
   "contextWindow": zod.string().default(extractorsControllerUpdateBodyContextWindowDefault),
-  "defaultModel": zod.string().default(extractorsControllerUpdateBodyDefaultModelDefault)
+  "defaultModel": zod.string().default(extractorsControllerUpdateBodyDefaultModelDefault),
+  "isPublic": zod.boolean().default(extractorsControllerUpdateBodyIsPublicDefault).describe('Make this extractor visible as a template to all users')
 })
 
 export const extractorsControllerUpdateResponseIsPublicDefault = false;export const extractorsControllerUpdateResponseConsensusEnabledDefault = false;export const extractorsControllerUpdateResponseConfidenceThresholdDefault = 85;export const extractorsControllerUpdateResponseConflictResolutionDefault = `majority`;export const extractorsControllerUpdateResponseParserEngineDefault = `docling`;export const extractorsControllerUpdateResponseCitationEnabledDefault = false;export const extractorsControllerUpdateResponseCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateResponseCitationIncludeBboxDefault = false;export const extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateResponseContextWindowDefault = `128k`;export const extractorsControllerUpdateResponseDefaultModelDefault = `gpt-4o`;
@@ -207,6 +245,9 @@ export const ExtractorsControllerUpdateResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().optional(),
   "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
   "schema": zod.object({
 
 }),
@@ -235,6 +276,13 @@ export const ExtractorsControllerUpdateResponse = zod.object({
  * @summary Delete an extractor by id
  */
 export const ExtractorsControllerRemoveParams = zod.object({
+  "id": zod.string()
+})
+
+/**
+ * @summary Clone a public extractor into current user workspace
+ */
+export const ExtractorsControllerCloneExtractorParams = zod.object({
   "id": zod.string()
 })
 
@@ -287,6 +335,9 @@ export const ExtractorsControllerUpdateVariantResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().optional(),
   "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
   "schema": zod.object({
 
 }),
@@ -331,6 +382,9 @@ export const ExtractorsControllerDeleteVariantResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().optional(),
   "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
   "schema": zod.object({
 
 }),

@@ -9,4 +9,9 @@
 export interface GenerateExtractorDto {
 	/** A description of the extractor to generate, including what documents it processes and what data to extract */
 	description: string;
+	/**
+	 * Sample document text to improve field inference (max 3000 chars)
+	 * @maxLength 3000
+	 */
+	sampleText?: string;
 }

@@ -93,7 +93,9 @@ export class DemoService implements OnApplicationBootstrap {
       .values({ fingerprint })
       .orIgnore()
       .execute();
-    return this.demoSessionRepo.findOne({ where: { fingerprint } }) as Promise<DemoSession>;
+    return this.demoSessionRepo.findOne({
+      where: { fingerprint },
+    }) as Promise<DemoSession>;
   }
 
   async getSession(fingerprint: string): Promise<DemoSession | null> {

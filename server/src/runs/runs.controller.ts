@@ -29,14 +29,22 @@ export class RunsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new extraction run' })
-  @ApiResponse({ status: 201, description: 'Run created successfully', type: Run })
+  @ApiResponse({
+    status: 201,
+    description: 'Run created successfully',
+    type: Run,
+  })
   create(@Body() createRunDto: CreateRunDto, @GetUser() user: JWTPayload) {
     return this.runsService.create(createRunDto, user.sub);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all runs with pagination and filtering' })
-  @ApiResponse({ status: 200, description: 'Returns paginated runs', type: PaginatedRunsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns paginated runs',
+    type: PaginatedRunsDto,
+  })
   findAll(@Query() query: FindRunsDto, @GetUser() user: JWTPayload) {
     return this.runsService.findAll(user.sub, query);
   }
@@ -51,7 +59,11 @@ export class RunsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a run' })
-  @ApiResponse({ status: 200, description: 'Run updated successfully', type: Run })
+  @ApiResponse({
+    status: 200,
+    description: 'Run updated successfully',
+    type: Run,
+  })
   update(
     @Param('id') id: string,
     @Body() updateRunDto: UpdateRunDto,
@@ -69,7 +81,11 @@ export class RunsController {
 
   @Post(':id/retry')
   @ApiOperation({ summary: 'Retry a failed or cancelled run' })
-  @ApiResponse({ status: 200, description: 'Run restarted successfully', type: Run })
+  @ApiResponse({
+    status: 200,
+    description: 'Run restarted successfully',
+    type: Run,
+  })
   @ApiResponse({ status: 404, description: 'Run not found' })
   retry(@Param('id') id: string, @GetUser() user: JWTPayload) {
     return this.runsService.retry(id, user.sub);
