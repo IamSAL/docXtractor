@@ -865,13 +865,26 @@ export const TemplateWizardModal = NiceModal.create(() => {
               <div className="text-xs text-gray-400 font-mono hidden sm:block">
                 DocXTractor v3.0.1-beta
               </div>
-              <Button
-                onClick={handleUseTemplate}
-                className="px-8 py-2 bg-primary text-black font-bold uppercase tracking-wider hover:bg-primary-hover transition-colors border-2 border-black flex items-center justify-center gap-2 shadow-hard-sm"
-              >
-                <span className="material-symbols-outlined">play_arrow</span>
-                Use This Template
-              </Button>
+              {view === "ai-generate" ? (
+                <Button
+                  onClick={handleAiGenerate}
+                  disabled={!aiDescription.trim() || aiGenerating}
+                  className="px-8 py-2 bg-primary text-black font-bold uppercase tracking-wider hover:bg-primary-hover transition-colors border-2 border-black flex items-center justify-center gap-2 shadow-hard-sm disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  <span className="material-symbols-outlined">
+                    {aiGenerating ? "hourglass_empty" : "auto_awesome"}
+                  </span>
+                  {aiGenerating ? "Generating..." : "Generate →"}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleUseTemplate}
+                  className="px-8 py-2 bg-primary text-black font-bold uppercase tracking-wider hover:bg-primary-hover transition-colors border-2 border-black flex items-center justify-center gap-2 shadow-hard-sm"
+                >
+                  <span className="material-symbols-outlined">play_arrow</span>
+                  Use This Template
+                </Button>
+              )}
             </>
           )}
         </footer>

@@ -177,7 +177,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
                     setAiGenOpen(true);
                     setTimeout(() => aiInputRef.current?.focus(), 100);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-purple-600 hover:bg-purple-50 border-2 border-purple-400 rounded-md transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wide text-black bg-primary hover:brightness-95 border-2 border-black shadow-[2px_2px_0px_0px_#000] active:shadow-none active:translate-x-px active:translate-y-px rounded-md transition-all cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[16px]">
                     auto_awesome
@@ -187,7 +187,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
                 <button
                   type="button"
                   onClick={() => setInferOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-[#007AFF] hover:bg-blue-50 border-2 border-[#007AFF] rounded-md transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-gray-600 hover:bg-gray-100 border-2 border-gray-300 rounded-md transition-colors cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[16px]">
                     data_object

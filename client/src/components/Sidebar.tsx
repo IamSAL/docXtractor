@@ -77,7 +77,10 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                         onClick={onClose}
                     >
                         <span className="material-symbols-outlined">auto_mode</span>
-                        <span className="font-bold">AutoRuns</span>
+                        <div className="flex flex-col">
+                            <span className="font-bold leading-none">AutoRuns</span>
+                            <span className="text-[10px] font-medium text-gray-500 leading-none mt-0.5">Scheduled &amp; triggered</span>
+                        </div>
                     </Link>
                     <div className="my-2 border-t-2 border-black border-dashed" />
                     <Link

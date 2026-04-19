@@ -230,16 +230,6 @@ export function RunExtractorForm({
             )}
           </h3>
         </div>
-        <p className="text-xs font-mono text-gray-500 pl-[44px] flex items-center gap-2">
-          <span>
-            EXTRACTOR ID:{" "}
-            {activeExtractorId
-              ? `#${activeExtractorId.substring(0, 8)}`
-              : "SELECT_REQUIRED"}
-          </span>
-          <span>•</span>
-          <span>{processingMode.toUpperCase()} EXTRACTION MODE</span>
-        </p>
       </div>
       {onClose && (
         <button
@@ -298,10 +288,18 @@ export function RunExtractorForm({
               <RunExtractorSources onUploadFile={handleUploadFile} />
 
               {extractorDetail?.data && (
-                <RunExtractorFieldSelector
-                  schema={(extractorDetail.data as any).schema || {}}
-                  variants={(extractorDetail.data as any).variants || []}
-                />
+                <details className="group">
+                  <summary className="flex cursor-pointer items-center justify-between gap-2 border-2 border-black bg-white px-3 py-2 select-none list-none text-marker-none hover:bg-gray-50 transition-colors">
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-600">Advanced: Customize Fields</span>
+                    <span className="material-symbols-outlined text-gray-400 text-sm transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                  </summary>
+                  <div className="border-2 border-t-0 border-black">
+                    <RunExtractorFieldSelector
+                      schema={(extractorDetail.data as any).schema || {}}
+                      variants={(extractorDetail.data as any).variants || []}
+                    />
+                  </div>
+                </details>
               )}
             </div>
 

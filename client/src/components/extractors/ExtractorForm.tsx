@@ -65,6 +65,9 @@ export function ExtractorForm({
   } = methods;
 
   const schema = watch("schema");
+  const nameValue = watch("name");
+  const hasFields = Object.keys((schema as any)?.properties || {}).length > 0;
+  const canTestRun = !!nameValue?.trim() && hasFields;
 
   const handleUploadFile = async (file: File) => {
     if (!user?.id) throw new Error("User not authenticated");
@@ -178,11 +181,11 @@ export function ExtractorForm({
                 Cancel
               </Button>
               <TooltipProvider>
-                <Tooltip content="Test with a sample document" side="bottom">
+                <Tooltip content={canTestRun ? "Test with a sample document" : "Add a name and at least one field first"} side="bottom">
                   <Button
                     type="button"
                     className="bg-white"
-                    disabled={isTesting}
+                    disabled={isTesting || !canTestRun}
                     onClick={() =>
                       NiceModal.show(RunExtractorModal, {
                         extractorName: watch("name") || "Unnamed Extractor",
@@ -212,7 +215,7 @@ export function ExtractorForm({
           <div className="mx-auto flex flex-col gap-8">
             <Accordion
               type="multiple"
-              defaultValue={["basic", "schema", "advanced"]}
+              defaultValue={["basic", "schema"]}
               className="flex flex-col gap-8"
             >
               <BasicInfoSection onUploadFile={handleUploadFile} />

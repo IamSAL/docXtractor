@@ -145,27 +145,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             {getTypeIcon(type)}
           </span>
           <div className="flex flex-col min-w-0 flex-1">
-            {!readOnly && isEditingName ? (
-              <Input
-                value={tempName}
-                onChange={(e) => setTempName(e.target.value)}
-                onBlur={handleNameSubmit}
-                onKeyDown={(e) => e.key === "Enter" && handleNameSubmit()}
-                className="h-7 text-sm font-bold min-w-[120px] bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:ring-0 focus:shadow-none transition-all px-2"
-                autoFocus
-                onFocus={(e) => e.target.select()}
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={() => !readOnly && setIsEditingName(true)}
-                className="font-bold text-text-main-light xdark:text-white truncate text-left hover:underline decoration-2 underline-offset-4"
-              >
-                {name}
-              </button>
-            )}
-
-            {/* Description (sub-text) */}
+            {/* Primary label: description if set, else field name */}
             {!readOnly && isEditingDesc ? (
               <Textarea
                 value={tempDesc}
@@ -173,7 +153,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                 onBlur={handleDescSubmit}
                 onKeyDown={(e) => e.key === "Enter" && handleDescSubmit()}
                 placeholder={t.propertyDescriptionPlaceholder}
-                className="h-6 mt-1 text-xs text-muted-foreground italic bg-white border border-gray-200 px-1"
+                className="h-6 text-sm font-bold bg-white border border-gray-200 px-1"
                 autoFocus
                 onFocus={(e) => e.target.select()}
               />
@@ -181,20 +161,64 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
               <button
                 type="button"
                 onClick={() => !readOnly && setIsEditingDesc(true)}
-                className="text-[10px] text-text-secondary-light xdark:text-text-secondary-dark truncate text-left"
+                className="font-bold text-text-main-light xdark:text-white truncate text-left hover:underline decoration-2 underline-offset-4"
               >
                 {tempDesc}
               </button>
             ) : (
-              !readOnly && (
+              !readOnly && isEditingName ? (
+                <Input
+                  value={tempName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  onBlur={handleNameSubmit}
+                  onKeyDown={(e) => e.key === "Enter" && handleNameSubmit()}
+                  className="h-7 text-sm font-bold min-w-[120px] bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:ring-0 focus:shadow-none transition-all px-2"
+                  autoFocus
+                  onFocus={(e) => e.target.select()}
+                />
+              ) : (
                 <button
                   type="button"
-                  onClick={() => setIsEditingDesc(true)}
-                  className="text-[10px] text-text-secondary-light/50 opacity-0 group-hover:opacity-100 transition-opacity truncate text-left"
+                  onClick={() => !readOnly && setIsEditingName(true)}
+                  className="font-bold text-text-main-light xdark:text-white truncate text-left hover:underline decoration-2 underline-offset-4"
                 >
-                  + description
+                  {name}
                 </button>
               )
+            )}
+
+            {/* Secondary: technical field name (when description is shown as primary) */}
+            {tempDesc && (
+              !readOnly && isEditingName ? (
+                <Input
+                  value={tempName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  onBlur={handleNameSubmit}
+                  onKeyDown={(e) => e.key === "Enter" && handleNameSubmit()}
+                  className="h-5 text-[10px] min-w-[80px] bg-white border border-gray-200 px-1 mt-0.5"
+                  autoFocus
+                  onFocus={(e) => e.target.select()}
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => !readOnly && setIsEditingName(true)}
+                  className="text-[10px] font-mono text-text-secondary-light xdark:text-text-secondary-dark truncate text-left opacity-60 hover:opacity-100 transition-opacity"
+                >
+                  {name}
+                </button>
+              )
+            )}
+
+            {/* Add description hint when no description set */}
+            {!tempDesc && !readOnly && !isEditingName && (
+              <button
+                type="button"
+                onClick={() => setIsEditingDesc(true)}
+                className="text-[10px] text-text-secondary-light/50 opacity-0 group-hover:opacity-100 transition-opacity truncate text-left"
+              >
+                + add label
+              </button>
             )}
           </div>
         </div>

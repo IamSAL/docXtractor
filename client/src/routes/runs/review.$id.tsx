@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/runs/review/$id')({
@@ -6,6 +7,7 @@ export const Route = createFileRoute('/runs/review/$id')({
 
 function RunReviewComponent() {
   const { id } = Route.useParams()
+  const [introDismissed, setIntroDismissed] = useState(false)
 
   return (
     <div className="bg-[#FFFDF5] text-slate-900 font-sans h-screen flex flex-col overflow-hidden  w-full">
@@ -20,8 +22,8 @@ function RunReviewComponent() {
             </Link>
             <div className="h-8 w-0.5 bg-[#1e293b]"></div>
             <div className="hidden md:flex flex-col">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Case ID</span>
-              <span className="font-bold text-slate-900">CASE-2023-{id}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Run</span>
+              <span className="font-bold text-slate-900">#{id.substring(0, 8)}</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -35,6 +37,25 @@ function RunReviewComponent() {
           </div>
         </div>
       </header>
+
+      {!introDismissed && (
+        <div className="flex-none bg-[#FFFDF5] border-b-2 border-[#1e293b] px-6 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="material-symbols-outlined text-[#1e293b] shrink-0 mt-0.5">info</span>
+            <p className="text-sm text-slate-700">
+              <strong>Review your extracted data.</strong> We'll show you each value alongside where it came from in the document.
+              Accept values that look correct, or edit and reject ones that don't. This helps improve accuracy over time.
+            </p>
+          </div>
+          <button
+            className="shrink-0 text-slate-400 hover:text-slate-700 transition-colors"
+            onClick={() => setIntroDismissed(true)}
+            aria-label="Dismiss"
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      )}
 
       <main className="flex-1 flex overflow-hidden relative">
         {/* PDF Viewer Area */}

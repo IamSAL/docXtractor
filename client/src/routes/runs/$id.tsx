@@ -356,9 +356,7 @@ function RunDetailComponent() {
                     <span className="material-symbols-outlined font-black">
                       monitor_heart
                     </span>
-                    {run.processingMode === "per_document"
-                      ? "Batch Extraction Monitor"
-                      : "Unified Extraction Monitor"}
+                    Extraction Results
                   </h3>
                   <span className="text-xs font-black bg-black text-white px-2 py-1 rounded-sm uppercase tracking-widest">
                     {run.progress?.currentStep || run.status}
@@ -724,50 +722,60 @@ function RunDetailComponent() {
               </div>
               {/* Logs */}
               <section className="flex flex-col gap-4">
-                <h3 className="text-lg font-black uppercase flex items-center gap-2 tracking-tighter">
-                  <span className="material-symbols-outlined font-black">
-                    terminal
-                  </span>
-                  Run Logs
-                </h3>
-                <div className="bg-black text-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] rounded-sm overflow-hidden flex flex-col h-full min-h-[300px]">
-                  <div className="bg-gray-800 border-b-2 border-black p-2 flex items-center justify-between px-4">
-                    <span className="text-[10px] font-mono text-[#00FF99] font-black uppercase tracking-widest">
-                      LIVE_LOG ({run.logs?.length || 0} entries)
+                <details className="group">
+                  <summary className="flex cursor-pointer items-center gap-2 select-none list-none text-marker-none">
+                    <h3 className="text-lg font-black uppercase flex items-center gap-2 tracking-tighter">
+                      <span className="material-symbols-outlined font-black">
+                        terminal
+                      </span>
+                      Technical Logs
+                    </h3>
+                    <span className="text-xs font-bold text-gray-400 border border-gray-300 px-2 py-0.5 rounded">
+                      {run.logs?.length || 0} entries
                     </span>
-                    <span className="material-symbols-outlined text-sm text-gray-400">
-                      terminal
+                    <span className="material-symbols-outlined text-gray-400 ml-auto transition-transform duration-200 group-open:rotate-180">
+                      expand_more
                     </span>
+                  </summary>
+                  <div className="mt-3 bg-black text-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] rounded-sm overflow-hidden flex flex-col h-full min-h-[300px]">
+                    <div className="bg-gray-800 border-b-2 border-black p-2 flex items-center justify-between px-4">
+                      <span className="text-[10px] font-mono text-[#00FF99] font-black uppercase tracking-widest">
+                        LIVE_LOG ({run.logs?.length || 0} entries)
+                      </span>
+                      <span className="material-symbols-outlined text-sm text-gray-400">
+                        terminal
+                      </span>
+                    </div>
+                    <div className="p-4 font-mono text-[11px] leading-relaxed overflow-y-auto font-medium max-h-[400px]">
+                      {run.logs && run.logs.length > 0 ? (
+                        run.logs.map((log: any, idx: number) => (
+                          <p key={idx} className="mb-2">
+                            <span className="text-gray-500">
+                              [{new Date(log.timestamp).toLocaleTimeString()}]
+                            </span>{" "}
+                            <span
+                              className={`font-black uppercase ${getLogSourceColor(log.source)}`}
+                            >
+                              [{log.source || "server"}]
+                            </span>{" "}
+                            <span
+                              className={`font-black uppercase ${getLogLevelColor(log.level)}`}
+                            >
+                              [{log.level}]
+                            </span>{" "}
+                            <span className="text-white">{log.message}</span>
+                          </p>
+                        ))
+                      ) : (
+                        <p className="text-gray-500">No log entries yet...</p>
+                      )}
+                      {isProcessing && (
+                        <p className="animate-pulse text-[#00FF99]">_</p>
+                      )}
+                      <div ref={logsEndRef} />
+                    </div>
                   </div>
-                  <div className="p-4 font-mono text-[11px] leading-relaxed overflow-y-auto font-medium max-h-[400px]">
-                    {run.logs && run.logs.length > 0 ? (
-                      run.logs.map((log: any, idx: number) => (
-                        <p key={idx} className="mb-2">
-                          <span className="text-gray-500">
-                            [{new Date(log.timestamp).toLocaleTimeString()}]
-                          </span>{" "}
-                          <span
-                            className={`font-black uppercase ${getLogSourceColor(log.source)}`}
-                          >
-                            [{log.source || "server"}]
-                          </span>{" "}
-                          <span
-                            className={`font-black uppercase ${getLogLevelColor(log.level)}`}
-                          >
-                            [{log.level}]
-                          </span>{" "}
-                          <span className="text-white">{log.message}</span>
-                        </p>
-                      ))
-                    ) : (
-                      <p className="text-gray-500">No log entries yet...</p>
-                    )}
-                    {isProcessing && (
-                      <p className="animate-pulse text-[#00FF99]">_</p>
-                    )}
-                    <div ref={logsEndRef} />
-                  </div>
-                </div>
+                </details>
               </section>
               {/* Error Section */}
               {run.status === "failed" && run.error && (
@@ -810,13 +818,13 @@ function RunDetailComponent() {
                 {run.status === "done" && (
                   <Link to="/runs/review/$id" params={{ id: run.id }}>
                     <button
-                      className="bg-white hover:bg-gray-50 text-black w-full py-3 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_#000000] transition-all"
+                      className="bg-primary hover:brightness-95 text-black w-full py-3 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_#000000] transition-all"
                       type="button"
                     >
                       <span className="material-symbols-outlined text-sm">
-                        description
+                        arrow_forward
                       </span>
-                      View Full Report
+                      Review Results
                     </button>
                   </Link>
                 )}
@@ -892,25 +900,25 @@ function RunDetailComponent() {
               {run.metrics && (
                 <div className="flex flex-col gap-2 mt-4">
                   <h4 className="text-xs font-black uppercase tracking-widest text-gray-500 border-b-2 border-gray-200 pb-2">
-                    Token Usage
+                    Content Processed
                   </h4>
                   {run.metrics.totalInputTokens != null && (
                     <div className="flex justify-between items-center py-1">
                       <span className="text-xs font-bold text-gray-600">
-                        Input Tokens
+                        Words analyzed
                       </span>
                       <span className="font-black text-sm">
-                        {run.metrics.totalInputTokens.toLocaleString()}
+                        ~{Math.round(run.metrics.totalInputTokens * 0.75).toLocaleString()}
                       </span>
                     </div>
                   )}
                   {run.metrics.totalOutputTokens != null && (
                     <div className="flex justify-between items-center py-1">
                       <span className="text-xs font-bold text-gray-600">
-                        Output Tokens
+                        Fields extracted
                       </span>
                       <span className="font-black text-sm">
-                        {run.metrics.totalOutputTokens.toLocaleString()}
+                        {run.metrics.totalOutputTokens > 0 ? `~${Math.round(run.metrics.totalOutputTokens * 0.75).toLocaleString()} words` : '—'}
                       </span>
                     </div>
                   )}
@@ -1064,20 +1072,20 @@ function ResultsSection({
       <Tabs defaultValue="spreadsheet">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <TabsList>
-            <TabsTrigger value="json">
-              <span className="flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[16px]">
-                  code
-                </span>
-                JSON
-              </span>
-            </TabsTrigger>
             <TabsTrigger value="spreadsheet">
               <span className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[16px]">
                   table_chart
                 </span>
                 Spreadsheet
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="json">
+              <span className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px]">
+                  code
+                </span>
+                JSON
               </span>
             </TabsTrigger>
           </TabsList>
