@@ -6,12 +6,24 @@ import { useAuth } from '@/hooks/useAuth'
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(
+        () => localStorage.getItem('sidebar-collapsed') === 'true'
+    )
     const { user } = useAuth()
 
     return (
         <ProtectedRoute>
             <div className="flex flex-col lg:flex-row min-h-screen bg-yellow-50/30 w-full relative">
-                <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+                <Sidebar
+                    isOpen={isSidebarOpen}
+                    onClose={() => setIsSidebarOpen(false)}
+                    isCollapsed={isSidebarCollapsed}
+                    onToggleCollapse={() => setIsSidebarCollapsed(c => {
+                        const next = !c
+                        localStorage.setItem('sidebar-collapsed', String(next))
+                        return next
+                    })}
+                />
 
                 {/* Mobile Header */}
                 <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b-2 border-black px-4 py-3 flex items-center justify-between lg:hidden transition-all">
@@ -40,7 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     </Button>
                 </header>
 
-                <main className="lg:ml-64 flex-1 flex flex-col min-h-[calc(100vh-64px)] lg:min-h-screen overflow-y-auto relative w-full lg:w-auto animate-fade-in">
+                <main className={`flex-1 flex flex-col min-h-[calc(100vh-64px)] lg:min-h-screen overflow-y-auto relative w-full lg:w-auto animate-fade-in transition-[margin-left] duration-300 ease-in-out ${isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
                     {children}
                 </main>
             </div>
