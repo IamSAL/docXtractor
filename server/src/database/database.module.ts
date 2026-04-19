@@ -21,6 +21,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         // ssl: true,
         // //  configService.get<string>('NODE_ENV') !== 'development',
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
+        migrationsRun: configService.get<string>('NODE_ENV') === 'production',
         logging: false,
         //  configService.get<string>('NODE_ENV') !== 'production',
         url: configService.get<string>('DATABASE_URL'),
