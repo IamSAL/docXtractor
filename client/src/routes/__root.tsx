@@ -66,20 +66,22 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="bg-background-cream min-h-screen  flex text-black light">
         <NiceModal.Provider>{children}</NiceModal.Provider>
-        <TanStackDevtools
-          config={{
-            position: "bottom-right",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-            AiDevtools,
-            StoreDevtools,
-          ]}
-        />
+        {import.meta.env.DEV && (
+          <TanStackDevtools
+            config={{
+              position: "bottom-right",
+            }}
+            plugins={[
+              {
+                name: "Tanstack Router",
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+              TanStackQueryDevtools,
+              AiDevtools,
+              StoreDevtools,
+            ]}
+          />
+        )}
         <Scripts />
         <Toaster />
       </body>

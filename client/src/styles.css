@@ -195,6 +195,35 @@
   }
 }
 
+@media (min-width: 1024px) {
+  /* Expand on hover after 3s — overrides Tailwind lg:w-16 */
+  aside[data-collapsed="trues"]:hover {
+    width: 16rem !important;
+    transition:
+      width 100ms ease-in-out 0s,
+      transform 100ms ease-in-out !important;
+    .label {
+      opacity: 1;
+      transition: opacity 100ms ease-in-out 0s;
+    }
+    .sidebar-user-row {
+      padding: 8px 4px;
+    }
+    .user-avatar {
+      display: flex;
+    }
+  }
+
+  aside[data-collapsed="true"] {
+    .label {
+      opacity: 0;
+    }
+    .user-avatar {
+      display: none;
+    }
+  }
+}
+
 .toggle-checkbox:checked {
   right: 0;
   border-color: #e5d161;

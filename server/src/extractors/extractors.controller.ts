@@ -6,7 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  HttpCode,
+  HttpStatus,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
+import { Public } from '../auth/decorators/public.decorators';
+import { PreviewExtractionDto } from './dto/preview-extraction.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -25,6 +35,8 @@ import {
   GenerateExtractorDto,
 } from './dto/generate-extractor.dto';
 import { Extractor } from './entities/extractor.entity';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { JWTPayload } from '../shared/types/jwt-payload.types';
 
 @ApiTags('Extractors')
 @ApiBearerAuth()
@@ -39,8 +51,11 @@ export class ExtractorsController {
     description: 'The extractor has been successfully created.',
     type: Extractor,
   })
-  create(@Body() createExtractorDto: CreateExtractorDto) {
-    return this.extractorsService.create(createExtractorDto);
+  create(
+    @Body() createExtractorDto: CreateExtractorDto,
+    @GetUser() user: JWTPayload,
+  ) {
+    return this.extractorsService.create(createExtractorDto, user.sub);
   }
 
   @Post('generate-schema')
@@ -65,7 +80,30 @@ export class ExtractorsController {
     description: 'The extractor configuration has been generated.',
   })
   generateExtractor(@Body() dto: GenerateExtractorDto) {
-    return this.extractorsService.generateExtractor(dto.description);
+    return this.extractorsService.generateExtractor(dto.description, dto.sampleText);
+  }
+
+  @Post('parse-preview')
+  @UseInterceptors(FileInterceptor('file'))
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Parse a file to text for preview purposes' })
+  @ApiResponse({ status: 200, description: 'Parsed text from file' })
+  parsePreview(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('No file provided');
+    return this.extractorsService.parsePreview(file.buffer, file.originalname);
+  }
+
+  @Post('preview-extraction')
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Preview extraction result using sample text (direct LLM, no queue)',
+  })
+  @ApiResponse({ status: 200, description: 'Preview extraction result' })
+  previewExtraction(@Body() dto: PreviewExtractionDto) {
+    return this.extractorsService.previewExtraction(dto);
   }
 
   @Get()
@@ -75,8 +113,8 @@ export class ExtractorsController {
     description: 'Return all extractors.',
     type: [Extractor],
   })
-  findAll() {
-    return this.extractorsService.findAll();
+  findAll(@GetUser() user: JWTPayload, @Query('scope') scope?: string) {
+    return this.extractorsService.findAll(user.sub, scope);
   }
 
   @Get(':id')
@@ -86,8 +124,21 @@ export class ExtractorsController {
     description: 'Return the extractor.',
     type: Extractor,
   })
-  findOne(@Param('id') id: string) {
-    return this.extractorsService.findOne(id);
+  findOne(@Param('id') id: string, @GetUser() user: JWTPayload) {
+    return this.extractorsService.findOne(id, user.sub);
+  }
+
+  @Post(':id/clone')
+  @ApiOperation({
+    summary: 'Clone a public extractor into current user workspace',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Cloned extractor',
+    type: Extractor,
+  })
+  cloneExtractor(@Param('id') id: string, @GetUser() user: JWTPayload) {
+    return this.extractorsService.cloneExtractor(id, user.sub);
   }
 
   @Patch(':id')
@@ -100,8 +151,9 @@ export class ExtractorsController {
   update(
     @Param('id') id: string,
     @Body() updateExtractorDto: UpdateExtractorDto,
+    @GetUser() user: JWTPayload,
   ) {
-    return this.extractorsService.update(id, updateExtractorDto);
+    return this.extractorsService.update(id, updateExtractorDto, user.sub);
   }
 
   @Delete(':id')
@@ -110,8 +162,8 @@ export class ExtractorsController {
     status: 200,
     description: 'The extractor has been successfully deleted.',
   })
-  remove(@Param('id') id: string) {
-    return this.extractorsService.remove(id);
+  remove(@Param('id') id: string, @GetUser() user: JWTPayload) {
+    return this.extractorsService.remove(id, user.sub);
   }
 
   // --- Schema Variant Endpoints ---
@@ -123,8 +175,12 @@ export class ExtractorsController {
     description: 'Variant added successfully.',
     type: Extractor,
   })
-  addVariant(@Param('id') id: string, @Body() dto: CreateSchemaVariantDto) {
-    return this.extractorsService.addVariant(id, dto);
+  addVariant(
+    @Param('id') id: string,
+    @Body() dto: CreateSchemaVariantDto,
+    @GetUser() user: JWTPayload,
+  ) {
+    return this.extractorsService.addVariant(id, dto, user.sub);
   }
 
   @Patch(':id/variants/:variantId')
@@ -138,8 +194,9 @@ export class ExtractorsController {
     @Param('id') id: string,
     @Param('variantId') variantId: string,
     @Body() dto: UpdateSchemaVariantDto,
+    @GetUser() user: JWTPayload,
   ) {
-    return this.extractorsService.updateVariant(id, variantId, dto);
+    return this.extractorsService.updateVariant(id, variantId, dto, user.sub);
   }
 
   @Delete(':id/variants/:variantId')
@@ -152,7 +209,8 @@ export class ExtractorsController {
   deleteVariant(
     @Param('id') id: string,
     @Param('variantId') variantId: string,
+    @GetUser() user: JWTPayload,
   ) {
-    return this.extractorsService.deleteVariant(id, variantId);
+    return this.extractorsService.deleteVariant(id, variantId, user.sub);
   }
 }

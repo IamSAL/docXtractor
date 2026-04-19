@@ -15,7 +15,7 @@ import { LlmService } from './llm.service';
 
 function getMockCreate(): jest.Mock {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return (require('openai') as any).__mockCreate as jest.Mock;
+  return require('openai').__mockCreate as jest.Mock;
 }
 
 const mockConfigGet = jest.fn((key: string, def?: any) => {

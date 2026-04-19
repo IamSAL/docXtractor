@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppLayout } from "../../components/AppLayout";
 import { Popover } from "../../components/retroui/Popover";
 import { Button } from "../../components/retroui/Button";
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/dashboard/")({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const { data: statsData, isLoading: statsLoading } =
     useDashboardControllerGetStats();
   const { data: extractorsData, isLoading: extractorsLoading } =
@@ -331,18 +332,44 @@ function RouteComponent() {
                   </Card>
                 ))
               ) : extractors.length === 0 ? (
-                <Card className="p-5 flex flex-col items-center justify-center col-span-full h-48 text-center bg-gray-50/50 border-dashed border-2">
-                  <span className="material-symbols-outlined text-4xl text-gray-400 mb-2">
-                    inventory_2
-                  </span>
-                  <p className="text-gray-500 font-bold">No extractors found</p>
-                  <button
-                    onClick={() => NiceModal.show(TemplateWizardModal)}
-                    className="mt-2 text-primary hover:underline font-bold text-sm"
-                  >
-                    Create your first extractor
-                  </button>
-                </Card>
+                <div className="col-span-full">
+                  <Card className="p-8 flex flex-col gap-6 bg-yellow-50/50 border-2 border-black border-dashed">
+                    <div className="text-center">
+                      <span className="material-symbols-outlined text-5xl text-gray-400 mb-3 block">
+                        rocket_launch
+                      </span>
+                      <h4 className="font-black text-xl tracking-tight mb-1">Welcome! Let's extract your first document.</h4>
+                      <p className="text-gray-500 text-sm max-w-md mx-auto">
+                        DocXtractor turns documents into structured data in 3 steps.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {[
+                        { step: "1", icon: "fork_right", label: "Create an Extractor", desc: "Define what data to pull out of your documents" },
+                        { step: "2", icon: "upload_file", label: "Upload a Document", desc: "PDF, image, URL — any format works" },
+                        { step: "3", icon: "table_chart", label: "View Structured Results", desc: "Get clean JSON or spreadsheet output instantly" },
+                      ].map(({ step, icon, label, desc }) => (
+                        <div key={step} className="bg-white border-2 border-black p-4 flex flex-col gap-2 shadow-[2px_2px_0px_0px_#000]">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-black bg-black text-white w-5 h-5 flex items-center justify-center rounded-full shrink-0">{step}</span>
+                            <span className="material-symbols-outlined text-[18px] text-gray-600">{icon}</span>
+                            <span className="font-bold text-sm">{label}</span>
+                          </div>
+                          <p className="text-xs text-gray-500 pl-7">{desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex justify-center">
+                      <button
+                        onClick={() => NiceModal.show(TemplateWizardModal)}
+                        className="bg-primary border-2 border-black px-8 py-3 font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all text-sm flex items-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">add</span>
+                        Create Your First Extractor
+                      </button>
+                    </div>
+                  </Card>
+                </div>
               ) : (
                 extractors.slice(0, 3).map((extractor) => (
                   <Link
@@ -386,6 +413,8 @@ function RouteComponent() {
                             NiceModal.show(RunExtractorModal, {
                               extractorName: extractor.name,
                               extractorId: extractor.id,
+                            }).then((runId) => {
+                              if (runId) navigate({ to: "/runs/$id", params: { id: runId as string } });
                             });
                           }}
                           className="rounded-full border-2 border-black bg-white hover:bg-black hover:text-white text-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] w-10 h-10 p-0 flex items-center justify-center"

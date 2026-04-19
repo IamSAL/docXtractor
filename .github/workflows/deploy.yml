@@ -111,29 +111,51 @@ jobs:
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
 
-            # Wait for health checks to pass
-            echo "Waiting for services to become healthy..."
-            sleep 15
-
             # Verify critical services are running
             # Fixed-name containers
             for container in docxtractor-server docxtractor-client docxtractor-db docxtractor-redis docxtractor-minio docxtractor-freellm docxtractor-extractor; do
-              if ! docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
-                echo "ERROR: ${container} is not running!"
-                docker logs "${container}" --tail 30 2>&1 || true
-                exit 1
-              fi
+              retries=0
+              until docker ps --format '{{.Names}}' | grep -q "^${container}$"; do
+                retries=$((retries+1))
+                if [ $retries -ge 18 ]; then
+                  echo "ERROR: ${container} did not start in time!"
+                  docker logs "${container}" --tail 30 2>&1 || true
+                  exit 1
+                fi
+                echo "Waiting for ${container}... (${retries}/18)"
+                sleep 5
+              done
             done
 
             # Scaled/unnamed services (match by prefix)
             for prefix in parser-service; do
-              if ! docker compose -f docker-compose.prod.yml ps --status running --format '{{.Name}}' | grep -q "${prefix}"; then
-                echo "ERROR: No running instances of ${prefix}!"
-                docker compose -f docker-compose.prod.yml logs "${prefix}" --tail 30 2>&1 || true
-                exit 1
-              fi
+              retries=0
+              until docker compose -f docker-compose.prod.yml ps --status running --format '{{.Name}}' | grep -q "${prefix}"; do
+                retries=$((retries+1))
+                if [ $retries -ge 18 ]; then
+                  echo "ERROR: No running instances of ${prefix}!"
+                  docker compose -f docker-compose.prod.yml logs "${prefix}" --tail 30 2>&1 || true
+                  exit 1
+                fi
+                echo "Waiting for ${prefix}... (${retries}/18)"
+                sleep 5
+              done
             done
             echo "All services are running."
+
+            # Smoke-test: verify API is actually responding
+            retries=0
+            until curl -sf http://localhost:3001/health > /dev/null 2>&1; do
+              retries=$((retries+1))
+              if [ $retries -ge 12 ]; then
+                echo "ERROR: API health check failed after 60s"
+                docker logs docxtractor-server --tail 30 2>&1 || true
+                exit 1
+              fi
+              echo "Waiting for API health... (${retries}/12)"
+              sleep 5
+            done
+            echo "API health check passed."
 
             # Cleanup old images and build cache
             docker image prune -f

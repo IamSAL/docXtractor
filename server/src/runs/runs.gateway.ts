@@ -53,9 +53,19 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
       });
 
-      // Store user info in socket context
-      client.data.user = payload;
-      this.logger.log(`Client connected: ${client.id} (user: ${payload.sub})`);
+      if (payload.type === 'demo') {
+        // Demo token: scoped to a single runId
+        client.data.demo = { runId: payload.runId };
+        this.logger.log(
+          `Demo client connected: ${client.id} (run: ${payload.runId})`,
+        );
+      } else {
+        // Standard user token
+        client.data.user = payload;
+        this.logger.log(
+          `Client connected: ${client.id} (user: ${payload.sub})`,
+        );
+      }
     } catch (e) {
       this.logger.warn(
         `Disconnecting client ${client.id}: Invalid token - ${e.message}`,
@@ -73,11 +83,24 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { runId: string },
     @ConnectedSocket() client: Socket,
   ) {
+    const { runId } = data;
+
+    // Demo clients: scoped to their specific runId only
+    if (client.data.demo) {
+      if (client.data.demo.runId !== runId) {
+        this.logger.warn(
+          `Demo client ${client.id} tried to join unauthorized run: ${runId}`,
+        );
+        return { event: 'error', data: { message: 'Unauthorized' } };
+      }
+      client.join(`run:${runId}`);
+      return { event: 'joinedRun', data: { runId } };
+    }
+
     if (!client.data.user) {
       this.logger.warn(`Unauthorized joinRun attempt from ${client.id}`);
       return { event: 'error', data: { message: 'Unauthorized' } };
     }
-    const { runId } = data;
     client.join(`run:${runId}`);
     return { event: 'joinedRun', data: { runId } };
   }
@@ -162,7 +185,9 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     if (!client.data.user) {
-      this.logger.warn(`Unauthorized joinWorkflowExecution attempt from ${client.id}`);
+      this.logger.warn(
+        `Unauthorized joinWorkflowExecution attempt from ${client.id}`,
+      );
       return { event: 'error', data: { message: 'Unauthorized' } };
     }
     const { executionId } = data;
@@ -183,7 +208,9 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('joinWorkflowsList')
   handleJoinWorkflowsList(@ConnectedSocket() client: Socket) {
     if (!client.data.user) {
-      this.logger.warn(`Unauthorized joinWorkflowsList attempt from ${client.id}`);
+      this.logger.warn(
+        `Unauthorized joinWorkflowsList attempt from ${client.id}`,
+      );
       return { event: 'error', data: { message: 'Unauthorized' } };
     }
     client.join('workflows:list');

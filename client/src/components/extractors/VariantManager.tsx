@@ -139,7 +139,7 @@ export function VariantManager({
 						Schema Variants
 					</h3>
 					<p className="text-xs text-gray-500 mt-0.5">
-						Create named schema subsets for different extraction needs
+						Define alternate field sets for different document formats. Most users don't need this.
 					</p>
 				</div>
 				{!isCreating && (

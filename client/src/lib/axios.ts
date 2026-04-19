@@ -34,8 +34,17 @@ AXIOS_INSTANCE.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle 401 errors (Unauthorized)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Handle 401 errors (Unauthorized) — skip auth endpoints so login/setup
+    // failures return the real server error instead of "No refresh token available"
+    const isAuthEndpoint =
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/admin-setup") ||
+      originalRequest.url?.includes("/auth/signup");
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint
+    ) {
       originalRequest._retry = true;
 
       try {
@@ -102,7 +111,6 @@ export const HttpClient = <T>(
   options: RequestInit & { params?: any; responseType?: any } = {},
 ): Promise<T> => {
   const { body, ...rest } = options;
-  const source = axios.CancelToken.source();
 
   const config: AxiosRequestConfig = {
     url,
@@ -110,20 +118,11 @@ export const HttpClient = <T>(
     ...rest,
     headers: rest.headers as any,
     signal: rest.signal || undefined,
-    // Provide a way to pass axios-specific config if needed via custom property or casting
-    cancelToken: source.token,
   };
 
-  const promise = AXIOS_INSTANCE(config).then((res) => ({
+  return AXIOS_INSTANCE(config).then((res) => ({
     data: res.data,
     status: res.status,
     headers: res.headers,
-  }));
-
-  // @ts-ignore
-  promise.cancel = () => {
-    source.cancel("Query was cancelled");
-  };
-
-  return promise as Promise<T>;
+  })) as Promise<T>;
 };

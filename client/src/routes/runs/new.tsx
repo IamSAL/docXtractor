@@ -25,7 +25,7 @@ function RunsNewComponent() {
       <div className="flex flex-col h-full bg-white">
         <RunExtractorForm
           extractorId={urlExtractorId}
-          onSuccess={() => navigate({ to: "/runs" })}
+          onSuccess={(runId) => navigate({ to: "/runs/$id", params: { id: runId } })}
           onClose={() => navigate({ to: "/runs" })}
           gridClassName="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-5xl mx-auto w-full"
           footerClassName="px-12 py-5 border-t-4 border-black bg-gray-50 shrink-0 flex flex-col gap-4"

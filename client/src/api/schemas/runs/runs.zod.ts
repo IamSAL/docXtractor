@@ -22,7 +22,7 @@ export const RunsControllerCreateBody = zod.object({
   "fileId": zod.string().optional().describe('File ID if type is file')
 })).describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerCreateBodyProcessingModeDefault),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerCreateBodyExtractionProviderDefault),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']).default(runsControllerCreateBodyExtractionProviderDefault),
   "variantId": zod.string().optional().describe('ID of schema variant to use for extraction'),
   "skippedFields": zod.array(zod.string()).optional().describe('Field names to exclude from extraction')
 })
@@ -52,7 +52,7 @@ export const RunsControllerFindAllResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -74,6 +74,7 @@ export const RunsControllerFindAllResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -117,7 +118,7 @@ export const RunsControllerFindOneResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -139,6 +140,7 @@ export const RunsControllerFindOneResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -179,7 +181,7 @@ export const RunsControllerUpdateBody = zod.object({
   "fileId": zod.string().optional().describe('File ID if type is file')
 })).optional().describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerUpdateBodyProcessingModeDefault),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerUpdateBodyExtractionProviderDefault),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']).default(runsControllerUpdateBodyExtractionProviderDefault),
   "variantId": zod.string().optional().describe('ID of schema variant to use for extraction'),
   "skippedFields": zod.array(zod.string()).optional().describe('Field names to exclude from extraction'),
   "sortConfig": zod.object({
@@ -193,7 +195,7 @@ export const RunsControllerUpdateResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -215,6 +217,7 @@ export const RunsControllerUpdateResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -257,7 +260,7 @@ export const RunsControllerRetryResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -279,6 +282,7 @@ export const RunsControllerRetryResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -323,7 +327,7 @@ export const RunsControllerRetrySourcesBatchResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -345,6 +349,7 @@ export const RunsControllerRetrySourcesBatchResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -381,7 +386,7 @@ export const RunsControllerRetrySourceResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -403,6 +408,7 @@ export const RunsControllerRetrySourceResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),

@@ -10,12 +10,23 @@ import type { ExtractorFewShotExamplesItem } from "./extractorFewShotExamplesIte
 import type { ExtractorParserEngine } from "./extractorParserEngine";
 import type { ExtractorSchema } from "./extractorSchema";
 import type { ExtractorVariantsItem } from "./extractorVariantsItem";
+import type { User } from "./user";
 
 export interface Extractor {
 	id: string;
+	user?: User;
+	userId?: string;
+	/** Visible to all users as a template */
+	isPublic?: boolean;
 	name: string;
 	description?: string;
 	thumbnailUrl?: string;
+	/** Template category for display */
+	category?: string;
+	/** Material Symbols icon name */
+	icon?: string;
+	/** Display tags for templates */
+	tags?: string[];
 	schema: ExtractorSchema;
 	systemPrompt: string;
 	fewShotExamples?: ExtractorFewShotExamplesItem[];

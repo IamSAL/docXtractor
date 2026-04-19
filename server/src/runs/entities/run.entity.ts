@@ -105,7 +105,7 @@ export class Run {
   @ApiProperty()
   extractorId: string;
 
-  @Column('uuid')
+  @Column('uuid', { nullable: true })
   @ApiProperty()
   userId: string;
 
@@ -166,6 +166,10 @@ export class Run {
   @ApiProperty()
   isAutorun: boolean;
 
+  @Column({ type: 'boolean', default: false, nullable: true })
+  @ApiPropertyOptional()
+  isDemo: boolean;
+
   // Schema customization: variant selection + field skipping
   @Column({ type: 'text', nullable: true })
   @ApiPropertyOptional({
@@ -212,7 +216,7 @@ export class Run {
   @JoinColumn({ name: 'extractorId' })
   extractor: Extractor;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'userId' })
   user: User;
 

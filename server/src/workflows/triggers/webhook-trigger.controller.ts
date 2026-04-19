@@ -1,6 +1,14 @@
-import { Controller, Post, Param, Body, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Param,
+  Body,
+  Logger,
+  ForbiddenException,
+} from '@nestjs/common';
 import { WorkflowsService } from '../workflows.service';
-import { Public } from '../../auth/decorators/public.decorators';
+import { GetUser } from '../../auth/decorators/get-user.decorator';
+import { JWTPayload } from '../../shared/types/jwt-payload.types';
 
 @Controller('webhooks')
 export class WebhookTriggerController {
@@ -9,19 +17,24 @@ export class WebhookTriggerController {
   constructor(private workflowsService: WorkflowsService) {}
 
   /**
-   * Generic webhook endpoint for triggering workflows
+   * Trigger a workflow via webhook. Caller must be authenticated and own the workflow.
    * POST /webhooks/:workflowId/*
    */
-  @Public()
   @Post(':workflowId/*path')
   async handleWebhook(
     @Param('workflowId') workflowId: string,
     @Param('path') path: string,
-    @Body() body: any,
+    @Body() body: unknown,
+    @GetUser() user: JWTPayload,
   ) {
     this.logger.log(
-      `Webhook received for workflow ${workflowId} at path /${path}`,
+      `Webhook received for workflow ${workflowId} at path /${path} by user ${user.sub}`,
     );
+
+    const workflow = await this.workflowsService.findById(workflowId);
+    if (workflow.userId !== user.sub) {
+      throw new ForbiddenException('You do not own this workflow');
+    }
 
     try {
       await this.workflowsService.triggerWorkflow(workflowId, {

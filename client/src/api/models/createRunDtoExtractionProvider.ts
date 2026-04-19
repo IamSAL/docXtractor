@@ -12,5 +12,5 @@ export type CreateRunDtoExtractionProvider =
 export const CreateRunDtoExtractionProvider = {
 	doclo: "doclo",
 	langextract: "langextract",
-	ollama: "ollama",
+	freellm: "freellm",
 } as const;

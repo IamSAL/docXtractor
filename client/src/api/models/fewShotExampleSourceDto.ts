@@ -13,4 +13,6 @@ export interface FewShotExampleSourceDto {
 	name: string;
 	description: string;
 	content: string;
+	storageKey?: string;
+	parsedContent?: string;
 }

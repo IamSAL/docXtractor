@@ -1,8 +1,9 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
-import { execSync } from 'child_process';
-import { existsSync, mkdirSync, unlinkSync } from 'fs';
+import { execSync, execFileSync } from 'child_process';
+import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
+import { gzipSync } from 'zlib';
 import { join } from 'path';
 
 interface DbConfig {
@@ -93,11 +94,25 @@ export class BackupService implements OnModuleInit {
     try {
       this.logger.log(`[${tier}] Starting backup...`);
 
-      // pg_dump → gzip
-      execSync(
-        `PGPASSWORD="${this.db.password}" pg_dump -h ${this.db.host} -p ${this.db.port} -U ${this.db.user} -d ${this.db.database} | gzip > "${localPath}"`,
-        { stdio: 'pipe', timeout: 120_000 },
+      // pg_dump → gzip (execFileSync avoids shell injection from DB config values)
+      const dumpBuffer = execFileSync(
+        'pg_dump',
+        [
+          '-h',
+          this.db.host,
+          '-p',
+          this.db.port,
+          '-U',
+          this.db.user,
+          '-d',
+          this.db.database,
+        ],
+        {
+          env: { ...process.env, PGPASSWORD: this.db.password },
+          timeout: 120_000,
+        },
       );
+      writeFileSync(localPath, gzipSync(dumpBuffer));
       this.logger.log(`[${tier}] Dump complete: ${filename}`);
 
       // Upload to Google Drive

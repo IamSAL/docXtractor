@@ -37,6 +37,7 @@ export interface Run {
 	confidence?: RunConfidence;
 	autorunId?: RunAutorunId;
 	isAutorun: boolean;
+	isDemo?: boolean;
 	/** ID of schema variant used for this run */
 	variantId?: RunVariantId;
 	/** Field names excluded from extraction */

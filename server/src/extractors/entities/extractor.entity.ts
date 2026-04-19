@@ -4,16 +4,20 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
 } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { User } from '../../user/entities/user.entity';
 
 export interface FewShotExampleSource {
   id: string;
   type: 'file' | 'url' | 'text';
   name: string;
   description: string;
-  content: string;       // original: MinIO public URL for file, URL string for url, raw text for text
-  storageKey?: string;   // MinIO storage key for file type (e.g. "user-id/timestamp_file.pdf")
+  content: string; // original: MinIO public URL for file, URL string for url, raw text for text
+  storageKey?: string; // MinIO storage key for file type (e.g. "user-id/timestamp_file.pdf")
   parsedContent?: string; // parsed markdown; populated async by background job for file/url types
 }
 
@@ -33,11 +37,28 @@ export interface SchemaVariant {
   createdAt: string;
 }
 
+@Index(['userId'])
 @Entity()
 export class Extractor {
   @ApiProperty({ example: '3fa85f64-5717-4562-b3fc-2c963f66afa6' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @ApiPropertyOptional()
+  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user?: User;
+
+  @ApiPropertyOptional()
+  @Column({ type: 'uuid', nullable: true })
+  userId?: string;
+
+  @ApiPropertyOptional({
+    default: false,
+    description: 'Visible to all users as a template',
+  })
+  @Column({ default: false })
+  isPublic: boolean;
 
   @ApiProperty({ example: 'Invoice Processor' })
   @Column()
@@ -50,6 +71,18 @@ export class Extractor {
   @ApiPropertyOptional({ example: 'https://example.com/thumb.png' })
   @Column({ type: 'text', nullable: true })
   thumbnailUrl: string;
+
+  @ApiPropertyOptional({ example: 'Financial', description: 'Template category for display' })
+  @Column({ type: 'text', nullable: true })
+  category?: string;
+
+  @ApiPropertyOptional({ example: 'receipt_long', description: 'Material Symbols icon name' })
+  @Column({ type: 'text', nullable: true })
+  icon?: string;
+
+  @ApiPropertyOptional({ type: [String], description: 'Display tags for templates' })
+  @Column('jsonb', { nullable: true })
+  tags?: string[];
 
   @ApiProperty({ example: { type: 'object', properties: {} } })
   @Column('jsonb')

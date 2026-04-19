@@ -332,9 +332,6 @@ function LandingPage() {
                       your team for manual verification and sign-off.
                     </p>
                   </div>
-                  <button className="text-[10px] font-bold uppercase underline mt-auto">
-                    Review Flagged Item
-                  </button>
                 </div>
               </ScrollReveal>
             </div>
@@ -351,9 +348,14 @@ function LandingPage() {
                     sources, AI models, and destinations with zero code.
                   </p>
                 </div>
-                <button className="text-lg font-bold border-b-4 border-primary hover:bg-primary/20 px-2 transition-colors">
-                  Explore Documentation -&gt;
-                </button>
+                <a
+                  className="text-lg font-bold border-b-4 border-primary hover:bg-primary/20 px-2 transition-colors"
+                  href="https://github.com/iamsal/docXtractor"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  View on GitHub -&gt;
+                </a>
               </div>
               <div className="w-full bg-white border-[2px] border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
                 <div className="bg-gray-100 border-b-[2px] border-black p-3 flex items-center gap-4">
@@ -490,18 +492,24 @@ function LandingPage() {
               Ready to Scale?
             </h2>
             <p className="text-xl font-medium max-w-lg">
-              Join 5,000+ companies automating their data entry with
-              DocXTractor.
+              Open source and self-hosted. Deploy on your own infrastructure
+              in minutes.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 mt-6 w-full justify-center max-w-md">
-              <input
-                className="bg-gray-50 border-[3px] border-black px-4 py-3 text-lg font-bold w-full focus:ring-0 focus:outline-none focus:bg-white transition-colors placeholder:text-gray-400"
-                placeholder="work@email.com"
-                type="email"
-              />
-              <button className="bg-primary border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-6 py-3 text-lg font-black uppercase hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all whitespace-nowrap cursor-pointer">
-                Get Access
-              </button>
+            <div className="flex flex-col sm:flex-row gap-4 mt-6">
+              <Link
+                className="bg-primary border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-6 py-3 text-lg font-black uppercase hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all whitespace-nowrap cursor-pointer"
+                to="/login"
+              >
+                Get Started
+              </Link>
+              <a
+                className="bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-6 py-3 text-lg font-black uppercase hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all whitespace-nowrap cursor-pointer"
+                href="https://github.com/iamsal/docXtractor"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                View on GitHub
+              </a>
             </div>
           </div>
         </ScrollReveal>
@@ -524,35 +532,35 @@ function LandingPage() {
               fast, and developer-friendly.
             </p>
             <p className="font-bold text-xs uppercase mt-4">
-              © 2024 DocXTractor Inc.
+              © {new Date().getFullYear()} DocXTractor
             </p>
           </div>
           <div className="flex gap-12 md:gap-24">
             <div className="flex flex-col gap-4">
               <h4 className="font-black uppercase text-sm tracking-wider border-b-2 border-primary inline-block">
-                Product
+                Project
               </h4>
               <a
                 className="font-bold text-sm hover:text-primary hover:underline transition-colors"
-                href="#"
+                href="https://github.com/iamsal/docXtractor"
+                rel="noopener noreferrer"
+                target="_blank"
               >
-                Features
+                GitHub
               </a>
               <a
                 className="font-bold text-sm hover:text-primary hover:underline transition-colors"
-                href="#"
+                href="https://github.com/iamsal/docXtractor/issues"
+                rel="noopener noreferrer"
+                target="_blank"
               >
-                Integrations
+                Issues
               </a>
               <a
                 className="font-bold text-sm hover:text-primary hover:underline transition-colors"
-                href="#"
-              >
-                Pricing
-              </a>
-              <a
-                className="font-bold text-sm hover:text-primary hover:underline transition-colors"
-                href="#"
+                href="https://github.com/iamsal/docXtractor/releases"
+                rel="noopener noreferrer"
+                target="_blank"
               >
                 Changelog
               </a>
@@ -563,38 +571,25 @@ function LandingPage() {
               </h4>
               <a
                 className="font-bold text-sm hover:text-primary hover:underline transition-colors"
-                href="#"
+                href="https://github.com/iamsal/docXtractor#readme"
+                rel="noopener noreferrer"
+                target="_blank"
               >
                 Documentation
               </a>
-              <a
+              <Link
                 className="font-bold text-sm hover:text-primary hover:underline transition-colors"
-                href="#"
+                to="/api"
               >
                 API Reference
-              </a>
+              </Link>
               <a
                 className="font-bold text-sm hover:text-primary hover:underline transition-colors"
-                href="#"
+                href="https://github.com/iamsal/docXtractor/discussions"
+                rel="noopener noreferrer"
+                target="_blank"
               >
                 Community
-              </a>
-            </div>
-            <div className="flex flex-col gap-4">
-              <h4 className="font-black uppercase text-sm tracking-wider border-b-2 border-primary inline-block">
-                Legal
-              </h4>
-              <a
-                className="font-bold text-sm hover:text-primary hover:underline transition-colors"
-                href="#"
-              >
-                Privacy
-              </a>
-              <a
-                className="font-bold text-sm hover:text-primary hover:underline transition-colors"
-                href="#"
-              >
-                Terms
               </a>
             </div>
           </div>

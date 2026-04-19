@@ -2,14 +2,17 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  ForbiddenException,
   OnModuleInit,
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 import { CreateExtractorDto } from './dto/create-extractor.dto';
 import { UpdateExtractorDto } from './dto/update-extractor.dto';
+import { PreviewExtractionDto } from './dto/preview-extraction.dto';
 import {
   CreateSchemaVariantDto,
   UpdateSchemaVariantDto,
@@ -40,14 +43,19 @@ export class ExtractorsService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const count = await this.extractorRepository.count();
-    if (count === 0) {
-      const seedData = this.loadSeedData();
-      if (seedData.length > 0) {
-        this.logger.log('No extractors found — seeding defaults...');
-        const extractors = this.extractorRepository.create(seedData);
-        await this.extractorRepository.save(extractors);
-        this.logger.log(`Seeded ${extractors.length} default extractors`);
+    const seedData = this.loadSeedData();
+    if (seedData.length === 0) return;
+
+    this.logger.log('Checking system templates...');
+    for (const d of seedData) {
+      const existing = await this.extractorRepository.findOne({
+        where: { name: d.name, isPublic: true, userId: IsNull() },
+      });
+      if (!existing) {
+        await this.extractorRepository.save(
+          this.extractorRepository.create({ ...d, isPublic: true, userId: null }),
+        );
+        this.logger.log(`Seeded template: ${d.name}`);
       }
     }
   }
@@ -119,8 +127,15 @@ export class ExtractorsService implements OnModuleInit {
     );
   }
 
-  async create(createExtractorDto: CreateExtractorDto): Promise<Extractor> {
-    const extractor = this.extractorRepository.create(createExtractorDto);
+  async create(
+    createExtractorDto: CreateExtractorDto,
+    userId: string,
+  ): Promise<Extractor> {
+    const extractor = this.extractorRepository.create({
+      ...createExtractorDto,
+      userId,
+      isPublic: createExtractorDto.isPublic ?? false,
+    });
     const saved = await this.extractorRepository.save(extractor);
     await this.dispatchExampleSourceParseJobs(
       saved.id,
@@ -130,16 +145,85 @@ export class ExtractorsService implements OnModuleInit {
     return saved;
   }
 
-  async findAll(): Promise<Extractor[]> {
-    return await this.extractorRepository.find({
+  async findAll(userId: string, scope?: string): Promise<Extractor[]> {
+    if (scope === 'instance') {
+      return this.extractorRepository.find({
+        where: { isPublic: true },
+        order: { createdAt: 'DESC' },
+      });
+    }
+    if (scope === 'mine-public') {
+      return this.extractorRepository.find({
+        where: { isPublic: true, userId },
+        order: { createdAt: 'DESC' },
+      });
+    }
+    // Default: only the user's own extractors (no public bleed-through)
+    return this.extractorRepository.find({
+      where: { userId },
       order: { createdAt: 'DESC' },
     });
   }
 
-  async findOne(id: string): Promise<Extractor> {
+  async previewExtraction(dto: PreviewExtractionDto): Promise<{
+    extractionResult: Record<string, unknown> | null;
+    error?: string;
+  }> {
+    if (!dto.sampleText?.trim()) {
+      return { extractionResult: null, error: 'No sample text provided' };
+    }
+    const TIMEOUT_MS = 30_000;
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Preview timeout')), TIMEOUT_MS),
+    );
+    try {
+      const result = await Promise.race([
+        this.llmService.extract(dto.sampleText, dto.schema, dto.systemPrompt),
+        timeoutPromise,
+      ]);
+      return { extractionResult: result.data };
+    } catch (err: any) {
+      this.logger.warn(`Preview extraction failed: ${err?.message}`);
+      return { extractionResult: null, error: 'Preview unavailable' };
+    }
+  }
+
+  async cloneExtractor(id: string, userId: string): Promise<Extractor> {
+    const original = await this.findOne(id);
+    if (!original.isPublic && original.userId !== userId) {
+      throw new ForbiddenException('You do not have access to this extractor');
+    }
+    const clone = this.extractorRepository.create({
+      name: `${original.name} (copy)`,
+      description: original.description,
+      thumbnailUrl: original.thumbnailUrl,
+      schema: original.schema,
+      systemPrompt: original.systemPrompt,
+      fewShotExamples: [],
+      variants: [],
+      consensusEnabled: original.consensusEnabled,
+      confidenceThreshold: original.confidenceThreshold,
+      conflictResolution: original.conflictResolution,
+      parserEngine: original.parserEngine,
+      citationEnabled: original.citationEnabled,
+      citationIncludePdfPage: original.citationIncludePdfPage,
+      citationIncludeBbox: original.citationIncludeBbox,
+      citationIncludeParagraphId: original.citationIncludeParagraphId,
+      contextWindow: original.contextWindow,
+      defaultModel: original.defaultModel,
+      userId,
+      isPublic: false,
+    });
+    return this.extractorRepository.save(clone);
+  }
+
+  async findOne(id: string, userId?: string): Promise<Extractor> {
     const extractor = await this.extractorRepository.findOne({ where: { id } });
     if (!extractor) {
       throw new NotFoundException(`Extractor with ID ${id} not found`);
+    }
+    if (userId && extractor.userId !== userId && !extractor.isPublic) {
+      throw new ForbiddenException('You do not have access to this extractor');
     }
     return extractor;
   }
@@ -147,8 +231,12 @@ export class ExtractorsService implements OnModuleInit {
   async update(
     id: string,
     updateExtractorDto: UpdateExtractorDto,
+    userId: string,
   ): Promise<Extractor> {
     const extractor = await this.findOne(id);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
     this.extractorRepository.merge(extractor, updateExtractorDto);
     const saved = await this.extractorRepository.save(extractor);
     await this.dispatchExampleSourceParseJobs(
@@ -159,7 +247,11 @@ export class ExtractorsService implements OnModuleInit {
     return saved;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, userId: string): Promise<void> {
+    const extractor = await this.findOne(id);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
     const result = await this.extractorRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Extractor with ID ${id} not found`);
@@ -171,8 +263,12 @@ export class ExtractorsService implements OnModuleInit {
   async addVariant(
     extractorId: string,
     dto: CreateSchemaVariantDto,
+    userId: string,
   ): Promise<Extractor> {
     const extractor = await this.findOne(extractorId);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
 
     if (extractor.variants.some((v) => v.name === dto.name)) {
       throw new BadRequestException('Variant name already exists');
@@ -201,8 +297,12 @@ export class ExtractorsService implements OnModuleInit {
     extractorId: string,
     variantId: string,
     dto: UpdateSchemaVariantDto,
+    userId: string,
   ): Promise<Extractor> {
     const extractor = await this.findOne(extractorId);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
     const variant = extractor.variants.find((v) => v.id === variantId);
 
     if (!variant) {
@@ -220,8 +320,12 @@ export class ExtractorsService implements OnModuleInit {
   async deleteVariant(
     extractorId: string,
     variantId: string,
+    userId: string,
   ): Promise<Extractor> {
     const extractor = await this.findOne(extractorId);
+    if (extractor.userId && extractor.userId !== userId) {
+      throw new ForbiddenException('You do not own this extractor');
+    }
     const index = extractor.variants.findIndex((v) => v.id === variantId);
 
     if (index === -1) {
@@ -278,15 +382,43 @@ Return ONLY a JSON object with this exact structure:
     return { schema };
   }
 
-  async generateExtractor(description: string): Promise<{
+  async parsePreview(
+    fileBuffer: Buffer,
+    fileName: string,
+  ): Promise<{ text: string }> {
+    const parserUrl =
+      process.env.PARSER_SERVICE_URL || 'http://parser-service:8001';
+    try {
+      const form = new FormData();
+      form.append('file', new Blob([fileBuffer.buffer as ArrayBuffer]), fileName);
+      const res = await axios.post<{ text: string }>(
+        `${parserUrl}/parse-file`,
+        form,
+        { timeout: 60_000 },
+      );
+      return { text: res.data.text ?? '' };
+    } catch (err: any) {
+      this.logger.warn(`parsePreview failed: ${err?.message}`);
+      return { text: '' };
+    }
+  }
+
+  async generateExtractor(
+    description: string,
+    sampleText?: string,
+  ): Promise<{
     name: string;
     description: string;
     schema: Record<string, any>;
     systemPrompt: string;
   }> {
+    const sampleSection = sampleText?.trim()
+      ? `\n\nHere is a sample document to help infer the right fields:\n\`\`\`\n${sampleText.slice(0, 3000)}\n\`\`\``
+      : '';
+
     const prompt = `You are an expert at building document data extraction pipelines. Generate a complete extractor configuration for the following use case:
 
-${description}
+${description}${sampleSection}
 
 Return a JSON object with this exact structure:
 {
