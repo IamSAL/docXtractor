@@ -8,7 +8,7 @@ export function getContext() {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 500,
+        staleTime: 800,
         gcTime: 10 * 60 * 1000, // Garbage collect after 10 minutes
         retry: 1,
         refetchOnWindowFocus: true,
