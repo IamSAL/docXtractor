@@ -92,6 +92,7 @@ jobs:
           port: 22
           source: docker-compose.prod.yml
           target: ${{ secrets.PROJECT_DIR }}
+          debug: true
 
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
