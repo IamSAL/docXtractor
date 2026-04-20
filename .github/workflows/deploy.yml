@@ -109,6 +109,7 @@ jobs:
 
             # Pull pre-built images and start services
             docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --force-recreate client
             docker compose -f docker-compose.prod.yml up -d
 
             # Wait for health checks to pass
