@@ -1,4 +1,4 @@
-name: Docker CD - Build and Deploy
+name: Docker CD - Build and Deploy on Production
 
 on:
   push:

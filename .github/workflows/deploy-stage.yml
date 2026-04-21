@@ -1,0 +1,129 @@
+name: Docker CD - Build and Deploy on Staging
+
+on:
+  push:
+    branches:
+      - stage
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        include:
+          - service: server
+            context: ./server
+            dockerfile: ./server/Dockerfile.prod
+            image: docxtractor-server
+          - service: client
+            context: ./client
+            dockerfile: ./client/Dockerfile.prod
+            image: docxtractor-client
+          - service: parser-service
+            context: ./workers/parser-service
+            dockerfile: ./workers/parser-service/Dockerfile
+            image: docxtractor-parser
+          - service: extraction-service
+            context: ./workers/extraction-service
+            dockerfile: ./workers/extraction-service/Dockerfile
+            image: docxtractor-extractor
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+          build-args: |
+            ${{ matrix.service == 'client' && format('VITE_API_URL={0}', secrets.VITE_API_URL) || '' }}
+            ${{ matrix.service == 'client' && format('VITE_SENTRY_DSN={0}', secrets.VITE_SENTRY_DSN) || '' }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: docker-compose.stage.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Copy compose file to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: docker-compose.stage.yml
+          target: ${{ secrets.PROJECT_DIR_STAGE }}
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            cd ${{ secrets.PROJECT_DIR_STAGE }}
+
+            # Log in to ghcr.io to pull private images
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
+
+            # Pull pre-built images and start services
+            docker compose -f docker-compose.stage.yml pull
+            docker compose -f docker-compose.stage.yml up -d
+
+            # Wait for health checks to pass
+            echo "Waiting for services to become healthy..."
+            sleep 15
+
+            # Verify critical services are running
+            for container in docxtractor-stage-server docxtractor-stage-client docxtractor-stage-db docxtractor-stage-redis docxtractor-stage-minio docxtractor-stage-freellm docxtractor-stage-extractor docxtractor-stage-parser; do
+              if ! docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
+                echo "ERROR: ${container} is not running!"
+                docker logs "${container}" --tail 30 2>&1 || true
+                exit 1
+              fi
+            done
+            echo "All stage services are running."
+
+            # Cleanup old images and build cache
+            docker image prune -f

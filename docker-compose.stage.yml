@@ -1,0 +1,233 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: docxtractor-stage-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - stage_postgres_data:/var/lib/postgresql/data
+    networks:
+      - docxtractor-stage-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    container_name: docxtractor-stage-redis
+    restart: unless-stopped
+    command: redis-server --port 6379
+    volumes:
+      - stage_redis_data:/data
+    networks:
+      - docxtractor-stage-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6379", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:RELEASE.2024-01-18T22-51-28Z-cpuv1
+    container_name: docxtractor-stage-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - stage_minio_data:/data
+    command: server /data --console-address ":9001"
+    ports:
+      - "9010:9000"
+    networks:
+      - docxtractor-stage-network
+
+  createbuckets:
+    image: minio/minio:RELEASE.2024-01-18T22-51-28Z-cpuv1
+    container_name: docxtractor-stage-createbuckets
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO...';
+      while ! /usr/bin/mc alias set local http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} > /dev/null 2>&1; do
+        sleep 2;
+      done;
+      /usr/bin/mc mb -p local/docxtractor-documents;
+      /usr/bin/mc anonymous set public local/docxtractor-documents;
+      exit 0;
+      "
+    networks:
+      - docxtractor-stage-network
+
+  freellm:
+    image: ghcr.io/devansh-365/freellm:latest
+    container_name: docxtractor-stage-freellm
+    restart: unless-stopped
+    ports:
+      - "4002:3000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      - CEREBRAS_API_KEY=${CEREBRAS_API_KEY}
+      - FREELLM_API_KEY=${FREELLM_API_KEY}
+      - FREELLM_TOKEN_SECRET=${FREELLM_TOKEN_SECRET}
+    networks:
+      - docxtractor-stage-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/v1/models"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  server:
+    image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-server:latest
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
+    container_name: docxtractor-stage-server
+    restart: unless-stopped
+    ports:
+      - "4001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@docxtractor-stage-db:5432/${DB_NAME}
+      - REDIS_HOST=docxtractor-stage-redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://docxtractor-stage-redis:6379
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET=docxtractor-documents
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_RESET_SECRET=${JWT_RESET_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL:-https://stage.docxtractor.sk-salman.com}
+      - FREELLM_BASE_URL=http://docxtractor-stage-freellm:3000/v1
+      - FREELLM_API_KEY=${FREELLM_API_KEY}
+      - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
+      - LLM_EXTRACTION_MODEL=${LLM_EXTRACTION_MODEL}
+      - SWAGGER_USER=${SWAGGER_USER:-admin}
+      - SWAGGER_PASS=${SWAGGER_PASS:-admin}
+      - THROTTLER_TTL=${THROTTLER_TTL:-60000}
+      - THROTTLER_LIMIT=${THROTTLER_LIMIT:-100}
+      - BACKUP_ENABLED=${BACKUP_ENABLED:-false}
+      - BACKUP_GDRIVE_REMOTE=${BACKUP_GDRIVE_REMOTE:-gdrive}
+      - BACKUP_GDRIVE_PATH=${BACKUP_GDRIVE_PATH:-docxtractor-stage-backups}
+    volumes:
+      - ${HOME}/.config/rclone:/root/.config/rclone:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      createbuckets:
+        condition: service_completed_successfully
+    networks:
+      - docxtractor-stage-network
+
+  client:
+    image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-client:latest
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+        - VITE_SENTRY_DSN=${VITE_SENTRY_DSN:-}
+    container_name: docxtractor-stage-client
+    restart: unless-stopped
+    ports:
+      - "4000:3000"
+    environment:
+      - NODE_ENV=production
+      - NITRO_PORT=3000
+    depends_on:
+      - server
+    networks:
+      - docxtractor-stage-network
+
+  parser-service:
+    image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-parser:latest
+    build:
+      context: ./workers/parser-service
+    container_name: docxtractor-stage-parser
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      createbuckets:
+        condition: service_completed_successfully
+    environment:
+      - REDIS_URL=redis://docxtractor-stage-redis:6379
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET=docxtractor-documents
+      - PARSER_CONCURRENCY=1
+      - DNNL_VERBOSE=0
+      - PARSER_ENGINE=docling
+      - PARSE_CACHE_ENABLED=true
+      - LOG_LEVEL=INFO
+      - PYTHONWARNINGS=ignore
+      - PYTORCH_NO_NNPACK=1
+      - PYTORCH_NNPACK_ENABLED=0
+      - TF_CPP_MIN_LOG_LEVEL=3
+      - TORCH_CPP_LOG_LEVEL=ERROR
+      - OMP_NUM_THREADS=2
+    networks:
+      - docxtractor-stage-network
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8001
+
+  extraction-service:
+    image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-extractor:latest
+    build:
+      context: ./workers/extraction-service
+    container_name: docxtractor-stage-extractor
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      createbuckets:
+        condition: service_completed_successfully
+    environment:
+      - REDIS_URL=redis://docxtractor-stage-redis:6379
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET=docxtractor-documents
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - FREELLM_BASE_URL=http://docxtractor-stage-freellm:3000/v1
+      - FREELLM_API_KEY=${FREELLM_API_KEY}
+      - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
+      - EXTRACTION_CONCURRENCY=${EXTRACTION_CONCURRENCY:-3}
+      - LOG_LEVEL=WARNING
+      - PYTHONWARNINGS=ignore
+      - TF_CPP_MIN_LOG_LEVEL=3
+    networks:
+      - docxtractor-stage-network
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8002
+
+volumes:
+  stage_postgres_data:
+  stage_minio_data:
+  stage_redis_data:
+
+networks:
+  docxtractor-stage-network:
+    driver: bridge
