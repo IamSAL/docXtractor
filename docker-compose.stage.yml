@@ -114,7 +114,7 @@ services:
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET}
-      - FRONTEND_URL=${FRONTEND_URL:-https://stage.docxtractor.sk-salman.com}
+      - FRONTEND_URL=${FRONTEND_URL:-https://docxtractor-stage.sk-salman.com}
       - FREELLM_BASE_URL=http://docxtractor-stage-freellm:3000/v1
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
