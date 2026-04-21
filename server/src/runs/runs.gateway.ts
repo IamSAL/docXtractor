@@ -17,6 +17,7 @@ import { Server, Socket } from 'socket.io';
       'http://localhost:5174',
       'https://docxtract.sk-salman.com',
       'https://docxtractor.sk-salman.com',
+      'https://docxtractor-stage.sk-salman.com',
     ],
     credentials: true,
   },
