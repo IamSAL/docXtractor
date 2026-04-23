@@ -22,9 +22,10 @@ export const RunsControllerCreateBody = zod.object({
   "fileId": zod.string().optional().describe('File ID if type is file')
 })).describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerCreateBodyProcessingModeDefault),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerCreateBodyExtractionProviderDefault),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']).default(runsControllerCreateBodyExtractionProviderDefault),
   "variantId": zod.string().optional().describe('ID of schema variant to use for extraction'),
-  "skippedFields": zod.array(zod.string()).optional().describe('Field names to exclude from extraction')
+  "skippedFields": zod.array(zod.string()).optional().describe('Field names to exclude from extraction'),
+  "model": zod.string().optional().describe('LLM model to use for extraction (overrides extractor default)')
 })
 
 /**
@@ -52,7 +53,7 @@ export const RunsControllerFindAllResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -80,6 +81,9 @@ export const RunsControllerFindAllResponse = zod.object({
   "skippedFields": zod.object({
 
 }).optional().describe('Field names excluded from extraction'),
+  "model": zod.object({
+
+}).optional().describe('LLM model used for extraction'),
   "sortConfig": zod.object({
 
 }).optional().describe('Reference sort configuration from uploaded XLSX'),
@@ -117,7 +121,7 @@ export const RunsControllerFindOneResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -145,6 +149,9 @@ export const RunsControllerFindOneResponse = zod.object({
   "skippedFields": zod.object({
 
 }).optional().describe('Field names excluded from extraction'),
+  "model": zod.object({
+
+}).optional().describe('LLM model used for extraction'),
   "sortConfig": zod.object({
 
 }).optional().describe('Reference sort configuration from uploaded XLSX'),
@@ -179,9 +186,10 @@ export const RunsControllerUpdateBody = zod.object({
   "fileId": zod.string().optional().describe('File ID if type is file')
 })).optional().describe('List of documents to process'),
   "processingMode": zod.enum(['unified', 'per_document']).default(runsControllerUpdateBodyProcessingModeDefault),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']).default(runsControllerUpdateBodyExtractionProviderDefault),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']).default(runsControllerUpdateBodyExtractionProviderDefault),
   "variantId": zod.string().optional().describe('ID of schema variant to use for extraction'),
   "skippedFields": zod.array(zod.string()).optional().describe('Field names to exclude from extraction'),
+  "model": zod.string().optional().describe('LLM model to use for extraction (overrides extractor default)'),
   "sortConfig": zod.object({
 
 }).optional().describe('Reference sort configuration')
@@ -193,7 +201,7 @@ export const RunsControllerUpdateResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -221,6 +229,9 @@ export const RunsControllerUpdateResponse = zod.object({
   "skippedFields": zod.object({
 
 }).optional().describe('Field names excluded from extraction'),
+  "model": zod.object({
+
+}).optional().describe('LLM model used for extraction'),
   "sortConfig": zod.object({
 
 }).optional().describe('Reference sort configuration from uploaded XLSX'),
@@ -257,7 +268,7 @@ export const RunsControllerRetryResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -285,6 +296,9 @@ export const RunsControllerRetryResponse = zod.object({
   "skippedFields": zod.object({
 
 }).optional().describe('Field names excluded from extraction'),
+  "model": zod.object({
+
+}).optional().describe('LLM model used for extraction'),
   "sortConfig": zod.object({
 
 }).optional().describe('Reference sort configuration from uploaded XLSX'),
@@ -323,7 +337,7 @@ export const RunsControllerRetrySourcesBatchResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -351,6 +365,9 @@ export const RunsControllerRetrySourcesBatchResponse = zod.object({
   "skippedFields": zod.object({
 
 }).optional().describe('Field names excluded from extraction'),
+  "model": zod.object({
+
+}).optional().describe('LLM model used for extraction'),
   "sortConfig": zod.object({
 
 }).optional().describe('Reference sort configuration from uploaded XLSX'),
@@ -381,7 +398,7 @@ export const RunsControllerRetrySourceResponse = zod.object({
   "userId": zod.string(),
   "sources": zod.array(zod.string()),
   "processingMode": zod.enum(['unified', 'per_document']),
-  "extractionProvider": zod.enum(['doclo', 'langextract', 'ollama']),
+  "extractionProvider": zod.enum(['doclo', 'langextract', 'freellm']),
   "status": zod.enum(['pending', 'queued', 'parsing', 'extracting', 'done', 'failed', 'cancelled', 'review']),
   "progress": zod.object({
 
@@ -409,6 +426,9 @@ export const RunsControllerRetrySourceResponse = zod.object({
   "skippedFields": zod.object({
 
 }).optional().describe('Field names excluded from extraction'),
+  "model": zod.object({
+
+}).optional().describe('LLM model used for extraction'),
   "sortConfig": zod.object({
 
 }).optional().describe('Reference sort configuration from uploaded XLSX'),

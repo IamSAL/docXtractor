@@ -1,6 +1,8 @@
 import { Controller, useFormContext } from 'react-hook-form'
 import type { ExtractorFormData } from '@/types/extractor'
 import { FormErrorMessage } from '@/components/FormErrorMessage'
+import { useLlmControllerListModels } from '@/api/endpoints/llm/llm'
+import { Select } from '@/components/retroui/Select'
 
 interface ExtractionSettingsProps {
     showHeader?: boolean
@@ -8,6 +10,8 @@ interface ExtractionSettingsProps {
 
 export function ExtractionSettings({ showHeader = true }: ExtractionSettingsProps) {
     const { control, formState: { errors } } = useFormContext<ExtractorFormData>()
+    const { data: modelsResponse, isLoading: modelsLoading } = useLlmControllerListModels()
+    const models = modelsResponse?.data
     return (
         <div className="flex flex-col gap-6">
             {/* Parser Engine */}
@@ -43,15 +47,20 @@ export function ExtractionSettings({ showHeader = true }: ExtractionSettingsProp
                         name="parserEngine"
                         control={control}
                         render={({ field }) => (
-                            <select
-                                className="inset-input w-full appearance-none bg-[#f3f4f6] xdark:bg-[#1a190e] border border-border-light xdark:border-border-dark rounded-lg px-4 py-3 text-text-main xdark:text-white font-medium text-sm focus:border-primary focus:ring-0"
-                                {...field}
+                            <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
                             >
-                                <option value="docling">Docling (AI-Powered, Best Accuracy)</option>
-                                <option value="opendataloader">OpenDataLoader (Fast, 20+ pages/sec)</option>
-                                <option value="markitdown">MarkItDown (Lightweight, Multi-Format)</option>
-                                <option value="pymupdf">PyMuPDF (Basic Text Extraction)</option>
-                            </select>
+                                <Select.Trigger className="w-full">
+                                    <Select.Value />
+                                </Select.Trigger>
+                                <Select.Content>
+                                    <Select.Item value="docling">Docling (AI-Powered, Best Accuracy)</Select.Item>
+                                    <Select.Item value="opendataloader">OpenDataLoader (Fast, 20+ pages/sec)</Select.Item>
+                                    <Select.Item value="markitdown">MarkItDown (Lightweight, Multi-Format)</Select.Item>
+                                    <Select.Item value="pymupdf">PyMuPDF (Basic Text Extraction)</Select.Item>
+                                </Select.Content>
+                            </Select>
                         )}
                     />
                     <p className="text-[11px] text-text-sub flex items-center gap-1">
@@ -148,15 +157,20 @@ export function ExtractionSettings({ showHeader = true }: ExtractionSettingsProp
                                     name="conflictResolution"
                                     control={control}
                                     render={({ field }) => (
-                                        <select
-                                            className="inset-input w-full appearance-none bg-[#f3f4f6] xdark:bg-[#1a190e] border border-border-light xdark:border-border-dark rounded-lg px-4 py-3 text-text-main xdark:text-white font-medium text-sm focus:border-primary focus:ring-0"
-                                            {...field}
+                                        <Select
+                                            value={field.value}
+                                            onValueChange={field.onChange}
                                         >
-                                            <option value="majority">Majority Vote</option>
-                                            <option value="highest_confidence">Highest Confidence</option>
-                                            <option value="human_review">Human Review (Flag)</option>
-                                            <option value="conservative">Conservative Fallback</option>
-                                        </select>
+                                            <Select.Trigger className="w-full">
+                                                <Select.Value />
+                                            </Select.Trigger>
+                                            <Select.Content>
+                                                <Select.Item value="majority">Majority Vote</Select.Item>
+                                                <Select.Item value="highest_confidence">Highest Confidence</Select.Item>
+                                                <Select.Item value="human_review">Human Review (Flag)</Select.Item>
+                                                <Select.Item value="conservative">Conservative Fallback</Select.Item>
+                                            </Select.Content>
+                                        </Select>
                                     )}
                                 />
 
@@ -345,14 +359,43 @@ export function ExtractionSettings({ showHeader = true }: ExtractionSettingsProp
                                 name="defaultModel"
                                 control={control}
                                 render={({ field }) => (
-                                    <select
-                                        className="inset-input w-full appearance-none bg-[#f3f4f6] xdark:bg-[#1a190e] border border-border-light xdark:border-border-dark rounded-lg px-4 py-3 text-text-main xdark:text-white font-medium text-sm focus:border-primary focus:ring-0"
-                                        {...field}
+                                    <Select
+                                        value={field.value || ''}
+                                        onValueChange={field.onChange}
+                                        disabled={modelsLoading}
                                     >
-                                        <option value="gpt-4o">GPT-4o (High Accuracy)</option>
-                                        <option value="claude-3.5-sonnet">Claude 3.5 Sonnet (Balanced)</option>
-                                        <option value="llama-3-70b">Llama 3 70B (Local/Private)</option>
-                                    </select>
+                                        <Select.Trigger className="w-full">
+                                            <Select.Value placeholder={modelsLoading ? 'Loading models...' : 'Select model...'} />
+                                        </Select.Trigger>
+                                        <Select.Content>
+                                            {models && Object.entries(
+                                                models.reduce<Record<string, typeof models>>((acc, m) => {
+                                                    const key = m.owned_by || 'Other';
+                                                    acc[key] = acc[key] ? [...acc[key], m] : [m];
+                                                    return acc;
+                                                }, {})
+                                            ).map(([provider, providerModels]) => (
+                                                <Select.Group key={provider}>
+                                                    <Select.Label>
+                                                        {provider}
+                                                    </Select.Label>
+                                                    {providerModels.map((m) => (
+                                                        <Select.Item key={m.id} value={m.id}>
+                                                            {m.id}
+                                                        </Select.Item>
+                                                    ))}
+                                                </Select.Group>
+                                            ))}
+                                            {!modelsLoading && !models?.find((m) => m.id === field.value) && field.value && (
+                                                <Select.Group>
+                                                    <Select.Label>
+                                                        Current
+                                                    </Select.Label>
+                                                    <Select.Item value={field.value}>{field.value}</Select.Item>
+                                                </Select.Group>
+                                            )}
+                                        </Select.Content>
+                                    </Select>
                                 )}
                             />
                         </div>

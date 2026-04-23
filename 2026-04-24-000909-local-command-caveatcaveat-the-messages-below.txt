@@ -1,0 +1,485 @@
+ ▐▛███▜▌   Claude Code v2.1.112
+▝▜█████▛▘  Sonnet 4.6 · API Usage Billing
+  ▘▘ ▝▝    ~/Pets/docXtractor
+
+❯ /plan                                                                         
+  ⎿  Enabled plan mode
+
+❯ /plan utilize this feature in my @server/src/shared/llm/llm.service.ts :      
+JSON mode across providers                                                      
+FreeLLM accepts response_format: { type: "json_object" } and { type:            
+"json_schema", json_schema: { schema: {...} } } and forwards them to the        
+upstream provider. Most providers support this natively. For NVIDIA NIM, which  
+uses a proprietary guided_json parameter instead, FreeLLM translates the        
+standard format automatically so you don't have to special-case your code per   
+provider.                                                                       
+                                                                                
+When a JSON-mode response hits max_tokens and the output is almost certainly    
+broken (missing closing brackets, truncated strings), the response carries a    
+X-FreeLLM-Warning: json-possibly-truncated header. You'll know the JSON is      
+incomplete before you try to parse it.                                          
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+also, format the full prompt in such a way that it is properly communicated to  
+model what is input, what is expected output(schema, descriptions) which are    
+examples, so that model does not mix them and can identify them prominently.    
+  ⎿  Already in plan mode. No plan written yet.
+
+❯ /plan utilize this feature in my @server/src/shared/llm/llm.service.ts :      
+JSON mode across providers                                                      
+FreeLLM accepts response_format: { type: "json_object" } and { type:            
+"json_schema", json_schema: { schema: {...} } } and forwards them to the        
+upstream provider. Most providers support this natively. For NVIDIA NIM, which  
+uses a proprietary guided_json parameter instead, FreeLLM translates the        
+standard format automatically so you don't have to special-case your code per   
+provider.                                                                       
+                                                                                
+When a JSON-mode response hits max_tokens and the output is almost certainly    
+broken (missing closing brackets, truncated strings), the response carries a    
+X-FreeLLM-Warning: json-possibly-truncated header. You'll know the JSON is      
+incomplete before you try to parse it.                                          
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+also, format the full prompt in such a way that it is properly communicated to  
+model what is input, what is expected output(schema, descriptions) which are    
+examples, so that model does not mix them and can identify them prominently.    
+  ⎿  Already in plan mode. No plan written yet.
+
+❯  utilize this feature in my @server/src/shared/llm/llm.service.ts :           
+  JSON mode across providers                                                    
+  FreeLLM accepts response_format: { type: "json_object" } and { type:          
+  "json_schema", json_schema: { schema: {...} } } and forwards them to the      
+  upstream provider. Most providers support this natively. For NVIDIA NIM,      
+  which uses a proprietary guided_json parameter instead, FreeLLM translates    
+  the standard format automatically so you don't have to special-case your code 
+   per provider.                                                                
+                                                                                
+  When a JSON-mode response hits max_tokens and the output is almost certainly  
+  broken (missing closing brackets, truncated strings), the response carries a  
+  X-FreeLLM-Warning: json-possibly-truncated header. You'll know the JSON is    
+  incomplete before you try to parse it.                                        
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+  also, format the full prompt in such a way that it is properly communicated   
+  to model what is input, what is expected output(schema, descriptions) which   
+  are examples, so that model does not mix them and can identify them           
+  prominently.                                                                  
+  ⎿  Read server/src/shared/llm/llm.service.ts (274 lines)
+
+⏺ Two changes: upgrade JSON mode to json_schema, handle truncation header, and
+  restructure prompt formatting. Let me explore how the schema and OpenAI client
+   are used.
+
+⏺ Explore(Explore schema and OpenAI usage)
+  ⎿  Done (26 tool uses · 75.9k tokens · 1m 56s)
+  (ctrl+o to expand)
+
+⏺ Good exploration. Now designing implementation plan.
+
+⏺ Plan(Design LLM service improvements)
+  ⎿  Done (27 tool uses · 72.1k tokens · 2m 58s)
+  (ctrl+o to expand)
+
+⏺ Good plan from the agent. Let me read the test file to verify details, then
+  write the final plan.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Now writing the final plan.
+
+⏺ Updated plan
+  ⎿  /plan to preview
+  ⎿  Tool use rejected
+
+⏺ Skill(superpowers:brainstorming)
+  ⎿  Successfully loaded skill
+⏺ Already explored extensively from Phase 1. I have full context on the LLM
+  service, its callers, schema shapes, OpenAI SDK types, and test file. Let me
+  mark this done and move to questions.
+
+⏺ No visual questions ahead — this is purely backend logic. Skipping visual
+  companion.
+
+  First clarifying question:
+
+⏺ User answered Claude's questions:
+  ⎿  · OpenAI strict mode requires `additionalProperties: false` and all keys in
+      `required` at every object level. Your user-defined schemas likely don't 
+     have this. How should we handle it? → Skip strict mode
+
+⏺ Got it — json_schema without strict: true. Simpler, no schema normalization
+  needed.
+
+⏺ User answered Claude's questions:
+  ⎿  · For the prompt structure, should we use system + user message split, or 
+     keep everything in a single user message? → System + User split 
+     (Recommended)
+
+⏺ User answered Claude's questions:
+  ⎿  · When FreeLLM sends `X-FreeLLM-Warning: json-possibly-truncated`, how 
+     should we handle it? → Retry as normal attempt (Recommended)
+
+⏺ User answered Claude's questions:
+  ⎿  · For correction retries (when schema validation fails), should we also use
+      multi-turn messages (system, user, assistant with bad output, user with 
+     fix request)? → Multi-turn correction (Recommended)
+
+⏺ All key decisions made. Let me summarize:
+
+⏺ Decisions locked. Presenting design now. Here's Section 1:
+
+  ---
+  Section 1: Truncation Detection
+
+  Add TruncatedResponseError class + private callWithTruncationCheck() method.
+
+  All 3 client.chat.completions.create() calls (extract main, extract
+  correction, generate) switch to this helper. It uses .withResponse() to get
+  headers, checks for json-possibly-truncated, throws TruncatedResponseError if
+  found. Existing retry loops catch it like any other error — counts against
+  maxRetries, no special budget.
+
+  // Helper wraps every LLM call
+  private async callWithTruncationCheck(params): Promise<ChatCompletion> {
+    const { data, response } = await
+  this.client.chat.completions.create(params).withResponse();
+    if (response.headers.get('x-freellm-warning')?.includes('json-possibly-trunc
+  ated')) {
+      throw new TruncatedResponseError();
+    }
+    return data;
+  }
+
+  Does this section look right?
+
+⏺ User answered Claude's questions:
+  ⎿  · Section 1 (Truncation Detection) — does this look right? → Looks good, 
+     continue
+
+⏺ Section 2: JSON Schema Response Format
+
+  Switch extract() from { type: 'json_object' } to { type: 'json_schema', 
+  json_schema: { name: 'extraction_result', schema: schema } }. No strict: true
+  — model sees schema structure without enforcement.
+
+  Guard for legacy fields format:
+  const responseFormat = schema.properties
+    ? { type: 'json_schema', json_schema: { name: 'extraction_result', schema }
+  }
+    : { type: 'json_object' };
+
+  - generate() stays on json_object (varied output structures)
+  - Keep jsonrepair as safety net
+  - Same responseFormat used for both main call and correction retries
+
+⏺ User answered Claude's questions:
+  ⎿  · Section 2 (JSON Schema Response Format) — does this look right? → Looks 
+     good, continue
+
+⏺ Section 3: Structured Prompt with XML Sections + System/User Split
+
+  Replace flat string concatenation with clear XML-delimited sections:
+
+  System message (instructions + schema + examples):
+  <instructions>
+  {systemPrompt or "Extract the following fields from the document text.
+  Reference the exact text where possible."}
+  Return a valid JSON object matching the output schema exactly.
+  </instructions>
+
+  <output_schema>
+  Fields to extract:
+  - invoice_number (string): Invoice ID
+  - amount (number): Total amount
+
+  JSON Schema:
+  {"invoice_number": {"type": "string", ...}, ...}
+  </output_schema>
+
+  <examples>
+  <example>
+  <input>
+  ...source content...
+  </input>
+  <expected_output>
+  ...JSON output...
+  </expected_output>
+  </example>
+  </examples>
+
+  User message (document only):
+  <document>
+  {content}
+  </document>
+
+  Correction retries use multi-turn:
+  messages: [
+    { role: 'system', content: systemContent },
+    { role: 'user', content: '<document>...</document>' },
+    { role: 'assistant', content: '{previous bad JSON}' },
+    { role: 'user', content: 'Your previous response failed validation:
+  {errors}. Fix the JSON.' }
+  ]
+
+  This ensures model never confuses example content with actual document, and
+  self-correction gets proper context.
+
+⏺ User answered Claude's questions:
+  ⎿  · Section 3 (Structured Prompt + Message Split) — does this look right? → 
+     Looks good, continue
+
+⏺ Section 4: Test Updates
+
+  File: llm.service.spec.ts
+
+  1. Mock update — mockCreate return value needs .withResponse():
+  // mockCreate returns plain data, wrap it so .withResponse() works
+  const wrappedCreate = (...args) => {
+    const promise = Promise.resolve(mockCreate(...args));
+    promise.withResponse = () => promise.then(data => ({
+      data, response: { headers: { get: () => '' } }, request_id: null
+    }));
+    return promise;
+  };
+
+  2. Extract tests — assert response_format.type === 'json_schema', messages[0]
+  is system role, messages[1] is user with <document>
+  3. Legacy schema test — assert falls back to json_object
+  4. Generate tests — still assert json_object, no changes to generate format
+  5. New test — truncation: mock header returns json-possibly-truncated on first
+   call, clean on second, assert 2 calls made
+
+⏺ User answered Claude's questions:
+  ⎿  · Section 4 (Test Updates) — does this look right? → Looks good, continue
+
+⏺ All 4 sections approved. Writing design doc now.
+  Listed 1 directory (ctrl+o to expand)
+
+⏺ Write(docs/superpowers/specs/2026-04-24-llm-service-json-schema-structured-pro
+       mpts.md)
+  ⎿  Wrote 116 lines to docs/superpowers/specs/2026-04-24-llm-service-json-
+     schema-structured-prompts.md
+         Promptsrvice: JSON Schema Mode, Truncation Detection, Structured
+      3 ## Problem
+      5 The LLM service (`server/src/shared/llm/llm.service.ts`) has thre
+      6 e issues:
+      7 1. **Basic JSON mode** — uses `response_format: { type: 'json_obj
+        ng structure. FreeLLM supports `json_schema` mode that forwards t
+      8 2. **No truncation detection** — FreeLLM sends `X-FreeLLM-Warning
+        nore it and try to parse broken JSON.t hits max_tokens, but we ig
+         content are concatenated into one string. Models can confuse exa
+        mpl
+     … +137 lines (ctrl+o to expand)
+
+⏺ Running spec self-review now.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Self-review check:
+  - Placeholders/TBD: None found.
+  - Internal consistency: All sections align — truncation helper used
+  everywhere, json_schema for extract only, prompt restructured with system/user
+   split used in both main and correction paths.
+  - Scope: Single file + its tests. Focused enough for one implementation plan.
+  - Ambiguity: None — each decision is explicit with reasoning.
+
+  Spec is clean.
+
+⏺ Spec written and committed to docs/superpowers/specs/2026-04-24-llm-service-js
+  on-schema-structured-prompts.md. Please review it and let me know if you want
+  to make any changes before we start writing out the implementation plan.
+
+⏺ User answered Claude's questions:
+  ⎿  · [Bonsai] What went well or could be improved on this task? Consider 
+     correctness, performance, and code quality. → good continue
+
+⏺ User answered Claude's questions:
+  ⎿  · [Bonsai] How did the model do on this task? → Great
+
+⏺ Thank you for the feedback!
+
+✻ Crunched for 9m 58s
+
+❯ continue                                                                      
+
+⏺ Spec approved. Updating plan file and exiting plan mode.
+
+⏺ Updated plan
+  ⎿  /plan to preview
+
+⏺ User approved Claude's plan
+  ⎿  Plan saved to: ~/.claude/plans/playful-dancing-wilkes.md · /plan to edit
+     Plan: LLM Service — JSON Schema Mode, Truncation Detection, Structured 
+     Prompts
+
+     Context
+
+     FreeLLM supports json_schema response format and X-FreeLLM-Warning: 
+     json-possibly-truncated header. Neither is used. Prompt is flat string
+     where models confuse examples with input. Spec: docs/superpowers/specs/2026
+     -04-24-llm-service-json-schema-structured-prompts.md
+
+     Files
+
+     - server/src/shared/llm/llm.service.ts — all production changes
+     - server/src/shared/llm/llm.service.spec.ts — test updates
+
+     Steps
+
+     Step 1: Add TruncatedResponseError + callWithTruncationCheck helper
+
+     In llm.service.ts:
+
+     1. Add exported TruncatedResponseError class after line 11 (after
+     LlmExtractionResult interface)
+     2. Add private method callWithTruncationCheck(params: 
+     OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming):
+       - const { data, response } = await 
+     this.client.chat.completions.create(params).withResponse()
+       - Check response.headers.get('x-freellm-warning')?.includes('json-possibl
+     y-truncated')
+       - Throw TruncatedResponseError if truncated, return data otherwise
+     3. Replace this.client.chat.completions.create(...) at line 107 with
+     this.callWithTruncationCheck(...)
+     4. Replace this.client.chat.completions.create(...) at line 142 with
+     this.callWithTruncationCheck(...)
+     5. Replace this.client.chat.completions.create(...) at line 190 with
+     this.callWithTruncationCheck(...)
+     6. In extract() catch block: add TruncatedResponseError instanceof check
+     before 429 check — log warning, count as normal retry
+     7. In correction inner loop: wrap callWithTruncationCheck in try/catch —
+     TruncatedResponseError → continue inner loop
+
+     Step 2: Switch extract() to json_schema response format
+
+     1. Build responseFormat once at top of extract():
+     const responseFormat = schema.properties
+       ? { type: 'json_schema' as const, json_schema: { name:
+     'extraction_result', schema } }
+       : { type: 'json_object' as const };
+     2. Use responseFormat in both main call and correction call (replaces { 
+     type: 'json_object' })
+     3. Keep jsonrepair on parsed output
+     4. generate() stays on { type: 'json_object' }
+
+     Step 3: Restructure prompt with XML sections + system/user split
+
+     1. Replace buildFewShotBlock() — use <examples>, <example>, <input>,
+     <expected_output> tags
+     2. Build systemContent with XML sections:
+       - <instructions> — systemPrompt or default + "Return a valid JSON object
+     matching the output schema exactly."
+       - <output_schema> — fieldsDesc + JSON.stringify(schema.properties)
+       - <examples> — from buildFewShotBlock
+     3. Build userContent: <document>\n${content}\n</document>
+     4. Main call messages: [{ role: 'system', content: systemContent }, { role:
+      'user', content: userContent }]
+     5. Correction call messages (multi-turn):
+     { role: 'system', content: systemContent },
+     { role: 'user', content: userContent },
+     { role: 'assistant', content: raw },
+     { role: 'user', content: 'Your previous response failed validation:
+     ${errors}. Fix the JSON.' }
+     6. Update logging to reflect new structure
+
+     Step 4: Update tests
+
+     In llm.service.spec.ts:
+
+     1. Update mock: wrap mockCreate so return has .withResponse() → { data, 
+     response: { headers: { get: () => '' } }, request_id: null }
+     2. Extract tests: assert response_format.type === 'json_schema',
+     messages[0].role === 'system', messages[1].role === 'user' containing
+     <document>
+     3. Legacy schema test: assert response_format is { type: 'json_object' }
+     4. Generate tests: assert json_object still (unchanged)
+     5. New test: truncation — first call returns json-possibly-truncated
+     header, second succeeds, assert 2 calls
+
+     Verification
+
+     1. pnpm run test -- --testPathPattern=llm.service
+     2. pnpm run build
+     3. Manual docker-compose test with real extraction
+
+⏺ Plan approved. Implementing now — all 4 steps are sequential (each builds on
+  prior). Starting with Step 1.
+⏺ Re-reading the file fresh before editing.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Good, file unchanged. Implementing Step 1 — add TruncatedResponseError class
+  and callWithTruncationCheck helper.
+
+⏺ Update(server/src/shared/llm/llm.service.ts)
+  ⎿  Added 7 lines
+      10    };
+      11  }
+      12  
+      13 +export class TruncatedResponseError extends Error {            
+      14 +  constructor() {                                              
+      15 +    super('LLM response was truncated (json-possibly-truncated)
+         +');                                                            
+      16 +    this.name = 'TruncatedResponseError';                      
+      17 +  }                                                            
+      18 +}                                                              
+      19 +                                                               
+      20  interface FewShotSource {
+      21    type?: string;
+      22    parsedContent?: string;
+
+⏺ Now add the callWithTruncationCheck private method at the end of the class
+  (before closing brace).
+
+⏺ Update(server/src/shared/llm/llm.service.ts)
+  ⎿  Added 16 lines
+      277  
+      278      return JSON.stringify(schema, null, 2);
+      279    }
+      280 +                                                              
+      281 +  private async callWithTruncationCheck(                      
+      282 +    params: OpenAI.Chat.Completions.ChatCompletionCreateParams
+          +NonStreaming,                                                 
+      283 +  ): Promise<OpenAI.Chat.Completions.ChatCompletion> {        
+      284 +    const { data, response } = await this.client.chat.completi
+          +ons                                                           
+      285 +      .create(params)                                         
+      286 +      .withResponse();                                        
+      287 +                                                              
+      288 +    const warning = response.headers.get('x-freellm-warning') 
+          +?? '';                                                        
+      289 +    if (warning.includes('json-possibly-truncated')) {        
+      290 +      this.logger.warn(`FreeLLM truncation warning: ${warning}
+          +`);                                                           
+      291 +      throw new TruncatedResponseError();                     
+      292 +    }                                                         
+      293 +                                                              
+      294 +    return data;                                              
+      295 +  }                                                           
+      296  }
+
+⏺ Now replace all 3 this.client.chat.completions.create(...) calls. First the
+  main extraction call.
+
+⏺ Update(server/src/shared/llm/llm.service.ts)
+  ⎿  Added 1 line, removed 1 line
+      111  
+      112      for (let attempt = 1; attempt <= this.maxRetries; attempt+
+           +) {
+      113        try {
+      114 -        const response = await this.client.chat.completions.cr
+          -eate({                                                        
+      114 +        const response = await this.callWithTruncationCheck({ 
+      115            model: modelId,
+      116            messages: [{ role: 'user', content: fullPrompt }],
+      117            response_format: { type: 'json_object' },
+  ⎿  API Error: 400 You have exceeded your daily token limit. You can resume at 
+     2026-04-24 00:00 UTC.
+
+✻ Cooked for 1m 34s

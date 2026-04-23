@@ -324,7 +324,7 @@
     "citationIncludeBbox": false,
     "citationIncludeParagraphId": false,
     "contextWindow": "128k",
-    "defaultModel": "gpt-4o"
+    "defaultModel": "gpt-4o-mini"
   },
   {
     "name": "Invoice Parser Global",
@@ -666,7 +666,7 @@
     "citationIncludeBbox": false,
     "citationIncludeParagraphId": false,
     "contextWindow": "128k",
-    "defaultModel": "gpt-4o"
+    "defaultModel": "gpt-4o-mini"
   },
   {
     "name": "Derivative Warrants Extractor V1",
@@ -792,7 +792,7 @@
     "citationIncludeBbox": false,
     "citationIncludeParagraphId": false,
     "contextWindow": "128k",
-    "defaultModel": "gpt-4o"
+    "defaultModel": "gpt-4o-mini"
   },
   {
     "name": "BNP Paribas",
@@ -839,7 +839,7 @@
     "citationIncludeBbox": false,
     "citationIncludeParagraphId": false,
     "contextWindow": "128k",
-    "defaultModel": "gpt-4o"
+    "defaultModel": "gpt-4o-mini"
   },
   {
     "name": "(Use this) BNP Paribas KID Extractor",
@@ -1235,6 +1235,6 @@
     "citationIncludeBbox": false,
     "citationIncludeParagraphId": false,
     "contextWindow": "128k",
-    "defaultModel": "gpt-4o"
+    "defaultModel": "gpt-4o-mini"
   }
 ]

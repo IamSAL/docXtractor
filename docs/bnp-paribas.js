@@ -473,6 +473,6 @@ CRITICAL EXTRACTION RULES:
     citationIncludeBbox: false,
     citationIncludeParagraphId: false,
     contextWindow: "128k",
-    defaultModel: "gpt-4o",
+    defaultModel: "gpt-4o-mini",
   }),
 });

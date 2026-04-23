@@ -83,4 +83,12 @@ export class CreateRunDto {
     example: ['optional_notes', 'internal_reference'],
   })
   skippedFields?: string[];
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: 'LLM model to use for extraction (overrides extractor default)',
+    example: 'free-smart',
+  })
+  model?: string;
 }

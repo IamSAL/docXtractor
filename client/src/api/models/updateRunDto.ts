@@ -21,6 +21,8 @@ export interface UpdateRunDto {
 	variantId?: string;
 	/** Field names to exclude from extraction */
 	skippedFields?: string[];
+	/** LLM model to use for extraction (overrides extractor default) */
+	model?: string;
 	/** Reference sort configuration */
 	sortConfig?: UpdateRunDtoSortConfig;
 }

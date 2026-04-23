@@ -268,6 +268,7 @@ export class RunsService {
       extractionProvider: dto.extractionProvider,
       variantId: dto.variantId || null,
       skippedFields: dto.skippedFields?.length ? dto.skippedFields : null,
+      model: dto.model || null,
       status: RunStatus.QUEUED,
       progress: { parsed: 0, total: sources.length, currentStep: 'queued' },
       startedAt: new Date(),
@@ -615,7 +616,7 @@ export class RunsService {
             run.skippedFields,
           ),
           extractor?.systemPrompt || '',
-          undefined,
+          run.model || extractor?.defaultModel || undefined,
           extractor?.fewShotExamples,
         );
 
@@ -791,7 +792,7 @@ export class RunsService {
           run.skippedFields,
         ),
         extractor?.systemPrompt || '',
-        undefined,
+        run.model || extractor?.defaultModel || undefined,
         extractor?.fewShotExamples,
       );
     } catch (error) {
@@ -1314,7 +1315,7 @@ export class RunsService {
               run.skippedFields,
             ),
             extractor?.systemPrompt || '',
-            undefined,
+            run.model || extractor?.defaultModel || undefined,
             extractor?.fewShotExamples,
           );
 
@@ -1589,7 +1590,7 @@ export class RunsService {
               source.parsedContent!,
               effectiveSchema,
               extractor?.systemPrompt || '',
-              undefined,
+              run.model || extractor?.defaultModel || undefined,
               extractor?.fewShotExamples,
             );
             source.extractionStatus = 'done';

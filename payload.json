@@ -5,24 +5,15 @@
     "type": "object",
     "properties": {
       "cln_reference_obligation_isin": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null."
       },
       "underlying_sector": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set to null. The sector classification is handled downstream by the Bloomberg terminal ticker linkage."
       },
       "sales_concession": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set to null."
       },
       "leveraged_product_multiplier": {
@@ -30,24 +21,15 @@
         "description": "Extract the decimal exercise ratio ('อัตราการใช้สิทธิต่อหน่วย'). For example, extract 0.06256 for the ADVANC Put"
       },
       "multiple_initial_valuation_dates_last_date": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null."
       },
       "cln_credit_events": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null."
       },
       "autocall_barrier": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null."
       },
       "settlement_type": {
@@ -55,17 +37,11 @@
         "description": "Extract the settlement method. This should map from 'ชำระเงินตามส่วนต่างของราคา' to the English string 'Cash' or 'Cash Settlement'"
       },
       "proportional_principal_amount": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set to null or a default integer if required by the legacy schema (e.g., 1 or 10)"
       },
       "all_filing_dates": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null unless multiple regulatory filing timestamps are explicitly present."
       },
       "distributor": {
@@ -73,10 +49,7 @@
         "description": "Default to the identical value extracted for the 'issuer' parameter, as the issuer acts as its own direct listing distributor on the SET"
       },
       "multiple_final_valuation_dates_interval": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null."
       },
       "investment_or_leveraged": {
@@ -84,10 +57,7 @@
         "description": "Hardcode as 'Leveraged Product', indicating the derivative nature of the warrant"
       },
       "coupon_rate": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null."
       },
       "underlying_ticker": {
@@ -95,17 +65,11 @@
         "description": "Identify the underlying asset ('หลักทรัพย์อ้างอิง'). Determine its standard SET symbol and append ' TB Equity' to format it as a valid Bloomberg ticker (e.g., 'COM7 TB Equity', 'CPF TB Equity')"
       },
       "dropback_trigger_event_type": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null. Dropback reallocation mechanics are inapplicable."
       },
       "coupon_barrier": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null."
       },
       "leveraged_product_exercise_style": {
@@ -113,17 +77,11 @@
         "description": "Extract the exercise architecture. Expected to perfectly map from 'แบบยุโรป' to the string 'European'"
       },
       "estimated_value": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set to null unless explicitly provided outside of the Black-Scholes issue price proxy."
       },
       "multiple_final_valuation_dates_first_date": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null."
       },
       "global_identifier": {
@@ -131,10 +89,7 @@
         "description": "Extract the unique alphanumeric symbol of the derivative warrant. In the Thai term sheet, this is denoted as 'ชื่อย่อ' (e.g., 'ADVANC01P2607A' or 'COM701C2607B')"
       },
       "knock_out_barrier_level": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null for standard DWs. Do not populate unless the product is explicitly a CBBC."
       },
       "asset_class": {
@@ -142,17 +97,11 @@
         "description": "Hardcode as 'Cash'"
       },
       "knock_in_barrier": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null. Vanilla DWs lack knock-in activation events."
       },
       "put_strike_level": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "**CRITICAL LOGIC:** If product_subtype is 'Put Warrant', construct a mathematical string formatted exactly as '\\[Quantity\\]*\\[Issue Price\\]' (e.g., '40000000*1.00'). Do NOT input the actual financial strike price. If 'Call Warrant', return null"
       },
       "final_valuation_date": {
@@ -160,24 +109,15 @@
         "description": "Extract the last trading day ('วันทำการซื้อขายสุดท้าย'). Format as DD/MM/YYYY"
       },
       "aggregate_principal_amount_type": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set to null"
       },
       "leveraged_product_target_leverage_factor": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null. This parameter is used for constant leverage certificates, not vanilla DWs. Do not populate with 1899-12-31"
       },
       "live_or_not": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Extract the status of the listing, or default to null if it cannot be determined exclusively from the static term sheet"
       },
       "issue_price_absolute": {
@@ -185,31 +125,19 @@
         "description": "Extract the theoretical issue price per unit used for calculation (e.g., 1.00 Baht based on the Black & Scholes Model)"
       },
       "floor": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null. Downside is limited to the premium paid, but a specific payout floor is not hardcoded in the settlement formula."
       },
       "memory_coupon_applies": {
-        "type": [
-          "boolean",
-          "null"
-        ],
+        "type": ["boolean", "null"],
         "description": "Set strictly to false or null"
       },
       "cln_recovery_type": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null. Not a Credit-Linked Note."
       },
       "distribution_category": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set to null unless a specific client segmentation (e.g., Retail, Institutional) is defined."
       },
       "document_type": {
@@ -217,10 +145,7 @@
         "description": "Hardcode as 'Final' to indicate these are finalized, non-draft pricing term sheets"
       },
       "initial_guaranteed_fixed_coupon_applies": {
-        "type": [
-          "boolean",
-          "null"
-        ],
+        "type": ["boolean", "null"],
         "description": "Set strictly to false or null."
       },
       "created_at": {
@@ -228,10 +153,7 @@
         "description": "Generate the current ISO 8601 timestamp representing the exact moment of AI extraction."
       },
       "call_strike_level": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "**CRITICAL LOGIC:** If product_subtype is 'Call Warrant', construct a mathematical string formatted exactly as '\\[Quantity\\]*\\[Issue Price\\]' (e.g., '100000000*1.00'). Do NOT input the actual financial strike price. If 'Put Warrant', return null"
       },
       "issuer": {
@@ -239,10 +161,7 @@
         "description": "Extract the full legal name of the issuing entity and translate to English. For the provided documents, this maps to 'ผู้ออกใบสำคัญแสดงสิทธิอนุพันธ์ฯ' and must be output exactly as 'Bualuang Securities Public Company Limited'"
       },
       "multiple_initial_valuation_dates_style": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null. Vanilla DWs do not utilize multiple initial valuation averaging styles."
       },
       "product_description": {
@@ -258,45 +177,27 @@
         "description": "Hardcode as 'Growth', indicating the product is engineered for capital appreciation rather than income generation"
       },
       "multiple_underlyings": {
-        "type": [
-          "boolean",
-          "null"
-        ],
+        "type": ["boolean", "null"],
         "description": "Determine if the instrument is linked to a basket of assets. For vanilla single-stock DWs, this must be false or null."
       },
       "provider_type": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set to null."
       },
       "pricing_supplement_url": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Extract the hyperlink to the final pricing document if present in the text. For flat PDF ingestion lacking embedded URIs, return null"
       },
       "call_strike_level_absolute": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "If product_subtype is 'Call Warrant', extract the actual numerical exercise price ('ราคาใช้สิทธิ') without currency markers (e.g., 31.00 for the COM7 Call). If 'Put Warrant', return null"
       },
       "coupon_interval": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null."
       },
       "multiple_final_valuation_dates_style": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null. European exercise prohibits multiple final valuation averaging (Asian option style)."
       },
       "maturity_date": {
@@ -304,10 +205,7 @@
         "description": "Extract the maturity date ('วันครบกำหนดอายุ'). Format as DD/MM/YYYY"
       },
       "base_rate_": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null. Floating rate benchmarks are inapplicable to DW equity derivatives."
       },
       "product_subtype": {
@@ -315,31 +213,19 @@
         "description": "Determine the option directionality. If the document states 'สิทธิในการซื้อ' (Right to buy), output 'Call Warrant'. If it states 'สิทธิในการขาย' (Right to sell), output 'Put Warrant'"
       },
       "structuring_fee": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set to null. Standard DW term sheets do not explicitly separate structuring fees in the headline data."
       },
       "initial_valuation_date": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Extract the date used to determine the initial reference price. If not explicitly isolated from the issue date, return null."
       },
       "cusip": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "The Committee on Uniform Securities Identification Procedures 9-character alphanumeric code. As Thai domestic DWs typically do not utilize CUSIPs, this must structurally default to null"
       },
       "cap": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null. Upside is theoretically unlimited for Call DWs."
       },
       "leveraged_product_automatic_exercise": {
@@ -347,17 +233,11 @@
         "description": "Set to true. European derivative warrants feature automatic exercise ('วันใช้สิทธิอัตโนมัติ') if the Net Cash Settlement Amount exceeds zero"
       },
       "multiple_initial_valuation_dates_interval": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null."
       },
       "buffer_level": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null."
       },
       "expiry_payment_date": {
@@ -369,10 +249,7 @@
         "description": "Mirror the final_valuation_date, as European DWs observe the underlying price strictly on the final trading day."
       },
       "strike_date": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "The date the strike price was finalized. Often mirrors the date the Black-Scholes pricing was run (e.g., 4 February 2026).2 Format as DD/MM/YYYY or null if ambiguous."
       },
       "issue_date": {
@@ -384,38 +261,23 @@
         "description": "Extract the absolute total offering value ('มูลค่ารวมที่เสนอขาย') without currency symbols (e.g., 40000000.00 for the ADVANC Put)"
       },
       "issuer_call_applies": {
-        "type": [
-          "boolean",
-          "null"
-        ],
+        "type": ["boolean", "null"],
         "description": "Set strictly to false or null. The issuer cannot recall these specific European warrants prior to maturity."
       },
       "contingent_coupon_applies": {
-        "type": [
-          "boolean",
-          "null"
-        ],
+        "type": ["boolean", "null"],
         "description": "Set strictly to false or null"
       },
       "coupon_applies": {
-        "type": [
-          "boolean",
-          "null"
-        ],
+        "type": ["boolean", "null"],
         "description": "Set strictly to false or null. DWs do not pay coupons"
       },
       "digital_amount": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "Set strictly to null. Settlement is linear based on the cash difference, not a fixed digital payout"
       },
       "isin": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "The International Securities Identification Number. Extract if available; otherwise, return null."
       },
       "currency": {
@@ -423,24 +285,15 @@
         "description": "Hardcode as 'THB' based on the Thai Baht denomination of the SET"
       },
       "multiple_final_valuation_dates_last_date": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null."
       },
       "put_strike_level_absolute": {
-        "type": [
-          "number",
-          "null"
-        ],
+        "type": ["number", "null"],
         "description": "If product_subtype is 'Put Warrant', extract the actual numerical exercise price ('ราคาใช้สิทธิ') without currency markers (e.g., 272.00 for the ADVANC Put). If 'Call Warrant', return null"
       },
       "multiple_initial_valuation_dates_first_date": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null. Do not populate with 1899-12-31 epoch artifacts."
       },
       "product_type": {
@@ -460,31 +313,19 @@
         "description": "Generate the current ISO 8601 timestamp, identical to created_at."
       },
       "offering_closes": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "The date the subscription period ends. For direct market listings lacking a discrete subscription window, return null."
       },
       "date_filed": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "The date the prospectus was filed with the SEC. If not explicitly stated in the abbreviated term sheet, return null. Do not hallucinate filing dates."
       },
       "autocall_applies": {
-        "type": [
-          "boolean",
-          "null"
-        ],
+        "type": ["boolean", "null"],
         "description": "Set strictly to false or null."
       },
       "multi_range_results_1": {
-        "type": [
-          "string",
-          "null"
-        ],
+        "type": ["string", "null"],
         "description": "Set strictly to null. Complex digital corridor pricing is structurally irrelevant."
       }
     },
@@ -501,5 +342,5 @@
   "citationIncludeBbox": false,
   "citationIncludeParagraphId": false,
   "contextWindow": "128k",
-  "defaultModel": "gpt-4o"
+  "defaultModel": "gpt-4o-mini"
 }

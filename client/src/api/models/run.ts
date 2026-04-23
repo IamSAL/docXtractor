@@ -11,6 +11,7 @@ import type { RunError } from "./runError";
 import type { RunExtractionProvider } from "./runExtractionProvider";
 import type { RunFinishedAt } from "./runFinishedAt";
 import type { RunMetrics } from "./runMetrics";
+import type { RunModel } from "./runModel";
 import type { RunProcessingMode } from "./runProcessingMode";
 import type { RunProgress } from "./runProgress";
 import type { RunResults } from "./runResults";
@@ -41,6 +42,8 @@ export interface Run {
 	variantId?: RunVariantId;
 	/** Field names excluded from extraction */
 	skippedFields?: RunSkippedFields;
+	/** LLM model used for extraction */
+	model?: RunModel;
 	/** Reference sort configuration from uploaded XLSX */
 	sortConfig?: RunSortConfig;
 	workflowExecutionId?: RunWorkflowExecutionId;

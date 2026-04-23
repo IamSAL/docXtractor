@@ -93,7 +93,18 @@ const SelectItem = ({
     </span>
   </SelectPrimitive.Item>
 );
-const SelectLabel = SelectPrimitive.Label;
+const SelectLabel = ({
+  className,
+  ...props
+}: SelectPrimitive.SelectLabelProps) => (
+  <SelectPrimitive.Label
+    className={cn(
+      "px-2 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100 mb-0.5",
+      className,
+    )}
+    {...props}
+  />
+);
 const SelectSeparator = SelectPrimitive.Separator;
 
 const SelectObj = Object.assign(Select, {

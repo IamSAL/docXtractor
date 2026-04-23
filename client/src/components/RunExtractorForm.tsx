@@ -159,7 +159,6 @@ export function RunExtractorForm({
         fileId: source.type === "file" ? source.id : undefined,
       }));
 
-      // Note: variantId and skippedFields will be typed after running `pnpm run gen:api`
       const dto = {
         extractorId: activeExtractorId,
         processingMode: data.processingMode as ProcessingMode,
@@ -169,6 +168,7 @@ export function RunExtractorForm({
         ...(data.skippedFields?.length
           ? { skippedFields: data.skippedFields }
           : {}),
+        ...(data.model ? { model: data.model } : {}),
       } as CreateRunDto;
 
       await createRunMutation.mutateAsync({

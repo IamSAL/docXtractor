@@ -170,7 +170,7 @@ export class CreateExtractorDto {
   @IsOptional()
   contextWindow?: string;
 
-  @ApiPropertyOptional({ default: 'gpt-4o' })
+  @ApiPropertyOptional({ default: 'gpt-4o-mini' })
   @IsString()
   @IsOptional()
   defaultModel?: string;

@@ -22,7 +22,7 @@ export const extractorsControllerCreateBodyCitationIncludePdfPageDefault = false
 export const extractorsControllerCreateBodyCitationIncludeBboxDefault = false;
 export const extractorsControllerCreateBodyCitationIncludeParagraphIdDefault = false;
 export const extractorsControllerCreateBodyContextWindowDefault = `128k`;
-export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerCreateBody = zod.object({
   name: zod.string().describe("The name of the extractor"),
@@ -30,7 +30,7 @@ export const ExtractorsControllerCreateBody = zod.object({
     .string()
     .optional()
     .describe("The description of the extractor"),
-  thumbnailUrl: zod.string().optional().nullable(),
+  thumbnailUrl: zod.string().optional(),
   schema: zod.object({}),
   systemPrompt: zod.string(),
   fewShotExamples: zod
@@ -44,7 +44,7 @@ export const ExtractorsControllerCreateBody = zod.object({
             type: zod.enum(["file", "url", "text"]),
             name: zod.string(),
             description: zod.string(),
-            content: zod.string().optional(),
+            content: zod.string(),
             storageKey: zod.string().optional(),
             parsedContent: zod.string().optional(),
           }),
@@ -100,7 +100,7 @@ export const extractorsControllerFindAllResponseCitationIncludePdfPageDefault = 
 export const extractorsControllerFindAllResponseCitationIncludeBboxDefault = false;
 export const extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault = false;
 export const extractorsControllerFindAllResponseContextWindowDefault = `128k`;
-export const extractorsControllerFindAllResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerFindAllResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerFindAllResponseItem = zod.object({
   id: zod.string(),
@@ -187,7 +187,7 @@ export const extractorsControllerFindOneResponseCitationIncludePdfPageDefault = 
 export const extractorsControllerFindOneResponseCitationIncludeBboxDefault = false;
 export const extractorsControllerFindOneResponseCitationIncludeParagraphIdDefault = false;
 export const extractorsControllerFindOneResponseContextWindowDefault = `128k`;
-export const extractorsControllerFindOneResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerFindOneResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerFindOneResponse = zod.object({
   id: zod.string(),
@@ -254,7 +254,7 @@ export const extractorsControllerUpdateBodyCitationIncludePdfPageDefault = false
 export const extractorsControllerUpdateBodyCitationIncludeBboxDefault = false;
 export const extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault = false;
 export const extractorsControllerUpdateBodyContextWindowDefault = `128k`;
-export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerUpdateBody = zod.object({
   name: zod.string().optional().describe("The name of the extractor"),
@@ -276,7 +276,7 @@ export const ExtractorsControllerUpdateBody = zod.object({
             type: zod.enum(["file", "url", "text"]),
             name: zod.string(),
             description: zod.string(),
-            content: zod.string().optional(),
+            content: zod.string(),
             storageKey: zod.string().optional(),
             parsedContent: zod.string().optional(),
           }),
@@ -329,7 +329,7 @@ export const extractorsControllerUpdateResponseCitationIncludePdfPageDefault = f
 export const extractorsControllerUpdateResponseCitationIncludeBboxDefault = false;
 export const extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault = false;
 export const extractorsControllerUpdateResponseContextWindowDefault = `128k`;
-export const extractorsControllerUpdateResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerUpdateResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerUpdateResponse = zod.object({
   id: zod.string(),
@@ -430,7 +430,7 @@ export const extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefa
 export const extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault = false;
 export const extractorsControllerUpdateVariantResponseCitationIncludeParagraphIdDefault = false;
 export const extractorsControllerUpdateVariantResponseContextWindowDefault = `128k`;
-export const extractorsControllerUpdateVariantResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerUpdateVariantResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerUpdateVariantResponse = zod.object({
   id: zod.string(),
@@ -503,7 +503,7 @@ export const extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefa
 export const extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault = false;
 export const extractorsControllerDeleteVariantResponseCitationIncludeParagraphIdDefault = false;
 export const extractorsControllerDeleteVariantResponseContextWindowDefault = `128k`;
-export const extractorsControllerDeleteVariantResponseDefaultModelDefault = `gpt-4o`;
+export const extractorsControllerDeleteVariantResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerDeleteVariantResponse = zod.object({
   id: zod.string(),

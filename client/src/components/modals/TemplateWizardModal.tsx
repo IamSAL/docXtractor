@@ -98,7 +98,7 @@ const TEMPLATES = [
   {
     id: "resume-cv-parser",
     name: "AI Resume Parser",
-    version: "GPT-4o Ready",
+    version: "gpt-4o-mini Ready",
     description:
       "Extract structured candidate data, skills, and work history from resumes and CVs.",
     icon: "person_search",
@@ -653,7 +653,9 @@ export const TemplateWizardModal = NiceModal.create(() => {
                     </div>
                     <div>
                       <h2 className="text-xl font-bold">Generate with AI</h2>
-                      <p className="text-xs text-gray-500">Powered by FreeLLM</p>
+                      <p className="text-xs text-gray-500">
+                        Powered by FreeLLM
+                      </p>
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 mb-4">

@@ -20,4 +20,6 @@ export interface CreateRunDto {
 	variantId?: string;
 	/** Field names to exclude from extraction */
 	skippedFields?: string[];
+	/** LLM model to use for extraction (overrides extractor default) */
+	model?: string;
 }

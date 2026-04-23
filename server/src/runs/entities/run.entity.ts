@@ -180,6 +180,12 @@ export class Run {
   })
   skippedFields: string[] | null;
 
+  @Column({ type: 'text', nullable: true })
+  @ApiPropertyOptional({
+    description: 'LLM model used for extraction',
+  })
+  model: string | null;
+
   @Column({ type: 'jsonb', nullable: true })
   @ApiPropertyOptional({
     description: 'Reference sort configuration from uploaded XLSX',

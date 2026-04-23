@@ -10,6 +10,13 @@ export interface LlmExtractionResult {
   };
 }
 
+export class TruncatedResponseError extends Error {
+  constructor() {
+    super('LLM response was truncated (json-possibly-truncated)');
+    this.name = 'TruncatedResponseError';
+  }
+}
+
 interface FewShotSource {
   type?: string;
   parsedContent?: string;
@@ -24,7 +31,7 @@ function buildFewShotBlock(examples?: FewShotExample[]): string {
   if (!examples?.length) return '';
 
   const blocks = examples
-    .map((ex, i) => {
+    .map((ex) => {
       const sourceTexts = ex.sources
         .map((s) => {
           if (s.type === 'text') return (s.content || '').trim();
@@ -36,17 +43,13 @@ function buildFewShotBlock(examples?: FewShotExample[]): string {
       const output = (ex.output || '').trim();
       if (!sourceTexts.length && !output) return null;
 
-      return `Example ${i + 1}:\nInput:\n${combinedInput}\nExpected Output:\n${output}`;
+      return `<example>\n<input>\n${combinedInput}\n</input>\n<expected_output>\n${output}\n</expected_output>\n</example>`;
     })
     .filter((b): b is string => b !== null);
 
   if (!blocks.length) return '';
 
-  return (
-    '\n\nHere are examples of the expected extraction format:\n\n' +
-    blocks.join('\n\n---\n\n') +
-    '\n\n'
-  );
+  return `\n<examples>\n${blocks.join('\n')}\n</examples>`;
 }
 
 @Injectable()
@@ -85,28 +88,53 @@ export class LlmService {
     fewShotExamples?: FewShotExample[],
   ): Promise<LlmExtractionResult> {
     const modelId = model || this.defaultExtractionModel;
-    const fieldsDesc = this.buildFieldsDescription(schema);
 
-    const instruction = systemPrompt
-      ? `${systemPrompt}\n\nFields to extract:\n${fieldsDesc}\n\nReturn a valid JSON object matching this structure.`
-      : `Extract the following fields from the document text.\nReference the exact text where possible.\n\nFields to extract:\n${fieldsDesc}\n\nReturn a valid JSON object matching this structure.`;
+    // Build response format: json_schema for structured schemas, fallback to json_object for legacy
+    const responseFormat: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming['response_format'] =
+      schema.properties
+        ? {
+            type: 'json_schema',
+            json_schema: { name: 'extraction_result', schema },
+          }
+        : { type: 'json_object' };
+
+    // Build system content with XML-delimited sections
+    const fieldsDesc = this.buildFieldsDescription(schema);
+    const baseInstruction = systemPrompt
+      ? systemPrompt
+      : 'Extract the following fields from the document text. Reference the exact text where possible.';
 
     const fewShotBlock = buildFewShotBlock(fewShotExamples);
-    const fullPrompt = `${instruction}${fewShotBlock}\nDocument Content:\n${content}\nImportant, Your output structure must match 100% of this json schema:\n ${JSON.stringify(schema.properties)}`;
 
-    this.logger.log(`Running LLM extraction, model: ${modelId}`);
-    this.logger.log('::::INPUT::::');
-    this.logger.log(fullPrompt);
+    const systemContent = [
+      `<instructions>\n${baseInstruction}\nReturn a valid JSON object matching the output schema exactly.\n</instructions>`,
+      `<output_schema>\nFields to extract:\n${fieldsDesc}\n\nJSON Schema:\n${JSON.stringify(schema.properties ?? schema, null, 2)}\n</output_schema>`,
+      fewShotBlock,
+    ]
+      .filter((s) => s.length > 0)
+      .join('\n\n');
+
+    // User message: document only
+    const userContent = `<document>\n${content}\n</document>`;
+
+    this.logger.log(`Running LLM extraction, model: ${modelId}, format: ${responseFormat.type}`);
+    this.logger.log('::::SYSTEM::::');
+    this.logger.log(systemContent);
+    this.logger.log('::::USER::::');
+    this.logger.log(userContent);
 
     const validationRetries = 3;
     let lastValidationErrors = '';
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
-        const response = await this.client.chat.completions.create({
+        const response = await this.callWithTruncationCheck({
           model: modelId,
-          messages: [{ role: 'user', content: fullPrompt }],
-          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: systemContent },
+            { role: 'user', content: userContent },
+          ],
+          response_format: responseFormat,
         });
 
         const raw = response.choices[0].message.content ?? '{}';
@@ -136,25 +164,52 @@ export class LlmService {
 
           if (vAttempt === validationRetries) break;
 
-          // Retry LLM with validation feedback
-          const correctionPrompt = `${fullPrompt}\n\nYour previous response failed schema validation with errors: ${errors}\nFix the JSON to match the schema exactly.`;
-          const correctionResponse = await this.client.chat.completions.create({
-            model: modelId,
-            messages: [{ role: 'user', content: correctionPrompt }],
-            response_format: { type: 'json_object' },
-          });
-          const correctedRaw =
-            correctionResponse.choices[0].message.content ?? '{}';
-          Object.assign(
-            resultData,
-            JSON.parse(jsonrepair(correctedRaw)) as Record<string, unknown>,
-          );
+          // Multi-turn correction retry: model sees its own bad output in context
+          try {
+            const correctionResponse = await this.callWithTruncationCheck({
+              model: modelId,
+              messages: [
+                { role: 'system', content: systemContent },
+                { role: 'user', content: userContent },
+                { role: 'assistant', content: raw },
+                {
+                  role: 'user',
+                  content: `Your previous response failed validation: ${errors}. Fix the JSON to match the schema exactly.`,
+                },
+              ],
+              response_format: responseFormat,
+            });
+            const correctedRaw =
+              correctionResponse.choices[0].message.content ?? '{}';
+            Object.assign(
+              resultData,
+              JSON.parse(jsonrepair(correctedRaw)) as Record<string, unknown>,
+            );
+          } catch (correctionError: any) {
+            if (correctionError instanceof TruncatedResponseError) {
+              this.logger.warn(
+                `Truncation during correction attempt ${vAttempt} — continuing inner loop`,
+              );
+              // Continue to next vAttempt, resultData unchanged
+            } else {
+              throw correctionError;
+            }
+          }
         }
 
         throw new Error(
           `LLM response failed schema validation after ${validationRetries} attempts: ${lastValidationErrors}`,
         );
       } catch (error: any) {
+        if (error instanceof TruncatedResponseError) {
+          this.logger.warn(
+            `Truncation on attempt ${attempt}/${this.maxRetries} — counting as normal retry`,
+          );
+          if (attempt === this.maxRetries) throw error;
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+          continue;
+        }
+
         this.logger.error(
           `LLM extraction failed (attempt ${attempt}/${this.maxRetries}): ${error}`,
         );
@@ -186,7 +241,7 @@ export class LlmService {
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
-        const response = await this.client.chat.completions.create({
+        const response = await this.callWithTruncationCheck({
           model: modelId,
           messages: [{ role: 'user', content: prompt }],
           response_format: { type: 'json_object' },
@@ -200,6 +255,15 @@ export class LlmService {
         this.logger.log(`LLM generation complete: tokens=${totalTokens}`);
         return result;
       } catch (error: any) {
+        if (error instanceof TruncatedResponseError) {
+          this.logger.warn(
+            `Truncation on generation attempt ${attempt}/${this.maxRetries} — counting as normal retry`,
+          );
+          if (attempt === this.maxRetries) throw error;
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+          continue;
+        }
+
         this.logger.error(
           `LLM generation failed (attempt ${attempt}/${this.maxRetries}): ${error}`,
         );
@@ -239,6 +303,15 @@ export class LlmService {
     };
   }
 
+  async listModels(): Promise<{ id: string; owned_by: string }[]> {
+    const list = await this.client.models.list();
+    const models: { id: string; owned_by: string }[] = [];
+    for await (const model of list) {
+      models.push({ id: model.id, owned_by: model.owned_by });
+    }
+    return models;
+  }
+
   private buildFieldsDescription(schema: Record<string, any>): string {
     // Legacy format: { fields: [{ name, type, description }] }
     if (schema.fields && Array.isArray(schema.fields)) {
@@ -259,5 +332,21 @@ export class LlmService {
     }
 
     return JSON.stringify(schema, null, 2);
+  }
+
+  private async callWithTruncationCheck(
+    params: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming,
+  ): Promise<OpenAI.Chat.Completions.ChatCompletion> {
+    const { data, response } = await this.client.chat.completions
+      .create(params)
+      .withResponse();
+
+    const warning = response.headers.get('x-freellm-warning') ?? '';
+    if (warning.includes('json-possibly-truncated')) {
+      this.logger.warn(`FreeLLM truncation warning: ${warning}`);
+      throw new TruncatedResponseError();
+    }
+
+    return data;
   }
 }

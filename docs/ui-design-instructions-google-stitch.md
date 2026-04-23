@@ -38,9 +38,8 @@ Use a **Neubrutalism** aesthetic – bold, playful, and highly functional. This 
 
 ### Core Design Tokens (RetroUI)
 
-
 | Token                 | Value                  | TailwindCSS Class            |
-| ----------------------- | ------------------------ | ------------------------------ |
+| --------------------- | ---------------------- | ---------------------------- |
 | **Primary**           | `#fde047` (Yellow)     | `bg-primary`                 |
 | **Primary Hover**     | `#fcd34d`              | `hover:bg-primary-hover`     |
 | **Background**        | `#FFFFFF` or `#F7F7F5` | `bg-background`              |
@@ -53,9 +52,9 @@ Use a **Neubrutalism** aesthetic – bold, playful, and highly functional. This 
 | **Accent Purple**     | `#a855f7`              | Custom                       |
 | **Success Green**     | `#22c55e`              | Custom                       |
 | **Warning Yellow**    | `#eab308`              | Custom                       |
-| **Border Width**      | 2px–4px               | `border-2` or `border-4`     |
-| **Border Radius**     | 4px–8px               | `rounded` or `rounded-lg`    |
-| **Shadow**            | Hard 4px–8px offset   | `shadow-md`, no blur         |
+| **Border Width**      | 2px–4px                | `border-2` or `border-4`     |
+| **Border Radius**     | 4px–8px                | `rounded` or `rounded-lg`    |
+| **Shadow**            | Hard 4px–8px offset    | `shadow-md`, no blur         |
 | **Typography**        | Inter or Public Sans   | `font-head`, `font-sans`     |
 
 ### RetroUI Typography
@@ -69,33 +68,33 @@ Use a **Neubrutalism** aesthetic – bold, playful, and highly functional. This 
 #### Buttons (Primary)
 
 ```css
-font-head rounded outline-hidden cursor-pointer duration-200 font-medium 
-flex items-center shadow-md hover:shadow active:shadow-none 
-bg-primary text-primary-foreground border-2 border-black 
-transition hover:translate-y-1 active:translate-y-2 active:translate-x-1 
+font-head rounded outline-hidden cursor-pointer duration-200 font-medium
+flex items-center shadow-md hover:shadow active:shadow-none
+bg-primary text-primary-foreground border-2 border-black
+transition hover:translate-y-1 active:translate-y-2 active:translate-x-1
 hover:bg-primary-hover px-4 py-1.5 text-base
 ```
 
 #### Buttons (Outline)
 
 ```css
-font-head rounded outline-hidden cursor-pointer duration-200 font-medium 
-flex items-center shadow-md hover:shadow active:shadow-none 
-bg-transparent border-2 transition 
+font-head rounded outline-hidden cursor-pointer duration-200 font-medium
+flex items-center shadow-md hover:shadow active:shadow-none
+bg-transparent border-2 transition
 hover:translate-y-1 active:translate-y-2 active:translate-x-1 px-4 py-1.5 text-base
 ```
 
 #### Cards
 
 ```css
-inline-block border-2 rounded transition-all hover:shadow-none 
+inline-block border-2 rounded transition-all hover:shadow-none
 w-full bg-background shadow-none
 ```
 
 #### Input Fields
 
 ```css
-px-4 py-2 w-full rounded border-2 shadow-md transition 
+px-4 py-2 w-full rounded border-2 shadow-md transition
 focus:outline-hidden focus:shadow-xs
 ```
 
@@ -314,7 +313,7 @@ Empty State:
 
 ### 4. Extractor Editor
 
-```
+````
 Design a comprehensive extractor editor page for "DocXTractor" – create/edit extraction extractors with full schema configuration.
 
 Style: Neubrutalism / RetroUI (https://www.retroui.dev)
@@ -331,11 +330,11 @@ Overall Layout:
 
 Top Header Bar:
 - Breadcrumb navigation:
-  - "Extractors" (link, text-muted-foreground) > 
-  - Chevron icon > 
+  - "Extractors" (link, text-muted-foreground) >
+  - Chevron icon >
   - "[Extractor Name]" or "New Extractor" (current, text-foreground)
   - Breadcrumb items: text-sm, hover:underline
-- Extractor name: 
+- Extractor name:
   - Inline editable input (text-2xl, font-bold)
   - Pencil icon appears on hover
   - Click to edit mode with focus ring
@@ -349,7 +348,7 @@ Right Header Actions:
 - "Cancel" button (ghost, text only)
 
 Version Indicator (if editing existing):
-- Small badge: "v1.2" or "Draft" 
+- Small badge: "v1.2" or "Draft"
 - Last saved timestamp: "Saved 2 minutes ago"
 
 === SECTION 1: BASIC INFORMATION CARD ===
@@ -479,7 +478,7 @@ Table Body Rows (per field):
    - Small number input (0.5-1.0)
    - Stepper buttons (+/-)
    - Default: 0.7
-   - Visual indicator: 
+   - Visual indicator:
      - Green if ≥0.9
      - Yellow if 0.7-0.9
      - Red if <0.7
@@ -532,7 +531,7 @@ Tab Navigation (within panel):
 1. AI Provider Selector:
    - Segmented button: "OpenAI" | "LangExtract"
    - OpenAI selected: Shows model dropdown
-     - Options: "gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"
+     - Options: "gpt-4o-mini", "gpt-4o-mini-mini", "gpt-3.5-turbo"
    - LangExtract: Uses configured schema
 
 2. System Prompt Template:
@@ -762,7 +761,7 @@ Mobile (< 768px):
 - Each field card shows key info, expandable for details
 - Sticky footer remains
 - Sidebar becomes hamburger menu
-```
+````
 
 ---
 
@@ -839,7 +838,7 @@ Content Sections:
 
 6. Preview Summary Card:
 - Yellow background, 2px black border
-- Content: 
+- Content:
   "6 sources ready (3 PDFs, 2 DOCX, 1 URL)
    Mode: Unified Extraction
    Consensus: 3 runs • Citations: On"
@@ -887,7 +886,7 @@ Progress Section:
 - Each source row:
   - File type icon (PDF icon, DOCX icon, Globe for URLs)
   - Source name: "invoice_2024.pdf" or "https://example.com/..."
-  - Parse status: 
+  - Parse status:
     - ✓ Parsed (green checkmark)
     - ⏳ Parsing (yellow spinner)
     - ❌ Failed (red X with retry button)
@@ -1040,7 +1039,7 @@ Overall Layout:
 Header Bar:
 - Left: Back button (arrow) + Job title "Review Job #12345"
 - Center: Extractor name badge
-- Right: 
+- Right:
   - Processing mode badge ("Unified Extraction" / "Per-Document")
   - Overall confidence indicator (circular progress)
   - "Exit Review" button (outline)
@@ -1192,7 +1191,7 @@ Value Section:
 - Read mode: Value in styled box, click to edit
 - Edit mode: Input field with save/cancel buttons
 - Monospace font for structured values
-- Original value indicator (if edited): 
+- Original value indicator (if edited):
 - Strikethrough original, arrow to new value
 - "Edited" yellow badge
 
@@ -1696,9 +1695,11 @@ Card Header:
 
 Mini Flow Diagram (center of card):
 - Simplified visual representation:
-  ```
-  [📅] ──▶ [🔧] ──▶ [📑]
-  ```
+```
+
+[📅] ──▶ [🔧] ──▶ [📑]
+
+```
 - Shows: Trigger → Extractor → Destination
 - Nodes as small rounded squares with icons
 - Connection lines between nodes
@@ -1717,9 +1718,9 @@ Card Actions (on hover or always visible):
 - "Edit" button (pencil icon, outline)
 - "Run Now" button (play icon, yellow)
 - Overflow menu (three dots):
-  - Duplicate
-  - View History
-  - Delete (red text)
+- Duplicate
+- View History
+- Delete (red text)
 
 Card States:
 - Default: White background
@@ -1735,12 +1736,12 @@ When no flows exist:
 - Heading: "Create your first automation"
 - Subtext: "Automate document extraction with event-driven workflows"
 - Two large buttons:
-  - "Create Flow" (yellow primary)
-  - "Generate with AI ✨" (outline)
+- "Create Flow" (yellow primary)
+- "Generate with AI ✨" (outline)
 - Example use cases as small cards:
-  - "📅 Daily invoice processing"
-  - "📁 Auto-extract uploaded contracts"
-  - "🔗 API-triggered data extraction"
+- "📅 Daily invoice processing"
+- "📁 Auto-extract uploaded contracts"
+- "🔗 API-triggered data extraction"
 ```
 
 ---
@@ -1813,22 +1814,22 @@ Node Categories (accordions):
 **Triggers (always start of flow):**
 - Section header: "TRIGGERS" (text-xs, uppercase, muted)
 - Node items (draggable):
-  
+
   📅 Schedule
   - Label: "Schedule"
   - Description: "Run on a schedule"
   - Icon: Calendar
-  
+
   🔗 Webhook
   - Label: "Webhook"
   - Description: "Trigger via HTTP"
   - Icon: Link
-  
+
   📁 File Upload
   - Label: "File Upload"
   - Description: "On file submission"
   - Icon: Upload
-  
+
   📝 Form Submit
   - Label: "Form"
   - Description: "On form submission"
@@ -1841,7 +1842,7 @@ Node Categories (accordions):
   - Label: "Condition"
   - Description: "If/else branching"
   - Icon: Zap
-  
+
   🔍 Filter
   - Label: "Filter"
   - Description: "Filter documents"
@@ -1863,17 +1864,17 @@ Node Categories (accordions):
   - Label: "Excel File"
   - Description: "Generate .xlsx"
   - Icon: FileSpreadsheet
-  
+
   📑 Google Sheets
   - Label: "Google Sheets"
   - Description: "Append to sheet"
   - Icon: Table
-  
+
   📂 Google Drive
   - Label: "Google Drive"
   - Description: "Save to Drive"
   - Icon: Cloud
-  
+
   🌐 Webhook Output
   - Label: "Send Webhook"
   - Description: "POST results"
@@ -1918,13 +1919,15 @@ Node Container:
 
 Node Structure:
 ```
+
 ┌────────────────────────────┐
-│ ●  📅 Schedule          ▼ │  ← Header: status dot, icon, label, menu
+│ ● 📅 Schedule ▼ │ ← Header: status dot, icon, label, menu
 ├────────────────────────────┤
-│   Every day at 9:00 AM     │  ← Summary of config (auto-generated)
+│ Every day at 9:00 AM │ ← Summary of config (auto-generated)
 ├────────────────────────────┤
-│ ○                        ○ │  ← Connection ports
+│ ○ ○ │ ← Connection ports
 └────────────────────────────┘
+
 ```
 
 Node Header:
@@ -2211,7 +2214,7 @@ Documents Column:
 **Confidence Column (matches manual jobs):**
 - Average confidence badge:
   - "95%" (green) - High confidence
-  - "82%" (yellow) - Medium confidence  
+  - "82%" (yellow) - Medium confidence
   - "65%" (red) - Low confidence, needs review
 - Click to go directly to Citation Viewer
 
@@ -2282,21 +2285,23 @@ Tab Navigation:
 
 When a run fails:
 - Show retry attempts timeline:
-  ```
-  ⏺ Run started
-  │
-  ❌ Attempt 1 failed (API timeout)
-  │
-  🔄 Retry 1 (30s delay)
-  ❌ Attempt 2 failed (API timeout)
-  │
-  🔄 Retry 2 (60s delay)
-  ❌ Attempt 3 failed (API timeout)
-  │
-  📧 Alert sent to admin@example.com
-  │
-  ⏭️ Continued to next scheduled run
-  ```
+```
+
+⏺ Run started
+│
+❌ Attempt 1 failed (API timeout)
+│
+🔄 Retry 1 (30s delay)
+❌ Attempt 2 failed (API timeout)
+│
+🔄 Retry 2 (60s delay)
+❌ Attempt 3 failed (API timeout)
+│
+📧 Alert sent to admin@example.com
+│
+⏭️ Continued to next scheduled run
+
+```
 
 === REAL-TIME UPDATES ===
 
@@ -2376,14 +2381,16 @@ Modal Header:
 
 Flow Preview:
 - Visual diagram (simplified, read-only):
-  ```
-  ┌─────────────────────────────────────────────────────────────────┐
-  │                                                                 │
-  │   [📅 Schedule]  ──▶  [🔧 Invoice Parser]  ──▶  [📑 Sheets]    │
-  │    Daily 9am            Extractor               Append rows      │
-  │                                                                 │
-  └─────────────────────────────────────────────────────────────────┘
-  ```
+```
+
+┌─────────────────────────────────────────────────────────────────┐
+│ │
+│ [📅 Schedule] ──▶ [🔧 Invoice Parser] ──▶ [📑 Sheets] │
+│ Daily 9am Extractor Append rows │
+│ │
+└─────────────────────────────────────────────────────────────────┘
+
+```
 - Nodes shown with icons and labels
 - Connection lines between nodes
 
@@ -2391,9 +2398,9 @@ Detected Settings Card:
 - 2px black border
 - Light yellow background (#fef9c3)
 - Checklist of detected configurations:
-  - ✅ Trigger: Daily schedule at 9:00 AM
-  - ✅ Extractor: Invoice Parser (matched existing)
-  - ⚠️ Output: Google Sheets (needs sheet selection)
+- ✅ Trigger: Daily schedule at 9:00 AM
+- ✅ Extractor: Invoice Parser (matched existing)
+- ⚠️ Output: Google Sheets (needs sheet selection)
 - Warning items (⚠️) indicate additional setup needed
 
 AI Confidence Indicator:
@@ -2402,11 +2409,11 @@ AI Confidence Indicator:
 
 Action Buttons (3 options):
 - "Regenerate" (outline, left side)
-  - Returns to Step 1 with prompt preserved
+- Returns to Step 1 with prompt preserved
 - "Edit in Canvas" (outline)
-  - Opens Flow Builder with generated flow
+- Opens Flow Builder with generated flow
 - "Use This Flow" (yellow primary)
-  - Creates flow and opens for final config
+- Creates flow and opens for final config
 
 === STEP 3: QUICK CONFIGURATION (Optional) ===
 
@@ -2419,8 +2426,8 @@ Modal Header:
 Required Fields:
 - Only shows inputs for items that need configuration
 - Minimal form:
-  - Google Sheets: Sheet selector dropdown
-  - Schedule: Time picker (if time was ambiguous)
+- Google Sheets: Sheet selector dropdown
+- Schedule: Time picker (if time was ambiguous)
 - Pre-filled where possible from AI interpretation
 
 Action Buttons:
@@ -2451,9 +2458,9 @@ Modal Content:
 - Title: "Couldn't generate flow"
 - Message: "We had trouble understanding your request. Try being more specific."
 - Suggestions:
-  - "Mention which extractor to use"
-  - "Specify the schedule clearly (daily, weekly, etc.)"
-  - "Describe where to save the output"
+- "Mention which extractor to use"
+- "Specify the schedule clearly (daily, weekly, etc.)"
+- "Describe where to save the output"
 - "Try Again" button
 
 === RESPONSIVE BEHAVIOR ===
@@ -2511,9 +2518,8 @@ States Needed:
 
 ### Available RetroUI Components
 
-
 | Component     | Usage                      |
-| --------------- | ---------------------------- |
+| ------------- | -------------------------- |
 | Button        | Primary actions, nav items |
 | Badge         | Status indicators, tags    |
 | Card          | Content containers         |
@@ -2705,5 +2711,5 @@ Before finalizing each screen, verify:
 
 ---
 
-*Updated for DocXTractor v2.0 – Includes Consensus Voting and Citation Tracking features*
-*Design System: RetroUI (NeoBrutalism styled React + TailwindCSS)*
+_Updated for DocXTractor v2.0 – Includes Consensus Voting and Citation Tracking features_
+_Design System: RetroUI (NeoBrutalism styled React + TailwindCSS)_

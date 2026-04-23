@@ -1,12 +1,60 @@
 import { Controller, useFormContext } from 'react-hook-form'
 import type { RunExtractorFormData } from '@/types/run-extractor'
+import { useLlmControllerListModels } from '@/api/endpoints/llm/llm'
+import { Select } from '@/components/retroui/Select'
 
 export function RunExtractorSettings() {
-    const { control, watch } = useFormContext<RunExtractorFormData>()
-    const processingMode = watch('processingMode')
+    const { control } = useFormContext<RunExtractorFormData>()
+    const { data: modelsResponse, isLoading: modelsLoading } = useLlmControllerListModels()
+    const models = modelsResponse?.data
 
     return (
         <div className="lg:col-span-5 flex flex-col gap-6">
+            {/* Model Selection */}
+            <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 ml-1">Model</label>
+                <div className="bg-gray-50 border-2 border-black p-4 rounded">
+                    <Controller
+                        name="model"
+                        control={control}
+                        render={({ field }) => (
+                            <Select
+                                value={field.value || '__default__'}
+                                onValueChange={(val) => field.onChange(val === '__default__' ? '' : val)}
+                                disabled={modelsLoading}
+                            >
+                                <Select.Trigger className="w-full">
+                                    <Select.Value placeholder="Default (from extractor)" />
+                                </Select.Trigger>
+                                <Select.Content>
+                                    <Select.Item value="__default__">Default (from extractor)</Select.Item>
+                                    {models && Object.entries(
+                                        models.reduce<Record<string, typeof models>>((acc, m) => {
+                                            const key = m.owned_by || 'Other';
+                                            acc[key] = acc[key] ? [...acc[key], m] : [m];
+                                            return acc;
+                                        }, {})
+                                    ).map(([provider, providerModels]) => (
+                                        <Select.Group key={provider}>
+                                            <Select.Label>
+                                                {provider}
+                                            </Select.Label>
+                                            {providerModels.map((m) => (
+                                                <Select.Item key={m.id} value={m.id}>
+                                                    {m.id}
+                                                </Select.Item>
+                                            ))}
+                                        </Select.Group>
+                                    ))}
+                                </Select.Content>
+                            </Select>
+                        )}
+                    />
+                    <p className="text-[10px] text-gray-500 mt-2">Override the extractor's default model for this run.</p>
+                </div>
+            </div>
+
+
             {/* Extraction Provider */}
             <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-gray-500 ml-1">Extraction Provider</label>

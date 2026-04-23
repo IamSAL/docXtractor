@@ -22,6 +22,7 @@ export const RunExtractorFormSchema = z.object({
   citationTracking: z.boolean(),
   variantId: z.string().optional(),
   skippedFields: z.array(z.string()),
+  model: z.string().optional(),
 });
 
 export type RunExtractorFormData = z.infer<typeof RunExtractorFormSchema>;

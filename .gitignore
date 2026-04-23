@@ -55,3 +55,4 @@ misc
 workers/**/src/__pycache__/
 client/.output
 test/**/output.worktrees/
+.playwright-mcp

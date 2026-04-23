@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Popover } from "@/components/retroui/Popover";
 import { Button } from "@/components/retroui/Button";
+import { Select } from "@/components/retroui/Select";
 import { RetrySourcesDtoMode } from "@/api/models/retrySourcesDtoMode";
 
 export interface RetryOptionsResult {
@@ -202,19 +203,22 @@ function RetryOptionsContent({
           <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 block mb-1.5">
             Schema Variant
           </label>
-          <select
-            value={selectedVariantId}
-            onChange={(e) => setSelectedVariantId(e.target.value)}
-            className="w-full border-2 border-black p-1.5 text-[11px] font-bold bg-white shadow-[2px_2px_0px_0px_#000000]"
+          <Select
+            value={selectedVariantId || '__default__'}
+            onValueChange={(val) => setSelectedVariantId(val === '__default__' ? '' : val)}
           >
-            <option value="">Default Schema</option>
-            {variants.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name}
-                {v.isDefault ? " (default)" : ""}
-              </option>
-            ))}
-          </select>
+            <Select.Trigger className="w-full">
+              <Select.Value placeholder="Default Schema" />
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Item value="__default__">Default Schema</Select.Item>
+              {variants.map((v) => (
+                <Select.Item key={v.id} value={v.id}>
+                  {v.name}{v.isDefault ? " (default)" : ""}
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select>
         </div>
       )}
 

@@ -1,0 +1,206 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e7]: grid_view
+          - heading "DocXTractor" [level=1] [ref=e8]
+        - generic [ref=e9]:
+          - link "GitHub GitHub" [ref=e10] [cursor=pointer]:
+            - /url: https://github.com/IamSAL/docXtractor
+            - img "GitHub" [ref=e11]
+            - text: GitHub
+          - link "Launch App" [ref=e12] [cursor=pointer]:
+            - /url: /login
+            - button "Launch App" [ref=e13]
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e20]: System Operational
+        - heading "Documents In. Data Out. Automatically." [level=1] [ref=e21]:
+          - text: Documents In.
+          - text: Data Out.
+          - text: Automatically.
+        - paragraph [ref=e22]: Industrial-strength document extraction. Turn messy PDFs into clean JSON in seconds.
+        - generic [ref=e23]:
+          - link "Start Extracting" [ref=e24] [cursor=pointer]:
+            - /url: /login
+            - button "Start Extracting" [ref=e25]
+          - link "View Demo" [ref=e26] [cursor=pointer]:
+            - /url: /demo
+            - button "View Demo" [ref=e27]
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e31]: description
+            - generic [ref=e32]: INVOICE.PDF
+          - generic [ref=e34]: settings
+          - generic [ref=e35]:
+            - generic [ref=e36]: data_object
+            - generic [ref=e37]: DATA.JSON
+        - generic [ref=e43]:
+          - paragraph [ref=e44]: "> docker run -p 8000:8000 docxtractor/core"
+          - paragraph [ref=e45]: Starting local extraction engine...
+          - paragraph [ref=e46]: ✓ Ready on port 8000
+    - generic [ref=e48]:
+      - 'heading "Your Data, Your Rules: Open Source Freedom" [level=2] [ref=e49]':
+        - text: "Your Data, Your Rules:"
+        - text: Open Source Freedom
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e53]: terminal
+            - heading "Completely Open Source" [level=3] [ref=e54]
+          - paragraph [ref=e55]: No black boxes. DocXTractor's core is open source, allowing full auditability, community contributions, and infinite customization to fit your enterprise needs.
+          - list [ref=e56]:
+            - listitem [ref=e57]:
+              - generic [ref=e58]: check_circle
+              - text: Self-Hostable On-Premise
+            - listitem [ref=e59]:
+              - generic [ref=e60]: check_circle
+              - text: MIT Licensed Engine
+            - listitem [ref=e61]:
+              - generic [ref=e62]: check_circle
+              - text: No Vendor Lock-in
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - generic [ref=e65]: shield_person
+            - heading "Private & Compliant" [level=3] [ref=e66]
+          - paragraph [ref=e67]: Maintain 100% data sovereignty. Run state-of-the-art extraction on your own hardware, ensuring sensitive documents never leave your secure environment.
+          - list [ref=e68]:
+            - listitem [ref=e69]:
+              - generic [ref=e70]: check_circle
+              - text: Cloud AI with FreeLLM
+            - listitem [ref=e71]:
+              - generic [ref=e72]: check_circle
+              - text: Full Data Compliance
+            - listitem [ref=e73]:
+              - generic [ref=e74]: check_circle
+              - text: Air-Gapped Ready
+    - generic [ref=e76]:
+      - generic [ref=e77]:
+        - generic [ref=e78]: TRICKLE.IO
+        - generic [ref=e79]: SUDO TECH
+        - generic [ref=e80]: TRIANGLE SYSTEMS
+        - generic [ref=e81]: SHIELD LOGISTICS
+        - generic [ref=e82]: GLOBAL CORE
+        - generic [ref=e83]: JSON-GEN
+        - generic [ref=e84]: TRICKLE.IO
+        - generic [ref=e85]: SUDO TECH
+        - generic [ref=e86]: TRIANGLE SYSTEMS
+      - generic [ref=e87]:
+        - generic [ref=e88]: TRICKLE.IO
+        - generic [ref=e89]: SUDO TECH
+        - generic [ref=e90]: TRIANGLE SYSTEMS
+        - generic [ref=e91]: SHIELD LOGISTICS
+        - generic [ref=e92]: GLOBAL CORE
+        - generic [ref=e93]: JSON-GEN
+        - generic [ref=e94]: TRICKLE.IO
+        - generic [ref=e95]: SUDO TECH
+        - generic [ref=e96]: TRIANGLE SYSTEMS
+    - generic [ref=e98]:
+      - generic [ref=e99]:
+        - heading "Intelligent Validation Workflow" [level=2] [ref=e100]
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - generic [ref=e104]: link
+            - generic [ref=e105]:
+              - heading "Source Citation" [level=4] [ref=e106]
+              - paragraph [ref=e107]: Every extracted field is mapped back to its exact bounding box in the original source document.
+            - generic [ref=e108]: "REF: pg. 12, line 4"
+          - generic [ref=e109]:
+            - generic [ref=e111]: group
+            - generic [ref=e112]:
+              - heading "Consensus Review" [level=4] [ref=e113]
+              - paragraph [ref=e114]: Multi-model cross-referencing ensures data integrity by comparing outputs from different AI architectures.
+            - generic [ref=e115]:
+              - generic [ref=e116]: MODEL A ✓
+              - generic [ref=e117]: MODEL B ✓
+          - generic [ref=e118]:
+            - generic [ref=e120]: person_search
+            - generic [ref=e121]:
+              - heading "Human Intervention" [level=4] [ref=e122]
+              - paragraph [ref=e123]: Low-confidence extractions are automatically routed to your team for manual verification and sign-off.
+            - button "Review Flagged Item" [ref=e124] [cursor=pointer]
+      - generic [ref=e125]:
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - heading "Visual AutoRun Builder" [level=2] [ref=e128]
+            - paragraph [ref=e129]: Design complex extraction workflows visually. Connect sources, AI models, and destinations with zero code.
+          - button "Explore Documentation ->" [ref=e130] [cursor=pointer]
+        - generic [ref=e131]:
+          - generic [ref=e137]: https://app.docxtractor.com/builder/workflow-01
+          - generic [ref=e138]:
+            - img
+            - generic [ref=e139]:
+              - generic [ref=e140]:
+                - generic [ref=e141]: Trigger
+                - generic [ref=e142]: mail
+              - generic [ref=e143]:
+                - paragraph [ref=e144]: New Email Attachment
+                - generic [ref=e145]: "Filter: *.pdf"
+            - generic [ref=e146]:
+              - generic [ref=e147]:
+                - generic [ref=e148]: Action
+                - generic [ref=e149]: smart_toy
+              - generic [ref=e150]:
+                - paragraph [ref=e151]: Extract Data
+                - generic [ref=e152]:
+                  - generic [ref=e153]: "Model: v4"
+                  - generic [ref=e154]: Strict
+            - generic [ref=e155]:
+              - generic [ref=e156]:
+                - generic [ref=e157]: Destination
+                - generic [ref=e158]: webhook
+              - generic [ref=e159]:
+                - paragraph [ref=e160]: Send Webhook
+                - generic [ref=e161]: POST /api/v1/ingest
+    - generic [ref=e163]:
+      - generic [ref=e164]:
+        - generic [ref=e165]: 99.9%
+        - generic [ref=e166]: Accuracy Rate
+      - generic [ref=e167]:
+        - generic [ref=e168]: 250M+
+        - generic [ref=e169]: Docs Processed
+      - generic [ref=e170]:
+        - generic [ref=e171]: <2s
+        - generic [ref=e172]: Avg Latency
+    - generic [ref=e174]:
+      - heading "Ready to Scale?" [level=2] [ref=e175]
+      - paragraph [ref=e176]: Join 5,000+ companies automating their data entry with DocXTractor.
+      - generic [ref=e177]:
+        - textbox "work@email.com" [ref=e178]
+        - button "Get Access" [ref=e179] [cursor=pointer]
+    - contentinfo [ref=e180]:
+      - generic [ref=e181]:
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - generic [ref=e185]: grid_view
+            - heading "DocXTractor" [level=1] [ref=e186]
+          - paragraph [ref=e187]: The new standard for industrial document processing. Minimalist, fast, and developer-friendly.
+          - paragraph [ref=e188]: © 2024 DocXTractor Inc.
+        - generic [ref=e189]:
+          - generic [ref=e190]:
+            - heading "Product" [level=4] [ref=e191]
+            - link "Features" [ref=e192] [cursor=pointer]:
+              - /url: "#"
+            - link "Integrations" [ref=e193] [cursor=pointer]:
+              - /url: "#"
+            - link "Pricing" [ref=e194] [cursor=pointer]:
+              - /url: "#"
+            - link "Changelog" [ref=e195] [cursor=pointer]:
+              - /url: "#"
+          - generic [ref=e196]:
+            - heading "Resources" [level=4] [ref=e197]
+            - link "Documentation" [ref=e198] [cursor=pointer]:
+              - /url: "#"
+            - link "API Reference" [ref=e199] [cursor=pointer]:
+              - /url: "#"
+            - link "Community" [ref=e200] [cursor=pointer]:
+              - /url: "#"
+          - generic [ref=e201]:
+            - heading "Legal" [level=4] [ref=e202]
+            - link "Privacy" [ref=e203] [cursor=pointer]:
+              - /url: "#"
+            - link "Terms" [ref=e204] [cursor=pointer]:
+              - /url: "#"
+  - region "Notifications alt+T"
