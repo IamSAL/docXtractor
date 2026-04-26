@@ -68,6 +68,7 @@ export class Invite {
     return new Date() > this.expiresAt;
   }
 
+  // fallow-ignore-next-line unused-class-members
   get isValid(): boolean {
     return this.status === InviteStatus.PENDING && !this.isExpired;
   }

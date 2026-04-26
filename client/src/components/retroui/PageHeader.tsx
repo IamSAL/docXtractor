@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 
-export interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {
+interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {
     heading: string;
     description?: string;
     breadcrumb?: string;

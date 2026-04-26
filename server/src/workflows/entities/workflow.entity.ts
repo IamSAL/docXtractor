@@ -10,19 +10,19 @@ import {
 import { User } from '../../user/entities/user.entity';
 import { WorkflowStatus } from '../enums/workflow-status.enum';
 
-export interface WorkflowDefinition {
+interface WorkflowDefinition {
   nodes: WorkflowNode[];
   connections: WorkflowConnection[];
 }
 
-export interface WorkflowNode {
+interface WorkflowNode {
   id: string;
   type: string; // webhook_trigger, extract_data, send_email, etc.
   position: { x: number; y: number };
   params: Record<string, any>;
 }
 
-export interface WorkflowConnection {
+interface WorkflowConnection {
   id: string;
   source: string; // node ID
   target: string; // node ID
@@ -30,7 +30,7 @@ export interface WorkflowConnection {
   targetHandle?: string;
 }
 
-export interface TriggerConfig {
+interface TriggerConfig {
   type: 'webhook' | 'email' | 'schedule' | 'google_drive' | 's3';
   webhookPath?: string;
   imapConfig?: {

@@ -147,7 +147,7 @@ const dialogFooterVariants = cva(
   },
 );
 
-export interface IDialogFooterProps
+interface IDialogFooterProps
   extends
     HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof dialogFooterVariants> {}

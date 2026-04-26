@@ -1,4 +1,4 @@
-export const baseStyles = {
+const baseStyles = {
   body: "background-color:#ffffff;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;margin:0;padding:0;color:#1a1a1a;",
   container: 'max-width:600px;margin:0 auto;padding:40px 20px;',
   table: 'width:100%;border-collapse:collapse;margin-bottom:15px;',
@@ -45,7 +45,7 @@ export const baseStyles = {
   messageText: 'color: #4B5563; margin: 0; line-height: 1.6;text-align:start;',
 };
 
-export function baseEmailTemplate({
+function baseEmailTemplate({
   companyName = 'DocXtractor',
   title,
   content,

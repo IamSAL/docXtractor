@@ -1,3 +1,4 @@
+// fallow-ignore-file circular-dependencies
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 

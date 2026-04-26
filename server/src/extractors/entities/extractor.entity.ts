@@ -11,7 +11,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.entity';
 
-export interface FewShotExampleSource {
+interface FewShotExampleSource {
   id: string;
   type: 'file' | 'url' | 'text';
   name: string;

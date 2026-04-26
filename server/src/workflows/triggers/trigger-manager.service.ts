@@ -1,3 +1,4 @@
+// fallow-ignore-file circular-dependencies
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';

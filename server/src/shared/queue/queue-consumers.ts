@@ -13,6 +13,7 @@ export class ParsedDocumentsConsumer extends WorkerHost {
     super();
   }
 
+  // fallow-ignore-next-line unused-class-members
   async process(job: Job<any>): Promise<any> {
     this.logger.log(`Processing parsed document job: ${job.id}`);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -35,6 +36,7 @@ export class ExtractionCompletedConsumer extends WorkerHost {
     super();
   }
 
+  // fallow-ignore-next-line unused-class-members
   async process(job: Job<any>): Promise<any> {
     this.logger.log(`Processing extraction completed job: ${job.id}`);
     const data = job.data;

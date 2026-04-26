@@ -1,6 +1,6 @@
 import { AXIOS_INSTANCE } from "./axios";
 
-export interface DemoClassification {
+interface DemoClassification {
   suggestedType: string;
   method: "heuristic" | "llm";
   suggestedExtractorId: string | null;
@@ -16,7 +16,7 @@ export interface DemoUploadResult {
   suggestedExtractorId: string | null;
 }
 
-export interface DemoRunResult {
+interface DemoRunResult {
   runId: string;
   status: string;
   demoToken: string;
@@ -32,7 +32,7 @@ export interface DemoResult {
   createdAt: string;
 }
 
-export interface DemoSession {
+interface DemoSession {
   runsUsed: number;
   email: string | null;
 }

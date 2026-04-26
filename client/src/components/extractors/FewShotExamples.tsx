@@ -10,9 +10,9 @@ import { useFormContext, useFieldArray } from "react-hook-form";
 import type { ExtractorFormData } from "@/types/extractor";
 import { cn } from "@/lib/utils";
 
-export type SourceType = "file" | "url" | "text";
+type SourceType = "file" | "url" | "text";
 
-export interface Source {
+interface Source {
   id: string;
   type: SourceType;
   name: string;

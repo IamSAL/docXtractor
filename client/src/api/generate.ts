@@ -1,10 +1,10 @@
 import { AXIOS_INSTANCE } from "@/lib/axios";
 
-export interface GenerateSchemaResponse {
+interface GenerateSchemaResponse {
 	schema: Record<string, unknown>;
 }
 
-export interface GenerateExtractorResponse {
+interface GenerateExtractorResponse {
 	name: string;
 	description: string;
 	schema: Record<string, unknown>;
@@ -42,7 +42,7 @@ export async function parsePreviewFile(file: File): Promise<string> {
 	return data.text ?? "";
 }
 
-export interface PreviewExtractionResponse {
+interface PreviewExtractionResponse {
 	extractionResult: Record<string, unknown> | null;
 	error?: string;
 }

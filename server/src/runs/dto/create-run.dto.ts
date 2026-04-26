@@ -13,7 +13,7 @@ import {
 import { Type } from 'class-transformer';
 import { ProcessingMode, ExtractionProvider } from '../entities/run.entity';
 
-export class RunSourceDto {
+class RunSourceDto {
   @IsString()
   @ApiProperty({ enum: ['file', 'url'] })
   type: 'file' | 'url';

@@ -39,7 +39,7 @@ export const onDemoRunUpdated = (
   return () => demoSocket?.off("run:updated", callback);
 };
 
-export const onDemoRunLog = (
+const onDemoRunLog = (
   callback: (data: any) => void,
 ): (() => void) => {
   if (!demoSocket) return () => {};

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "entry": ["src/index.{js,jsx,mjs}", "src/main.{js,jsx,mjs}"],
+  "ignorePatterns": [
+    "**/endpoints/**",
+    "**/models/**",
+    "**/jsonjoy/**",
+    "**/schemas/**",
+    "scripts/**",
+    "src/workflows/nodes/**",
+    "src/workflows/enums/**",
+    "src/dashboard/dto/**",
+    "src/dashboard/entities/**"
+  ],
+  "rules": {
+    "unused-class-members": "off",
+    "circular-dependencies": "off"
+  }
+}

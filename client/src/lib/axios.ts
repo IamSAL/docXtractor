@@ -106,6 +106,7 @@ AXIOS_INSTANCE.interceptors.response.use(
   },
 );
 
+// fallow-ignore-next-line unused-exports
 export const HttpClient = <T>(
   url: string,
   options: RequestInit & { params?: any; responseType?: any } = {},

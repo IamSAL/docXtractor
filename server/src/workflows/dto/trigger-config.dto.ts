@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export enum TriggerType {
+enum TriggerType {
   WEBHOOK = 'webhook',
   EMAIL = 'email',
   SCHEDULE = 'schedule',
@@ -16,7 +16,7 @@ export enum TriggerType {
   S3 = 's3',
 }
 
-export class ImapConfigDto {
+class ImapConfigDto {
   @ApiProperty()
   @IsString()
   host: string;

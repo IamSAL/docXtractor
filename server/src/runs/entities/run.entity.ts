@@ -21,7 +21,6 @@ export enum RunStatus {
   EXTRACTING = 'extracting',
   DONE = 'done',
   FAILED = 'failed',
-  CANCELLED = 'cancelled',
   REVIEW = 'review',
 }
 
@@ -61,7 +60,7 @@ export interface RunSource {
   retryGeneration?: number;
 }
 
-export interface RunProgress {
+interface RunProgress {
   parsed: number;
   total: number;
   currentStep: 'queued' | 'parsing' | 'extracting' | 'complete';

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import guitars from '@/data/demo-guitars'
 
 // Tool definition for getting guitars
-export const getGuitarsToolDef = toolDefinition({
+const getGuitarsToolDef = toolDefinition({
   name: 'getGuitars',
   description: 'Get all products from the database',
   inputSchema: z.object({}),
@@ -20,7 +20,7 @@ export const getGuitarsToolDef = toolDefinition({
 })
 
 // Server implementation
-export const getGuitars = getGuitarsToolDef.server(() => guitars)
+const getGuitars = getGuitarsToolDef.server(() => guitars)
 
 // Tool definition for guitar recommendation
 export const recommendGuitarToolDef = toolDefinition({

@@ -5,7 +5,7 @@ import { Slot } from "@radix-ui/react-slot";
 
 
 
-export const buttonVariants = cva(
+const buttonVariants = cva(
   " neobrutal-btn font-head transition-all rounded outline-hidden cursor-pointer duration-200 font-medium flex items-center",
   {
     variants: {
@@ -33,7 +33,7 @@ export const buttonVariants = cva(
   },
 );
 
-export interface IButtonProps
+interface IButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
   VariantProps<typeof buttonVariants> {
   asChild?: boolean;

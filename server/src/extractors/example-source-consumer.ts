@@ -17,6 +17,7 @@ export class ExampleSourceParsedConsumer extends WorkerHost {
     super();
   }
 
+  // fallow-ignore-next-line unused-class-members
   async process(job: Job<any>): Promise<any> {
     const {
       extractor_id,

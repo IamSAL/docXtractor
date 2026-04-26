@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "entry": ["src/index.{js,jsx,mjs}", "src/main.{js,jsx,mjs}"],
+  "ignorePatterns": [
+    "**/endpoints/**",
+    "**/models/**",
+    "**/jsonjoy/**",
+    "**/schemas/**",
+    "instrument.server.mjs",
+    "orval.config.ts",
+    "src/components/retroui/Checkbox.tsx",
+    "src/components/retroui/Command.tsx",
+    "src/components/retroui/Label.tsx",
+    "src/components/retroui/Menu.tsx",
+    "src/components/retroui/Progress.tsx"
+  ],
+  "ignoreDependencies": ["nitro-nightly", "@radix-ui/react-dropdown-menu", "@radix-ui/react-progress", "cmdk"],
+  "rules": {
+    "unused-exports": "off"
+  }
+}

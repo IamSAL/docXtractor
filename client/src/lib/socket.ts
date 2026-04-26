@@ -86,12 +86,12 @@ export const leaveWorkflowExecution = (executionId: string) => {
   s.emit("leaveWorkflowExecution", { executionId });
 };
 
-export const joinWorkflowsList = () => {
+const joinWorkflowsList = () => {
   const s = getSocket();
   s.emit("joinWorkflowsList");
 };
 
-export const leaveWorkflowsList = () => {
+const leaveWorkflowsList = () => {
   const s = getSocket();
   s.emit("leaveWorkflowsList");
 };
@@ -145,7 +145,7 @@ export const onWorkflowNodeFailed = (
   return () => s.off("workflow:node:failed", callback);
 };
 
-export const onWorkflowsListUpdated = (
+const onWorkflowsListUpdated = (
   callback: (data: any) => void,
 ): (() => void) => {
   const s = getSocket();

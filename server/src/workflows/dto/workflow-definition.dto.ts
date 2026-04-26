@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class WorkflowNodePositionDto {
+class WorkflowNodePositionDto {
   @ApiProperty()
   @IsObject()
   x: number;
@@ -18,7 +18,7 @@ export class WorkflowNodePositionDto {
   y: number;
 }
 
-export class WorkflowNodeDto {
+class WorkflowNodeDto {
   @ApiProperty()
   @IsString()
   id: string;
@@ -37,7 +37,7 @@ export class WorkflowNodeDto {
   params: Record<string, any>;
 }
 
-export class WorkflowConnectionDto {
+class WorkflowConnectionDto {
   @ApiProperty()
   @IsString()
   id: string;

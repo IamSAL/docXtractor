@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { useStore } from '@tanstack/react-store'
-import { Store } from '@tanstack/store'
 
 import { Send, X, ChevronRight, BotIcon } from 'lucide-react'
 import { Streamdown } from 'streamdown'
@@ -9,8 +8,7 @@ import { useGuitarRecommendationChat } from '@/lib/demo-ai-hook'
 import type { ChatMessages } from '@/lib/demo-ai-hook'
 
 import GuitarRecommendation from './demo-GuitarRecommendation'
-
-export const showAIAssistant = new Store(false)
+import { showAIAssistant } from './demo-ai-store'
 
 function Messages({ messages }: { messages: ChatMessages }) {
   const messagesContainerRef = useRef<HTMLDivElement>(null)

@@ -40,7 +40,7 @@ export function useAuth() {
 /**
  * Hook to protect routes - redirects to login if not authenticated
  */
-export function useRequireAuth() {
+function useRequireAuth() {
   const { isAuthenticated, isLoading } = useAuthStore();
   const navigate = useNavigate();
 

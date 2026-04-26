@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 import { Button } from './retroui/Button.tsx'
 
-export default function Header() {
+function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [groupedExpanded, setGroupedExpanded] = useState<
     Record<string, boolean>

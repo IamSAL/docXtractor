@@ -9,7 +9,7 @@ import {
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class DemoRunSourceDto {
+class DemoRunSourceDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

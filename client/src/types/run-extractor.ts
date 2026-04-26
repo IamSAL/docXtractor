@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const SourceSchema = z.object({
+const SourceSchema = z.object({
   id: z.string(),
   type: z.enum(["file", "url", "text"]),
   name: z.string(),

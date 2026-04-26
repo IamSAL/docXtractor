@@ -16,7 +16,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { IsJsonSchema } from '../../shared/decorators/is-json-schema.decorator';
 
-export class FewShotExampleSourceDto {
+class FewShotExampleSourceDto {
   @ApiProperty()
   @IsString()
   id: string;
@@ -49,7 +49,7 @@ export class FewShotExampleSourceDto {
   parsedContent?: string;
 }
 
-export class FewShotExampleDto {
+class FewShotExampleDto {
   @ApiProperty()
   @IsString()
   id: string;

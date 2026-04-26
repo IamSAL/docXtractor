@@ -16,6 +16,7 @@ export class WorkflowExecutionsConsumer extends WorkerHost {
     super();
   }
 
+  // fallow-ignore-next-line unused-class-members
   async process(job: Job<any>): Promise<any> {
     this.logger.log(`Processing workflow execution job: ${job.id}`);
     const { workflowId, triggerPayload } = job.data;
