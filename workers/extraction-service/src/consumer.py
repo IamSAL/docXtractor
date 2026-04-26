@@ -123,19 +123,25 @@ async def process_job(job: Job, token: str = None):
     except Exception as e:
         logger.error(f"❌ Error extracting in job {job.id}: {e}", exc_info=True)
         logs.append(_make_log("error", f"Extraction failed: {e}"))
-        event = {
-            "run_id": data.get("run_id"),
-            "document_id": document_id,
-            "source_name": source_name,
-            "status": "failed",
-            "error": str(e),
-            "logs": logs,
-        }
-        logger.info(f"📤 Sending failure event to queue: {QUEUE_COMPLETED}")
-        await bullmq_client.add_job_with_retry(QUEUE_COMPLETED, "extraction-completed", event)
-        # Return failure result — do NOT re-raise, which would cause BullMQ to
-        # retry the job and send duplicate failure events, corrupting progress counters.
-        return {"status": "error", "message": str(e)}
+        # Only publish failure event on the final attempt to prevent duplicate
+        # extracted-count increments from BullMQ retries.
+        max_attempts = job.opts.get('attempts', 1) if isinstance(job.opts, dict) else 1
+        is_final_attempt = (job.attemptsMade + 1) >= max_attempts
+        if is_final_attempt:
+            event = {
+                "run_id": data.get("run_id"),
+                "document_id": document_id,
+                "source_name": source_name,
+                "status": "failed",
+                "error": str(e),
+                "logs": logs,
+            }
+            logger.info(f"📤 Sending failure event (final attempt {job.attemptsMade + 1}/{max_attempts}): {QUEUE_COMPLETED}")
+            await bullmq_client.add_job_with_retry(QUEUE_COMPLETED, "extraction-completed", event)
+            return {"status": "error", "message": str(e)}
+        else:
+            logger.info(f"⏳ Attempt {job.attemptsMade + 1}/{max_attempts} failed — will retry, not publishing failure event")
+            raise e
 
 async def _idle_watcher():
     if IDLE_SHUTDOWN_SECONDS <= 0:

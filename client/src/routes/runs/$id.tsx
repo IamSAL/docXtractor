@@ -141,8 +141,6 @@ function RunDetailComponent() {
     socket.on("run:updated", handleRunUpdated);
     socket.on("run:source:updated", handleSourceUpdated);
     socket.on("run:log", handleRunLog);
-    // C2: handle both initial connect and reconnect (socket.io "connect" fires on both)
-    socket.on("connect", handleReconnect);
     socket.io.on("reconnect", handleReconnect);
 
     return () => {
@@ -150,7 +148,6 @@ function RunDetailComponent() {
       socket.off("run:updated", handleRunUpdated);
       socket.off("run:source:updated", handleSourceUpdated);
       socket.off("run:log", handleRunLog);
-      socket.off("connect", handleReconnect);
       socket.io.off("reconnect", handleReconnect);
     };
   }, [id, queryClient]);

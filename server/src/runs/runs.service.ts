@@ -1624,6 +1624,7 @@ export class RunsService {
         } else {
           source.previousExtractionResult = undefined;
         }
+        source.retryGeneration = (source.retryGeneration || 0) + 1;
         source.status = 'parsing';
         source.error = undefined;
         source.parsedContent = undefined;
@@ -1666,6 +1667,8 @@ export class RunsService {
             file_key: source.fileKey,
             url: source.url,
             name: source.name,
+            retry_generation: source.retryGeneration,
+            parser_engine: extractor?.parserEngine,
           },
         );
       }
