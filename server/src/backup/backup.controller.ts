@@ -38,7 +38,7 @@ export class BackupController {
 
   @Get('export')
   @ApiOperation({ summary: 'Create and download a new backup' })
-  async export(@Res() res: Response) {
+  async export(@Res({ passthrough: true }) res: Response) {
     const { filename, buffer } = await this.backupService.createBackup();
     res.setHeader('Content-Type', 'application/json');
     res.setHeader(
@@ -50,7 +50,7 @@ export class BackupController {
 
   @Get('download/:filename')
   @ApiOperation({ summary: 'Download a specific stored backup' })
-  async download(@Param('filename') filename: string, @Res() res: Response) {
+  async download(@Param('filename') filename: string, @Res({ passthrough: true }) res: Response) {
     const buffer = await this.backupService.downloadBackup(filename);
     res.setHeader('Content-Type', 'application/json');
     res.setHeader(
