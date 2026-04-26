@@ -23,6 +23,14 @@ export class ParsedDocumentsConsumer extends WorkerHost {
       await this.runsService.handleDocumentParsed(data);
     } catch (error) {
       this.logger.error(`Error handling parsed document: ${error.message}`);
+      const maxAttempts: number = (job.opts as any)?.attempts ?? 1;
+      if (job.attemptsMade + 1 >= maxAttempts) {
+        try {
+          await this.runsService.markParseHandlerFailure(data, error.message as string);
+        } catch (e) {
+          this.logger.error(`markParseHandlerFailure failed: ${(e as Error).message}`);
+        }
+      }
       throw error;
     }
   }
@@ -47,6 +55,14 @@ export class ExtractionCompletedConsumer extends WorkerHost {
       this.logger.error(
         `Error handling extraction completion: ${error.message}`,
       );
+      const maxAttempts: number = (job.opts as any)?.attempts ?? 1;
+      if (job.attemptsMade + 1 >= maxAttempts) {
+        try {
+          await this.runsService.markExtractionHandlerFailure(data, error.message as string);
+        } catch (e) {
+          this.logger.error(`markExtractionHandlerFailure failed: ${(e as Error).message}`);
+        }
+      }
       throw error;
     }
   }

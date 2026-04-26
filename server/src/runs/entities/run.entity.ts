@@ -44,12 +44,12 @@ export interface RunSource {
   fileId?: string;
   fileKey?: string; // S3/MinIO key for parser
   fileUrl?: string;
-  status: 'pending' | 'parsing' | 'parsed' | 'failed';
+  status: 'pending' | 'parsing' | 'parsed' | 'failed' | 'cancelled';
   error?: string;
   parsedContent?: string;
   tokenCount?: number;
   // Per-document extraction tracking (PER_DOCUMENT mode only)
-  extractionStatus?: 'pending' | 'extracting' | 'done' | 'failed';
+  extractionStatus?: 'pending' | 'extracting' | 'done' | 'failed' | 'cancelled';
   extractionResult?: Record<string, unknown> | unknown[];
   extractionError?: string;
   // Flag used during per-source retry to only trigger extraction for retried sources

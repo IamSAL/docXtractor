@@ -13,6 +13,7 @@ import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/lib/socket";
 import { toast } from "sonner";
+import { AXIOS_INSTANCE } from "@/lib/axios";
 import { SpreadsheetView } from "@/components/SpreadsheetView";
 import {
   RetryOptionsPopover,
@@ -40,24 +41,39 @@ function RunDetailComponent() {
   const retryBatchMutation = useRunsControllerRetrySourcesBatch();
   const logsEndRef = useRef<HTMLDivElement>(null);
 
+  const lastSeqRef = useRef<number>(0);
+
   useEffect(() => {
     const socket = getSocket();
 
-    socket.emit("joinRun", { runId: id });
+    const joinAndRefetch = () => {
+      lastSeqRef.current = 0;
+      // Join room first, then refetch — prevents missing events emitted before join
+      socket.emitWithAck("joinRun", { runId: id }).then(() => {
+        queryClient.invalidateQueries({
+          queryKey: getRunsControllerFindOneQueryKey(id),
+        });
+      }).catch(() => {
+        // Fallback: emit without ack and still refetch
+        socket.emit("joinRun", { runId: id });
+        queryClient.invalidateQueries({
+          queryKey: getRunsControllerFindOneQueryKey(id),
+        });
+      });
+    };
 
-    // After joining the room, refetch to close the race window where events
-    // emitted before we joined are lost (initial fetch may already be stale).
-    queryClient.invalidateQueries({
-      queryKey: getRunsControllerFindOneQueryKey(id),
-    });
+    joinAndRefetch();
 
-    const handleRunUpdated = (updatedRun: any) => {
+    const handleRunUpdated = (payload: any) => {
+      // Drop stale out-of-order payloads
+      if (payload?.seq !== undefined && payload.seq <= lastSeqRef.current) return;
+      if (payload?.seq !== undefined) lastSeqRef.current = payload.seq;
+      // Extract actual run data (seq is spread into payload alongside run fields)
+      const runData = payload?.seq !== undefined
+        ? (({ seq: _seq, ...rest }: any) => rest)(payload)
+        : payload;
       const terminalStatuses = ["done", "failed", "review"];
-      if (terminalStatuses.includes(updatedRun?.status)) {
-        // For terminal states, force a fresh fetch instead of trusting the
-        // socket payload. With LLM extraction (slower models), the "done" event
-        // can fire before all results are fully committed to the DB, so the
-        // payload may be partial. A re-fetch guarantees complete data.
+      if (terminalStatuses.includes(runData?.status)) {
         queryClient.invalidateQueries({
           queryKey: getRunsControllerFindOneQueryKey(id),
         });
@@ -66,22 +82,27 @@ function RunDetailComponent() {
           getRunsControllerFindOneQueryKey(id),
           (oldData: any) => {
             if (!oldData) return oldData;
-            // Preserve computed fileUrl on each source — WS payload is raw DB object
             const oldSources: any[] = oldData.data?.sources ?? [];
-            const mergedSources = updatedRun.sources?.map((s: any) => {
+            const mergedSources = runData.sources?.map((s: any) => {
               const old = oldSources.find((o: any) => o.id === s.id);
               return { ...s, fileUrl: old?.fileUrl ?? s.fileUrl };
             });
             return {
               ...oldData,
-              data: { ...updatedRun, sources: mergedSources },
+              data: { ...runData, sources: mergedSources },
             };
           },
         );
       }
     };
 
-    const handleSourceUpdated = (updatedSource: any) => {
+    const handleSourceUpdated = (payload: any) => {
+      // Drop stale out-of-order payloads
+      if (payload?.seq !== undefined && payload.seq <= lastSeqRef.current) return;
+      if (payload?.seq !== undefined) lastSeqRef.current = payload.seq;
+      const updatedSource = payload?.seq !== undefined
+        ? (({ seq: _seq, ...rest }: any) => rest)(payload)
+        : payload;
       queryClient.setQueryData(
         getRunsControllerFindOneQueryKey(id),
         (oldData: any) => {
@@ -89,7 +110,6 @@ function RunDetailComponent() {
           const run = oldData.data;
           const sources = run.sources?.map((s: any) => {
             if (s.id !== updatedSource.id) return s;
-            // Preserve computed fileUrl — WS payload is raw DB object, no fileUrl
             return {
               ...updatedSource,
               fileUrl: s.fileUrl ?? updatedSource.fileUrl,
@@ -115,16 +135,14 @@ function RunDetailComponent() {
     };
 
     const handleReconnect = () => {
-      socket.emit("joinRun", { runId: id });
-      // Re-fetch to catch any events missed during the disconnect window
-      queryClient.invalidateQueries({
-        queryKey: getRunsControllerFindOneQueryKey(id),
-      });
+      joinAndRefetch();
     };
 
     socket.on("run:updated", handleRunUpdated);
     socket.on("run:source:updated", handleSourceUpdated);
     socket.on("run:log", handleRunLog);
+    // C2: handle both initial connect and reconnect (socket.io "connect" fires on both)
+    socket.on("connect", handleReconnect);
     socket.io.on("reconnect", handleReconnect);
 
     return () => {
@@ -132,6 +150,7 @@ function RunDetailComponent() {
       socket.off("run:updated", handleRunUpdated);
       socket.off("run:source:updated", handleSourceUpdated);
       socket.off("run:log", handleRunLog);
+      socket.off("connect", handleReconnect);
       socket.io.off("reconnect", handleReconnect);
     };
   }, [id, queryClient]);
@@ -248,6 +267,18 @@ function RunDetailComponent() {
       });
     } catch {
       toast.error("Failed to retry");
+    }
+  };
+
+  const handleForceFailSource = async (sourceId: string) => {
+    try {
+      await AXIOS_INSTANCE.post(`/runs/${id}/sources/${sourceId}/force-fail`);
+      toast.success("Source force-failed");
+      queryClient.invalidateQueries({
+        queryKey: getRunsControllerFindOneQueryKey(id),
+      });
+    } catch {
+      toast.error("Failed to force-fail source");
     }
   };
 
@@ -638,13 +669,23 @@ function RunDetailComponent() {
                               </div>
                               <div className="flex items-center gap-2">
                                 {(() => {
+                                  const isCancelled =
+                                    source.status === "cancelled" ||
+                                    source.extractionStatus === "cancelled";
                                   const isSourceLoading =
-                                    source.status === "parsing" ||
-                                    source.status === "pending" ||
-                                    source.extractionStatus === "extracting" ||
-                                    source.extractionStatus === "pending";
-                                  const icon =
-                                    source.extractionStatus === "done"
+                                    !isCancelled && (
+                                      source.status === "parsing" ||
+                                      source.status === "pending" ||
+                                      source.extractionStatus === "extracting" ||
+                                      source.extractionStatus === "pending"
+                                    );
+                                  const isStuck =
+                                    isSourceLoading &&
+                                    source.updatedAt &&
+                                    Date.now() - new Date(source.updatedAt as string).getTime() > 10 * 60 * 1000;
+                                  const icon = isCancelled
+                                    ? "block"
+                                    : source.extractionStatus === "done"
                                       ? "check"
                                       : source.extractionStatus === "failed" ||
                                           source.status === "failed"
@@ -653,8 +694,9 @@ function RunDetailComponent() {
                                             !source.extractionStatus
                                           ? "check"
                                           : "progress_activity";
-                                  const bg =
-                                    source.extractionStatus === "done"
+                                  const bg = isCancelled
+                                    ? "bg-gray-400"
+                                    : source.extractionStatus === "done"
                                       ? "bg-green-400"
                                       : source.extractionStatus === "failed" ||
                                           source.status === "failed"
@@ -662,16 +704,28 @@ function RunDetailComponent() {
                                         : source.status === "parsed" &&
                                             !source.extractionStatus
                                           ? "bg-green-400"
-                                          : "bg-[#FFD700]";
+                                          : isStuck
+                                            ? "bg-orange-400"
+                                            : "bg-[#FFD700]";
                                   return (
-                                    <div
-                                      className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${bg}`}
-                                    >
-                                      <span
-                                        className={`material-symbols-outlined text-[16px] font-black text-black${isSourceLoading ? " animate-spin" : ""}`}
+                                    <div className="flex items-center gap-1">
+                                      {isStuck && (
+                                        <span
+                                          className="material-symbols-outlined text-[16px] text-orange-600"
+                                          title="Stuck for >10 minutes"
+                                        >
+                                          warning
+                                        </span>
+                                      )}
+                                      <div
+                                        className={`size-8 border-2 border-black rounded-full flex items-center justify-center ${bg}`}
                                       >
-                                        {icon}
-                                      </span>
+                                        <span
+                                          className={`material-symbols-outlined text-[16px] font-black text-black${isSourceLoading ? " animate-spin" : ""}`}
+                                        >
+                                          {icon}
+                                        </span>
+                                      </div>
                                     </div>
                                   );
                                 })()}
@@ -690,7 +744,9 @@ function RunDetailComponent() {
                                   View Parsed
                                 </button>
                               )}
-                              {isTerminalState && (
+                              {(isTerminalState ||
+                                source.status === "failed" ||
+                                source.extractionStatus === "failed") && (
                                 <RetryOptionsPopover
                                   sourceNames={[source.name]}
                                   variants={run?.extractor?.variants || []}
@@ -712,6 +768,21 @@ function RunDetailComponent() {
                                   </button>
                                 </RetryOptionsPopover>
                               )}
+                              {!isTerminalState &&
+                                (source.status === "parsing" ||
+                                  source.extractionStatus === "extracting") && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleForceFailSource(source.id)}
+                                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-red-700 bg-red-50 border-2 border-black shadow-[2px_2px_0px_0px_#000000] hover:bg-red-100 transition-colors"
+                                    title="Force-fail this stuck source"
+                                  >
+                                    <span className="material-symbols-outlined text-[14px]">
+                                      cancel
+                                    </span>
+                                    Force Fail
+                                  </button>
+                                )}
                             </div>
                           </div>
                         </div>

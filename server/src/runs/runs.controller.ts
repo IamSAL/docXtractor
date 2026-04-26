@@ -114,4 +114,16 @@ export class RunsController {
   ) {
     return this.runsService.retrySource(id, sourceId, user.sub);
   }
+
+  @Post(':id/sources/:sourceId/force-fail')
+  @ApiOperation({ summary: 'Force-fail a stuck source (admin / run owner)' })
+  @ApiResponse({ status: 200, description: 'Source force-failed', type: Run })
+  @ApiResponse({ status: 404, description: 'Run or source not found' })
+  forceFailSource(
+    @Param('id') id: string,
+    @Param('sourceId') sourceId: string,
+    @GetUser() user: JWTPayload,
+  ) {
+    return this.runsService.forceFailSource(id, sourceId, user.sub);
+  }
 }

@@ -82,6 +82,8 @@ export class RunsService {
   private pendingLogLines: Map<string, string[]> = new Map();
   // Serialize concurrent extraction completions per run to prevent race conditions
   private extractionLocks: Map<string, Promise<void>> = new Map();
+  // Serialize concurrent parse completions per run to prevent JSONB clobber
+  private parsedDocumentLocks: Map<string, Promise<void>> = new Map();
 
   /**
    * Serialize async operations per run to prevent concurrent LLM
@@ -94,6 +96,19 @@ export class RunsService {
     const existingLock = this.extractionLocks.get(runId) || Promise.resolve();
     const newLock = existingLock.then(fn);
     this.extractionLocks.set(
+      runId,
+      newLock.catch(() => {}),
+    );
+    await newLock;
+  }
+
+  private async serializeDocumentParsed(
+    runId: string,
+    fn: () => Promise<void>,
+  ): Promise<void> {
+    const existingLock = this.parsedDocumentLocks.get(runId) || Promise.resolve();
+    const newLock = existingLock.then(fn);
+    this.parsedDocumentLocks.set(
       runId,
       newLock.catch(() => {}),
     );
@@ -263,6 +278,7 @@ export class RunsService {
           fileId: s.fileId,
           fileKey,
           status: 'pending' as const,
+          extractionStatus: 'pending' as const,
         };
       }),
     );
@@ -291,21 +307,26 @@ export class RunsService {
     for (const source of run.sources) {
       source.status = 'parsing';
       this.addLog(run, 'info', `Queuing document '${source.name}' for parsing`);
-      await this.queueService.addJob(
-        QueueName.UPLOADED_DOCUMENTS,
-        'parse-document',
-        {
-          run_id: run.id,
-          document_id: source.id,
-          type: source.type,
-          file_key: source.fileKey,
-          url: source.url,
-          name: source.name,
-          parser_engine: extractor.parserEngine,
-        },
-      );
-
-      this.logger.log(`Parse Requested for document ${source.name}`);
+      try {
+        await this.queueService.addJob(
+          QueueName.UPLOADED_DOCUMENTS,
+          'parse-document',
+          {
+            run_id: run.id,
+            document_id: source.id,
+            type: source.type,
+            file_key: source.fileKey,
+            url: source.url,
+            name: source.name,
+            parser_engine: extractor.parserEngine,
+          },
+        );
+        this.logger.log(`Parse Requested for document ${source.name}`);
+      } catch (err) {
+        source.status = 'failed';
+        source.error = `enqueue failed: ${(err as Error).message}`;
+        this.addLog(run, 'error', `Failed to queue '${source.name}': ${(err as Error).message}`);
+      }
     }
 
     this.addLog(run, 'info', 'All documents queued, parsing started');
@@ -408,17 +429,19 @@ export class RunsService {
    * Handle document parsed event from parser-service
    */
   async handleDocumentParsed(data: any) {
+    const { run_id } = data;
+    await this.serializeDocumentParsed(run_id, () =>
+      this._handleDocumentParsedLocked(data),
+    );
+  }
+
+  private async _handleDocumentParsedLocked(data: any) {
     const { run_id, document_id, status, markdown_content, token_count } = data;
     this.logger.log(
       `📥 Received parsed document event: run=${run_id}, doc=${document_id}, status=${status}`,
     );
-    this.logger.debug(
-      `Parsed document data: ${JSON.stringify({ run_id, document_id, status, token_count })}`,
-    );
-    this.logger.log(
-      `Processing parsed document for run ${run_id}, doc ${document_id}`,
-    );
 
+    // Re-fetch inside lock so we always see the latest sources[] state
     const run = await this.runRepo.findOne({ where: { id: run_id } });
     if (!run) return;
 
@@ -464,6 +487,10 @@ export class RunsService {
         'info',
         `Document '${source.name}' parsed successfully (${token_count} tokens)`,
       );
+    } else if (status === 'cancelled') {
+      source.status = 'cancelled';
+      source.extractionStatus = 'cancelled';
+      this.addLog(run, 'info', `Document '${source.name}' skipped (run cancelled)`);
     } else {
       source.status = 'failed';
       source.error = data.error || 'Parsing failed';
@@ -486,14 +513,16 @@ export class RunsService {
       .where('id = :id', { id: run.id })
       .execute();
 
-    // Re-fetch to get the true state of all sources (avoids race condition)
-    const freshRunForCheck = await this.runRepo.findOne({
+    // Re-fetch to get the atomically-incremented parsed count (via SQL jsonb_set above)
+    const freshRunForCount = await this.runRepo.findOne({
       where: { id: run_id },
     });
-    if (!freshRunForCheck) return;
+    if (!freshRunForCount) return;
 
-    // Use re-fetched run from here on to avoid stale data
-    Object.assign(run, freshRunForCheck);
+    // Only update the parsed counter — preserve run.sources so source reference stays valid
+    if (freshRunForCount.progress) {
+      run.progress!.parsed = freshRunForCount.progress.parsed;
+    }
 
     this.runsGateway.emitRunSourceUpdated(run.id, source);
 
@@ -524,7 +553,7 @@ export class RunsService {
 
     // Check if all sources are parsed
     const allParsed = run.sources.every(
-      (s) => s.status === 'parsed' || s.status === 'failed',
+      (s) => s.status === 'parsed' || s.status === 'failed' || s.status === 'cancelled',
     );
     if (allParsed) {
       this.logger.log(`🎯 All documents parsed for run ${run.id}`);
@@ -769,12 +798,20 @@ export class RunsService {
         examples: extractor?.fewShotExamples || [],
       };
 
-      await this.queueService.addJob(
-        QueueName.EXTRACTION_REQUESTS,
-        'extract-data',
-        extractionPayload,
-      );
-      this.addLog(run, 'info', `Extraction job queued for '${source.name}'`);
+      try {
+        await this.queueService.addJob(
+          QueueName.EXTRACTION_REQUESTS,
+          'extract-data',
+          extractionPayload,
+        );
+        this.addLog(run, 'info', `Extraction job queued for '${source.name}'`);
+      } catch (err) {
+        source.extractionStatus = 'failed';
+        source.extractionError = `enqueue failed: ${(err as Error).message}`;
+        this.addLog(run, 'error', `Failed to queue extraction for '${source.name}': ${(err as Error).message}`);
+        this.runsGateway.emitRunSourceUpdated(run.id, source);
+        throw err;
+      }
     }
   }
 
@@ -998,6 +1035,10 @@ export class RunsService {
           'info',
           `Extraction completed for '${source.name}' (${usage?.input_tokens || 0} input tokens)`,
         );
+      } else if (status === 'cancelled') {
+        source.extractionStatus = 'cancelled';
+        source.previousExtractionResult = undefined;
+        this.addLog(run, 'info', `Extraction skipped for '${source.name}' (run cancelled)`);
       } else {
         source.extractionStatus = 'failed';
         source.extractionError = data.error || 'Extraction failed';
@@ -1037,7 +1078,7 @@ export class RunsService {
       const extractedCount = run.progress!.extracted || 0;
       const extractionTotal = run.progress!.extractionTotal || 0;
 
-      if (extractedCount >= extractionTotal) {
+      if (extractionTotal > 0 && extractedCount >= extractionTotal) {
         // All done — results already accumulated incrementally
         if (
           run.results &&
@@ -1077,6 +1118,91 @@ export class RunsService {
       status: (freshRun || savedRun).status,
       progress: (freshRun || savedRun).progress,
     });
+  }
+
+  /**
+   * Called by the consumer on final-attempt failure for parsed-document jobs.
+   * Flips the source to failed and emits WS events.
+   */
+  async markParseHandlerFailure(data: any, errorMessage: string) {
+    const { run_id, document_id } = data;
+    await this.serializeDocumentParsed(run_id, async () => {
+      const run = await this.runRepo.findOne({ where: { id: run_id } });
+      if (!run) return;
+      const source = run.sources.find((s) => s.id === document_id);
+      if (!source || source.status === 'parsed' || source.status === 'failed') return;
+      source.status = 'failed';
+      source.error = `handler error: ${errorMessage}`;
+      this.addLog(run, 'error', `Parse handler permanently failed for '${source.name}': ${errorMessage}`);
+      await this.runRepo.save(run);
+      this.runsGateway.emitRunSourceUpdated(run.id, source);
+      this.runsGateway.emitRunUpdated(run.id, run);
+    });
+  }
+
+  /**
+   * Called by the consumer on final-attempt failure for extraction-completed jobs.
+   * Flips the source to failed and emits WS events.
+   */
+  async markExtractionHandlerFailure(data: any, errorMessage: string) {
+    const { run_id, document_id } = data;
+    if (!run_id) return;
+    await this.serializeLlmCompletion(run_id, async () => {
+      const run = await this.runRepo.findOne({ where: { id: run_id } });
+      if (!run) return;
+      if (document_id) {
+        const source = run.sources.find((s) => s.id === document_id);
+        if (source && source.extractionStatus === 'extracting') {
+          source.extractionStatus = 'failed';
+          source.extractionError = `handler error: ${errorMessage}`;
+          this.addLog(run, 'error', `Extraction handler permanently failed for '${source.name}': ${errorMessage}`);
+          this.runsGateway.emitRunSourceUpdated(run.id, source);
+        }
+      } else if (run.status === RunStatus.EXTRACTING) {
+        run.status = RunStatus.FAILED;
+        run.error = `handler error: ${errorMessage}`;
+        run.finishedAt = new Date();
+        this.addLog(run, 'error', `Extraction handler permanently failed: ${errorMessage}`);
+      }
+      await this.runRepo.save(run);
+      this.runsGateway.emitRunUpdated(run.id, run);
+    });
+  }
+
+  /**
+   * Admin force-fail: immediately marks a stuck source as failed and recomputes run terminal state.
+   */
+  async forceFailSource(runId: string, sourceId: string, userId: string): Promise<Run> {
+    const run = await this.findOne(runId, userId);
+    await this.serializeDocumentParsed(runId, async () => {
+      const freshRun = await this.runRepo.findOne({ where: { id: runId } });
+      if (!freshRun) return;
+      const source = freshRun.sources.find((s) => s.id === sourceId);
+      if (!source) throw new NotFoundException(`Source ${sourceId} not found`);
+      source.status = 'failed';
+      source.extractionStatus = 'failed';
+      source.error = 'force-failed by admin';
+      source.extractionError = 'force-failed by admin';
+      this.addLog(freshRun, 'warn', `Source '${source.name}' force-failed by admin`);
+
+      const allTerminal = freshRun.sources.every(
+        (s) => s.status === 'failed' || s.status === 'parsed' || s.status === 'cancelled',
+      );
+      const allExtractionTerminal = freshRun.sources.every(
+        (s) => !s.extractionStatus || ['done', 'failed', 'cancelled'].includes(s.extractionStatus),
+      );
+      if (allTerminal && allExtractionTerminal && freshRun.status !== RunStatus.DONE) {
+        const hasDone = freshRun.sources.some((s) => s.extractionStatus === 'done');
+        freshRun.status = hasDone ? RunStatus.DONE : RunStatus.FAILED;
+        freshRun.finishedAt = freshRun.finishedAt || new Date();
+      }
+
+      await this.runRepo.save(freshRun);
+      this.runsGateway.emitRunSourceUpdated(freshRun.id, source);
+      this.runsGateway.emitRunUpdated(freshRun.id, freshRun);
+      this.runsGateway.emitRunsListUpdated({ runId: freshRun.id, status: freshRun.status });
+    });
+    return this.findOneForResponse(runId, userId);
   }
 
   async update(id: string, userId: string, updateRunDto: UpdateRunDto) {

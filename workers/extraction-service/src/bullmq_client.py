@@ -38,6 +38,24 @@ class BullMQClient:
             logger.info(f"Added job to {queue_name}: {name}")
         except Exception as e:
             logger.error(f"Failed to add job to {queue_name}: {e}")
+            raise e
+
+    async def add_job_with_retry(self, queue_name: str, name: str, data: dict, attempts: int = 5):
+        """Publish with exponential backoff retry. Raises on final failure so BullMQ can retry the job."""
+        delay = 0.5
+        last_error: Exception = RuntimeError("no attempts made")
+        for attempt in range(attempts):
+            try:
+                await self.add_job(queue_name, name, data)
+                return
+            except Exception as e:
+                last_error = e
+                if attempt < attempts - 1:
+                    logger.warning(f"add_job to {queue_name} failed (attempt {attempt+1}/{attempts}), retrying in {delay}s: {e}")
+                    await asyncio.sleep(delay)
+                    delay = min(delay * 2, 8.0)
+        logger.error(f"add_job to {queue_name} failed after {attempts} attempts")
+        raise last_error
 
     def create_worker(self, queue_name: str, processor: Callable[[Job], Awaitable[Any]], concurrency: int = 1):
         return Worker(queue_name, processor, opts={"connection": REDIS_URL, "concurrency": concurrency})

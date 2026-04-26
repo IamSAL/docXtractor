@@ -42,6 +42,13 @@ async def process_job(job: Job, token: str = None):
         # Check if run was cancelled/retried before starting expensive extraction
         if run_id and await bullmq_client.is_run_cancelled(run_id):
             logger.info(f"⏭️ Skipping extraction job {job.id} — run {run_id} was cancelled/retried")
+            await bullmq_client.add_job_with_retry(QUEUE_COMPLETED, "extraction-completed", {
+                "run_id": run_id,
+                "document_id": document_id,
+                "source_name": source_name,
+                "status": "cancelled",
+                "logs": [],
+            })
             return {"status": "skipped", "reason": "run_cancelled"}
 
         logger.info(f"📥 Received extraction request job {job.id} for run: {run_id}")
@@ -79,7 +86,7 @@ async def process_job(job: Job, token: str = None):
                 "error": "No markdown content",
                 "logs": logs,
             }
-            await bullmq_client.add_job(QUEUE_COMPLETED, "extraction-completed", event)
+            await bullmq_client.add_job_with_retry(QUEUE_COMPLETED, "extraction-completed", event)
             return {"status": "error", "message": "No markdown content"}
 
         # Run Extraction (Blocking IO -> Thread)
@@ -109,7 +116,7 @@ async def process_job(job: Job, token: str = None):
 
         logger.info(f"📤 Sending extraction result to queue: {QUEUE_COMPLETED}")
         logger.info(f"Result usage: {result['usage']}")
-        await bullmq_client.add_job(QUEUE_COMPLETED, "extraction-completed", event)
+        await bullmq_client.add_job_with_retry(QUEUE_COMPLETED, "extraction-completed", event)
         logger.info(f"✅ Completed extraction for {data.get('run_id')}")
         return {"status": "success"}
 
@@ -125,7 +132,7 @@ async def process_job(job: Job, token: str = None):
             "logs": logs,
         }
         logger.info(f"📤 Sending failure event to queue: {QUEUE_COMPLETED}")
-        await bullmq_client.add_job(QUEUE_COMPLETED, "extraction-completed", event)
+        await bullmq_client.add_job_with_retry(QUEUE_COMPLETED, "extraction-completed", event)
         # Return failure result — do NOT re-raise, which would cause BullMQ to
         # retry the job and send duplicate failure events, corrupting progress counters.
         return {"status": "error", "message": str(e)}

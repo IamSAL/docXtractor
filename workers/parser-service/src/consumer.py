@@ -23,6 +23,7 @@ PARSER_CONCURRENCY = int(os.getenv("PARSER_CONCURRENCY", "2"))
 IDLE_SHUTDOWN_SECONDS = int(os.getenv("IDLE_SHUTDOWN_MINUTES", "15")) * 60
 
 _last_activity: float = time.monotonic()
+_active_parse_jobs: int = 0  # tracks in-flight to_thread parse calls for idle-watcher gate
 
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "http://localhost:9000")
 MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "minioadmin")
@@ -92,6 +93,13 @@ async def process_job(job: Job, token: str = None):
         # Check if run was cancelled/retried before we start expensive work
         if run_id and await bullmq_client.is_run_cancelled(run_id):
             logger.info(f"⏭️ Skipping job {job.id} — run {run_id} was cancelled/retried")
+            await bullmq_client.add_job_with_retry(QUEUE_PARSED, "document-parsed", {
+                "run_id": run_id,
+                "document_id": data.get("document_id"),
+                "retry_generation": data.get("retry_generation", 0),
+                "status": "cancelled",
+                "logs": [],
+            })
             return {"status": "skipped", "reason": "run_cancelled"}
 
         logger.info(f"📥 Received job {job.id} for run: {run_id} doc: {data.get('document_id')} (engine={engine.name})")
@@ -114,7 +122,7 @@ async def process_job(job: Job, token: str = None):
                     "error": "No URL provided",
                     "logs": logs,
                 }
-                await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+                await bullmq_client.add_job_with_retry(QUEUE_PARSED, "document-parsed", event)
                 return {"status": "error", "message": "No URL provided"}
 
             # SSRF guard: reject internal/private IPs before fetching
@@ -130,13 +138,18 @@ async def process_job(job: Job, token: str = None):
                     "error": f"URL blocked by security policy: {ssrf_err}",
                     "logs": logs,
                 }
-                await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+                await bullmq_client.add_job_with_retry(QUEUE_PARSED, "document-parsed", event)
                 return {"status": "error", "message": str(ssrf_err)}
 
             # Process URL document
             logs.append(_make_log("info", f"Downloading URL: {url}"))
             logger.info(f"🌐 Downloading and processing URL: {url}")
-            result = await asyncio.to_thread(engine.parse_url, url)
+            global _active_parse_jobs
+            _active_parse_jobs += 1
+            try:
+                result = await asyncio.to_thread(engine.parse_url, url)
+            finally:
+                _active_parse_jobs -= 1
             logger.info(f"✅ URL document processed successfully")
         else:
             # Handle file type (default)
@@ -154,7 +167,7 @@ async def process_job(job: Job, token: str = None):
                     "error": "No file_key found",
                     "logs": logs,
                 }
-                await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+                await bullmq_client.add_job_with_retry(QUEUE_PARSED, "document-parsed", event)
                 return {"status": "error", "message": "No file_key found"}
 
             # Download from MinIO and parse
@@ -168,13 +181,24 @@ async def process_job(job: Job, token: str = None):
             file_stream.close()
             del file_stream
 
-            result = await asyncio.to_thread(engine.parse_bytes, file_bytes, doc_name)
+            _active_parse_jobs += 1
+            try:
+                result = await asyncio.to_thread(engine.parse_bytes, file_bytes, doc_name)
+            finally:
+                _active_parse_jobs -= 1
             del file_bytes
             logger.info(f"✅ File document processed successfully")
 
         # Check again after processing — run may have been cancelled while we were working
         if run_id and await bullmq_client.is_run_cancelled(run_id):
             logger.info(f"⏭️ Discarding result for job {job.id} — run {run_id} was cancelled/retried during processing")
+            await bullmq_client.add_job_with_retry(QUEUE_PARSED, "document-parsed", {
+                "run_id": run_id,
+                "document_id": data.get("document_id"),
+                "retry_generation": data.get("retry_generation", 0),
+                "status": "cancelled",
+                "logs": [],
+            })
             return {"status": "skipped", "reason": "run_cancelled"}
 
         logs.append(_make_log("info", "File downloaded, starting document parsing"))
@@ -193,7 +217,7 @@ async def process_job(job: Job, token: str = None):
         del result
 
         logger.info(f"📤 Sending parsed result to queue: {QUEUE_PARSED}")
-        await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+        await bullmq_client.add_job_with_retry(QUEUE_PARSED, "document-parsed", event)
         del event
         logger.info(f"✅ Processed and produced result for {data.get('document_id')}")
         gc.collect()
@@ -202,17 +226,23 @@ async def process_job(job: Job, token: str = None):
     except Exception as e:
         logger.error(f"❌ Error processing job {job.id}: {e}", exc_info=True)
         logs.append(_make_log("error", f"Parsing failed for '{doc_name}': {e}"))
-        # Produce failure event
-        event = {
-            "run_id": data.get("run_id"),
-            "document_id": data.get("document_id"),
-            "retry_generation": data.get("retry_generation", 0),
-            "status": "failed",
-            "error": str(e),
-            "logs": logs,
-        }
-        logger.info(f"📤 Sending failure event to queue: {QUEUE_PARSED}")
-        await bullmq_client.add_job(QUEUE_PARSED, "document-parsed", event)
+        # Only publish failure on the final attempt to prevent duplicate parsed-count increments.
+        # BullMQ sets attempts in job.opts; attemptsMade is 0-indexed before the raise.
+        max_attempts = job.opts.get('attempts', 1) if isinstance(job.opts, dict) else 1
+        is_final_attempt = (job.attemptsMade + 1) >= max_attempts
+        if is_final_attempt:
+            event = {
+                "run_id": data.get("run_id"),
+                "document_id": data.get("document_id"),
+                "retry_generation": data.get("retry_generation", 0),
+                "status": "failed",
+                "error": str(e),
+                "logs": logs,
+            }
+            logger.info(f"📤 Sending failure event (final attempt {job.attemptsMade + 1}/{max_attempts}): {QUEUE_PARSED}")
+            await bullmq_client.add_job_with_retry(QUEUE_PARSED, "document-parsed", event)
+        else:
+            logger.info(f"⏳ Attempt {job.attemptsMade + 1}/{max_attempts} failed — will retry, not publishing failure event")
         gc.collect()
         raise e
 
@@ -225,7 +255,7 @@ async def _idle_watcher():
     while True:
         await asyncio.sleep(60)
         idle = time.monotonic() - _last_activity
-        if idle >= IDLE_SHUTDOWN_SECONDS and not unloaded:
+        if idle >= IDLE_SHUTDOWN_SECONDS and not unloaded and _active_parse_jobs == 0:
             logger.info(f"No jobs for {idle / 60:.1f} min — unloading parser models to free RAM")
             await asyncio.to_thread(unload_engines)
             unloaded = True

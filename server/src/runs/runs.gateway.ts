@@ -134,17 +134,34 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { event: 'leftRunsList' };
   }
 
+  private seq = 0;
+
   // Helper methods to emit events to room
   emitRunUpdated(runId: string, payload: any) {
-    this.server.to(`run:${runId}`).emit('run:updated', payload);
+    if (!this.server) return;
+    try {
+      this.server.to(`run:${runId}`).emit('run:updated', { seq: ++this.seq, ...payload });
+    } catch (e) {
+      this.logger.warn(`emitRunUpdated failed: ${e.message}`);
+    }
   }
 
   emitRunSourceUpdated(runId: string, payload: any) {
-    this.server.to(`run:${runId}`).emit('run:source:updated', payload);
+    if (!this.server) return;
+    try {
+      this.server.to(`run:${runId}`).emit('run:source:updated', { seq: ++this.seq, ...payload });
+    } catch (e) {
+      this.logger.warn(`emitRunSourceUpdated failed: ${e.message}`);
+    }
   }
 
   emitRunLog(runId: string, log: any) {
-    this.server.to(`run:${runId}`).emit('run:log', { runId, log });
+    if (!this.server) return;
+    try {
+      this.server.to(`run:${runId}`).emit('run:log', { runId, log });
+    } catch (e) {
+      this.logger.warn(`emitRunLog failed: ${e.message}`);
+    }
   }
 
   emitRunsListUpdated(payload: {
@@ -152,7 +169,12 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     status: string;
     progress?: any;
   }) {
-    this.server.to('runs:list').emit('runs:list:updated', payload);
+    if (!this.server) return;
+    try {
+      this.server.to('runs:list').emit('runs:list:updated', payload);
+    } catch (e) {
+      this.logger.warn(`emitRunsListUpdated failed: ${e.message}`);
+    }
   }
 
   // Workflow execution events
