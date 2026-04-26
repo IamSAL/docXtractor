@@ -1,10 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  ArrayMinSize,
   IsArray,
   IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   IsUUID,
   ValidateNested,
 } from 'class-validator';
@@ -21,7 +23,7 @@ export class RunSourceDto {
   name: string;
 
   @IsOptional()
-  @IsString()
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true })
   @ApiPropertyOptional({ description: 'URL if type is url' })
   url?: string;
 
@@ -48,6 +50,7 @@ export class CreateRunDto {
     ],
   })
   @IsArray()
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => RunSourceDto)
   sources: RunSourceDto[];

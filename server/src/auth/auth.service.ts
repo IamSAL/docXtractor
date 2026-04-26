@@ -45,7 +45,7 @@ export class AuthService {
   }
 
   async adminSetup(dto: AdminSetupDto) {
-    const hasUsers = await this.instanceSettingsService.hasAnyUsers();
+    const hasUsers = await this.instanceSettingsService.hasAnyAdminUsers();
     if (hasUsers) {
       throw new ForbiddenException(
         'Instance is already initialized. Admin setup is no longer available.',
@@ -204,15 +204,12 @@ export class AuthService {
       );
     }
 
-    const hasProfile = false;
-    const fullName = '';
-
     const tokens = await this.generateTokens(
       user.id,
       user.email,
       user.role as UserRole,
-      hasProfile,
-      fullName,
+      false,
+      '',
     );
 
     return {
@@ -223,8 +220,8 @@ export class AuthService {
         email: user.email,
         role: user.role,
         isEmailVerified: user.isEmailVerified,
-        hasProfile,
-        fullName,
+        hasProfile: false,
+        fullName: '',
       },
     };
   }
@@ -242,19 +239,13 @@ export class AuthService {
 
       if (!user) throw new UnauthorizedException('User not found');
 
-      // Get updated profile info
-      const hasProfile = false;
-      const fullName = '';
-
-      // Profile logic removed
-
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
         await this.generateTokens(
           user.id,
           user.email,
           user.role as UserRole,
-          hasProfile,
-          fullName,
+          false,
+          '',
         );
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch {
@@ -266,7 +257,6 @@ export class AuthService {
     accessToken: string,
     refreshToken: string,
   ): Promise<string | boolean> {
-    console.log(accessToken, refreshToken);
     try {
       await this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
@@ -290,9 +280,10 @@ export class AuthService {
     if (!user) return; // Don't reveal if user doesn't exist
 
     const resetToken = this.generateResetToken(user.id, user.email);
-    console.log(resetToken);
-
-    // Send email with reset token (implementation omitted)
+    const frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5174';
+    const resetLink = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
+    await this.mailService.sendResetPasswordEmail(user.email, resetLink);
   }
 
   updatePassword(userId: string, email: string) {
@@ -460,7 +451,6 @@ export class AuthService {
     otpHash: string | undefined,
     otp: string,
   ): Promise<boolean> {
-    console.log(otpExpiry ? otpExpiry < new Date() : true, otpHash ?? null);
     if (!otpHash || !otpExpiry || otpExpiry < new Date()) {
       return false;
     }

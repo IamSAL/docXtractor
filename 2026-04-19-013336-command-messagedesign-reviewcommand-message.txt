@@ -1,0 +1,572 @@
+ ▐▛███▜▌   Claude Code v2.1.114
+▝▜█████▛▘  Sonnet 4.6 · Claude Team
+  ▘▘ ▝▝    ~/Pets/docXtractor
+
+❯ /design-review review my core MVP features (creating extractor, editing the,  
+running an extractor, viewing run details, interacting                          
+with run results) and find what's causing problem for non tech savvy users and  
+note down the UX issues, I want to make the app easily usable without mental    
+overhead. the app is running at https://docxtractor.sk-salman.com/ and  # Test  
+auth info to login:                                                             
+                                                                                
+email: sksalmanmiah@gmail.com                                                   
+                                                                                
+password: Test@123456                                                           
+
+⏺ Bash(_UPD=$(~/.claude/skills/gstack/bin/gstack-update-check 2>/dev/null ||
+      .claude/skills/gstack/bin/gstack-update-check 2>/dev/null || true)
+      [ -n "$_UPD" ] && echo…)
+  ⎿  JUST_UPGRADED 1.0.0.0 1.1.1.0
+     BRANCH: develop
+     PROACTIVE: true
+     … +22 lines (ctrl+o to expand)
+
+⏺ Running gstack v1.1.1.0 (just updated!). Let me set up browse and check the
+  working tree.
+
+⏺ Bash(_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+      B=""…)
+  ⎿  READY: /Users/cefalo/.claude/skills/gstack/browse/dist/browse
+
+⏺ Bash(_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+      D=""…)
+  ⎿  DESIGN_READY: /Users/cefalo/.claude/skills/gstack/design/dist/design
+     BROWSE_READY: /Users/cefalo/.claude/skills/gstack/browse/dist/browse
+     M  .github/workflows/deploy.yml
+     … +45 lines (ctrl+o to expand)
+
+⏺ User answered Claude's questions:
+  ⎿  · Working tree has uncommitted changes (QA fixes, demo module, health 
+     endpoints, many deleted demo routes). /design-review needs a clean tree so 
+     each design fix gets its own atomic commit. What should we do? → Commit 
+     changes (Recommended)
+
+⏺ Bash(git add -A && git commit -m "$(cat <<'EOF'
+      chore: WIP — demo module, health endpoint, removed demo routes, QA fixes…)
+  ⎿  Error: Exit code 1
+     On branch develop
+     nothing to commit, working tree clean
+
+⏺ Working tree already clean. Proceeding.
+
+⏺ Bash(# Check CDP mode
+      B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"…)
+  ⎿  CDP_MODE=false
+
+⏺ Bash(eval "$(~/.claude/skills/gstack/bin/gstack-slug 2>/dev/null)"
+      REPORT_DIR="$HOME/.gstack/projects/$SLUG/designs/design-audit-$(date
+      +%Y%m%d)"…)
+  ⎿  REPORT_DIR: /Users/cefalo/.gstack/projects/IamSAL-docXtractor/designs/
+     design-audit-20260419
+     SLUG: IamSAL-docXtractor
+
+⏺ Bash(_CROSS_PROJ=$(~/.claude/skills/gstack/bin/gstack-config get
+      cross_project_learnings 2>/dev/null || echo "unset")
+      echo "CROSS_PROJECT: $_CROSS_PROJ"…)
+  ⎿  CROSS_PROJECT: false
+     LEARNINGS: 4 loaded (3 architectures, 1 pattern)
+     … +17 lines (ctrl+o to expand)
+
+⏺ Setup done. Starting Phase 1: First Impression.
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      REPORT_DIR="/Users/cefalo/.gstack/projects/IamSAL-docXtractor/designs/desi
+      gn-audit-20260419"…)
+  ⎿  Operation timed out: goto: Timeout 15000ms exceeded.
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B goto "https://docxtractor.sk-salman.com/" --timeout 30000 2>&1 | head
+      -20)
+  ⎿  Navigated to https://docxtractor.sk-salman.com/ (200)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      REPORT_DIR="/Users/cefalo/.gstack/projects/IamSAL-docXtractor/designs/desi
+      gn-audit-20260419"…)
+  ⎿  Error: Exit code 1
+     Path must be within: /private/tmp, /Users/cefalo/Pets/docXtractor
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      mkdir -p /tmp/docxtractor-audit/screenshots…)
+  ⎿  Screenshot saved: /tmp/docxtractor-audit/screenshots/first-impression.
+     png
+
+  Read 1 file (ctrl+o to expand)
+⏺ Good - landing page visible. Now let me log in.
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B goto "https://docxtractor.sk-salman.com/login" --timeout 30000 2>&1…)
+  ⎿  Navigated to https://docxtractor.sk-salman.com/login (200)
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/login.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1 | head -60)
+  ⎿  --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://docxtractor.sk-s
+     alman.com/login) ---
+     @e1 [text]: description
+     … +13 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B fill @e5 "sksalmanmiah@gmail.com" 2>&1…)
+  ⎿  Filled @e5
+     Filled @e7
+     Clicked @e9 → now at https://docxtractor.sk-salman.com/login
+     … +2 lines (ctrl+o to expand)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B goto "https://docxtractor.sk-salman.com/dashboard" --timeout 30000
+      2>&1…)
+  ⎿  Navigated to https://docxtractor.sk-salman.com/dashboard (200)
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/dashboard.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      sleep 3…)
+  ⎿  Screenshot saved: /tmp/docxtractor-audit/screenshots/dashboard-loaded.
+     png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Dashboard loaded. Now let me explore the Extractors page.
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B goto "https://docxtractor.sk-salman.com/extractors" --timeout 30000
+      2>&1…)
+  ⎿  Operation timed out: goto: Timeout 15000ms exceeded.
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/extractors-list.p
+     ng
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      sleep 4…)
+  ⎿  Screenshot saved: /tmp/docxtractor-audit/screenshots/extractors-list-2
+     .png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1 | head -80)
+  ⎿  --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://docxtractor.sk-s
+     alman.com/extractors) ---
+     @e1 [complementary]
+     … +48 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Click the "+ New Extractor" button…)
+  ⎿  Clicked @e19 → now at https://docxtractor.sk-salman.com/extractors
+     https://docxtractor.sk-salman.com/extractors
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/create-extractor-
+     start.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1 | grep -A 5 "CREATE EXTRACTOR\|SELECT TEMPLATE\|Generate
+      with AI\|CREATE YOUR OWN\|C…)
+  ⎿    @e28 [heading] "Generate with AI" [level=3]
+       @e29 [text]: FreeLLM
+       @e30 [paragraph]: Describe your extraction use case and AI will gene
+     … +5 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1)
+  ⎿  --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://docxtractor.sk-s
+     alman.com/extractors) ---
+     @e1 [region] "Notifications alt+T"
+     … +46 lines (ctrl+o to expand)
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Click "Generate with AI" card…)
+  ⎿  Clicked @e28 → now at https://docxtractor.sk-salman.com/extractors
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/create-gen-ai-sel
+     ected.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B click @e66 2>&1…)
+  ⎿  Ref @e66 (button "Create your own arrow_forward") is stale — element n
+     o longer exists. Run 'snapshot' for fresh refs.
+     https://docxtractor.sk-salman.com/extractors
+     … +2 lines (ctrl+o to expand)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1)
+  ⎿  --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://docxtractor.sk-s
+     alman.com/extractors) ---
+     @e1 [region] "Notifications alt+T"
+     … +18 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Go back and then try "Create your own"…)
+  ⎿  Clicked @e22 → now at https://docxtractor.sk-salman.com/extractors
+       @e60 [heading] "CMS-1500 Claim Parser" [level=3]
+       @e61 [text]: Medical Billing
+     … +6 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B click @e66 2>&1…)
+  ⎿  Clicked @e66 → now at https://docxtractor.sk-salman.com/extractors/new
+     https://docxtractor.sk-salman.com/extractors/new
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/create-your-own.p
+     ng
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      sleep 4…)
+  ⎿  Screenshot saved: /tmp/docxtractor-audit/screenshots/create-your-own-2
+     .png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1 | head -80)
+  ⎿  --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://docxtractor.sk-s
+     alman.com/extractors/new) ---
+     @e1 [complementary]
+     … +55 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Navigate to an existing extractor edit page…)
+  ⎿  Navigated to https://docxtractor.sk-salman.com/extractors (200)
+       @e28 [link] "edit Edit"
+       @e36 [link] "edit Edit"
+     … +3 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Click edit on the Invoice Parser (simplest one)…)
+  ⎿  Clicked @e44 → now at https://docxtractor.sk-salman.com/extractors/edi
+     t/be5e9f24-c512-42cf-83f2-14037049a05a
+     https://docxtractor.sk-salman.com/extractors/edit/be5e9f24-c512-42cf-8
+     … +3 lines (ctrl+o to expand)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Let's look closer at the field schema section…)
+  ⎿      @e41 [button] "currency"
+         @e42 [button] "+ description"
+         @e43 [button] "Text"
+     … +28 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Now let's look at the Run extractor flow - go back and click "Run" on
+      invoice parser…)
+  ⎿  Navigated to https://docxtractor.sk-salman.com/extractors (200)
+       @e29 [button] "play_arrow Run"
+       @e37 [button] "play_arrow Run"
+     … +3 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Run the Invoice Parser (3rd one = @e45)…)
+  ⎿  Clicked @e45 → now at https://docxtractor.sk-salman.com/extractors
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/run-extractor-mod
+     al.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1)
+  ⎿  --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://docxtractor.sk-s
+     alman.com/extractors) ---
+     @e1 [region] "Notifications alt+T"
+     … +34 lines (ctrl+o to expand)
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B click @e6 2>&1  # close modal…)
+  ⎿  Clicked @e6 → now at https://docxtractor.sk-salman.com/extractors
+     Navigated to https://docxtractor.sk-salman.com/runs (200)
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/runs-list.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1 | grep "Run ID\|@e[0-9]*.*\[row\]\|@e.*link.*#" | head
+      -20)
+  ⎿    @e22 [textbox] "Search by Run ID..."
+           @e38 [row] "Run ID Extractor Timestamp Status Confidence Actions
+     "
+     … +20 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Click on the first done run…)
+  ⎿  Clicked @e48 → now at https://docxtractor.sk-salman.com/runs/7650ed66-
+     6c3d-42d4-83e7-4b9a220dfed7
+     https://docxtractor.sk-salman.com/runs/7650ed66-6c3d-42d4-83e7-4b9a220
+     … +2 lines (ctrl+o to expand)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      sleep 4…)
+  ⎿  Screenshot saved: /tmp/docxtractor-audit/screenshots/run-detail-2.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1 | head -100)
+  ⎿  --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://docxtractor.sk-s
+     alman.com/runs/7650ed66-6c3d-42d4-83e7-4b9a220dfed7) ---
+     @e1 [complementary]
+     … +61 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1 | tail -80)
+  ⎿          @e173 [cell] "certificate"
+             @e174 [cell] "Digital"
+             @e175 [cell] "2026-05-19T00:00:00Z:100%; 2026-08-19T00:00:00Z:
+     … +61 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B click @e242 2>&1…)
+  ⎿  Clicked @e242 → now at https://docxtractor.sk-salman.com/runs/review/7
+     650ed66-6c3d-42d4-83e7-4b9a220dfed7
+     https://docxtractor.sk-salman.com/runs/review/7650ed66-6c3d-42d4-83e7-
+     … +3 lines (ctrl+o to expand)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      sleep 3…)
+  ⎿  Screenshot saved: /tmp/docxtractor-audit/screenshots/run-review-page.p
+     ng
+     --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://docxtractor.sk-s
+     … +20 lines (ctrl+o to expand)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Go back to run detail to check JSON view and copy functionality…)
+  ⎿  Navigated to https://docxtractor.sk-salman.com/runs/7650ed66-6c3d-42d4
+     -83e7-4b9a220dfed7 (200)
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/run-detail-json.p
+     ng
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Get fresh snapshot to find JSON button…)
+  ⎿    @e20 [text]: complete 01. Parsing (2/2) 02. Extracting (2/2) 03. Com
+     plete check check check check_circle
+       @e21 [paragraph]: Extraction Complete
+     … +19 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B click @e23 2>&1  # JSON tab…)
+  ⎿  Clicked @e23 → now at https://docxtractor.sk-salman.com/runs/7650ed66-
+     6c3d-42d4-83e7-4b9a220dfed7
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/run-json-view.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Design system extraction…)
+  ⎿  [
+       "ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Sego
+     e UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+     … +6 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Color palette…)
+  ⎿  [
+       "rgb(0, 0, 0)",
+       "rgb(247, 247, 245)",
+     … +26 lines (ctrl+o to expand)
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Heading hierarchy…)
+  ⎿  [
+       {
+         "tag": "H1",
+     … +50 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Touch targets…)
+  ⎿  [
+       {
+         "tag": "A",
+     … +59 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Performance metrics…)
+  ⎿  dns          1ms
+     tcp          610ms
+     ssl          306ms
+     … +6 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Check responsive on mobile - go to extractors page…)
+  ⎿  Navigated to https://docxtractor.sk-salman.com/extractors (200)
+     mobile (375x812): /tmp/docxtractor-audit/screenshots/extractors-mobile
+     .png
+     … +4 lines (ctrl+o to expand)
+
+  Read 2 files (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Go to new extractor page to check Add Field modal…)
+  ⎿  Navigated to https://docxtractor.sk-salman.com/extractors/new (200)
+       @e30 [heading] "schema Field Schema Define the data points to be ext
+     racted from the documents. auto_awesome AI Generate data_object Paste
+     … +14 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B click @e36 2>&1…)
+  ⎿  Selector matched multiple elements. Be more specific or use @refs from
+      'snapshot'.
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/add-field-modal.p
+     ng
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Use the ref directly…)
+  ⎿  [browse] The operation timed out.
+
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/add-field-2.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B snapshot 2>&1 | grep "@e3[0-9]" | head -20)
+  ⎿    @e30 [heading] "schema Field Schema Define the data points to be ext
+     racted from the documents. auto_awesome AI Generate data_object Paste
+     JSON add Add Field" [level=3]
+     … +14 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      $B click @e36 2>&1…)
+  ⎿  Selector matched multiple elements. Be more specific or use @refs from
+      'snapshot'.
+     Screenshot saved: /tmp/docxtractor-audit/screenshots/add-field-clicked
+     .png
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Try clicking by coordinates - the Add Field button should be near the
+      top of the field schema secti…)
+  ⎿  Screenshot saved: /tmp/docxtractor-audit/screenshots/add-field-js.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ I have enough data. Now compiling the full report.
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Check console errors…)
+  ⎿  --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://docxtractor.sk-s
+     alman.com/extractors/new) ---
+     [2026-04-18T18:54:17.329Z] [error] Failed to load resource: the server
+     … +19 lines (ctrl+o to expand)
+
+⏺ Bash(B="/Users/cefalo/.claude/skills/gstack/browse/dist/browse"
+      # Get 404 URLs…)
+  ⎿  GET https://docxtractor.sk-salman.com/assets/styles-CLOUsoTW.css → 404
+      (7098ms, ?B)
+     GET https://docxtractor.sk-salman.com/assets/styles-CLOUsoTW.css → 404
+     … +7 lines (ctrl+o to expand)
+
+⏺ Critical: assets/styles-CLOUsoTW.css returning 404 repeatedly. Main stylesheet
+   missing. Now writing report.
+
+⏺ Write(/tmp/docxtractor-audit/design-audit-docxtractor.md)
+  ⎿  Wrote 426 lines to
+     ../../../../tmp/docxtractor-audit/design-audit-docxtractor.md
+       1 # DocXtractor — UX Audit Report
+       2 **Focus:** Core MVP flows for non-tech users  
+       3 **Date:** 2026-04-19  
+       4 **Branch:** develop  
+       5 **Target:** https://docxtractor.sk-salman.com/  
+       6 **Auditor:** gstack /design-review  
+       7 
+       8 ---
+       9 
+      10 ## First Impression
+     … +584 lines (ctrl+o to expand)
+
+⏺ Bash(eval "$(~/.claude/skills/gstack/bin/gstack-slug 2>/dev/null)"
+      cp /tmp/docxtractor-audit/design-audit-docxtractor.md
+      ~/.gstack/projects/$SLUG/designs/design-audi…)
+  ⎿  Report saved to ~/.gstack/projects/IamSAL-docXtractor/designs/design-a
+     udit-20260419/
+
+⏺ Bash(~/.claude/skills/gstack/bin/gstack-learnings-log '{"skill":"design-review
+      ","type":"pitfall","key":"css_404_on_navigation","insight":"The app has a
+      recurring 404…)
+  ⎿  Done
+
+⏺ Here's the full audit. The design itself is not the problem — the neobrutalist
+   system is clean, zero AI slop. The problem is every flow leaks developer
+  mental model onto non-tech users.
+
+  ---
+  Overall: C+ Design / A AI Slop Score
+
+  Goodwill score: 20/100 — critical UX debt for non-tech users.
+
+  ---
+  The Root Cause (one sentence)
+
+  Every piece of jargon, every uncollapsed advanced option, every raw log line
+  is a developer's mental model leaking into the user interface.
+
+  ---
+  24 Findings — Grouped by Flow
+
+  BLOCKER
+
+  FINDING-000 — assets/styles-CLOUsoTW.css returns 404 on every page. Vite asset
+   hash mismatch. Causes icon names to render as text ("description", "mail",
+  "lock") until fonts load. Rebuild + redeploy fixes it.
+
+  Creating an Extractor (4 High)
+
+  - F-001: Template wizard is a hybrid modal/navigation that loses user
+  orientation. Fix: all-modal or all-page, not both.
+  - F-002: "Use This Template" button exists before anything is generated —
+  false affordance. Fix: disable until generation completes, relabel "Continue
+  with Generated Config."
+  - F-003: New extractor form dumps ALL options at once (System Prompt, Parser
+  Engine, Consensus Voting, Citation Tracking, Model Parameters). No required vs
+   optional split. Fix: collapse Advanced Options by default, add "Recommended
+  defaults pre-set" note.
+  - F-004: Field Schema has 3 entry points with no recommended path. "AI
+  Generate" should be the prominent primary button, not one of three peers.
+
+  Running an Extractor (2 High)
+
+  - F-009: 3-way Extraction Provider choice (Doclo / FreeLLM / LangExtract) with
+   no "Recommended" label. Fix: one badge — "Recommended ★" on FreeLLM, collapse
+   others under "Advanced."
+  - F-010: "Merge all inputs into a single context window for cross-document
+  reasoning" — rewrite in plain English.
+
+  Viewing Run Details (3 High)
+
+  - F-013: "BATCH EXTRACTION MONITOR" → rename to "Extraction Results."
+  - F-014: Raw server logs shown by default. Fix: collapse behind "Show
+  technical logs" toggle.
+  - F-016: "View Full Report" buried in sidebar. After extraction completes,
+  show a prominent yellow "Review Results →" in the main area.
+
+  Interacting with Results (1 High)
+
+  - F-019: Review flow (Accept/Reject) has zero onboarding. Users don't know why
+   they're there. Fix: one-paragraph intro, dismissable.
+
+  ---
+  5 Quick Wins (< 1 hour each)
+
+  1. "BATCH EXTRACTION MONITOR" → "Extraction Results" — one string
+  2. Collapse Run Logs behind toggle — collapsed by default
+  3. Add ★ Recommended badge to FreeLLM in run modal
+  4. Swap result tabs: Spreadsheet first, JSON second
+  5. Make "Review Results" a yellow CTA in the main area after extraction
+
+  The design language is already excellent. The content just needs to speak to
+  users, not developers.
+
+✻ Crunched for 30m 56s
+❯ save your findings in an md file in the project, i'll address them later      
+  ⎿  Interrupted · What should Claude do instead?

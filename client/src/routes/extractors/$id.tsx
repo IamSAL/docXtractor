@@ -217,6 +217,8 @@ function ExtractorDetailComponent() {
                       NiceModal.show(RunExtractorModal, {
                         extractorName: extractor.name,
                         extractorId: extractor.id,
+                      }).then((runId) => {
+                        if (runId) navigate({ to: "/runs/$id", params: { id: runId as string } });
                       });
                     }}
                     className="neu-btn bg-primary text-black px-6 py-3 font-bold text-lg rounded-lg flex items-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-primary-dark transition-colors border-3 border-black hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all"

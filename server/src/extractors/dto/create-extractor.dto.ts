@@ -91,6 +91,22 @@ export class CreateExtractorDto {
   @IsOptional()
   thumbnailUrl?: string;
 
+  @ApiPropertyOptional({ example: 'Financial' })
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @ApiPropertyOptional({ example: 'receipt_long' })
+  @IsString()
+  @IsOptional()
+  icon?: string;
+
+  @ApiPropertyOptional({ type: [String], example: ['24 Fields', 'Multi-Currency'] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
+
   @ApiProperty({ example: { type: 'object', properties: {} } })
   @IsObject()
   @IsJsonSchema()
@@ -174,4 +190,12 @@ export class CreateExtractorDto {
   @IsString()
   @IsOptional()
   defaultModel?: string;
+
+  @ApiPropertyOptional({
+    default: false,
+    description: 'Make this extractor visible as a template to all users',
+  })
+  @IsBoolean()
+  @IsOptional()
+  isPublic?: boolean;
 }

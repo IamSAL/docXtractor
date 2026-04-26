@@ -4,6 +4,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -231,12 +232,19 @@ export class RunsService {
    * Create a new run and start processing.
    */
   async create(dto: CreateRunDto, userId: string): Promise<Run> {
-    // Verify extractor exists and belongs to user
+    // Verify extractor exists and caller has access (owns it or it is public)
     const extractor = await this.extractorRepo.findOne({
-      where: { id: dto.extractorId }, // In a real app, also userId: userId
+      where: { id: dto.extractorId },
     });
     if (!extractor) {
       throw new NotFoundException('Extractor not found');
+    }
+    if (
+      extractor.userId &&
+      extractor.userId !== userId &&
+      !extractor.isPublic
+    ) {
+      throw new ForbiddenException('You do not have access to this extractor');
     }
 
     // Resolve file keys for file sources

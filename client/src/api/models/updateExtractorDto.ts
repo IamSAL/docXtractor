@@ -16,6 +16,9 @@ export interface UpdateExtractorDto {
 	/** The description of the extractor */
 	description?: string;
 	thumbnailUrl?: string;
+	category?: string;
+	icon?: string;
+	tags?: string[];
 	schema?: UpdateExtractorDtoSchema;
 	systemPrompt?: string;
 	fewShotExamples?: FewShotExampleDto[];
@@ -34,4 +37,6 @@ export interface UpdateExtractorDto {
 	citationIncludeParagraphId?: boolean;
 	contextWindow?: string;
 	defaultModel?: string;
+	/** Make this extractor visible as a template to all users */
+	isPublic?: boolean;
 }

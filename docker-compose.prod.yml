@@ -11,6 +11,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - docxtractor-network
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
       interval: 10s
@@ -21,7 +23,7 @@ services:
     image: redis:alpine
     container_name: docxtractor-redis
     restart: unless-stopped
-    command: redis-server --port 6379
+    command: redis-server --port 6379 --stop-writes-on-bgsave-error no
     volumes:
       - redis_data:/data
     networks:

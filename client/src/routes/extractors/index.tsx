@@ -87,6 +87,13 @@ function ExtractorsComponent() {
           description="Manage your AI extraction workflows. Create, test, and deploy data parsers."
           breadcrumb="/ HOME / EXTRACTORS"
         >
+          <Link
+            to="/extractors/templates"
+            className="flex items-center gap-2 px-4 py-3 border-2 border-black bg-white text-black font-bold text-sm uppercase tracking-wide hover:bg-gray-50 no-underline"
+          >
+            <span className="material-symbols-outlined text-[18px]">store</span>
+            <span>Browse Templates</span>
+          </Link>
           <Button
             onClick={openTemplateWizard}
             className="gap-2 px-6 py-3 rounded-lg text-sm uppercase tracking-wide"
@@ -249,6 +256,8 @@ function ExtractorsComponent() {
                     NiceModal.show(RunExtractorModal, {
                       extractorName: extractor.name,
                       extractorId: extractor.id,
+                    }).then((runId) => {
+                      if (runId) navigate({ to: "/runs/$id", params: { id: runId as string } });
                     });
                   }}
                   className="py-3 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 group bg-primary/20 hover:bg-primary text-black no-underline"

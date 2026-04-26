@@ -75,6 +75,7 @@ export const RunsControllerFindAllResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -143,6 +144,7 @@ export const RunsControllerFindOneResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -223,6 +225,7 @@ export const RunsControllerUpdateResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -290,6 +293,7 @@ export const RunsControllerRetryResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -359,6 +363,7 @@ export const RunsControllerRetrySourcesBatchResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),
@@ -420,6 +425,7 @@ export const RunsControllerRetrySourceResponse = zod.object({
 
 }).optional(),
   "isAutorun": zod.boolean(),
+  "isDemo": zod.boolean().optional(),
   "variantId": zod.object({
 
 }).optional().describe('ID of schema variant used for this run'),

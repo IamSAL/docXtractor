@@ -26,6 +26,9 @@ import { LlmModule } from './shared/llm/llm.module';
 import { MailModule } from './shared/mail/mail.module';
 import { WorkflowsModule } from './workflows/workflows.module';
 import { BackupModule } from './backup/backup.module';
+import { HealthModule } from './health/health.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { DemoModule } from './demo/demo.module';
 
 // Conditional imports based on rate limiting configuration
 const conditionalImports: DynamicModule[] = [];
@@ -94,6 +97,12 @@ if (process.env.ENABLE_RATE_LIMITING === 'true') {
     WorkflowsModule,
 
     BackupModule,
+
+    HealthModule,
+
+    ScheduleModule.forRoot(),
+
+    DemoModule,
   ],
   controllers: [AppController],
   providers: [

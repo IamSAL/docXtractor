@@ -96,12 +96,15 @@ export function RunExtractorSettings() {
                                         <div className={`absolute left-0 top-0 bottom-0 w-2 bg-primary border-r-2 border-black ${field.value === 'freellm' ? 'block' : 'hidden'}`}></div>
                                         <div className="pl-2 flex-1">
                                             <div className="flex items-center justify-between mb-1">
-                                                <span className="font-bold text-sm">FreeLLM (Cloud AI)</span>
+                                                <span className="font-bold text-sm flex items-center gap-2">
+                                                    FreeLLM (Cloud AI)
+                                                    <span className="text-[10px] font-black uppercase tracking-widest bg-primary border border-black px-1.5 py-0.5 leading-none">★ Recommended</span>
+                                                </span>
                                                 <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center ${field.value === 'freellm' ? 'bg-black' : ''}`}>
                                                     <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                                                 </div>
                                             </div>
-                                            <p className="text-xs text-gray-500 leading-tight">Use FreeLLM gateway (Groq, Gemini, Mistral, Cerebras) for extraction.</p>
+                                            <p className="text-xs text-gray-500 leading-tight">Best for most use cases. Fast and accurate extraction.</p>
                                         </div>
                                     </div>
                                 </label>
@@ -157,7 +160,7 @@ export function RunExtractorSettings() {
                                                     <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                                                 </div>
                                             </div>
-                                            <p className="text-xs text-gray-500 leading-tight">Merge all inputs into a single context window for cross-document reasoning.</p>
+                                            <p className="text-xs text-gray-500 leading-tight">All documents analyzed together — best when they're related (e.g., multiple pages of one contract).</p>
                                         </div>
                                     </div>
                                 </label>
@@ -178,7 +181,7 @@ export function RunExtractorSettings() {
                                                     <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                                                 </div>
                                             </div>
-                                            <p className="text-xs text-gray-500 leading-tight">Process each file independently. Faster for unrelated documents.</p>
+                                            <p className="text-xs text-gray-500 leading-tight">Each document analyzed separately — best for a pile of different invoices or unrelated files.</p>
                                         </div>
                                     </div>
                                 </label>

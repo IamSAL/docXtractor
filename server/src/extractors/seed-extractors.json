@@ -1236,5 +1236,408 @@
     "citationIncludeParagraphId": false,
     "contextWindow": "128k",
     "defaultModel": "gpt-4o-mini"
+  },
+  {
+    "name": "Invoice Parser Global",
+    "description": "Standard extraction for invoices from 50+ countries. Optimized for digital PDFs and scanned bills.",
+    "category": "Financial",
+    "icon": "receipt_long",
+    "tags": ["24 Fields", "Line Items", "Multi-Currency"],
+    "defaultModel": "free",
+    "systemPrompt": "You are an expert accountant. Extract vendor, date, total, and line items from this invoice. Return null for any field not present in the document. Ensure amounts are returned as numbers, not strings.",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "vendor_name": {
+          "type": "string",
+          "description": "Name of the vendor or seller"
+        },
+        "invoice_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of the invoice"
+        },
+        "total_amount": {
+          "type": "number",
+          "description": "Total invoice amount"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code, e.g. USD, EUR"
+        },
+        "line_items": {
+          "type": "array",
+          "description": "Individual line items on the invoice",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "quantity": { "type": "number" },
+              "unit_price": { "type": "number" },
+              "total": { "type": "number" }
+            }
+          }
+        }
+      },
+      "required": ["vendor_name", "total_amount", "invoice_date"]
+    },
+    "fewShotExamples": [],
+    "variants": [],
+    "consensusEnabled": false,
+    "confidenceThreshold": 85,
+    "conflictResolution": "majority",
+    "parserEngine": "docling",
+    "citationEnabled": false,
+    "citationIncludePdfPage": false,
+    "citationIncludeBbox": false,
+    "citationIncludeParagraphId": false,
+    "contextWindow": "128k"
+  },
+  {
+    "name": "Bank Statement Analyzer",
+    "description": "Extract transactions, account info, and balances from monthly bank statements (PDF/Scanned).",
+    "category": "Financial",
+    "icon": "account_balance",
+    "tags": ["Transaction List", "Balance Check"],
+    "defaultModel": "free",
+    "systemPrompt": "Extract account holder details and all transaction rows from the bank statement. Return transaction amounts as numbers (positive for credits, negative for debits). Return null for missing fields.",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "account_holder": {
+          "type": "string",
+          "description": "Name of the account holder"
+        },
+        "account_number": {
+          "type": "string",
+          "description": "Bank account number"
+        },
+        "statement_period": {
+          "type": "string",
+          "description": "Period covered by the statement"
+        },
+        "opening_balance": {
+          "type": "number",
+          "description": "Opening balance"
+        },
+        "closing_balance": {
+          "type": "number",
+          "description": "Closing balance"
+        },
+        "transactions": {
+          "type": "array",
+          "description": "List of transactions",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string" },
+              "description": { "type": "string" },
+              "amount": { "type": "number" },
+              "type": { "type": "string", "enum": ["debit", "credit"] }
+            }
+          }
+        }
+      }
+    },
+    "fewShotExamples": [],
+    "variants": [],
+    "consensusEnabled": false,
+    "confidenceThreshold": 85,
+    "conflictResolution": "majority",
+    "parserEngine": "docling",
+    "citationEnabled": false,
+    "citationIncludePdfPage": false,
+    "citationIncludeBbox": false,
+    "citationIncludeParagraphId": false,
+    "contextWindow": "128k"
+  },
+  {
+    "name": "AI Resume Parser",
+    "description": "Extract structured candidate data, skills, and work history from resumes and CVs.",
+    "category": "HR",
+    "icon": "person_search",
+    "tags": ["HR Tech", "Structured CV"],
+    "defaultModel": "free",
+    "systemPrompt": "Act as a technical recruiter. Extract contact info, skills, and work history from this resume or CV. Return skills as a list of strings. Return null for any field not present.",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "description": "Candidate's full name"
+        },
+        "email": { "type": "string", "description": "Email address" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "skills": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of skills"
+        },
+        "experience": {
+          "type": "array",
+          "description": "Work experience entries",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "company": { "type": "string" },
+              "duration": { "type": "string" }
+            }
+          }
+        },
+        "education": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Education entries"
+        }
+      }
+    },
+    "fewShotExamples": [],
+    "variants": [],
+    "consensusEnabled": false,
+    "confidenceThreshold": 85,
+    "conflictResolution": "majority",
+    "parserEngine": "docling",
+    "citationEnabled": false,
+    "citationIncludePdfPage": false,
+    "citationIncludeBbox": false,
+    "citationIncludeParagraphId": false,
+    "contextWindow": "128k"
+  },
+  {
+    "name": "Purchase Order Processor",
+    "description": "Extract PO numbers, vendor details, and line item tables for automated procurement.",
+    "category": "Logistics",
+    "icon": "shopping_cart",
+    "tags": ["Logistics", "Procure-to-Pay"],
+    "defaultModel": "free",
+    "systemPrompt": "Extract PO number, vendor, shipping address, and itemized list from this purchase order. Return numeric values as numbers. Return null for missing fields.",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "po_number": {
+          "type": "string",
+          "description": "Purchase order number"
+        },
+        "vendor_name": { "type": "string", "description": "Vendor name" },
+        "shipping_address": {
+          "type": "string",
+          "description": "Shipping address"
+        },
+        "total_order_value": {
+          "type": "number",
+          "description": "Total order value"
+        },
+        "items": {
+          "type": "array",
+          "description": "Ordered items",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku": { "type": "string" },
+              "description": { "type": "string" },
+              "quantity": { "type": "number" },
+              "unit_price": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "fewShotExamples": [],
+    "variants": [],
+    "consensusEnabled": false,
+    "confidenceThreshold": 85,
+    "conflictResolution": "majority",
+    "parserEngine": "docling",
+    "citationEnabled": false,
+    "citationIncludePdfPage": false,
+    "citationIncludeBbox": false,
+    "citationIncludeParagraphId": false,
+    "contextWindow": "128k"
+  },
+  {
+    "name": "Lease Agreement Extractor",
+    "description": "Pulls rent amounts, security deposits, and key dates from residential or commercial leases.",
+    "category": "Legal",
+    "icon": "home_work",
+    "tags": ["PropTech", "Legal Clauses"],
+    "defaultModel": "free",
+    "systemPrompt": "Identify landlord, tenant, rent amount, and lease term dates from this lease agreement. Return monetary values as numbers. Return null for any field not present in the document.",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "landlord": { "type": "string", "description": "Landlord name" },
+        "tenant": { "type": "string", "description": "Tenant name" },
+        "property_address": {
+          "type": "string",
+          "description": "Property address"
+        },
+        "monthly_rent": {
+          "type": "number",
+          "description": "Monthly rent amount"
+        },
+        "security_deposit": {
+          "type": "number",
+          "description": "Security deposit amount"
+        },
+        "start_date": { "type": "string", "description": "Lease start date" },
+        "end_date": { "type": "string", "description": "Lease end date" }
+      }
+    },
+    "fewShotExamples": [],
+    "variants": [],
+    "consensusEnabled": false,
+    "confidenceThreshold": 85,
+    "conflictResolution": "majority",
+    "parserEngine": "docling",
+    "citationEnabled": false,
+    "citationIncludePdfPage": false,
+    "citationIncludeBbox": false,
+    "citationIncludeParagraphId": false,
+    "contextWindow": "128k"
+  },
+  {
+    "name": "Medical Prescription Parser",
+    "description": "Specialized pipeline for handwritten doctors notes and prescription pads.",
+    "category": "Medical",
+    "icon": "medication",
+    "tags": ["MedTech", "Handwriting"],
+    "defaultModel": "free",
+    "systemPrompt": "You are a pharmacist's assistant. Extract patient info and medication details from this handwritten prescription. Be precise about dosage and frequency. Return null for any field not legible or present.",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "patient_name": {
+          "type": "string",
+          "description": "Patient's full name"
+        },
+        "medications": {
+          "type": "array",
+          "description": "List of prescribed medications",
+          "items": {
+            "type": "object",
+            "properties": {
+              "drug_name": { "type": "string" },
+              "dosage": { "type": "string" },
+              "frequency": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "fewShotExamples": [],
+    "variants": [],
+    "consensusEnabled": false,
+    "confidenceThreshold": 85,
+    "conflictResolution": "majority",
+    "parserEngine": "docling",
+    "citationEnabled": false,
+    "citationIncludePdfPage": false,
+    "citationIncludeBbox": false,
+    "citationIncludeParagraphId": false,
+    "contextWindow": "128k"
+  },
+  {
+    "name": "ID / Passport Scanner",
+    "description": "Extract MRZ codes, names, and bio-metric info from global identity documents.",
+    "category": "Identity",
+    "icon": "badge",
+    "tags": ["KYC", "Auth"],
+    "defaultModel": "free",
+    "systemPrompt": "Extract the MRZ code, full name, date of birth, and document number from this ID card or Passport. Return dates in YYYY-MM-DD format. Return null for fields not present or not legible.",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "description": "Full name as on document"
+        },
+        "document_number": {
+          "type": "string",
+          "description": "Document number"
+        },
+        "date_of_birth": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of birth"
+        },
+        "expiry_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Document expiry date"
+        },
+        "mrz_code": {
+          "type": "string",
+          "description": "Machine readable zone code"
+        },
+        "nationality": { "type": "string", "description": "Nationality" }
+      },
+      "required": ["full_name", "document_number", "mrz_code"]
+    },
+    "fewShotExamples": [],
+    "variants": [],
+    "consensusEnabled": false,
+    "confidenceThreshold": 85,
+    "conflictResolution": "majority",
+    "parserEngine": "docling",
+    "citationEnabled": false,
+    "citationIncludePdfPage": false,
+    "citationIncludeBbox": false,
+    "citationIncludeParagraphId": false,
+    "contextWindow": "128k"
+  },
+  {
+    "name": "CMS-1500 Claim Parser",
+    "description": "Extract charges, ICD codes, and provider info from standard health insurance claim forms.",
+    "category": "Medical",
+    "icon": "health_and_safety",
+    "tags": ["Billing", "Healthcare"],
+    "defaultModel": "free",
+    "systemPrompt": "Extract patient information, diagnosis codes, and service charges from this CMS-1500 health insurance claim form. Return charge amounts as numbers. Return null for missing fields.",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "patient_name": {
+          "type": "string",
+          "description": "Patient's full name"
+        },
+        "diagnosis_codes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "ICD diagnosis codes"
+        },
+        "total_charge": {
+          "type": "number",
+          "description": "Total charge amount"
+        },
+        "provider_npi": {
+          "type": "string",
+          "description": "Provider NPI number"
+        },
+        "services": {
+          "type": "array",
+          "description": "Individual services billed",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date_of_service": { "type": "string" },
+              "procedure_code": { "type": "string" },
+              "charge": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "fewShotExamples": [],
+    "variants": [],
+    "consensusEnabled": false,
+    "confidenceThreshold": 85,
+    "conflictResolution": "majority",
+    "parserEngine": "docling",
+    "citationEnabled": false,
+    "citationIncludePdfPage": false,
+    "citationIncludeBbox": false,
+    "citationIncludeParagraphId": false,
+    "contextWindow": "128k"
   }
 ]

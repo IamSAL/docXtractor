@@ -44,7 +44,7 @@ export function Sidebar({
           "transition-[transform,width] duration-300 ease-in-out",
           "lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          isCollapsed ? "lg:w-16" : "lg:w-64",
+          isCollapsed ? "lg:w-18" : "lg:w-64",
         ].join(" ")}
         data-collapsed={isCollapsed || undefined}
       >
@@ -97,7 +97,7 @@ export function Sidebar({
             <Link
               key={to}
               to={to}
-              className="sidebar-nav-item neobrutal-sidebar-item flex items-center gap-3 px-3 py-3 rounded-lg text-black no-underline"
+              className="sidebar-nav-item  rounded-md neobrutal-sidebar-item flex items-center gap-3 px-3 py-3 rounded-lg text-black no-underline"
               activeProps={{ className: "active" }}
               onClick={onClose}
               title={label}

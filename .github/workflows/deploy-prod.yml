@@ -92,6 +92,7 @@ jobs:
           port: 22
           source: docker-compose.prod.yml
           target: ${{ secrets.PROJECT_DIR }}
+          debug: true
 
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -109,6 +110,7 @@ jobs:
 
             # Pull pre-built images and start services
             docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --force-recreate client
             docker compose -f docker-compose.prod.yml up -d
 
             # Wait for health checks to pass

@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as RunsIndexRouteImport } from './routes/runs/index'
 import { Route as ExtractorsIndexRouteImport } from './routes/extractors/index'
+import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AutorunsIndexRouteImport } from './routes/autoruns/index'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
@@ -29,38 +30,18 @@ import { Route as SettingsApiKeysRouteImport } from './routes/settings/api-keys'
 import { Route as RunsNewRouteImport } from './routes/runs/new'
 import { Route as RunsIdRouteImport } from './routes/runs/$id'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as ExtractorsTemplatesRouteImport } from './routes/extractors/templates'
 import { Route as ExtractorsNewRouteImport } from './routes/extractors/new'
 import { Route as ExtractorsIdRouteImport } from './routes/extractors/$id'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
-import { Route as DemoTableRouteImport } from './routes/demo/table'
-import { Route as DemoStoreRouteImport } from './routes/demo/store'
-import { Route as DemoAiStructuredRouteImport } from './routes/demo/ai-structured'
-import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
-import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
 import { Route as AutorunsNewRouteImport } from './routes/autoruns/new'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
-import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
 import { Route as RunsReviewIdRouteImport } from './routes/runs/review.$id'
 import { Route as ExtractorsEditIdRouteImport } from './routes/extractors/edit.$id'
-import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
-import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
-import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
-import { Route as DemoGuitarsGuitarIdRouteImport } from './routes/demo/guitars/$guitarId'
-import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
-import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as DemoResultRunIdRouteImport } from './routes/demo/result.$runId'
 import { Route as AutorunsRunsIdRouteImport } from './routes/autoruns/runs.$id'
 import { Route as AutorunsEditIdRouteImport } from './routes/autoruns/edit.$id'
 import { Route as AutorunsBuilderIdRouteImport } from './routes/autoruns/builder.$id'
-import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
-import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
-import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
-import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
-import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
-import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
-import { Route as DemoApiAiStructuredRouteImport } from './routes/demo/api.ai.structured'
-import { Route as DemoApiAiImageRouteImport } from './routes/demo/api.ai.image'
-import { Route as DemoApiAiChatRouteImport } from './routes/demo/api.ai.chat'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -106,6 +87,11 @@ const ExtractorsIndexRoute = ExtractorsIndexRouteImport.update({
   id: '/extractors/',
   path: '/extractors/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DemoIndexRoute = DemoIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DemoRoute,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/dashboard/',
@@ -162,6 +148,11 @@ const InviteTokenRoute = InviteTokenRouteImport.update({
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExtractorsTemplatesRoute = ExtractorsTemplatesRouteImport.update({
+  id: '/extractors/templates',
+  path: '/extractors/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExtractorsNewRoute = ExtractorsNewRouteImport.update({
   id: '/extractors/new',
   path: '/extractors/new',
@@ -171,36 +162,6 @@ const ExtractorsIdRoute = ExtractorsIdRouteImport.update({
   id: '/extractors/$id',
   path: '/extractors/$id',
   getParentRoute: () => rootRouteImport,
-} as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/tanstack-query',
-  path: '/tanstack-query',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoTableRoute = DemoTableRouteImport.update({
-  id: '/table',
-  path: '/table',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/store',
-  path: '/store',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoAiStructuredRoute = DemoAiStructuredRouteImport.update({
-  id: '/ai-structured',
-  path: '/ai-structured',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoAiImageRoute = DemoAiImageRouteImport.update({
-  id: '/ai-image',
-  path: '/ai-image',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoAiChatRoute = DemoAiChatRouteImport.update({
-  id: '/ai-chat',
-  path: '/ai-chat',
-  getParentRoute: () => DemoRoute,
 } as any)
 const AutorunsNewRoute = AutorunsNewRouteImport.update({
   id: '/autoruns/new',
@@ -217,11 +178,6 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
-  id: '/guitars/',
-  path: '/guitars/',
-  getParentRoute: () => DemoRoute,
-} as any)
 const RunsReviewIdRoute = RunsReviewIdRouteImport.update({
   id: '/runs/review/$id',
   path: '/runs/review/$id',
@@ -232,34 +188,9 @@ const ExtractorsEditIdRoute = ExtractorsEditIdRouteImport.update({
   path: '/extractors/edit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
-  id: '/start/server-funcs',
-  path: '/start/server-funcs',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
-  id: '/start/api-request',
-  path: '/start/api-request',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
-  id: '/sentry/testing',
-  path: '/sentry/testing',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoGuitarsGuitarIdRoute = DemoGuitarsGuitarIdRouteImport.update({
-  id: '/guitars/$guitarId',
-  path: '/guitars/$guitarId',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoApiTqTodosRoute = DemoApiTqTodosRouteImport.update({
-  id: '/api/tq-todos',
-  path: '/api/tq-todos',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
-  id: '/api/names',
-  path: '/api/names',
+const DemoResultRunIdRoute = DemoResultRunIdRouteImport.update({
+  id: '/result/$runId',
+  path: '/result/$runId',
   getParentRoute: () => DemoRoute,
 } as any)
 const AutorunsRunsIdRoute = AutorunsRunsIdRouteImport.update({
@@ -277,51 +208,6 @@ const AutorunsBuilderIdRoute = AutorunsBuilderIdRouteImport.update({
   path: '/autoruns/builder/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
-  id: '/start/ssr/',
-  path: '/start/ssr/',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
-  id: '/start/ssr/spa-mode',
-  path: '/start/ssr/spa-mode',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoStartSsrFullSsrRoute = DemoStartSsrFullSsrRouteImport.update({
-  id: '/start/ssr/full-ssr',
-  path: '/start/ssr/full-ssr',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
-  id: '/start/ssr/data-only',
-  path: '/start/ssr/data-only',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoApiAiTtsRoute = DemoApiAiTtsRouteImport.update({
-  id: '/api/ai/tts',
-  path: '/api/ai/tts',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoApiAiTranscriptionRoute = DemoApiAiTranscriptionRouteImport.update({
-  id: '/api/ai/transcription',
-  path: '/api/ai/transcription',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoApiAiStructuredRoute = DemoApiAiStructuredRouteImport.update({
-  id: '/api/ai/structured',
-  path: '/api/ai/structured',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoApiAiImageRoute = DemoApiAiImageRouteImport.update({
-  id: '/api/ai/image',
-  path: '/api/ai/image',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoApiAiChatRoute = DemoApiAiChatRouteImport.update({
-  id: '/api/ai/chat',
-  path: '/api/ai/chat',
-  getParentRoute: () => DemoRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -333,14 +219,9 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/autoruns/new': typeof AutorunsNewRoute
-  '/demo/ai-chat': typeof DemoAiChatRoute
-  '/demo/ai-image': typeof DemoAiImageRoute
-  '/demo/ai-structured': typeof DemoAiStructuredRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
+  '/extractors/templates': typeof ExtractorsTemplatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/runs/$id': typeof RunsIdRoute
   '/runs/new': typeof RunsNewRoute
@@ -352,48 +233,28 @@ export interface FileRoutesByFullPath {
   '/settings/profile': typeof SettingsProfileRoute
   '/autoruns/': typeof AutorunsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/demo/': typeof DemoIndexRoute
   '/extractors/': typeof ExtractorsIndexRoute
   '/runs/': typeof RunsIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/autoruns/builder/$id': typeof AutorunsBuilderIdRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
-  '/demo/api/names': typeof DemoApiNamesRoute
-  '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
-  '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/demo/result/$runId': typeof DemoResultRunIdRoute
   '/extractors/edit/$id': typeof ExtractorsEditIdRoute
   '/runs/review/$id': typeof RunsReviewIdRoute
-  '/demo/guitars/': typeof DemoGuitarsIndexRoute
-  '/demo/api/ai/chat': typeof DemoApiAiChatRoute
-  '/demo/api/ai/image': typeof DemoApiAiImageRoute
-  '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
-  '/demo/api/ai/transcription': typeof DemoApiAiTranscriptionRoute
-  '/demo/api/ai/tts': typeof DemoApiAiTtsRoute
-  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
-  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
-  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/demo': typeof DemoRouteWithChildren
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/autoruns/new': typeof AutorunsNewRoute
-  '/demo/ai-chat': typeof DemoAiChatRoute
-  '/demo/ai-image': typeof DemoAiImageRoute
-  '/demo/ai-structured': typeof DemoAiStructuredRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
+  '/extractors/templates': typeof ExtractorsTemplatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/runs/$id': typeof RunsIdRoute
   '/runs/new': typeof RunsNewRoute
@@ -405,30 +266,16 @@ export interface FileRoutesByTo {
   '/settings/profile': typeof SettingsProfileRoute
   '/autoruns': typeof AutorunsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/demo': typeof DemoIndexRoute
   '/extractors': typeof ExtractorsIndexRoute
   '/runs': typeof RunsIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/autoruns/builder/$id': typeof AutorunsBuilderIdRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
-  '/demo/api/names': typeof DemoApiNamesRoute
-  '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
-  '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/demo/result/$runId': typeof DemoResultRunIdRoute
   '/extractors/edit/$id': typeof ExtractorsEditIdRoute
   '/runs/review/$id': typeof RunsReviewIdRoute
-  '/demo/guitars': typeof DemoGuitarsIndexRoute
-  '/demo/api/ai/chat': typeof DemoApiAiChatRoute
-  '/demo/api/ai/image': typeof DemoApiAiImageRoute
-  '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
-  '/demo/api/ai/transcription': typeof DemoApiAiTranscriptionRoute
-  '/demo/api/ai/tts': typeof DemoApiAiTtsRoute
-  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
-  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
-  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -441,14 +288,9 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/autoruns/new': typeof AutorunsNewRoute
-  '/demo/ai-chat': typeof DemoAiChatRoute
-  '/demo/ai-image': typeof DemoAiImageRoute
-  '/demo/ai-structured': typeof DemoAiStructuredRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/extractors/$id': typeof ExtractorsIdRoute
   '/extractors/new': typeof ExtractorsNewRoute
+  '/extractors/templates': typeof ExtractorsTemplatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/runs/$id': typeof RunsIdRoute
   '/runs/new': typeof RunsNewRoute
@@ -460,30 +302,16 @@ export interface FileRoutesById {
   '/settings/profile': typeof SettingsProfileRoute
   '/autoruns/': typeof AutorunsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/demo/': typeof DemoIndexRoute
   '/extractors/': typeof ExtractorsIndexRoute
   '/runs/': typeof RunsIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/autoruns/builder/$id': typeof AutorunsBuilderIdRoute
   '/autoruns/edit/$id': typeof AutorunsEditIdRoute
   '/autoruns/runs/$id': typeof AutorunsRunsIdRoute
-  '/demo/api/names': typeof DemoApiNamesRoute
-  '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
-  '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/demo/result/$runId': typeof DemoResultRunIdRoute
   '/extractors/edit/$id': typeof ExtractorsEditIdRoute
   '/runs/review/$id': typeof RunsReviewIdRoute
-  '/demo/guitars/': typeof DemoGuitarsIndexRoute
-  '/demo/api/ai/chat': typeof DemoApiAiChatRoute
-  '/demo/api/ai/image': typeof DemoApiAiImageRoute
-  '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
-  '/demo/api/ai/transcription': typeof DemoApiAiTranscriptionRoute
-  '/demo/api/ai/tts': typeof DemoApiAiTtsRoute
-  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
-  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
-  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -497,14 +325,9 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/verify'
     | '/autoruns/new'
-    | '/demo/ai-chat'
-    | '/demo/ai-image'
-    | '/demo/ai-structured'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
     | '/extractors/$id'
     | '/extractors/new'
+    | '/extractors/templates'
     | '/invite/$token'
     | '/runs/$id'
     | '/runs/new'
@@ -516,48 +339,28 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/autoruns/'
     | '/dashboard/'
+    | '/demo/'
     | '/extractors/'
     | '/runs/'
     | '/settings/'
     | '/autoruns/builder/$id'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
-    | '/demo/api/names'
-    | '/demo/api/tq-todos'
-    | '/demo/guitars/$guitarId'
-    | '/demo/sentry/testing'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
+    | '/demo/result/$runId'
     | '/extractors/edit/$id'
     | '/runs/review/$id'
-    | '/demo/guitars/'
-    | '/demo/api/ai/chat'
-    | '/demo/api/ai/image'
-    | '/demo/api/ai/structured'
-    | '/demo/api/ai/transcription'
-    | '/demo/api/ai/tts'
-    | '/demo/start/ssr/data-only'
-    | '/demo/start/ssr/full-ssr'
-    | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/demo'
     | '/login'
     | '/setup'
     | '/signup'
     | '/auth/callback'
     | '/auth/verify'
     | '/autoruns/new'
-    | '/demo/ai-chat'
-    | '/demo/ai-image'
-    | '/demo/ai-structured'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
     | '/extractors/$id'
     | '/extractors/new'
+    | '/extractors/templates'
     | '/invite/$token'
     | '/runs/$id'
     | '/runs/new'
@@ -569,30 +372,16 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/autoruns'
     | '/dashboard'
+    | '/demo'
     | '/extractors'
     | '/runs'
     | '/settings'
     | '/autoruns/builder/$id'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
-    | '/demo/api/names'
-    | '/demo/api/tq-todos'
-    | '/demo/guitars/$guitarId'
-    | '/demo/sentry/testing'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
+    | '/demo/result/$runId'
     | '/extractors/edit/$id'
     | '/runs/review/$id'
-    | '/demo/guitars'
-    | '/demo/api/ai/chat'
-    | '/demo/api/ai/image'
-    | '/demo/api/ai/structured'
-    | '/demo/api/ai/transcription'
-    | '/demo/api/ai/tts'
-    | '/demo/start/ssr/data-only'
-    | '/demo/start/ssr/full-ssr'
-    | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr'
   id:
     | '__root__'
     | '/'
@@ -604,14 +393,9 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/verify'
     | '/autoruns/new'
-    | '/demo/ai-chat'
-    | '/demo/ai-image'
-    | '/demo/ai-structured'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
     | '/extractors/$id'
     | '/extractors/new'
+    | '/extractors/templates'
     | '/invite/$token'
     | '/runs/$id'
     | '/runs/new'
@@ -623,30 +407,16 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/autoruns/'
     | '/dashboard/'
+    | '/demo/'
     | '/extractors/'
     | '/runs/'
     | '/settings/'
     | '/autoruns/builder/$id'
     | '/autoruns/edit/$id'
     | '/autoruns/runs/$id'
-    | '/demo/api/names'
-    | '/demo/api/tq-todos'
-    | '/demo/guitars/$guitarId'
-    | '/demo/sentry/testing'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
+    | '/demo/result/$runId'
     | '/extractors/edit/$id'
     | '/runs/review/$id'
-    | '/demo/guitars/'
-    | '/demo/api/ai/chat'
-    | '/demo/api/ai/image'
-    | '/demo/api/ai/structured'
-    | '/demo/api/ai/transcription'
-    | '/demo/api/ai/tts'
-    | '/demo/start/ssr/data-only'
-    | '/demo/start/ssr/full-ssr'
-    | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -661,6 +431,7 @@ export interface RootRouteChildren {
   AutorunsNewRoute: typeof AutorunsNewRoute
   ExtractorsIdRoute: typeof ExtractorsIdRoute
   ExtractorsNewRoute: typeof ExtractorsNewRoute
+  ExtractorsTemplatesRoute: typeof ExtractorsTemplatesRoute
   InviteTokenRoute: typeof InviteTokenRoute
   RunsIdRoute: typeof RunsIdRoute
   RunsNewRoute: typeof RunsNewRoute
@@ -740,6 +511,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExtractorsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/': {
+      id: '/demo/'
+      path: '/'
+      fullPath: '/demo/'
+      preLoaderRoute: typeof DemoIndexRouteImport
+      parentRoute: typeof DemoRoute
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/dashboard'
@@ -817,6 +595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/extractors/templates': {
+      id: '/extractors/templates'
+      path: '/extractors/templates'
+      fullPath: '/extractors/templates'
+      preLoaderRoute: typeof ExtractorsTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/extractors/new': {
       id: '/extractors/new'
       path: '/extractors/new'
@@ -830,48 +615,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/extractors/$id'
       preLoaderRoute: typeof ExtractorsIdRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/table': {
-      id: '/demo/table'
-      path: '/table'
-      fullPath: '/demo/table'
-      preLoaderRoute: typeof DemoTableRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/store': {
-      id: '/demo/store'
-      path: '/store'
-      fullPath: '/demo/store'
-      preLoaderRoute: typeof DemoStoreRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/ai-structured': {
-      id: '/demo/ai-structured'
-      path: '/ai-structured'
-      fullPath: '/demo/ai-structured'
-      preLoaderRoute: typeof DemoAiStructuredRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/ai-image': {
-      id: '/demo/ai-image'
-      path: '/ai-image'
-      fullPath: '/demo/ai-image'
-      preLoaderRoute: typeof DemoAiImageRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/ai-chat': {
-      id: '/demo/ai-chat'
-      path: '/ai-chat'
-      fullPath: '/demo/ai-chat'
-      preLoaderRoute: typeof DemoAiChatRouteImport
-      parentRoute: typeof DemoRoute
     }
     '/autoruns/new': {
       id: '/autoruns/new'
@@ -894,13 +637,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/guitars/': {
-      id: '/demo/guitars/'
-      path: '/guitars'
-      fullPath: '/demo/guitars/'
-      preLoaderRoute: typeof DemoGuitarsIndexRouteImport
-      parentRoute: typeof DemoRoute
-    }
     '/runs/review/$id': {
       id: '/runs/review/$id'
       path: '/runs/review/$id'
@@ -915,46 +651,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExtractorsEditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/start/server-funcs': {
-      id: '/demo/start/server-funcs'
-      path: '/start/server-funcs'
-      fullPath: '/demo/start/server-funcs'
-      preLoaderRoute: typeof DemoStartServerFuncsRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/start/api-request': {
-      id: '/demo/start/api-request'
-      path: '/start/api-request'
-      fullPath: '/demo/start/api-request'
-      preLoaderRoute: typeof DemoStartApiRequestRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/sentry/testing': {
-      id: '/demo/sentry/testing'
-      path: '/sentry/testing'
-      fullPath: '/demo/sentry/testing'
-      preLoaderRoute: typeof DemoSentryTestingRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/guitars/$guitarId': {
-      id: '/demo/guitars/$guitarId'
-      path: '/guitars/$guitarId'
-      fullPath: '/demo/guitars/$guitarId'
-      preLoaderRoute: typeof DemoGuitarsGuitarIdRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/api/tq-todos': {
-      id: '/demo/api/tq-todos'
-      path: '/api/tq-todos'
-      fullPath: '/demo/api/tq-todos'
-      preLoaderRoute: typeof DemoApiTqTodosRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/api/names': {
-      id: '/demo/api/names'
-      path: '/api/names'
-      fullPath: '/demo/api/names'
-      preLoaderRoute: typeof DemoApiNamesRouteImport
+    '/demo/result/$runId': {
+      id: '/demo/result/$runId'
+      path: '/result/$runId'
+      fullPath: '/demo/result/$runId'
+      preLoaderRoute: typeof DemoResultRunIdRouteImport
       parentRoute: typeof DemoRoute
     }
     '/autoruns/runs/$id': {
@@ -978,120 +679,17 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AutorunsBuilderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/start/ssr/': {
-      id: '/demo/start/ssr/'
-      path: '/start/ssr'
-      fullPath: '/demo/start/ssr/'
-      preLoaderRoute: typeof DemoStartSsrIndexRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/start/ssr/spa-mode': {
-      id: '/demo/start/ssr/spa-mode'
-      path: '/start/ssr/spa-mode'
-      fullPath: '/demo/start/ssr/spa-mode'
-      preLoaderRoute: typeof DemoStartSsrSpaModeRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/start/ssr/full-ssr': {
-      id: '/demo/start/ssr/full-ssr'
-      path: '/start/ssr/full-ssr'
-      fullPath: '/demo/start/ssr/full-ssr'
-      preLoaderRoute: typeof DemoStartSsrFullSsrRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/start/ssr/data-only': {
-      id: '/demo/start/ssr/data-only'
-      path: '/start/ssr/data-only'
-      fullPath: '/demo/start/ssr/data-only'
-      preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/api/ai/tts': {
-      id: '/demo/api/ai/tts'
-      path: '/api/ai/tts'
-      fullPath: '/demo/api/ai/tts'
-      preLoaderRoute: typeof DemoApiAiTtsRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/api/ai/transcription': {
-      id: '/demo/api/ai/transcription'
-      path: '/api/ai/transcription'
-      fullPath: '/demo/api/ai/transcription'
-      preLoaderRoute: typeof DemoApiAiTranscriptionRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/api/ai/structured': {
-      id: '/demo/api/ai/structured'
-      path: '/api/ai/structured'
-      fullPath: '/demo/api/ai/structured'
-      preLoaderRoute: typeof DemoApiAiStructuredRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/api/ai/image': {
-      id: '/demo/api/ai/image'
-      path: '/api/ai/image'
-      fullPath: '/demo/api/ai/image'
-      preLoaderRoute: typeof DemoApiAiImageRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/api/ai/chat': {
-      id: '/demo/api/ai/chat'
-      path: '/api/ai/chat'
-      fullPath: '/demo/api/ai/chat'
-      preLoaderRoute: typeof DemoApiAiChatRouteImport
-      parentRoute: typeof DemoRoute
-    }
   }
 }
 
 interface DemoRouteChildren {
-  DemoAiChatRoute: typeof DemoAiChatRoute
-  DemoAiImageRoute: typeof DemoAiImageRoute
-  DemoAiStructuredRoute: typeof DemoAiStructuredRoute
-  DemoStoreRoute: typeof DemoStoreRoute
-  DemoTableRoute: typeof DemoTableRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
-  DemoApiNamesRoute: typeof DemoApiNamesRoute
-  DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
-  DemoGuitarsGuitarIdRoute: typeof DemoGuitarsGuitarIdRoute
-  DemoSentryTestingRoute: typeof DemoSentryTestingRoute
-  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
-  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
-  DemoGuitarsIndexRoute: typeof DemoGuitarsIndexRoute
-  DemoApiAiChatRoute: typeof DemoApiAiChatRoute
-  DemoApiAiImageRoute: typeof DemoApiAiImageRoute
-  DemoApiAiStructuredRoute: typeof DemoApiAiStructuredRoute
-  DemoApiAiTranscriptionRoute: typeof DemoApiAiTranscriptionRoute
-  DemoApiAiTtsRoute: typeof DemoApiAiTtsRoute
-  DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
-  DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
-  DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
-  DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
+  DemoIndexRoute: typeof DemoIndexRoute
+  DemoResultRunIdRoute: typeof DemoResultRunIdRoute
 }
 
 const DemoRouteChildren: DemoRouteChildren = {
-  DemoAiChatRoute: DemoAiChatRoute,
-  DemoAiImageRoute: DemoAiImageRoute,
-  DemoAiStructuredRoute: DemoAiStructuredRoute,
-  DemoStoreRoute: DemoStoreRoute,
-  DemoTableRoute: DemoTableRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
-  DemoApiNamesRoute: DemoApiNamesRoute,
-  DemoApiTqTodosRoute: DemoApiTqTodosRoute,
-  DemoGuitarsGuitarIdRoute: DemoGuitarsGuitarIdRoute,
-  DemoSentryTestingRoute: DemoSentryTestingRoute,
-  DemoStartApiRequestRoute: DemoStartApiRequestRoute,
-  DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
-  DemoGuitarsIndexRoute: DemoGuitarsIndexRoute,
-  DemoApiAiChatRoute: DemoApiAiChatRoute,
-  DemoApiAiImageRoute: DemoApiAiImageRoute,
-  DemoApiAiStructuredRoute: DemoApiAiStructuredRoute,
-  DemoApiAiTranscriptionRoute: DemoApiAiTranscriptionRoute,
-  DemoApiAiTtsRoute: DemoApiAiTtsRoute,
-  DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
-  DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
-  DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
-  DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
+  DemoIndexRoute: DemoIndexRoute,
+  DemoResultRunIdRoute: DemoResultRunIdRoute,
 }
 
 const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
@@ -1132,6 +730,7 @@ const rootRouteChildren: RootRouteChildren = {
   AutorunsNewRoute: AutorunsNewRoute,
   ExtractorsIdRoute: ExtractorsIdRoute,
   ExtractorsNewRoute: ExtractorsNewRoute,
+  ExtractorsTemplatesRoute: ExtractorsTemplatesRoute,
   InviteTokenRoute: InviteTokenRoute,
   RunsIdRoute: RunsIdRoute,
   RunsNewRoute: RunsNewRoute,

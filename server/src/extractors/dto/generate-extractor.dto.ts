@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class GenerateSchemaDto {
   @ApiProperty({
@@ -21,4 +21,13 @@ export class GenerateExtractorDto {
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  @ApiPropertyOptional({
+    description: 'Sample document text to improve field inference (max 3000 chars)',
+    maxLength: 3000,
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(3000)
+  sampleText?: string;
 }

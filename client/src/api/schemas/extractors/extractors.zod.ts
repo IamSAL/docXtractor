@@ -5,556 +5,407 @@
  * A comprehensive docXtractor System to extract text from documents.
  * OpenAPI spec version: 1.0
  */
-import * as zod from "zod";
+import * as zod from 'zod';
+
 
 /**
  * @summary Create a new extractor
  */
-export const extractorsControllerCreateBodyConsensusEnabledDefault = false;
-export const extractorsControllerCreateBodyConfidenceThresholdDefault = 85;
+export const extractorsControllerCreateBodyConsensusEnabledDefault = false;export const extractorsControllerCreateBodyConfidenceThresholdDefault = 85;
 export const extractorsControllerCreateBodyConfidenceThresholdMin = 0;
 export const extractorsControllerCreateBodyConfidenceThresholdMax = 100;
 
-export const extractorsControllerCreateBodyConflictResolutionDefault = `majority`;
-export const extractorsControllerCreateBodyParserEngineDefault = `docling`;
-export const extractorsControllerCreateBodyCitationEnabledDefault = false;
-export const extractorsControllerCreateBodyCitationIncludePdfPageDefault = false;
-export const extractorsControllerCreateBodyCitationIncludeBboxDefault = false;
-export const extractorsControllerCreateBodyCitationIncludeParagraphIdDefault = false;
-export const extractorsControllerCreateBodyContextWindowDefault = `128k`;
-export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o-mini`;
+export const extractorsControllerCreateBodyConflictResolutionDefault = `majority`;export const extractorsControllerCreateBodyParserEngineDefault = `docling`;export const extractorsControllerCreateBodyCitationEnabledDefault = false;export const extractorsControllerCreateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerCreateBodyCitationIncludeBboxDefault = false;export const extractorsControllerCreateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerCreateBodyContextWindowDefault = `128k`;export const extractorsControllerCreateBodyDefaultModelDefault = `gpt-4o-mini`;export const extractorsControllerCreateBodyIsPublicDefault = false;
 
 export const ExtractorsControllerCreateBody = zod.object({
-  name: zod.string().describe("The name of the extractor"),
-  description: zod
-    .string()
-    .optional()
-    .describe("The description of the extractor"),
-  thumbnailUrl: zod.string().optional(),
-  schema: zod.object({}),
-  systemPrompt: zod.string(),
-  fewShotExamples: zod
-    .array(
-      zod.object({
-        id: zod.string(),
-        name: zod.string(),
-        sources: zod.array(
-          zod.object({
-            id: zod.string(),
-            type: zod.enum(["file", "url", "text"]),
-            name: zod.string(),
-            description: zod.string(),
-            content: zod.string(),
-            storageKey: zod.string().optional(),
-            parsedContent: zod.string().optional(),
-          }),
-        ),
-        output: zod.string(),
-      }),
-    )
-    .optional(),
-  consensusEnabled: zod
-    .boolean()
-    .default(extractorsControllerCreateBodyConsensusEnabledDefault),
-  confidenceThreshold: zod
-    .number()
-    .min(extractorsControllerCreateBodyConfidenceThresholdMin)
-    .max(extractorsControllerCreateBodyConfidenceThresholdMax)
-    .default(extractorsControllerCreateBodyConfidenceThresholdDefault),
-  conflictResolution: zod
-    .enum(["majority", "highest_confidence", "human_review", "conservative"])
-    .default(extractorsControllerCreateBodyConflictResolutionDefault),
-  parserEngine: zod
-    .enum(["docling", "markitdown", "pymupdf", "opendataloader"])
-    .default(extractorsControllerCreateBodyParserEngineDefault)
-    .describe("Parser engine used for document parsing"),
-  citationEnabled: zod
-    .boolean()
-    .default(extractorsControllerCreateBodyCitationEnabledDefault),
-  citationIncludePdfPage: zod
-    .boolean()
-    .default(extractorsControllerCreateBodyCitationIncludePdfPageDefault),
-  citationIncludeBbox: zod
-    .boolean()
-    .default(extractorsControllerCreateBodyCitationIncludeBboxDefault),
-  citationIncludeParagraphId: zod
-    .boolean()
-    .default(extractorsControllerCreateBodyCitationIncludeParagraphIdDefault),
-  contextWindow: zod
-    .string()
-    .default(extractorsControllerCreateBodyContextWindowDefault),
-  defaultModel: zod
-    .string()
-    .default(extractorsControllerCreateBodyDefaultModelDefault),
-});
+  "name": zod.string().describe('The name of the extractor'),
+  "description": zod.string().optional().describe('The description of the extractor'),
+  "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional(),
+  "icon": zod.string().optional(),
+  "tags": zod.array(zod.string()).optional(),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "sources": zod.array(zod.object({
+  "id": zod.string(),
+  "type": zod.enum(['file', 'url', 'text']),
+  "name": zod.string(),
+  "description": zod.string(),
+  "content": zod.string(),
+  "storageKey": zod.string().optional(),
+  "parsedContent": zod.string().optional()
+})),
+  "output": zod.string()
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerCreateBodyConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().min(extractorsControllerCreateBodyConfidenceThresholdMin).max(extractorsControllerCreateBodyConfidenceThresholdMax).default(extractorsControllerCreateBodyConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerCreateBodyConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerCreateBodyParserEngineDefault).describe('Parser engine used for document parsing'),
+  "citationEnabled": zod.boolean().default(extractorsControllerCreateBodyCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerCreateBodyCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerCreateBodyCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerCreateBodyCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerCreateBodyContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerCreateBodyDefaultModelDefault),
+  "isPublic": zod.boolean().default(extractorsControllerCreateBodyIsPublicDefault).describe('Make this extractor visible as a template to all users')
+})
 
 /**
  * @summary Get all extractors
  */
-export const extractorsControllerFindAllResponseConsensusEnabledDefault = false;
-export const extractorsControllerFindAllResponseConfidenceThresholdDefault = 85;
-export const extractorsControllerFindAllResponseConflictResolutionDefault = `majority`;
-export const extractorsControllerFindAllResponseParserEngineDefault = `docling`;
-export const extractorsControllerFindAllResponseCitationEnabledDefault = false;
-export const extractorsControllerFindAllResponseCitationIncludePdfPageDefault = false;
-export const extractorsControllerFindAllResponseCitationIncludeBboxDefault = false;
-export const extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault = false;
-export const extractorsControllerFindAllResponseContextWindowDefault = `128k`;
-export const extractorsControllerFindAllResponseDefaultModelDefault = `gpt-4o-mini`;
+export const ExtractorsControllerFindAllQueryParams = zod.object({
+  "scope": zod.string()
+})
+
+export const extractorsControllerFindAllResponseIsPublicDefault = false;export const extractorsControllerFindAllResponseConsensusEnabledDefault = false;export const extractorsControllerFindAllResponseConfidenceThresholdDefault = 85;export const extractorsControllerFindAllResponseConflictResolutionDefault = `majority`;export const extractorsControllerFindAllResponseParserEngineDefault = `docling`;export const extractorsControllerFindAllResponseCitationEnabledDefault = false;export const extractorsControllerFindAllResponseCitationIncludePdfPageDefault = false;export const extractorsControllerFindAllResponseCitationIncludeBboxDefault = false;export const extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerFindAllResponseContextWindowDefault = `128k`;export const extractorsControllerFindAllResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerFindAllResponseItem = zod.object({
-  id: zod.string(),
-  name: zod.string(),
-  description: zod.string().optional(),
-  thumbnailUrl: zod.string().optional(),
-  schema: zod.object({}),
-  systemPrompt: zod.string(),
-  fewShotExamples: zod.array(zod.object({})).optional(),
-  variants: zod.array(zod.object({})).optional(),
-  consensusEnabled: zod
-    .boolean()
-    .default(extractorsControllerFindAllResponseConsensusEnabledDefault),
-  confidenceThreshold: zod
-    .number()
-    .default(extractorsControllerFindAllResponseConfidenceThresholdDefault),
-  conflictResolution: zod
-    .enum(["majority", "highest_confidence", "human_review", "conservative"])
-    .default(extractorsControllerFindAllResponseConflictResolutionDefault),
-  parserEngine: zod
-    .enum(["docling", "markitdown", "pymupdf", "opendataloader"])
-    .default(extractorsControllerFindAllResponseParserEngineDefault)
-    .describe("Parser engine used for document parsing"),
-  citationEnabled: zod
-    .boolean()
-    .default(extractorsControllerFindAllResponseCitationEnabledDefault),
-  citationIncludePdfPage: zod
-    .boolean()
-    .default(extractorsControllerFindAllResponseCitationIncludePdfPageDefault),
-  citationIncludeBbox: zod
-    .boolean()
-    .default(extractorsControllerFindAllResponseCitationIncludeBboxDefault),
-  citationIncludeParagraphId: zod
-    .boolean()
-    .default(
-      extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault,
-    ),
-  contextWindow: zod
-    .string()
-    .default(extractorsControllerFindAllResponseContextWindowDefault),
-  defaultModel: zod
-    .string()
-    .default(extractorsControllerFindAllResponseDefaultModelDefault),
-  createdAt: zod.iso.datetime({}),
-  updatedAt: zod.iso.datetime({}),
-});
-export const ExtractorsControllerFindAllResponse = zod.array(
-  ExtractorsControllerFindAllResponseItem,
-);
+  "id": zod.string(),
+  "user": zod.object({
+
+}).optional(),
+  "userId": zod.string().optional(),
+  "isPublic": zod.boolean().default(extractorsControllerFindAllResponseIsPublicDefault).describe('Visible to all users as a template'),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "variants": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerFindAllResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerFindAllResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerFindAllResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerFindAllResponseParserEngineDefault).describe('Parser engine used for document parsing'),
+  "citationEnabled": zod.boolean().default(extractorsControllerFindAllResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerFindAllResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerFindAllResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerFindAllResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerFindAllResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerFindAllResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
+export const ExtractorsControllerFindAllResponse = zod.array(ExtractorsControllerFindAllResponseItem)
 
 /**
  * @summary Generate a JSON schema from a description using AI
  */
 export const ExtractorsControllerGenerateSchemaBody = zod.object({
-  description: zod
-    .string()
-    .describe("A description of the data fields to extract"),
-});
+  "description": zod.string().describe('A description of the data fields to extract')
+})
 
 /**
  * @summary Generate a full extractor configuration from a description using AI
  */
+export const extractorsControllerGenerateExtractorBodySampleTextMax = 3000;
+
+
+
 export const ExtractorsControllerGenerateExtractorBody = zod.object({
-  description: zod
-    .string()
-    .describe(
-      "A description of the extractor to generate, including what documents it processes and what data to extract",
-    ),
-});
+  "description": zod.string().describe('A description of the extractor to generate, including what documents it processes and what data to extract'),
+  "sampleText": zod.string().max(extractorsControllerGenerateExtractorBodySampleTextMax).optional().describe('Sample document text to improve field inference (max 3000 chars)')
+})
+
+/**
+ * @summary Preview extraction result using sample text (direct LLM, no queue)
+ */
+export const extractorsControllerPreviewExtractionBodySampleTextMax = 2000;
+
+
+
+export const ExtractorsControllerPreviewExtractionBody = zod.object({
+  "schema": zod.object({
+
+}).describe('JSON schema to extract against'),
+  "systemPrompt": zod.string().describe('System prompt for the LLM'),
+  "sampleText": zod.string().max(extractorsControllerPreviewExtractionBodySampleTextMax).optional().describe('Sample document text (max 2000 chars)')
+})
 
 /**
  * @summary Get an extractor by id
  */
 export const ExtractorsControllerFindOneParams = zod.object({
-  id: zod.string(),
-});
+  "id": zod.string()
+})
 
-export const extractorsControllerFindOneResponseConsensusEnabledDefault = false;
-export const extractorsControllerFindOneResponseConfidenceThresholdDefault = 85;
-export const extractorsControllerFindOneResponseConflictResolutionDefault = `majority`;
-export const extractorsControllerFindOneResponseParserEngineDefault = `docling`;
-export const extractorsControllerFindOneResponseCitationEnabledDefault = false;
-export const extractorsControllerFindOneResponseCitationIncludePdfPageDefault = false;
-export const extractorsControllerFindOneResponseCitationIncludeBboxDefault = false;
-export const extractorsControllerFindOneResponseCitationIncludeParagraphIdDefault = false;
-export const extractorsControllerFindOneResponseContextWindowDefault = `128k`;
-export const extractorsControllerFindOneResponseDefaultModelDefault = `gpt-4o-mini`;
+export const extractorsControllerFindOneResponseIsPublicDefault = false;export const extractorsControllerFindOneResponseConsensusEnabledDefault = false;export const extractorsControllerFindOneResponseConfidenceThresholdDefault = 85;export const extractorsControllerFindOneResponseConflictResolutionDefault = `majority`;export const extractorsControllerFindOneResponseParserEngineDefault = `docling`;export const extractorsControllerFindOneResponseCitationEnabledDefault = false;export const extractorsControllerFindOneResponseCitationIncludePdfPageDefault = false;export const extractorsControllerFindOneResponseCitationIncludeBboxDefault = false;export const extractorsControllerFindOneResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerFindOneResponseContextWindowDefault = `128k`;export const extractorsControllerFindOneResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerFindOneResponse = zod.object({
-  id: zod.string(),
-  name: zod.string(),
-  description: zod.string().optional(),
-  thumbnailUrl: zod.string().optional(),
-  schema: zod.object({}),
-  systemPrompt: zod.string(),
-  fewShotExamples: zod.array(zod.object({})).optional(),
-  variants: zod.array(zod.object({})).optional(),
-  consensusEnabled: zod
-    .boolean()
-    .default(extractorsControllerFindOneResponseConsensusEnabledDefault),
-  confidenceThreshold: zod
-    .number()
-    .default(extractorsControllerFindOneResponseConfidenceThresholdDefault),
-  conflictResolution: zod
-    .enum(["majority", "highest_confidence", "human_review", "conservative"])
-    .default(extractorsControllerFindOneResponseConflictResolutionDefault),
-  parserEngine: zod
-    .enum(["docling", "markitdown", "pymupdf", "opendataloader"])
-    .default(extractorsControllerFindOneResponseParserEngineDefault)
-    .describe("Parser engine used for document parsing"),
-  citationEnabled: zod
-    .boolean()
-    .default(extractorsControllerFindOneResponseCitationEnabledDefault),
-  citationIncludePdfPage: zod
-    .boolean()
-    .default(extractorsControllerFindOneResponseCitationIncludePdfPageDefault),
-  citationIncludeBbox: zod
-    .boolean()
-    .default(extractorsControllerFindOneResponseCitationIncludeBboxDefault),
-  citationIncludeParagraphId: zod
-    .boolean()
-    .default(
-      extractorsControllerFindOneResponseCitationIncludeParagraphIdDefault,
-    ),
-  contextWindow: zod
-    .string()
-    .default(extractorsControllerFindOneResponseContextWindowDefault),
-  defaultModel: zod
-    .string()
-    .default(extractorsControllerFindOneResponseDefaultModelDefault),
-  createdAt: zod.iso.datetime({}),
-  updatedAt: zod.iso.datetime({}),
-});
+  "id": zod.string(),
+  "user": zod.object({
+
+}).optional(),
+  "userId": zod.string().optional(),
+  "isPublic": zod.boolean().default(extractorsControllerFindOneResponseIsPublicDefault).describe('Visible to all users as a template'),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "variants": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerFindOneResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerFindOneResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerFindOneResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerFindOneResponseParserEngineDefault).describe('Parser engine used for document parsing'),
+  "citationEnabled": zod.boolean().default(extractorsControllerFindOneResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerFindOneResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerFindOneResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerFindOneResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerFindOneResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerFindOneResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
 
 /**
  * @summary Update an extractor by id
  */
 export const ExtractorsControllerUpdateParams = zod.object({
-  id: zod.string(),
-});
+  "id": zod.string()
+})
 
-export const extractorsControllerUpdateBodyConsensusEnabledDefault = false;
-export const extractorsControllerUpdateBodyConfidenceThresholdDefault = 85;
+export const extractorsControllerUpdateBodyConsensusEnabledDefault = false;export const extractorsControllerUpdateBodyConfidenceThresholdDefault = 85;
 export const extractorsControllerUpdateBodyConfidenceThresholdMin = 0;
 export const extractorsControllerUpdateBodyConfidenceThresholdMax = 100;
 
-export const extractorsControllerUpdateBodyConflictResolutionDefault = `majority`;
-export const extractorsControllerUpdateBodyParserEngineDefault = `docling`;
-export const extractorsControllerUpdateBodyCitationEnabledDefault = false;
-export const extractorsControllerUpdateBodyCitationIncludePdfPageDefault = false;
-export const extractorsControllerUpdateBodyCitationIncludeBboxDefault = false;
-export const extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault = false;
-export const extractorsControllerUpdateBodyContextWindowDefault = `128k`;
-export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o-mini`;
+export const extractorsControllerUpdateBodyConflictResolutionDefault = `majority`;export const extractorsControllerUpdateBodyParserEngineDefault = `docling`;export const extractorsControllerUpdateBodyCitationEnabledDefault = false;export const extractorsControllerUpdateBodyCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateBodyCitationIncludeBboxDefault = false;export const extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateBodyContextWindowDefault = `128k`;export const extractorsControllerUpdateBodyDefaultModelDefault = `gpt-4o-mini`;export const extractorsControllerUpdateBodyIsPublicDefault = false;
 
 export const ExtractorsControllerUpdateBody = zod.object({
-  name: zod.string().optional().describe("The name of the extractor"),
-  description: zod
-    .string()
-    .optional()
-    .describe("The description of the extractor"),
-  thumbnailUrl: zod.string().optional(),
-  schema: zod.object({}).optional(),
-  systemPrompt: zod.string().optional(),
-  fewShotExamples: zod
-    .array(
-      zod.object({
-        id: zod.string(),
-        name: zod.string(),
-        sources: zod.array(
-          zod.object({
-            id: zod.string(),
-            type: zod.enum(["file", "url", "text"]),
-            name: zod.string(),
-            description: zod.string(),
-            content: zod.string(),
-            storageKey: zod.string().optional(),
-            parsedContent: zod.string().optional(),
-          }),
-        ),
-        output: zod.string(),
-      }),
-    )
-    .optional(),
-  consensusEnabled: zod
-    .boolean()
-    .default(extractorsControllerUpdateBodyConsensusEnabledDefault),
-  confidenceThreshold: zod
-    .number()
-    .min(extractorsControllerUpdateBodyConfidenceThresholdMin)
-    .max(extractorsControllerUpdateBodyConfidenceThresholdMax)
-    .default(extractorsControllerUpdateBodyConfidenceThresholdDefault),
-  conflictResolution: zod
-    .enum(["majority", "highest_confidence", "human_review", "conservative"])
-    .default(extractorsControllerUpdateBodyConflictResolutionDefault),
-  parserEngine: zod
-    .enum(["docling", "markitdown", "pymupdf", "opendataloader"])
-    .default(extractorsControllerUpdateBodyParserEngineDefault)
-    .describe("Parser engine used for document parsing"),
-  citationEnabled: zod
-    .boolean()
-    .default(extractorsControllerUpdateBodyCitationEnabledDefault),
-  citationIncludePdfPage: zod
-    .boolean()
-    .default(extractorsControllerUpdateBodyCitationIncludePdfPageDefault),
-  citationIncludeBbox: zod
-    .boolean()
-    .default(extractorsControllerUpdateBodyCitationIncludeBboxDefault),
-  citationIncludeParagraphId: zod
-    .boolean()
-    .default(extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault),
-  contextWindow: zod
-    .string()
-    .default(extractorsControllerUpdateBodyContextWindowDefault),
-  defaultModel: zod
-    .string()
-    .default(extractorsControllerUpdateBodyDefaultModelDefault),
-});
+  "name": zod.string().optional().describe('The name of the extractor'),
+  "description": zod.string().optional().describe('The description of the extractor'),
+  "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional(),
+  "icon": zod.string().optional(),
+  "tags": zod.array(zod.string()).optional(),
+  "schema": zod.object({
 
-export const extractorsControllerUpdateResponseConsensusEnabledDefault = false;
-export const extractorsControllerUpdateResponseConfidenceThresholdDefault = 85;
-export const extractorsControllerUpdateResponseConflictResolutionDefault = `majority`;
-export const extractorsControllerUpdateResponseParserEngineDefault = `docling`;
-export const extractorsControllerUpdateResponseCitationEnabledDefault = false;
-export const extractorsControllerUpdateResponseCitationIncludePdfPageDefault = false;
-export const extractorsControllerUpdateResponseCitationIncludeBboxDefault = false;
-export const extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault = false;
-export const extractorsControllerUpdateResponseContextWindowDefault = `128k`;
-export const extractorsControllerUpdateResponseDefaultModelDefault = `gpt-4o-mini`;
+}).optional(),
+  "systemPrompt": zod.string().optional(),
+  "fewShotExamples": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "sources": zod.array(zod.object({
+  "id": zod.string(),
+  "type": zod.enum(['file', 'url', 'text']),
+  "name": zod.string(),
+  "description": zod.string(),
+  "content": zod.string(),
+  "storageKey": zod.string().optional(),
+  "parsedContent": zod.string().optional()
+})),
+  "output": zod.string()
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerUpdateBodyConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().min(extractorsControllerUpdateBodyConfidenceThresholdMin).max(extractorsControllerUpdateBodyConfidenceThresholdMax).default(extractorsControllerUpdateBodyConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateBodyConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerUpdateBodyParserEngineDefault).describe('Parser engine used for document parsing'),
+  "citationEnabled": zod.boolean().default(extractorsControllerUpdateBodyCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerUpdateBodyCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerUpdateBodyContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerUpdateBodyDefaultModelDefault),
+  "isPublic": zod.boolean().default(extractorsControllerUpdateBodyIsPublicDefault).describe('Make this extractor visible as a template to all users')
+})
+
+export const extractorsControllerUpdateResponseIsPublicDefault = false;export const extractorsControllerUpdateResponseConsensusEnabledDefault = false;export const extractorsControllerUpdateResponseConfidenceThresholdDefault = 85;export const extractorsControllerUpdateResponseConflictResolutionDefault = `majority`;export const extractorsControllerUpdateResponseParserEngineDefault = `docling`;export const extractorsControllerUpdateResponseCitationEnabledDefault = false;export const extractorsControllerUpdateResponseCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateResponseCitationIncludeBboxDefault = false;export const extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateResponseContextWindowDefault = `128k`;export const extractorsControllerUpdateResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerUpdateResponse = zod.object({
-  id: zod.string(),
-  name: zod.string(),
-  description: zod.string().optional(),
-  thumbnailUrl: zod.string().optional(),
-  schema: zod.object({}),
-  systemPrompt: zod.string(),
-  fewShotExamples: zod.array(zod.object({})).optional(),
-  variants: zod.array(zod.object({})).optional(),
-  consensusEnabled: zod
-    .boolean()
-    .default(extractorsControllerUpdateResponseConsensusEnabledDefault),
-  confidenceThreshold: zod
-    .number()
-    .default(extractorsControllerUpdateResponseConfidenceThresholdDefault),
-  conflictResolution: zod
-    .enum(["majority", "highest_confidence", "human_review", "conservative"])
-    .default(extractorsControllerUpdateResponseConflictResolutionDefault),
-  parserEngine: zod
-    .enum(["docling", "markitdown", "pymupdf", "opendataloader"])
-    .default(extractorsControllerUpdateResponseParserEngineDefault)
-    .describe("Parser engine used for document parsing"),
-  citationEnabled: zod
-    .boolean()
-    .default(extractorsControllerUpdateResponseCitationEnabledDefault),
-  citationIncludePdfPage: zod
-    .boolean()
-    .default(extractorsControllerUpdateResponseCitationIncludePdfPageDefault),
-  citationIncludeBbox: zod
-    .boolean()
-    .default(extractorsControllerUpdateResponseCitationIncludeBboxDefault),
-  citationIncludeParagraphId: zod
-    .boolean()
-    .default(
-      extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault,
-    ),
-  contextWindow: zod
-    .string()
-    .default(extractorsControllerUpdateResponseContextWindowDefault),
-  defaultModel: zod
-    .string()
-    .default(extractorsControllerUpdateResponseDefaultModelDefault),
-  createdAt: zod.iso.datetime({}),
-  updatedAt: zod.iso.datetime({}),
-});
+  "id": zod.string(),
+  "user": zod.object({
+
+}).optional(),
+  "userId": zod.string().optional(),
+  "isPublic": zod.boolean().default(extractorsControllerUpdateResponseIsPublicDefault).describe('Visible to all users as a template'),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "variants": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerUpdateResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerUpdateResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerUpdateResponseParserEngineDefault).describe('Parser engine used for document parsing'),
+  "citationEnabled": zod.boolean().default(extractorsControllerUpdateResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerUpdateResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerUpdateResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerUpdateResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerUpdateResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
 
 /**
  * @summary Delete an extractor by id
  */
 export const ExtractorsControllerRemoveParams = zod.object({
-  id: zod.string(),
-});
+  "id": zod.string()
+})
+
+/**
+ * @summary Clone a public extractor into current user workspace
+ */
+export const ExtractorsControllerCloneExtractorParams = zod.object({
+  "id": zod.string()
+})
 
 /**
  * @summary Add a schema variant to an extractor
  */
 export const ExtractorsControllerAddVariantParams = zod.object({
-  id: zod.string(),
-});
+  "id": zod.string()
+})
 
 export const extractorsControllerAddVariantBodyIsDefaultDefault = false;
 
 export const ExtractorsControllerAddVariantBody = zod.object({
-  name: zod.string(),
-  description: zod.string().optional(),
-  schema: zod.object({}),
-  isDefault: zod
-    .boolean()
-    .default(extractorsControllerAddVariantBodyIsDefaultDefault),
-});
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "schema": zod.object({
+
+}),
+  "isDefault": zod.boolean().default(extractorsControllerAddVariantBodyIsDefaultDefault)
+})
 
 /**
  * @summary Update a schema variant
  */
 export const ExtractorsControllerUpdateVariantParams = zod.object({
-  id: zod.string(),
-  variantId: zod.string(),
-});
+  "id": zod.string(),
+  "variantId": zod.string()
+})
 
 export const extractorsControllerUpdateVariantBodyIsDefaultDefault = false;
 
 export const ExtractorsControllerUpdateVariantBody = zod.object({
-  name: zod.string().optional(),
-  description: zod.string().optional(),
-  schema: zod.object({}).optional(),
-  isDefault: zod
-    .boolean()
-    .default(extractorsControllerUpdateVariantBodyIsDefaultDefault),
-});
+  "name": zod.string().optional(),
+  "description": zod.string().optional(),
+  "schema": zod.object({
 
-export const extractorsControllerUpdateVariantResponseConsensusEnabledDefault = false;
-export const extractorsControllerUpdateVariantResponseConfidenceThresholdDefault = 85;
-export const extractorsControllerUpdateVariantResponseConflictResolutionDefault = `majority`;
-export const extractorsControllerUpdateVariantResponseParserEngineDefault = `docling`;
-export const extractorsControllerUpdateVariantResponseCitationEnabledDefault = false;
-export const extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefault = false;
-export const extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault = false;
-export const extractorsControllerUpdateVariantResponseCitationIncludeParagraphIdDefault = false;
-export const extractorsControllerUpdateVariantResponseContextWindowDefault = `128k`;
-export const extractorsControllerUpdateVariantResponseDefaultModelDefault = `gpt-4o-mini`;
+}).optional(),
+  "isDefault": zod.boolean().default(extractorsControllerUpdateVariantBodyIsDefaultDefault)
+})
+
+export const extractorsControllerUpdateVariantResponseIsPublicDefault = false;export const extractorsControllerUpdateVariantResponseConsensusEnabledDefault = false;export const extractorsControllerUpdateVariantResponseConfidenceThresholdDefault = 85;export const extractorsControllerUpdateVariantResponseConflictResolutionDefault = `majority`;export const extractorsControllerUpdateVariantResponseParserEngineDefault = `docling`;export const extractorsControllerUpdateVariantResponseCitationEnabledDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault = false;export const extractorsControllerUpdateVariantResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerUpdateVariantResponseContextWindowDefault = `128k`;export const extractorsControllerUpdateVariantResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerUpdateVariantResponse = zod.object({
-  id: zod.string(),
-  name: zod.string(),
-  description: zod.string().optional(),
-  thumbnailUrl: zod.string().optional(),
-  schema: zod.object({}),
-  systemPrompt: zod.string(),
-  fewShotExamples: zod.array(zod.object({})).optional(),
-  variants: zod.array(zod.object({})).optional(),
-  consensusEnabled: zod
-    .boolean()
-    .default(extractorsControllerUpdateVariantResponseConsensusEnabledDefault),
-  confidenceThreshold: zod
-    .number()
-    .default(
-      extractorsControllerUpdateVariantResponseConfidenceThresholdDefault,
-    ),
-  conflictResolution: zod
-    .enum(["majority", "highest_confidence", "human_review", "conservative"])
-    .default(
-      extractorsControllerUpdateVariantResponseConflictResolutionDefault,
-    ),
-  parserEngine: zod
-    .enum(["docling", "markitdown", "pymupdf", "opendataloader"])
-    .default(extractorsControllerUpdateVariantResponseParserEngineDefault)
-    .describe("Parser engine used for document parsing"),
-  citationEnabled: zod
-    .boolean()
-    .default(extractorsControllerUpdateVariantResponseCitationEnabledDefault),
-  citationIncludePdfPage: zod
-    .boolean()
-    .default(
-      extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefault,
-    ),
-  citationIncludeBbox: zod
-    .boolean()
-    .default(
-      extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault,
-    ),
-  citationIncludeParagraphId: zod
-    .boolean()
-    .default(
-      extractorsControllerUpdateVariantResponseCitationIncludeParagraphIdDefault,
-    ),
-  contextWindow: zod
-    .string()
-    .default(extractorsControllerUpdateVariantResponseContextWindowDefault),
-  defaultModel: zod
-    .string()
-    .default(extractorsControllerUpdateVariantResponseDefaultModelDefault),
-  createdAt: zod.iso.datetime({}),
-  updatedAt: zod.iso.datetime({}),
-});
+  "id": zod.string(),
+  "user": zod.object({
+
+}).optional(),
+  "userId": zod.string().optional(),
+  "isPublic": zod.boolean().default(extractorsControllerUpdateVariantResponseIsPublicDefault).describe('Visible to all users as a template'),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "variants": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerUpdateVariantResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerUpdateVariantResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerUpdateVariantResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerUpdateVariantResponseParserEngineDefault).describe('Parser engine used for document parsing'),
+  "citationEnabled": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerUpdateVariantResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerUpdateVariantResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerUpdateVariantResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
 
 /**
  * @summary Delete a schema variant
  */
 export const ExtractorsControllerDeleteVariantParams = zod.object({
-  id: zod.string(),
-  variantId: zod.string(),
-});
+  "id": zod.string(),
+  "variantId": zod.string()
+})
 
-export const extractorsControllerDeleteVariantResponseConsensusEnabledDefault = false;
-export const extractorsControllerDeleteVariantResponseConfidenceThresholdDefault = 85;
-export const extractorsControllerDeleteVariantResponseConflictResolutionDefault = `majority`;
-export const extractorsControllerDeleteVariantResponseParserEngineDefault = `docling`;
-export const extractorsControllerDeleteVariantResponseCitationEnabledDefault = false;
-export const extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefault = false;
-export const extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault = false;
-export const extractorsControllerDeleteVariantResponseCitationIncludeParagraphIdDefault = false;
-export const extractorsControllerDeleteVariantResponseContextWindowDefault = `128k`;
-export const extractorsControllerDeleteVariantResponseDefaultModelDefault = `gpt-4o-mini`;
+export const extractorsControllerDeleteVariantResponseIsPublicDefault = false;export const extractorsControllerDeleteVariantResponseConsensusEnabledDefault = false;export const extractorsControllerDeleteVariantResponseConfidenceThresholdDefault = 85;export const extractorsControllerDeleteVariantResponseConflictResolutionDefault = `majority`;export const extractorsControllerDeleteVariantResponseParserEngineDefault = `docling`;export const extractorsControllerDeleteVariantResponseCitationEnabledDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault = false;export const extractorsControllerDeleteVariantResponseCitationIncludeParagraphIdDefault = false;export const extractorsControllerDeleteVariantResponseContextWindowDefault = `128k`;export const extractorsControllerDeleteVariantResponseDefaultModelDefault = `gpt-4o-mini`;
 
 export const ExtractorsControllerDeleteVariantResponse = zod.object({
-  id: zod.string(),
-  name: zod.string(),
-  description: zod.string().optional(),
-  thumbnailUrl: zod.string().optional(),
-  schema: zod.object({}),
-  systemPrompt: zod.string(),
-  fewShotExamples: zod.array(zod.object({})).optional(),
-  variants: zod.array(zod.object({})).optional(),
-  consensusEnabled: zod
-    .boolean()
-    .default(extractorsControllerDeleteVariantResponseConsensusEnabledDefault),
-  confidenceThreshold: zod
-    .number()
-    .default(
-      extractorsControllerDeleteVariantResponseConfidenceThresholdDefault,
-    ),
-  conflictResolution: zod
-    .enum(["majority", "highest_confidence", "human_review", "conservative"])
-    .default(
-      extractorsControllerDeleteVariantResponseConflictResolutionDefault,
-    ),
-  parserEngine: zod
-    .enum(["docling", "markitdown", "pymupdf", "opendataloader"])
-    .default(extractorsControllerDeleteVariantResponseParserEngineDefault)
-    .describe("Parser engine used for document parsing"),
-  citationEnabled: zod
-    .boolean()
-    .default(extractorsControllerDeleteVariantResponseCitationEnabledDefault),
-  citationIncludePdfPage: zod
-    .boolean()
-    .default(
-      extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefault,
-    ),
-  citationIncludeBbox: zod
-    .boolean()
-    .default(
-      extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault,
-    ),
-  citationIncludeParagraphId: zod
-    .boolean()
-    .default(
-      extractorsControllerDeleteVariantResponseCitationIncludeParagraphIdDefault,
-    ),
-  contextWindow: zod
-    .string()
-    .default(extractorsControllerDeleteVariantResponseContextWindowDefault),
-  defaultModel: zod
-    .string()
-    .default(extractorsControllerDeleteVariantResponseDefaultModelDefault),
-  createdAt: zod.iso.datetime({}),
-  updatedAt: zod.iso.datetime({}),
-});
+  "id": zod.string(),
+  "user": zod.object({
+
+}).optional(),
+  "userId": zod.string().optional(),
+  "isPublic": zod.boolean().default(extractorsControllerDeleteVariantResponseIsPublicDefault).describe('Visible to all users as a template'),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "thumbnailUrl": zod.string().optional(),
+  "category": zod.string().optional().describe('Template category for display'),
+  "icon": zod.string().optional().describe('Material Symbols icon name'),
+  "tags": zod.array(zod.string()).optional().describe('Display tags for templates'),
+  "schema": zod.object({
+
+}),
+  "systemPrompt": zod.string(),
+  "fewShotExamples": zod.array(zod.object({
+
+})).optional(),
+  "variants": zod.array(zod.object({
+
+})).optional(),
+  "consensusEnabled": zod.boolean().default(extractorsControllerDeleteVariantResponseConsensusEnabledDefault),
+  "confidenceThreshold": zod.number().default(extractorsControllerDeleteVariantResponseConfidenceThresholdDefault),
+  "conflictResolution": zod.enum(['majority', 'highest_confidence', 'human_review', 'conservative']).default(extractorsControllerDeleteVariantResponseConflictResolutionDefault),
+  "parserEngine": zod.enum(['docling', 'markitdown', 'pymupdf', 'opendataloader']).default(extractorsControllerDeleteVariantResponseParserEngineDefault).describe('Parser engine used for document parsing'),
+  "citationEnabled": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationEnabledDefault),
+  "citationIncludePdfPage": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationIncludePdfPageDefault),
+  "citationIncludeBbox": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationIncludeBboxDefault),
+  "citationIncludeParagraphId": zod.boolean().default(extractorsControllerDeleteVariantResponseCitationIncludeParagraphIdDefault),
+  "contextWindow": zod.string().default(extractorsControllerDeleteVariantResponseContextWindowDefault),
+  "defaultModel": zod.string().default(extractorsControllerDeleteVariantResponseDefaultModelDefault),
+  "createdAt": zod.iso.datetime({}),
+  "updatedAt": zod.iso.datetime({})
+})
+

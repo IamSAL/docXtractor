@@ -66,6 +66,14 @@ export class WorkflowsService {
     return workflow;
   }
 
+  async findById(id: string) {
+    const workflow = await this.workflowRepository.findOne({ where: { id } });
+    if (!workflow) {
+      throw new NotFoundException(`Workflow with ID ${id} not found`);
+    }
+    return workflow;
+  }
+
   async update(
     id: string,
     updateWorkflowDto: UpdateWorkflowDto,

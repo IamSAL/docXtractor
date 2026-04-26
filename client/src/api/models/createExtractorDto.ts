@@ -16,6 +16,9 @@ export interface CreateExtractorDto {
 	/** The description of the extractor */
 	description?: string;
 	thumbnailUrl?: string;
+	category?: string;
+	icon?: string;
+	tags?: string[];
 	schema: CreateExtractorDtoSchema;
 	systemPrompt: string;
 	fewShotExamples?: FewShotExampleDto[];
@@ -34,4 +37,6 @@ export interface CreateExtractorDto {
 	citationIncludeParagraphId?: boolean;
 	contextWindow?: string;
 	defaultModel?: string;
+	/** Make this extractor visible as a template to all users */
+	isPublic?: boolean;
 }
