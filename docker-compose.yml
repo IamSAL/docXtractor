@@ -34,6 +34,76 @@ services:
       timeout: 5s
       retries: 5
 
+  ollama1:
+    image: alpine/ollama:latest
+    container_name: docxtractor-ollama1
+    restart: unless-stopped
+    volumes:
+      - ollama1_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - docxtractor-network
+
+  ollama2:
+    image: alpine/ollama:latest
+    container_name: docxtractor-ollama2
+    restart: unless-stopped
+    volumes:
+      - ollama2_data:/root/.ollama
+    ports:
+      - "11435:11434"
+    networks:
+      - docxtractor-network
+
+  ollama3:
+    image: alpine/ollama:latest
+    container_name: docxtractor-ollama3
+    restart: unless-stopped
+    volumes:
+      - ollama3_data:/root/.ollama
+    ports:
+      - "11436:11434"
+    networks:
+      - docxtractor-network
+
+  ollama4:
+    image: alpine/ollama:latest
+    container_name: docxtractor-ollama4
+    restart: unless-stopped
+    volumes:
+      - ollama4_data:/root/.ollama
+    ports:
+      - "11437:11434"
+    networks:
+      - docxtractor-network
+
+  ollama5:
+    image: alpine/ollama:latest
+    container_name: docxtractor-ollama5
+    restart: unless-stopped
+    volumes:
+      - ollama5_data:/root/.ollama
+    ports:
+      - "11438:11434"
+    networks:
+      - docxtractor-network
+
+  ollama-lb:
+    image: nginx:alpine
+    container_name: docxtractor-ollama-lb
+    restart: unless-stopped
+    volumes:
+      - ./infra/ollama-lb.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - ollama1
+      - ollama2
+      - ollama3
+      - ollama4
+      - ollama5
+    networks:
+      - docxtractor-network
+
   freellm:
     image: ghcr.io/devansh-365/freellm:latest
     container_name: docxtractor-freellm
@@ -50,6 +120,10 @@ services:
       - GITHUB_MODELS_API_KEY=${GITHUB_MODELS_API_KEY}
       - CLOUDFLARE_ACCOUNT_ID=${CLOUDFLARE_ACCOUNT_ID}
       - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
+      - OLLAMA_BASE_URL=http://ollama-lb:11434
+      - OLLAMA_MODELS=gpt-oss:120b-cloud
+    depends_on:
+      - ollama-lb
     networks:
       - docxtractor-network
     healthcheck:
@@ -84,6 +158,7 @@ services:
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL}
       - LLM_EXTRACTION_MODEL=${LLM_EXTRACTION_MODEL}
+      - OLLAMA_BASE_URL=http://ollama-lb:11434
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET:-docxtractor-dev-access-secret}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-docxtractor-dev-refresh-secret}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET:-docxtractor-dev-reset-secret}
@@ -218,6 +293,11 @@ services:
 volumes:
   postgres_data:
   minio_data:
+  ollama1_data:
+  ollama2_data:
+  ollama3_data:
+  ollama4_data:
+  ollama5_data:
 
 networks:
   docxtractor-network:

@@ -59,6 +59,8 @@ export class LlmService {
   private readonly defaultModel: string;
   private readonly defaultExtractionModel: string;
   private readonly maxRetries: number;
+  private readonly ollamaBaseUrl: string;
+  private readonly pulledModels = new Set<string>();
 
   constructor(private readonly configService: ConfigService) {
     this.client = new OpenAI({
@@ -74,10 +76,45 @@ export class LlmService {
       'free-smart',
     );
     this.maxRetries = configService.get<number>('LLM_MAX_RETRIES', 3);
+    this.ollamaBaseUrl = configService.get<string>(
+      'OLLAMA_BASE_URL',
+      'http://ollama-lb:11434',
+    );
 
     this.logger.log(
       `LlmService initialized: baseURL=${configService.get('FREELLM_BASE_URL', 'http://freellm:3000/v1')}, defaultModel=${this.defaultModel}`,
     );
+  }
+
+  private isOllamaModel(model: string): boolean {
+    return model.includes(':');
+  }
+
+  private isModelNotFoundError(error: any): boolean {
+    const msg: string = (error?.message ?? error?.error ?? '').toLowerCase();
+    return (
+      (error?.status === 404 || msg.includes('not found')) &&
+      msg.includes('model')
+    );
+  }
+
+  private async ensureOllamaModelPulled(model: string): Promise<void> {
+    if (this.pulledModels.has(model)) return;
+
+    this.logger.log(`Pulling Ollama model: ${model}`);
+    const res = await fetch(`${this.ollamaBaseUrl}/api/pull`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: model, stream: false }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Ollama pull failed for model '${model}': ${body}`);
+    }
+
+    this.pulledModels.add(model);
+    this.logger.log(`Ollama model pulled successfully: ${model}`);
   }
 
   async extract(
@@ -129,6 +166,7 @@ export class LlmService {
     let lastValidationErrors = '';
     const maxRateLimitRetries = 5;
     let rateLimitRetries = 0;
+    let autopullAttempted = false;
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
@@ -229,6 +267,20 @@ export class LlmService {
           `LLM extraction failed (attempt ${attempt}/${this.maxRetries}): ${error}`,
         );
 
+        if (
+          !autopullAttempted &&
+          this.isOllamaModel(modelId) &&
+          this.isModelNotFoundError(error)
+        ) {
+          autopullAttempted = true;
+          this.logger.warn(
+            `Ollama model '${modelId}' not found — pulling and retrying`,
+          );
+          await this.ensureOllamaModelPulled(modelId);
+          attempt--; // Don't consume a retry slot for the pull
+          continue;
+        }
+
         if (error?.status === 429) {
           rateLimitRetries++;
           if (rateLimitRetries > maxRateLimitRetries) {
@@ -266,6 +318,7 @@ export class LlmService {
 
     const maxRateLimitRetries = 5;
     let rateLimitRetries = 0;
+    let autopullAttempted = false;
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
@@ -295,6 +348,20 @@ export class LlmService {
         this.logger.error(
           `LLM generation failed (attempt ${attempt}/${this.maxRetries}): ${error}`,
         );
+
+        if (
+          !autopullAttempted &&
+          this.isOllamaModel(modelId) &&
+          this.isModelNotFoundError(error)
+        ) {
+          autopullAttempted = true;
+          this.logger.warn(
+            `Ollama model '${modelId}' not found — pulling and retrying`,
+          );
+          await this.ensureOllamaModelPulled(modelId);
+          attempt--;
+          continue;
+        }
 
         if (error?.status === 429) {
           rateLimitRetries++;

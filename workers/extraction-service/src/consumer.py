@@ -60,7 +60,7 @@ async def process_job(job: Job, token: str = None):
         system_prompt = data.get("system_prompt", "")
         extraction_type = data.get("extraction_type", "llm")
         examples = data.get("examples", [])
-        model_id = data.get("model_id", "gemini-2.0-flash-exp")
+        model_id = data.get("model_id", "free")
 
         schema_fields = len(schema.get("fields", []))
 

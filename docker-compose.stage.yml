@@ -68,6 +68,76 @@ services:
     networks:
       - docxtractor-stage-network
 
+  ollama1:
+    image: alpine/ollama:latest
+    container_name: docxtractor-stage-ollama1
+    restart: unless-stopped
+    volumes:
+      - ollama1_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - docxtractor-stage-network
+
+  ollama2:
+    image: alpine/ollama:latest
+    container_name: docxtractor-stage-ollama2
+    restart: unless-stopped
+    volumes:
+      - ollama2_data:/root/.ollama
+    ports:
+      - "11435:11434"
+    networks:
+      - docxtractor-stage-network
+
+  ollama3:
+    image: alpine/ollama:latest
+    container_name: docxtractor-stage-ollama3
+    restart: unless-stopped
+    volumes:
+      - ollama3_data:/root/.ollama
+    ports:
+      - "11436:11434"
+    networks:
+      - docxtractor-stage-network
+
+  ollama4:
+    image: alpine/ollama:latest
+    container_name: docxtractor-stage-ollama4
+    restart: unless-stopped
+    volumes:
+      - ollama4_data:/root/.ollama
+    ports:
+      - "11437:11434"
+    networks:
+      - docxtractor-stage-network
+
+  ollama5:
+    image: alpine/ollama:latest
+    container_name: docxtractor-stage-ollama5
+    restart: unless-stopped
+    volumes:
+      - ollama5_data:/root/.ollama
+    ports:
+      - "11438:11434"
+    networks:
+      - docxtractor-stage-network
+
+  ollama-lb:
+    image: nginx:alpine
+    container_name: docxtractor-stage-ollama-lb
+    restart: unless-stopped
+    volumes:
+      - ./infra/ollama-lb.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - ollama1
+      - ollama2
+      - ollama3
+      - ollama4
+      - ollama5
+    networks:
+      - docxtractor-stage-network
+
   freellm:
     image: ghcr.io/devansh-365/freellm:latest
     container_name: docxtractor-stage-freellm
@@ -81,6 +151,10 @@ services:
       - CEREBRAS_API_KEY=${CEREBRAS_API_KEY}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - FREELLM_TOKEN_SECRET=${FREELLM_TOKEN_SECRET}
+      - OLLAMA_BASE_URL=http://ollama-lb:11434
+      - OLLAMA_MODELS=gpt-oss:120b-cloud
+    depends_on:
+      - ollama-lb
     networks:
       - docxtractor-stage-network
     healthcheck:
@@ -88,7 +162,6 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-
   server:
     image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-server:latest
     build:
@@ -119,6 +192,7 @@ services:
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - LLM_EXTRACTION_MODEL=${LLM_EXTRACTION_MODEL}
+      - OLLAMA_BASE_URL=http://ollama-lb:11434
       - SWAGGER_USER=${SWAGGER_USER:-admin}
       - SWAGGER_PASS=${SWAGGER_PASS:-admin}
       - THROTTLER_TTL=${THROTTLER_TTL:-60000}
@@ -227,6 +301,11 @@ volumes:
   stage_postgres_data:
   stage_minio_data:
   stage_redis_data:
+  ollama1_data:
+  ollama2_data:
+  ollama3_data:
+  ollama4_data:
+  ollama5_data:
 
 networks:
   docxtractor-stage-network:

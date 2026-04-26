@@ -45,6 +45,10 @@ export class RunsService {
     private configService: ConfigService,
   ) {}
 
+  private resolveWorkerModel(run: Run, extractor: Extractor | null): string {
+    return run.model || extractor?.defaultModel || 'free';
+  }
+
   /**
    * Resolve the effective schema for a run, considering variant selection and skipped fields.
    */
@@ -106,7 +110,8 @@ export class RunsService {
     runId: string,
     fn: () => Promise<void>,
   ): Promise<void> {
-    const existingLock = this.parsedDocumentLocks.get(runId) || Promise.resolve();
+    const existingLock =
+      this.parsedDocumentLocks.get(runId) || Promise.resolve();
     const newLock = existingLock.then(fn);
     this.parsedDocumentLocks.set(
       runId,
@@ -325,7 +330,11 @@ export class RunsService {
       } catch (err) {
         source.status = 'failed';
         source.error = `enqueue failed: ${(err as Error).message}`;
-        this.addLog(run, 'error', `Failed to queue '${source.name}': ${(err as Error).message}`);
+        this.addLog(
+          run,
+          'error',
+          `Failed to queue '${source.name}': ${(err as Error).message}`,
+        );
       }
     }
 
@@ -490,7 +499,11 @@ export class RunsService {
     } else if (status === 'cancelled') {
       source.status = 'cancelled';
       source.extractionStatus = 'cancelled';
-      this.addLog(run, 'info', `Document '${source.name}' skipped (run cancelled)`);
+      this.addLog(
+        run,
+        'info',
+        `Document '${source.name}' skipped (run cancelled)`,
+      );
     } else {
       source.status = 'failed';
       source.error = data.error || 'Parsing failed';
@@ -553,7 +566,10 @@ export class RunsService {
 
     // Check if all sources are parsed
     const allParsed = run.sources.every(
-      (s) => s.status === 'parsed' || s.status === 'failed' || s.status === 'cancelled',
+      (s) =>
+        s.status === 'parsed' ||
+        s.status === 'failed' ||
+        s.status === 'cancelled',
     );
     if (allParsed) {
       this.logger.log(`🎯 All documents parsed for run ${run.id}`);
@@ -699,6 +715,7 @@ export class RunsService {
         `Starting extraction with ${run.extractionProvider} provider`,
       );
 
+      const workerModel = this.resolveWorkerModel(run, extractor);
       const extractionPayload = {
         run_id: run.id,
         content: {
@@ -711,12 +728,12 @@ export class RunsService {
         ),
         system_prompt: extractor?.systemPrompt || '',
         extraction_type: extractionType,
-        model_id: 'free',
+        model_id: workerModel,
         examples: extractor?.fewShotExamples || [],
       };
 
       this.logger.log(
-        `📤 Sending extraction job: type=${extractionType}, model=${'free'}`,
+        `📤 Sending extraction job: type=${extractionType}, model=${workerModel}`,
       );
 
       await this.queueService.addJob(
@@ -794,7 +811,7 @@ export class RunsService {
         ),
         system_prompt: extractor?.systemPrompt || '',
         extraction_type: extractionType,
-        model_id: 'free',
+        model_id: this.resolveWorkerModel(run, extractor),
         examples: extractor?.fewShotExamples || [],
       };
 
@@ -808,7 +825,11 @@ export class RunsService {
       } catch (err) {
         source.extractionStatus = 'failed';
         source.extractionError = `enqueue failed: ${(err as Error).message}`;
-        this.addLog(run, 'error', `Failed to queue extraction for '${source.name}': ${(err as Error).message}`);
+        this.addLog(
+          run,
+          'error',
+          `Failed to queue extraction for '${source.name}': ${(err as Error).message}`,
+        );
         this.runsGateway.emitRunSourceUpdated(run.id, source);
         throw err;
       }
@@ -1038,7 +1059,11 @@ export class RunsService {
       } else if (status === 'cancelled') {
         source.extractionStatus = 'cancelled';
         source.previousExtractionResult = undefined;
-        this.addLog(run, 'info', `Extraction skipped for '${source.name}' (run cancelled)`);
+        this.addLog(
+          run,
+          'info',
+          `Extraction skipped for '${source.name}' (run cancelled)`,
+        );
       } else {
         source.extractionStatus = 'failed';
         source.extractionError = data.error || 'Extraction failed';
@@ -1130,10 +1155,15 @@ export class RunsService {
       const run = await this.runRepo.findOne({ where: { id: run_id } });
       if (!run) return;
       const source = run.sources.find((s) => s.id === document_id);
-      if (!source || source.status === 'parsed' || source.status === 'failed') return;
+      if (!source || source.status === 'parsed' || source.status === 'failed')
+        return;
       source.status = 'failed';
       source.error = `handler error: ${errorMessage}`;
-      this.addLog(run, 'error', `Parse handler permanently failed for '${source.name}': ${errorMessage}`);
+      this.addLog(
+        run,
+        'error',
+        `Parse handler permanently failed for '${source.name}': ${errorMessage}`,
+      );
       await this.runRepo.save(run);
       this.runsGateway.emitRunSourceUpdated(run.id, source);
       this.runsGateway.emitRunUpdated(run.id, run);
@@ -1155,14 +1185,22 @@ export class RunsService {
         if (source && source.extractionStatus === 'extracting') {
           source.extractionStatus = 'failed';
           source.extractionError = `handler error: ${errorMessage}`;
-          this.addLog(run, 'error', `Extraction handler permanently failed for '${source.name}': ${errorMessage}`);
+          this.addLog(
+            run,
+            'error',
+            `Extraction handler permanently failed for '${source.name}': ${errorMessage}`,
+          );
           this.runsGateway.emitRunSourceUpdated(run.id, source);
         }
       } else if (run.status === RunStatus.EXTRACTING) {
         run.status = RunStatus.FAILED;
         run.error = `handler error: ${errorMessage}`;
         run.finishedAt = new Date();
-        this.addLog(run, 'error', `Extraction handler permanently failed: ${errorMessage}`);
+        this.addLog(
+          run,
+          'error',
+          `Extraction handler permanently failed: ${errorMessage}`,
+        );
       }
       await this.runRepo.save(run);
       this.runsGateway.emitRunUpdated(run.id, run);
@@ -1172,7 +1210,11 @@ export class RunsService {
   /**
    * Admin force-fail: immediately marks a stuck source as failed and recomputes run terminal state.
    */
-  async forceFailSource(runId: string, sourceId: string, userId: string): Promise<Run> {
+  async forceFailSource(
+    runId: string,
+    sourceId: string,
+    userId: string,
+  ): Promise<Run> {
     const run = await this.findOne(runId, userId);
     await this.serializeDocumentParsed(runId, async () => {
       const freshRun = await this.runRepo.findOne({ where: { id: runId } });
@@ -1183,16 +1225,31 @@ export class RunsService {
       source.extractionStatus = 'failed';
       source.error = 'force-failed by admin';
       source.extractionError = 'force-failed by admin';
-      this.addLog(freshRun, 'warn', `Source '${source.name}' force-failed by admin`);
+      this.addLog(
+        freshRun,
+        'warn',
+        `Source '${source.name}' force-failed by admin`,
+      );
 
       const allTerminal = freshRun.sources.every(
-        (s) => s.status === 'failed' || s.status === 'parsed' || s.status === 'cancelled',
+        (s) =>
+          s.status === 'failed' ||
+          s.status === 'parsed' ||
+          s.status === 'cancelled',
       );
       const allExtractionTerminal = freshRun.sources.every(
-        (s) => !s.extractionStatus || ['done', 'failed', 'cancelled'].includes(s.extractionStatus),
+        (s) =>
+          !s.extractionStatus ||
+          ['done', 'failed', 'cancelled'].includes(s.extractionStatus),
       );
-      if (allTerminal && allExtractionTerminal && freshRun.status !== RunStatus.DONE) {
-        const hasDone = freshRun.sources.some((s) => s.extractionStatus === 'done');
+      if (
+        allTerminal &&
+        allExtractionTerminal &&
+        freshRun.status !== RunStatus.DONE
+      ) {
+        const hasDone = freshRun.sources.some(
+          (s) => s.extractionStatus === 'done',
+        );
         freshRun.status = hasDone ? RunStatus.DONE : RunStatus.FAILED;
         freshRun.finishedAt = freshRun.finishedAt || new Date();
       }
@@ -1200,7 +1257,10 @@ export class RunsService {
       await this.runRepo.save(freshRun);
       this.runsGateway.emitRunSourceUpdated(freshRun.id, source);
       this.runsGateway.emitRunUpdated(freshRun.id, freshRun);
-      this.runsGateway.emitRunsListUpdated({ runId: freshRun.id, status: freshRun.status });
+      this.runsGateway.emitRunsListUpdated({
+        runId: freshRun.id,
+        status: freshRun.status,
+      });
     });
     return this.findOneForResponse(runId, userId);
   }
@@ -1521,7 +1581,7 @@ export class RunsService {
             ),
             system_prompt: extractor?.systemPrompt || '',
             extraction_type: extractionType,
-            model_id: 'free',
+            model_id: this.resolveWorkerModel(run, extractor),
             examples: extractor?.fewShotExamples || [],
           },
         );
@@ -1794,7 +1854,7 @@ export class RunsService {
               schema: effectiveSchema,
               system_prompt: extractor?.systemPrompt || '',
               extraction_type: extractionType,
-              model_id: 'free',
+              model_id: this.resolveWorkerModel(run, extractor),
               examples: extractor?.fewShotExamples || [],
             },
           );
@@ -1811,7 +1871,7 @@ export class RunsService {
                 schema: effectiveSchema,
                 system_prompt: extractor?.systemPrompt || '',
                 extraction_type: extractionType,
-                model_id: 'free',
+                model_id: this.resolveWorkerModel(run, extractor),
                 examples: extractor?.fewShotExamples || [],
               },
             );
