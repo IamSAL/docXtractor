@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/retroui/Card";
 import { demoApi, type DemoUploadResult } from "@/lib/demo-api";
 import { Step1Upload } from "./-step-1-upload";
-import { Step2Extract } from "./step-2-extract";
-import { Step3Result } from "./step-3-result";
+import { Step2Extract } from "./-step-2-extract";
+import { Step3Result } from "./-step-3-result";
 
 export const Route = createFileRoute("/demo/")({ component: DemoWizard });
 
