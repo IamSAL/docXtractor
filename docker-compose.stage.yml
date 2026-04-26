@@ -113,8 +113,6 @@ services:
       - ollama1
       - ollama2
       - ollama3
-      - ollama4
-      - ollama5
     networks:
       - docxtractor-stage-network
 
@@ -284,8 +282,6 @@ volumes:
   ollama1_data:
   ollama2_data:
   ollama3_data:
-  ollama4_data:
-  ollama5_data:
 
 networks:
   docxtractor-stage-network:
