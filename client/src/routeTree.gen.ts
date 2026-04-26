@@ -25,6 +25,7 @@ import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
 import { Route as SettingsNotificationsRouteImport } from './routes/settings/notifications'
 import { Route as SettingsInstanceRouteImport } from './routes/settings/instance'
 import { Route as SettingsExtractionRouteImport } from './routes/settings/extraction'
+import { Route as SettingsBackupsRouteImport } from './routes/settings/backups'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings/appearance'
 import { Route as SettingsApiKeysRouteImport } from './routes/settings/api-keys'
 import { Route as RunsNewRouteImport } from './routes/runs/new'
@@ -121,6 +122,11 @@ const SettingsInstanceRoute = SettingsInstanceRouteImport.update({
 const SettingsExtractionRoute = SettingsExtractionRouteImport.update({
   id: '/extraction',
   path: '/extraction',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsBackupsRoute = SettingsBackupsRouteImport.update({
+  id: '/backups',
+  path: '/backups',
   getParentRoute: () => SettingsRoute,
 } as any)
 const SettingsAppearanceRoute = SettingsAppearanceRouteImport.update({
@@ -227,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/runs/new': typeof RunsNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
+  '/settings/backups': typeof SettingsBackupsRoute
   '/settings/extraction': typeof SettingsExtractionRoute
   '/settings/instance': typeof SettingsInstanceRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/runs/new': typeof RunsNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
+  '/settings/backups': typeof SettingsBackupsRoute
   '/settings/extraction': typeof SettingsExtractionRoute
   '/settings/instance': typeof SettingsInstanceRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
@@ -296,6 +304,7 @@ export interface FileRoutesById {
   '/runs/new': typeof RunsNewRoute
   '/settings/api-keys': typeof SettingsApiKeysRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
+  '/settings/backups': typeof SettingsBackupsRoute
   '/settings/extraction': typeof SettingsExtractionRoute
   '/settings/instance': typeof SettingsInstanceRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
@@ -333,6 +342,7 @@ export interface FileRouteTypes {
     | '/runs/new'
     | '/settings/api-keys'
     | '/settings/appearance'
+    | '/settings/backups'
     | '/settings/extraction'
     | '/settings/instance'
     | '/settings/notifications'
@@ -366,6 +376,7 @@ export interface FileRouteTypes {
     | '/runs/new'
     | '/settings/api-keys'
     | '/settings/appearance'
+    | '/settings/backups'
     | '/settings/extraction'
     | '/settings/instance'
     | '/settings/notifications'
@@ -401,6 +412,7 @@ export interface FileRouteTypes {
     | '/runs/new'
     | '/settings/api-keys'
     | '/settings/appearance'
+    | '/settings/backups'
     | '/settings/extraction'
     | '/settings/instance'
     | '/settings/notifications'
@@ -560,6 +572,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsExtractionRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/settings/backups': {
+      id: '/settings/backups'
+      path: '/backups'
+      fullPath: '/settings/backups'
+      preLoaderRoute: typeof SettingsBackupsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/settings/appearance': {
       id: '/settings/appearance'
       path: '/appearance'
@@ -697,6 +716,7 @@ const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
 interface SettingsRouteChildren {
   SettingsApiKeysRoute: typeof SettingsApiKeysRoute
   SettingsAppearanceRoute: typeof SettingsAppearanceRoute
+  SettingsBackupsRoute: typeof SettingsBackupsRoute
   SettingsExtractionRoute: typeof SettingsExtractionRoute
   SettingsInstanceRoute: typeof SettingsInstanceRoute
   SettingsNotificationsRoute: typeof SettingsNotificationsRoute
@@ -707,6 +727,7 @@ interface SettingsRouteChildren {
 const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsApiKeysRoute: SettingsApiKeysRoute,
   SettingsAppearanceRoute: SettingsAppearanceRoute,
+  SettingsBackupsRoute: SettingsBackupsRoute,
   SettingsExtractionRoute: SettingsExtractionRoute,
   SettingsInstanceRoute: SettingsInstanceRoute,
   SettingsNotificationsRoute: SettingsNotificationsRoute,
