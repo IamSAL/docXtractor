@@ -206,7 +206,7 @@ export class BackupService implements OnModuleInit {
           if (raw[col] !== undefined) safe[col] = raw[col];
         }
 
-        // Null out userId if it doesn't exist on this instance
+        // Always null userId to avoid cross-instance user ID collisions
         if (safe.userId) {
           safe.userId = null;
         }
@@ -237,6 +237,7 @@ export class BackupService implements OnModuleInit {
           if (raw[col] !== undefined) safe[col] = raw[col];
         }
 
+        // Always null userId to avoid cross-instance user ID collisions
         if (safe.userId) {
           safe.userId = null;
         }
@@ -296,11 +297,11 @@ export class BackupService implements OnModuleInit {
     dated.slice(0, 7).forEach((b) => toKeep.add(b.filename));
 
     // Keep 4 most recent Sundays (day=0)
-    const sundays = dated.filter((b) => b.date.getDay() === 0);
+    const sundays = dated.filter((b) => b.date.getUTCDay() === 0);
     sundays.slice(0, 4).forEach((b) => toKeep.add(b.filename));
 
     // Keep 3 most recent 1st-of-month
-    const firsts = dated.filter((b) => b.date.getDate() === 1);
+    const firsts = dated.filter((b) => b.date.getUTCDate() === 1);
     firsts.slice(0, 3).forEach((b) => toKeep.add(b.filename));
 
     for (const b of dated) {
