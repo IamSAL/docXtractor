@@ -36,6 +36,11 @@ function SettingsLayout() {
             icon: "admin_panel_settings",
             path: "/settings/instance",
           },
+          {
+            label: "Backups",
+            icon: "backup",
+            path: "/settings/backups",
+          },
         ]
       : []),
   ];
