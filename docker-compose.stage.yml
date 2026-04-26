@@ -11,6 +11,8 @@ services:
       - stage_postgres_data:/var/lib/postgresql/data
     networks:
       - docxtractor-stage-network
+    ports:
+      - "5434:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
       interval: 10s
@@ -98,28 +100,6 @@ services:
       - ollama3_data:/root/.ollama
     ports:
       - "11436:11434"
-    networks:
-      - docxtractor-stage-network
-
-  ollama4:
-    image: alpine/ollama:latest
-    container_name: docxtractor-stage-ollama4
-    restart: unless-stopped
-    volumes:
-      - ollama4_data:/root/.ollama
-    ports:
-      - "11437:11434"
-    networks:
-      - docxtractor-stage-network
-
-  ollama5:
-    image: alpine/ollama:latest
-    container_name: docxtractor-stage-ollama5
-    restart: unless-stopped
-    volumes:
-      - ollama5_data:/root/.ollama
-    ports:
-      - "11438:11434"
     networks:
       - docxtractor-stage-network
 

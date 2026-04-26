@@ -67,28 +67,6 @@ services:
     networks:
       - docxtractor-network
 
-  ollama4:
-    image: alpine/ollama:latest
-    container_name: docxtractor-ollama4
-    restart: unless-stopped
-    volumes:
-      - ollama4_data:/root/.ollama
-    ports:
-      - "11437:11434"
-    networks:
-      - docxtractor-network
-
-  ollama5:
-    image: alpine/ollama:latest
-    container_name: docxtractor-ollama5
-    restart: unless-stopped
-    volumes:
-      - ollama5_data:/root/.ollama
-    ports:
-      - "11438:11434"
-    networks:
-      - docxtractor-network
-
   ollama-lb:
     image: nginx:alpine
     container_name: docxtractor-ollama-lb
@@ -99,8 +77,7 @@ services:
       - ollama1
       - ollama2
       - ollama3
-      - ollama4
-      - ollama5
+
     networks:
       - docxtractor-network
 
@@ -296,8 +273,6 @@ volumes:
   ollama1_data:
   ollama2_data:
   ollama3_data:
-  ollama4_data:
-  ollama5_data:
 
 networks:
   docxtractor-network:
