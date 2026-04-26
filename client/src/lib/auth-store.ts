@@ -34,7 +34,11 @@ interface AuthState {
   // Actions
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<{ email: string }>;
-  adminSetup: (email: string, password: string, instanceName?: string) => Promise<void>;
+  adminSetup: (
+    email: string,
+    password: string,
+    instanceName?: string,
+  ) => Promise<void>;
   verifyEmail: (email: string, otp: string) => Promise<void>;
   logout: () => void;
   refreshAccessToken: () => Promise<void>;
@@ -82,7 +86,9 @@ export const useAuthStore = create<AuthState>()(
           });
         } catch (error) {
           set({
-            error: error instanceof Error ? error.message : "Login failed",
+            error:
+              (error as any)?.response?.data?.message ||
+              (error instanceof Error ? error.message : "Login failed"),
             isLoading: false,
           });
           throw error;
@@ -90,7 +96,11 @@ export const useAuthStore = create<AuthState>()(
       },
 
       // Admin setup action (first-run)
-      adminSetup: async (email: string, password: string, instanceName?: string) => {
+      adminSetup: async (
+        email: string,
+        password: string,
+        instanceName?: string,
+      ) => {
         set({ isLoading: true, error: null });
         try {
           const response = await authApi.authControllerAdminSetup({
@@ -117,7 +127,8 @@ export const useAuthStore = create<AuthState>()(
           });
         } catch (error) {
           set({
-            error: error instanceof Error ? error.message : "Admin setup failed",
+            error:
+              error instanceof Error ? error.message : "Admin setup failed",
             isLoading: false,
           });
           throw error;
