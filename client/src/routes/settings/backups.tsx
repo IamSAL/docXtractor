@@ -45,7 +45,11 @@ function BackupsSettingsPage() {
   };
 
   useEffect(() => {
-    if (isAdmin) fetchBackups();
+    if (isAdmin) {
+      fetchBackups();
+    } else {
+      setLoading(false);
+    }
   }, [isAdmin]);
 
   const handleCreateBackup = async () => {
@@ -88,6 +92,7 @@ function BackupsSettingsPage() {
   };
 
   const handleDelete = async (filename: string) => {
+    if (!window.confirm(`Delete backup "${filename}"? This cannot be undone.`)) return;
     setDeletingFilename(filename);
     try {
       await AXIOS_INSTANCE.delete(
@@ -115,9 +120,7 @@ function BackupsSettingsPage() {
         extractors: { imported: number; updated: number; skipped: number };
         runs: { imported: number; updated: number; skipped: number };
         errors: string[];
-      }>("/admin/backup/import", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      }>("/admin/backup/import", formData);
       const { extractors, runs, errors } = res.data;
       toast.success(
         `Import complete — Extractors: ${extractors.imported} new, ${extractors.updated} updated, ${extractors.skipped} skipped. Runs: ${runs.imported} new, ${runs.updated} updated, ${runs.skipped} skipped.`,
