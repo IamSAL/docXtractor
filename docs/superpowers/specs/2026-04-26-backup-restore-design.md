@@ -103,4 +103,5 @@ Run after each nightly backup. Steps:
 - Parse and validate JSON (check `version` field)
 - Upsert extractors by `id` (insert if not exists, update if exists). `userId` from the backup is preserved as-is; if the user doesn't exist on this instance, it is set to `null`.
 - Upsert runs by `id`. Same `userId` rule applies.
-- Return `{ extractors: { imported, updated }, runs: { imported, updated } }` summary
+- **DB structure conflict handling**: unknown fields in the backup JSON are silently ignored. Missing fields (present in DB schema but absent in backup) fall back to column defaults. Each record is wrapped in a try/catch — a single record failure is logged and counted as `skipped`, never aborts the full import.
+- Return `{ extractors: { imported, updated, skipped }, runs: { imported, updated, skipped } }` summary with per-record errors in a `errors[]` array for inspection.
