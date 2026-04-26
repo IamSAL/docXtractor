@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/retroui/Card";
 import { demoApi, type DemoResult } from "@/lib/demo-api";
-import { ResultCard } from "./result-card";
+import { ResultCard } from "./-result-card";
 
 interface Step3ResultProps {
 	runId: string;

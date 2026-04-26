@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/retroui/Card";
 import { Button } from "@/components/retroui/Button";
 import { demoApi } from "@/lib/demo-api";
-import { ResultCard } from "./result-card";
+import { ResultCard } from "./-result-card";
 
 export const Route = createFileRoute("/demo/result/$runId")({
 	component: SharedResult,
