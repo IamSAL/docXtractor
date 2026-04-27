@@ -51,7 +51,10 @@ export class ExtractorsService implements OnModuleInit {
       const existing = await this.extractorRepository.findOne({
         where: { name: d.name, isPublic: true, userId: IsNull() },
       });
-      if (!existing) {
+      if (existing) {
+        await this.extractorRepository.save({ ...existing, ...d, id: existing.id, isPublic: true, userId: null });
+        this.logger.log(`Updated template: ${d.name}`);
+      } else {
         await this.extractorRepository.save(
           this.extractorRepository.create({ ...d, isPublic: true, userId: null }),
         );
@@ -199,8 +202,8 @@ export class ExtractorsService implements OnModuleInit {
       thumbnailUrl: original.thumbnailUrl,
       schema: original.schema,
       systemPrompt: original.systemPrompt,
-      fewShotExamples: [],
-      variants: [],
+      fewShotExamples: original.fewShotExamples ?? [],
+      variants: original.variants ?? [],
       consensusEnabled: original.consensusEnabled,
       confidenceThreshold: original.confidenceThreshold,
       conflictResolution: original.conflictResolution,

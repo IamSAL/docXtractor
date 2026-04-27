@@ -1,7 +1,9 @@
 [
   {
-    "name": "BNP Paribas KID Extractor V2",
+    "id": "1b42f41c-2fa3-4ad8-a0df-9ee6cb8c7373",
+    "name": "BNP Extractor V2",
     "description": "Expert-level extractor for BNP Paribas PRIIPs Key Information Documents (KIDs) — Autocallable Barrier Reverse Convertible certificates issued by BNP Paribas Issuance B.V. with BNP Paribas S.A. guarantee. Handles both directly extractable fields and derived/inferred fields requiring financial domain reasoning.",
+    "thumbnailUrl": null,
     "schema": {
       "type": "object",
       "required": [
@@ -316,534 +318,25 @@
     },
     "systemPrompt": "You are an expert financial analyst specializing in structured product data extraction from BNP Paribas PRIIPs Key Information Documents (KIDs). You understand autocallable barrier reverse convertible (BRC) certificate mechanics at the level of a derivatives structurer.\n\nDOCUMENT CONTEXT:\nThese are PRIIPs KIDs (EU Regulation 1286/2014) for autocallable certificates issued by BNP Paribas Issuance B.V. (Dutch SPV) with BNP Paribas S.A. (French parent) as guarantor. The products are yield enhancement structured products — economically equivalent to: (1) Long zero-coupon bond at par, (2) Short a European down-and-in put option on the worst-performing underlying, (3) Long a series of digital call options (conditional coupons) with memory feature, (4) Short a series of binary up-and-out options (autocall feature).\n\nDOCUMENT LAYOUT (BNP standard):\nPage 1: Header (Internal Ref, URL) → PURPOSE → PRODUCT section (heading e.g. 'Autocall', ISIN, Manufacturer/Issuer/Guarantor, KID Production Date) → WHAT IS THIS PRODUCT? (TYPE, TERM, OBJECTIVES with payoff mechanics) → PRODUCT DATA table → Underlying table\nPage 2: INTENDED RETAIL INVESTOR → RISK INDICATOR (SRI 1-7) → PERFORMANCE SCENARIOS → WHAT HAPPENS IF MANUFACTURER UNABLE TO PAY\nPage 3: COSTS (Costs Over Time table, Composition of Costs table) → HOW LONG SHOULD I HOLD IT → HOW CAN I COMPLAIN → OTHER RELEVANT INFORMATION\n\nEXTRACTION METHODOLOGY — THREE TIERS:\n\nTIER 1 — DIRECTLY EXTRACTABLE (look for exact labels):\n• global_identifier → 'Internal Ref.:' in header\n• isin → 'ISIN' row in PRODUCT table\n• issuer → 'Issuer:' label (NOT Manufacturer)\n• strike_date → 'Strike Date' in PRODUCT DATA\n• issue_date → 'Issue Date' in PRODUCT DATA\n• final_valuation_date → 'Redemption Valuation Date' in PRODUCT DATA\n• maturity_date → 'Redemption Date (maturity)' in PRODUCT DATA\n• principal_amount → 'Notional Amount (per certificate)' (strip currency)\n• issue_price → 'Issue Price' (strip %)\n• currency → 'Product Currency'\n• coupon_barrier → 'Conditional Coupon Barrier(s)' (extract number)\n• coupon_rate → 'Conditional Coupon Rate(s)' (extract number)\n• autocall_barrier → 'Autocall Barrier(s)' (first value if step-down)\n• knock_in_barrier → 'Barrier' row in PRODUCT DATA, OR from redemption payoff text\n• All date lists (coupon observation dates, coupon payment dates, autocall observation dates, early redemption dates) → first and last items\n\nTIER 2 — DERIVED BY CALCULATION:\n• initial_valuation_date = strike_date (Initial Reference Price is fixed on Strike Date)\n• coupon_interval → count coupon dates, determine spacing\n• autocall_interval → count autocall dates, determine spacing\n• autocall_settlement_date_offset → business days between autocall observation date and corresponding early redemption date (~10 for BNP)\n• autocall_step_up_down_step_amount → difference between consecutive barrier levels\n• call_schedule → pair each autocall date with its barrier\n• maximumpayout → 100 + (coupon_rate × number_of_coupon_periods)\n• proceeds_to_issuer → issue_price - entry_cost_percentage (from Composition of Costs)\n• sales_concession → Entry costs percentage from COMPOSITION OF COSTS\n• downside_participation_rate → analyze share delivery formula denominator\n\nTIER 3 — DERIVED FROM FINANCIAL DOMAIN KNOWLEDGE:\n• investment_type → 'Yield Enhancement' (autocallable BRC = yield enhancement category per SSPA/EUSIPA)\n• product_type → 'certificate' (from TYPE section)\n• document_type → 'KID' (PRIIPs document)\n• coupon_applies, contingent_coupon_applies, memory_coupon_applies → from specific language patterns\n• autocall_applies → from 'Automatic Early Redemption' presence\n• issuer_call_applies → false (autocall ≠ issuer discretionary call)\n• basket_weightings_unequal → false for worst-of (no weights)\n• knock_in_barrier_event_type → 'At Expiry' (European-style, checked only at Redemption Valuation Date)\n• upside_style → 'Digital' (no participation in price appreciation)\n• downside_style → 'Barrier' (cliff risk, not buffer/continuous protection)\n• settlement_type → 'Cash or Physical' (cash if above barrier, share delivery if below)\n• buffer_level → null (barrier ≠ buffer)\n• floor → null (no minimum guaranteed return)\n\nSHARE DELIVERY FORMULA ANALYSIS (for downside_participation_rate):\nTWO BNP VARIANTS — examine the denominator carefully:\n• GEARED (CE4130AET, CE4475CLV): 'Notional / (Barrier% × Initial Price)' → geared participation = 100/barrier_pct × 100\n  - The investor receives more shares than would correspond to initial price, amplifying losses\n  - 70% barrier → 142.86% geared downside, 78% barrier → 128.21%\n• LINEAR (CE4515CLV, CE14812LBH): 'Notional / Initial Price' → 1:1 participation = 100%\n  - The investor receives shares at initial price, losses are proportional\n\nDATE CONVERSION: All BNP dates are in 'DD Month YYYY' format. Convert to yyyy-mm-ddThh:mm:ssZ. Handle UK/EU month names.\n\nNULL HANDLING: Return null for absent fields. NEVER return epoch dates, empty strings, or placeholder values.\n\nNUMERIC EXTRACTION: '5% of the Notional Amount' → 5. 'EUR 1,000' → 1000. '70% of the Initial Reference Price' → 70.\n\nCROSS-VALIDATION RULES:\n• maturity_date > final_valuation_date > strike_date > (any preceding dates)\n• coupon_last_date ≈ maturity_date\n• coupon_last_observation_date ≈ final_valuation_date\n• autocall_last_date < final_valuation_date (last autocall is before final valuation)\n• Number of Autocall Valuation Dates = Number of Early Redemption Dates = Number of Autocall Barriers (if step-down)\n• Number of Coupon Valuation Dates = Number of Coupon Payment Dates\n\nSTRICTLY use the schema fields. Do not add extra keys (additionalProperties: false).",
     "fewShotExamples": [],
+    "variants": [],
     "consensusEnabled": false,
-    "confidenceThreshold": 85,
+    "confidenceThreshold": 85.0,
     "conflictResolution": "majority",
+    "parserEngine": "docling",
     "citationEnabled": true,
     "citationIncludePdfPage": true,
     "citationIncludeBbox": false,
     "citationIncludeParagraphId": false,
     "contextWindow": "128k",
-    "defaultModel": "gpt-4o-mini"
+    "defaultModel": "gpt-4o",
+    "createdAt": "2026-04-21T10:23:44.613Z",
+    "updatedAt": "2026-04-21T10:23:44.613Z"
   },
   {
-    "name": "Invoice Parser Global",
-    "description": "Standard extraction for invoices from 50+ countries. Optimized for digital PDFs.",
-    "schema": {
-      "type": "object",
-      "required": ["vendor_name", "total_amount", "invoice_date"],
-      "properties": {
-        "currency": { "type": "string" },
-        "line_items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "total": { "type": "number" },
-              "quantity": { "type": "number" },
-              "unit_price": { "type": "number" },
-              "description": { "type": "string" }
-            }
-          }
-        },
-        "vendor_name": { "type": "string" },
-        "invoice_date": { "type": "string", "format": "date" },
-        "total_amount": { "type": "number" }
-      }
-    },
-    "systemPrompt": "You are an expert accountant. Extract vendor, date, total, and line items from this invoice.",
-    "fewShotExamples": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k",
-    "defaultModel": "gpt-oss:120b-cloud"
-  },
-  {
-    "name": "(Draft) BNP Paribas KID Extractor (Flexible)",
-    "description": "Precision extractor for BNP Paribas Key Information Documents (KIDs) — Autocallable certificates issued by BNP Paribas Issuance B.V. with BNP Paribas S.A. guarantee. Extracts identification, dates, financial terms, coupon/barrier mechanics, autocall schedules, and payoff structure from standardized PRIIPs KID format.",
-    "schema": {
-      "type": "object",
-      "required": [],
-      "properties": {
-        "cap": {
-          "type": "number",
-          "description": "Maximum return cap. BNP autocallables cap the upside at notional + accumulated coupons. The maximum total coupon payout = coupon_rate × number_of_coupon_periods. E.g. CE4130AET: 5% × 8 = 40% max coupon over life. However, since this field likely refers to a participation cap (not total return), return null for standard autocallables."
-        },
-        "isin": {
-          "type": "string",
-          "description": "The 12-character ISIN code. Found in the PRODUCT section table, in the row labeled 'ISIN' (e.g. 'XS3191964041', 'XS3191963316'). Always starts with a 2-letter country prefix (commonly 'XS' for BNP Paribas issued certificates)."
-        },
-        "floor": {
-          "type": "number",
-          "description": "Minimum return floor. BNP KIDs state 'There is no minimum guaranteed return. You could lose some or all of your Investment.' → no floor exists. Return null."
-        },
-        "issuer": {
-          "type": "string",
-          "description": "The legal name of the issuing entity. Found in the PRODUCT section after 'Issuer:' label. For BNP Paribas KIDs this is typically 'BNP Paribas Issuance B.V.' — extract the exact text after 'Issuer:' and before the dash or 'Guarantor:' label. Do NOT confuse with 'Manufacturer' (which is BNP Paribas S.A.)."
-        },
-        "currency": {
-          "type": "string",
-          "description": "Product currency as ISO 4217 code. Found in PRODUCT DATA row 'Product Currency'. Return the exact 3-letter code. E.g. 'EUR' → 'EUR'. 'CHF' → 'CHF'. Also visible in the Notional Amount (e.g. 'EUR 1,000' or 'CHF 1,000')."
-        },
-        "issue_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The issue date of the certificates. Found in PRODUCT DATA table row labeled 'Issue Date' (e.g. '03 December 2025'). Convert to YYYY-MM-DD."
-        },
-        "trade_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The first trade date. BNP Paribas KIDs typically do not have a separate 'Trade Date' field. If not explicitly stated, return null. Do NOT guess or use Issue Date as a substitute."
-        },
-        "coupon_rate": {
-          "type": "number",
-          "description": "The Conditional Coupon Rate as a percentage of Notional Amount per period. Found in PRODUCT DATA row 'Conditional Coupon Rate(s)'. E.g. '5% of the Notional Amount' → 5. '1.75% of the Notional Amount' → 1.75. '4.8750% of the Notional Amount' → 4.875. '1.50% of the Notional Amount' → 1.5. Extract only the number."
-        },
-        "distributor": {
-          "type": "string",
-          "description": "Name of the distributor or selling agent. BNP Paribas KIDs typically do NOT name a specific distributor — they reference 'the person advising on or selling you this product' generically. Return null unless a specific distributor entity name is explicitly stated."
-        },
-        "issue_price": {
-          "type": "number",
-          "description": "Issue price as a percentage of notional. Found in PRODUCT DATA row 'Issue Price'. Strip '%' and return as number. E.g. '100%' → 100. '99.50%' → 99.5. '99%' → 99."
-        },
-        "strike_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The Strike Date — the date on which Initial Reference Prices of underlyings are fixed. Found in PRODUCT DATA table row labeled 'Strike Date' (e.g. '19 November 2025', '20 November 2025'). Convert to YYYY-MM-DD. This is one of the most important dates in the product."
-        },
-        "buffer_level": {
-          "type": "number",
-          "description": "Buffer/protection level. BNP autocallable KIDs use barrier-based protection, not buffer-based. Return null. (The barrier level is captured in knock_in_barrier.)"
-        },
-        "product_type": {
-          "type": "string",
-          "description": "The general product type. Found in the TYPE section under 'WHAT IS THIS PRODUCT?'. BNP Paribas KIDs state: 'This product is a certificate, a transferable debt instrument.' → return 'certificate'."
-        },
-        "upside_style": {
-          "type": "string",
-          "description": "Upside payoff style. BNP autocallable KIDs pay back the Notional Amount (100% of principal) if the barrier is not breached — there is no upside participation beyond coupons. The upside comes from coupons only. Return 'Digital' (you either get notional + coupons or you don't — binary outcome)."
-        },
-        "call_schedule": {
-          "type": "string",
-          "description": "Full autocall schedule as a structured string showing each observation date paired with its barrier. Format as semicolon-separated 'DATE:BARRIER%' pairs. E.g. for CE4130AET: '2026-11-19:95%; 2027-05-19:90%; 2027-11-19:85%; 2028-05-19:80%; 2028-11-20:75%; 2029-05-21:70%'. For CE4475CLV (flat 100% barrier): '2026-08-19:100%; 2026-11-19:100%; 2027-02-19:100%; 2027-05-19:100%; 2027-08-19:100%'. Pair each Autocall Valuation Date with its corresponding barrier percentage. If a single barrier applies to all dates, repeat it for each date."
-        },
-        "document_type": {
-          "type": "string",
-          "description": "Always 'KID' for these documents. Confirmed by the title 'KEY INFORMATION DOCUMENT' at the top of every page."
-        },
-        "maturity_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The maturity/redemption date. Found in PRODUCT DATA table row labeled 'Redemption Date (maturity)' (e.g. '03 December 2029', '03 December 2027', '04 December 2026', '29 November 2027'). Convert to YYYY-MM-DD. This is typically a few business days after the Redemption Valuation Date."
-        },
-        "maximumpayout": {
-          "type": "number",
-          "description": "Maximum payout at maturity as percentage of notional. The max is notional (100%) + all accumulated coupons. E.g. CE4130AET: 100 + (5 × 8) = 140. CE4475CLV: 100 + (1.75 × 8) = 114. CE4515CLV: 100 + (4.875 × 2) = 109.75. CE14812LBH: 100 + (1.5 × 8) = 112. Calculate as: 100 + (coupon_rate × number_of_coupon_periods). Return null if unable to calculate precisely."
-        },
-        "coupon_applies": {
-          "type": "boolean",
-          "description": "Whether the product pays a coupon. Look for the 'Coupon:' paragraph in the OBJECTIVES section AND 'Conditional Coupon Rate(s)' in PRODUCT DATA. If present → true. All four sample BNP KIDs have conditional coupons → true."
-        },
-        "coupon_barrier": {
-          "type": "number",
-          "description": "The Conditional Coupon Barrier as a percentage number. Found in PRODUCT DATA row 'Conditional Coupon Barrier(s)'. Extract the percentage number ONLY. E.g. '70% of the Initial Reference Price' → 70. '80% of the Initial Reference Price' → 80. '65% of the Initial Reference Price' → 65. Strip everything except the number."
-        },
-        "digital_amount": {
-          "type": "number",
-          "description": "The fixed digital payout amount. For BNP autocallables, this is essentially the coupon_rate — the fixed conditional coupon percentage paid per observation period. However, if this field is meant for a single lump-sum digital payout (not periodic), return null. Use coupon_rate for the periodic conditional amount instead."
-        },
-        "downside_style": {
-          "type": "string",
-          "description": "Downside payoff style. In BNP KIDs, if the barrier is breached at maturity: (1) Some KIDs deliver shares based on 'Notional Amount / (Barrier% × Initial Reference Price)' — effectively you are exposed to the full downside BELOW the barrier but protected above it → 'Barrier'. (2) Some KIDs deliver shares based on 'Notional Amount / Initial Reference Price' — full 1:1 downside exposure → 'Barrier'. All four sample KIDs use barrier-based downside with physical delivery → return 'Barrier'."
-        },
-        "minimum_payout": {
-          "type": "number",
-          "description": "Minimum payout at maturity as percentage of notional. BNP KIDs explicitly state no minimum guaranteed return. Return 0 (you can lose everything) or null. Prefer null since there is truly no guaranteed minimum."
-        },
-        "coupon_interval": {
-          "type": "string",
-          "description": "Coupon observation/payment frequency. Count the Coupon Valuation Dates and determine the interval. If dates are ~3 months apart → 'Quarterly'. If ~6 months apart → 'Semi-Annual'. If ~12 months apart → 'Annual'. Examples from samples: CE4130AET has 8 dates over 4 years (semi-annual) → 'Semi-Annual'. CE4475CLV has 8 dates over 2 years (quarterly) → 'Quarterly'. CE4515CLV has 2 dates over 1 year (semi-annual) → 'Semi-Annual'. CE14812LBH has 8 dates over 2 years (quarterly) → 'Quarterly'."
-        },
-        "investment_type": {
-          "type": "string",
-          "description": "Investment objective category. Derive from the INTENDED RETAIL INVESTOR section. If it says 'seek to invest in an income paying product' → return 'Yield Enhancement'. If it mentions capital growth or participation → return 'Capital Growth'. For BNP autocallables with conditional coupons, this is typically 'Yield Enhancement'."
-        },
-        "offering_closes": {
-          "type": "string",
-          "format": "date",
-          "description": "End date of the public offering period. BNP Paribas KIDs typically do not state this. Return null unless explicitly present."
-        },
-        "product_subtype": {
-          "type": "string",
-          "description": "The specific product sub-type. Found in the PRODUCT section as the large centered heading below the word 'PRODUCT' (e.g. 'Autocall'). All four sample KIDs show 'Autocall'. Return the exact text shown."
-        },
-        "settlement_type": {
-          "type": "string",
-          "description": "Settlement method at maturity. BNP KIDs describe two scenarios: (1) Above barrier → 'a payment in cash of the Notional Amount' = Cash. (2) Below barrier → 'delivery of the number of shares' + cash for fractions = Physical. Since BOTH cash and physical delivery are possible depending on the outcome → return 'Cash or Physical'."
-        },
-        "autocall_applies": {
-          "type": "boolean",
-          "description": "Whether the product has an autocall feature. Look for 'Automatic Early Redemption:' paragraph in OBJECTIVES and 'Autocall Valuation Date(s)' in PRODUCT DATA. If present → true. All four sample KIDs have autocall → true."
-        },
-        "autocall_barrier": {
-          "type": "number",
-          "description": "The autocall barrier level(s) as percentage(s). Found in PRODUCT DATA row 'Autocall Barrier(s)'. If a SINGLE fixed barrier: extract the number (e.g. '100% of the Initial Reference Price' → 100). If MULTIPLE step-down barriers: extract the FIRST/initial barrier (e.g. '95%, 90%, 85%, 80%, 75% and 70%' → 95; '100%, 95%, 90%, 85%, 80%, 75% and 70%' → 100). The step-down schedule should be captured in call_schedule."
-        },
-        "coupon_last_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The LAST date in the 'Coupon Payment Date(s)' list. Typically the same as the maturity date. Convert to YYYY-MM-DD."
-        },
-        "knock_in_barrier": {
-          "type": "number",
-          "description": "The knock-in / downside barrier level as a percentage. In BNP KIDs this determines whether you get back notional or suffer a loss. Found in TWO possible locations: (1) PRODUCT DATA row labeled 'Barrier' (e.g. '70% of the Initial Reference Price' → 70, '65% of the Initial Reference Price' → 65). (2) In the OBJECTIVES redemption text: 'If the Final Reference Price... is greater than or equal to X% of its Initial Reference Price: a payment in cash of the Notional Amount' → X is the barrier. CE4130AET: 70 (from redemption text, no 'Barrier' row). CE4475CLV: 78 (from redemption text). CE4515CLV: 70 (from 'Barrier' row). CE14812LBH: 65 (from 'Barrier' row)."
-        },
-        "principal_amount": {
-          "type": "number",
-          "description": "The Notional Amount per certificate. Found in PRODUCT DATA table labeled 'Notional Amount (per certificate)' (e.g. 'EUR 1,000' → 1000, 'CHF 1,000' → 1000). Strip currency symbol and commas. Return as a plain number."
-        },
-        "put_strike_level": {
-          "type": "string",
-          "description": "Strike level for an embedded put option. BNP autocallables are not warrants. Return null."
-        },
-        "sales_concession": {
-          "type": "number",
-          "description": "Sales concession as percentage. Not explicitly stated in BNP KIDs (they say 'We may share part of the costs with the person selling you the product'). Return null unless a specific percentage is stated."
-        },
-        "autocall_interval": {
-          "type": "string",
-          "description": "Frequency of autocall observations. Count the Autocall Valuation Dates and determine spacing. If ~3 months apart → 'Quarterly'. If ~6 months apart → 'Semi-Annual'. If ~12 months apart → 'Annual'. CE4130AET: 6 dates over ~3.5 years (semi-annual) → 'Semi-Annual'. CE4475CLV: 5 dates over ~1.75 years (quarterly) → 'Quarterly'. CE4515CLV: 1 date → 'Semi-Annual' (only one observation at 6-month mark). CE14812LBH: 7 dates over ~1.75 years (quarterly) → 'Quarterly'."
-        },
-        "call_strike_level": {
-          "type": "string",
-          "description": "Strike level for an embedded call option. BNP Paribas autocallable certificates are NOT warrants — they do not have explicit call/put strike levels in the warrant sense. Return null for these KIDs."
-        },
-        "coupon_first_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The FIRST date in the 'Coupon Payment Date(s)' list in PRODUCT DATA. Convert to YYYY-MM-DD. E.g. '02 June 2026' → '2026-06-02', '05 March 2026' → '2026-03-05', '03 June 2026' → '2026-06-03', '06 March 2026' → '2026-03-06'."
-        },
-        "global_identifier": {
-          "type": "string",
-          "description": "The Internal Reference code of the KID. Found in the top-right header area next to 'Internal Ref.:' (e.g. 'CE4130AET', 'CE4475CLV', 'CE4515CLV', 'CE14812LBH'). This is NOT the ISIN. It is a short alphanumeric code starting with 'CE' followed by digits and optional letters."
-        },
-        "underlying_ticker": {
-          "type": "string",
-          "description": "Bloomberg ticker(s) of the underlying asset(s). Found in the Underlying table with columns 'Underlying', 'Bloomberg Code', 'ISIN'. Extract the Bloomberg Code column values. For multiple underlyings, join with ' / ' separator. Examples: single underlying → 'DTE GY'; multiple → 'SAF FP / SU FP / AIR FP / AI FP'; or 'BP/ LN / TTE FP / SHELL NA'. Use the EXACT Bloomberg Code as printed (including spaces and slashes like 'BP/ LN')."
-        },
-        "autocall_last_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The LAST date in the 'Autocall Valuation Date(s)' list. Convert to YYYY-MM-DD. E.g. '21 May 2029' → '2029-05-21', '19 August 2027' → '2027-08-19', '20 May 2026' → '2026-05-20', '20 August 2027' → '2027-08-20'."
-        },
-        "proceeds_to_issuer": {
-          "type": "number",
-          "description": "Net proceeds to issuer as percentage. Not explicitly stated in BNP KIDs. Return null."
-        },
-        "autocall_first_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The FIRST date in the 'Autocall Valuation Date(s)' list in PRODUCT DATA. This is the first observation date. Convert to YYYY-MM-DD. E.g. '19 November 2026' → '2026-11-19', '19 August 2026' → '2026-08-19', '20 May 2026' → '2026-05-20', '20 February 2026' → '2026-02-20'."
-        },
-        "issuer_call_applies": {
-          "type": "boolean",
-          "description": "Whether the issuer has a discretionary right to call. BNP Paribas autocallable KIDs use automatic early redemption (autocall), NOT issuer-discretionary call. The early redemption is triggered by market conditions, not issuer choice. Return false unless the document explicitly states an issuer-discretionary call right separate from autocall."
-        },
-        "product_description": {
-          "type": "string",
-          "description": "Synthesize a concise product description by combining: product_subtype + 'on' + underlying names + '| Issuer:' + issuer + '| Maturity:' + maturity_date + '| Currency:' + currency + '| Coupon:' + coupon_rate + '% conditional | Barrier:' + knock_in_barrier + '%'. E.g. 'Autocall on Safran SA / Schneider Electric SE / Airbus SE / Air Liquide SA | Issuer: BNP Paribas Issuance B.V. | Maturity: 2029-12-03 | Currency: EUR | Coupon: 5% conditional | Barrier: 70%'."
-        },
-        "digital_strike_level": {
-          "type": "number",
-          "description": "Strike level for a digital payoff. BNP autocallables do not have a separate digital strike. Return null."
-        },
-        "final_valuation_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The final valuation date for determining the Final Reference Price. Found in PRODUCT DATA table labeled 'Redemption Valuation Date' (e.g. '19 November 2029', '19 November 2027', '20 November 2026'). Convert to YYYY-MM-DD. Note: BNP calls this 'Redemption Valuation Date', NOT 'Final Valuation Date'."
-        },
-        "trading_jurisdiction": {
-          "type": "string",
-          "description": "Jurisdiction where the product is supervised/regulated. Found in the Competent Authority line: 'Autorité des marchés financiers (AMF)' = France. Also, complaints go to Lisbon, Portugal. The issuer is Dutch (B.V.), guarantor is French. Return the regulatory jurisdiction → 'France' (AMF supervision). Alternatively, if a specific exchange listing is mentioned, use that."
-        },
-        "memory_coupon_applies": {
-          "type": "boolean",
-          "description": "Whether missed coupons accumulate and are paid later (memory feature). Look for the exact phrase: 'the coupon is missed but not lost definitely. All missed coupons will accumulate and become payable only if the Coupon Condition is subsequently satisfied.' If this language is present → true. All four sample BNP KIDs have memory coupons → true. If instead the KID says 'the coupon is missed and lost' or no such accumulation language exists → false."
-        },
-        "initial_valuation_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The initial valuation/fixing date. In BNP Paribas KIDs this is the same as the Strike Date (the date on which Initial Reference Prices are determined). Look for 'Strike Date' in the PRODUCT DATA table. Convert to YYYY-MM-DD. E.g. '19 November 2025' → '2025-11-19'."
-        },
-        "additional_upside_style": {
-          "type": "string",
-          "description": "Secondary upside feature. Return null for standard BNP autocallables — no additional upside mechanism beyond the coupon."
-        },
-        "basket_weightings_unequal": {
-          "type": "boolean",
-          "description": "Whether basket underlyings have unequal weights. BNP Paribas autocallable KIDs use worst-of mechanics (Worst-Performing Underlying) with equal treatment — no explicit weighting is assigned. Return false for worst-of baskets. Return null for single underlyings."
-        },
-        "contingent_coupon_applies": {
-          "type": "boolean",
-          "description": "Whether the coupon is contingent on a condition. In BNP KIDs look for 'A conditional coupon is due for payment... each time the following condition (Coupon Condition) is met'. If the coupon depends on the underlying closing price being ≥ a barrier → true. All four sample KIDs are contingent → true."
-        },
-        "upside_participation_rate": {
-          "type": "number",
-          "description": "Upside participation rate. Not applicable for BNP autocallable certificates (no participation in underlying upside). Return null."
-        },
-        "autocall_last_payment_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The LAST date in the 'Early Redemption Date(s)' list. Convert to YYYY-MM-DD. E.g. '04 June 2029' → '2029-06-04', '02 September 2027' → '2027-09-02', '03 June 2026' → '2026-06-03', '03 September 2027' → '2027-09-03'."
-        },
-        "autocall_first_payment_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The FIRST date in the 'Early Redemption Date(s)' list in PRODUCT DATA. This is the payment date if autocall triggers at the first observation. Convert to YYYY-MM-DD. E.g. '03 December 2026' → '2026-12-03', '02 September 2026' → '2026-09-02', '03 June 2026' → '2026-06-03', '06 March 2026' → '2026-03-06'."
-        },
-        "downside_participation_rate": {
-          "type": "number",
-          "description": "Downside participation rate below the barrier. In CE4130AET and CE4475CLV, shares are calculated using Barrier% of Initial Reference Price in the denominator, meaning downside is amplified (geared). In CE4515CLV and CE14812LBH, shares use Initial Reference Price directly (1:1 participation). For 1:1 → 100. For geared → calculate as 100/barrier*100 or simply return 100 for standard 1:1. Return null if unable to determine precisely."
-        },
-        "knock_in_barrier_event_type": {
-          "type": "string",
-          "description": "The type of barrier event. In BNP KIDs, look at how the barrier is evaluated: (1) If the document says 'A Barrier Event shall be deemed to occur if the Final Reference Price... is below the Barrier' — this is observed only at maturity → 'European' or 'At Expiry'. (2) If the barrier is evaluated only at maturity via the redemption payoff text (Final Reference Price vs barrier) → 'At Expiry'. (3) If the document mentions continuous or daily observation → 'Continuous'. All four sample KIDs evaluate the barrier only at the Redemption Valuation Date → 'At Expiry'."
-        },
-        "coupon_last_observation_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The LAST date in the 'Coupon Valuation Date(s)' list. This is typically the same as the Redemption Valuation Date. Convert to YYYY-MM-DD. E.g. '19 November 2029' → '2029-11-19'."
-        },
-        "coupon_first_observation_date": {
-          "type": "string",
-          "format": "date",
-          "description": "The FIRST date in the 'Coupon Valuation Date(s)' list in PRODUCT DATA. Convert to YYYY-MM-DD. E.g. '19 May 2026' → '2026-05-19', '19 February 2026' → '2026-02-19', '20 May 2026' → '2026-05-20', '20 February 2026' → '2026-02-20'."
-        },
-        "proportional_principal_amount": {
-          "type": "number",
-          "description": "Proportional share of principal. Not typically present in BNP Paribas KIDs. Return null."
-        },
-        "aggregate_principal_amount_type": {
-          "type": "string",
-          "description": "Whether the aggregate principal is fixed or variable. BNP Paribas KIDs typically do not specify this explicitly. Return null unless stated."
-        },
-        "autocall_settlement_date_offset": {
-          "type": "integer",
-          "description": "Number of business days between an Autocall Valuation Date and its corresponding Early Redemption Date. Calculate from the first pair. E.g. CE4130AET: 19 Nov 2026 → 03 Dec 2026 ≈ 10 business days. CE4475CLV: 19 Aug 2026 → 02 Sep 2026 ≈ 10 business days. CE4515CLV: 20 May 2026 → 03 Jun 2026 ≈ 10 business days. CE14812LBH: 20 Feb 2026 → 06 Mar 2026 ≈ 10 business days. Typically ~10 business days for BNP products."
-        },
-        "autocall_step_up_down_frequency": {
-          "type": "string",
-          "description": "Frequency at which the barrier steps down. Should match autocall_interval. E.g. 'Semi-Annual' if barrier drops every 6 months, 'Quarterly' if every 3 months. Return null if barriers are flat."
-        },
-        "autocall_step_up_down_step_amount": {
-          "type": "number",
-          "description": "The step-down decrement per observation period. E.g. if barriers are 95%, 90%, 85%... the step is -5. If barriers are 100%, 95%, 90%... the step is -5. Return as a positive number representing the absolute decrement (e.g. 5). Return null if barriers are flat (no step) or no autocall."
-        },
-        "autocall_step_up_down_initial_amount": {
-          "type": "number",
-          "description": "For step-down autocall barriers: the FIRST barrier percentage. E.g. '95%, 90%, 85%...' → 95. '100%, 95%, 90%...' → 100. If all barriers are the same (flat), return that single value. Return null if no autocall."
-        },
-        "knock_in_barrier_event_observation_type": {
-          "type": "string",
-          "description": "How the barrier is observed. 'At Expiry Only' if checked only on the Redemption Valuation Date (all four sample KIDs). 'Continuous' if monitored daily throughout the product life. 'Daily Close' if checked at each daily close. All sample BNP KIDs → 'At Expiry Only'."
-        }
-      },
-      "additionalProperties": false
-    },
-    "systemPrompt": "You are a specialist in extracting structured data from BNP Paribas Key Information Documents (KIDs) for autocallable structured certificates. These are PRIIPs-compliant KIDs issued by BNP Paribas Issuance B.V. with BNP Paribas S.A. as guarantor.\n\nDOCUMENT STRUCTURE — BNP Paribas KIDs follow this exact layout:\n1. HEADER: \"KEY INFORMATION DOCUMENT\" + Internal Ref (e.g. CE4130AET) + URL\n2. PURPOSE: Legal disclaimer paragraph\n3. PRODUCT section: Large centered heading (e.g. \"Autocall\"), then a table with ISIN, Manufacturer, Issuer/Guarantor, Competent Authority, KID Production Date\n4. WHAT IS THIS PRODUCT? → TYPE (certificate description), TERM, OBJECTIVES (payoff mechanics + coupon description + autocall description)\n5. PRODUCT DATA table: Strike Date, Issue Date, Redemption Valuation Date, Redemption Date, Coupon Valuation Dates, Coupon Payment Dates, Conditional Coupon Barrier, Conditional Coupon Rate, Autocall Valuation Dates, Early Redemption Dates, Autocall Barrier(s), and optionally a separate \"Barrier\" row for the knock-in barrier\n6. Underlying table: Underlying name, Bloomberg Code, ISIN\n7. INTENDED RETAIL INVESTOR, RISK INDICATOR, PERFORMANCE SCENARIOS, COSTS, COMPLAINTS, OTHER RELEVANT INFORMATION\n\nCRITICAL EXTRACTION RULES:\n\n1. GLOBAL IDENTIFIER: Extract from \"Internal Ref.:\" in the header (e.g. \"CE4130AET\"). This is NOT the ISIN.\n\n2. ISSUER vs MANUFACTURER: \"Manufacturer\" is BNP Paribas S.A. but \"Issuer\" is \"BNP Paribas Issuance B.V.\" — extract the Issuer entity.\n\n3. DATES: All dates in the document use \"DD Month YYYY\" format (e.g. \"19 November 2025\"). Convert ALL dates to YYYY-MM-DD format. Pay careful attention to dates — they must be exact.\n\n4. COUPON MECHANICS: BNP KIDs list Coupon Valuation Dates (observation) and Coupon Payment Dates (payment) separately. Extract both lists' first and last dates. The coupon is CONDITIONAL — paid only if each underlying closes ≥ Conditional Coupon Barrier on the observation date. Check for MEMORY feature: look for \"All missed coupons will accumulate and become payable only if the Coupon Condition is subsequently satisfied.\"\n\n5. AUTOCALL MECHANICS: Autocall Valuation Dates and Early Redemption Dates are listed separately. The autocall barrier may be FLAT (e.g. \"100% of the Initial Reference Price\") or STEP-DOWN (e.g. \"95%, 90%, 85%, 80%, 75% and 70%\"). For step-down barriers, pair each Autocall Valuation Date with its corresponding barrier in order.\n\n6. KNOCK-IN BARRIER: Found in two places — either as a separate \"Barrier\" row in PRODUCT DATA (CE4515CLV, CE14812LBH) OR embedded in the redemption payoff text as the threshold percentage (CE4130AET: \"70%\", CE4475CLV: \"78%\"). Extract the percentage number only.\n\n7. SINGLE vs MULTIPLE UNDERLYINGS: If the underlying table has one row → single underlying, multiple_underlyings concept doesn't apply. If multiple rows → worst-of basket, set basket_weightings_unequal=false (worst-of is not a weighted basket).\n\n8. SETTLEMENT TYPE: BNP autocallables have dual settlement — cash if above barrier, physical delivery of shares if below. Always return \"Cash or Physical\".\n\n9. ISSUE PRICE: May not be exactly 100%. Extract the exact percentage from PRODUCT DATA (e.g. 100%, 99.50%, 99%).\n\n10. NULL HANDLING: Return null for fields not present in the document. NEVER invent values. NEVER use epoch dates, zeros, or empty strings as substitutes for missing data.\n\n11. NUMBER EXTRACTION: \"5% of the Notional Amount\" → 5 (just the number). \"EUR 1,000\" → 1000. \"70% of the Initial Reference Price\" → 70. Always strip labels and return clean numbers.\n\n12. The additionalProperties: false constraint means you must ONLY populate the fields defined in the schema. Do not add extra keys.",
-    "fewShotExamples": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "citationEnabled": true,
-    "citationIncludePdfPage": true,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k",
-    "defaultModel": "gpt-4o-mini"
-  },
-  {
-    "name": "Derivative Warrants Extractor V1",
-    "description": "Automated Data Extraction Architecture for Derivative Warrants",
-    "schema": {
-      "type": "object",
-      "required": [],
-      "properties": {
-        "isin": {
-          "type": "string",
-          "description": "The International Securities Identification Number. Extract if available; otherwise, return null."
-        },
-        "issuer": {
-          "type": "string",
-          "description": "Extract the full legal name of the issuing entity and translate to English. For the provided documents, this maps to 'ผู้ออกใบสำคัญแสดงสิทธิอนุพันธ์ฯ' and must be output exactly as 'Bualuang Securities Public Company Limited'"
-        },
-        "currency": {
-          "type": "string",
-          "description": "Hardcode as 'THB' based on the Thai Baht denomination of the SET"
-        },
-        "issue_date": {
-          "type": "string",
-          "description": "Extract the issuance date ('วันออกใบสำคัญแสดงสิทธิอนุพันธ์ฯ'). Convert Thai BE dates to Gregorian DD/MM/YYYY (e.g., '6 กุมภาพันธ์ 2569' becomes '06/02/2026')"
-        },
-        "trade_date": {
-          "type": "string",
-          "description": "Identical to issue_date for Direct Listing (Direct Listing) SET DWs, representing the first day of exchange trading.2 Format as DD/MM/YYYY."
-        },
-        "distributor": {
-          "type": "string",
-          "description": "Default to the identical value extracted for the 'issuer' parameter, as the issuer acts as its own direct listing distributor on the SET"
-        },
-        "buffer_level": {
-          "type": "string",
-          "description": "Set strictly to null."
-        },
-        "product_type": {
-          "type": "string",
-          "description": "Hardcode as 'Growth'"
-        },
-        "document_type": {
-          "type": "string",
-          "description": "Hardcode as 'Final' to indicate these are finalized, non-draft pricing term sheets"
-        },
-        "maturity_date": {
-          "type": "string",
-          "description": "Extract the maturity date ('วันครบกำหนดอายุ'). Format as DD/MM/YYYY"
-        },
-        "investment_type": {
-          "type": "string",
-          "description": "Hardcode as 'Warrant'"
-        },
-        "offering_closes": {
-          "type": "string",
-          "description": "The date the subscription period ends. For direct market listings lacking a discrete subscription window, return null."
-        },
-        "product_subtype": {
-          "type": "string",
-          "description": "Determine the option directionality. If the document states 'สิทธิในการซื้อ' (Right to buy), output 'Call Warrant'. If it states 'สิทธิในการขาย' (Right to sell), output 'Put Warrant'"
-        },
-        "settlement_type": {
-          "type": "string",
-          "description": "Extract the settlement method. This should map from 'ชำระเงินตามส่วนต่างของราคา' to the English string 'Cash' or 'Cash Settlement'"
-        },
-        "principal_amount": {
-          "type": "number",
-          "description": "Extract the absolute total offering value ('มูลค่ารวมที่เสนอขาย') without currency symbols (e.g., 40000000.00 for the ADVANC Put)"
-        },
-        "global_identifier": {
-          "type": "string",
-          "description": "Extract the unique alphanumeric symbol of the derivative warrant. In the Thai term sheet, this is denoted as 'ชื่อย่อ' (e.g., 'ADVANC01P2607A' or 'COM701C2607B')"
-        },
-        "underlying_ticker": {
-          "type": "string",
-          "description": "Identify the underlying asset ('หลักทรัพย์อ้างอิง'). Determine its standard SET symbol and append ' TB Equity' to format it as a valid Bloomberg ticker (e.g., 'COM7 TB Equity', 'CPF TB Equity')"
-        },
-        "expiry_payment_date": {
-          "type": "string",
-          "description": "Mirror the maturity_date, as settlement occurs precisely upon expiration."
-        },
-        "final_valuation_date": {
-          "type": "string",
-          "description": "Extract the last trading day ('วันทำการซื้อขายสุดท้าย'). Format as DD/MM/YYYY"
-        },
-        "trading_jurisdiction": {
-          "type": "string",
-          "description": "Extract the exchange locale. Hardcode as 'TH' (Thailand) based on the SET regulatory framework"
-        },
-        "initial_valuation_date": {
-          "type": ["string", "null"],
-          "description": "Extract the date used to determine the initial reference price. If not explicitly isolated from the issue date, return null."
-        },
-        "expiry_observation_date": {
-          "type": "string",
-          "description": "Mirror the final_valuation_date, as European DWs observe the underlying price strictly on the final trading day."
-        },
-        "investment_or_leveraged": {
-          "type": "string",
-          "description": "Hardcode as 'Leveraged Product', indicating the derivative nature of the warrant"
-        },
-        "proportional_principal_amount": {
-          "type": "number",
-          "description": "Set to null or a default integer if required by the legacy schema (e.g., 1 or 10)"
-        },
-        "leveraged_product_exercise_style": {
-          "type": "string",
-          "description": "Extract the exercise architecture. Expected to perfectly map from 'แบบยุโรป' to the string 'European'"
-        },
-        "leveraged_product_exercise_period_end_date": {
-          "type": "string",
-          "description": "a date"
-        }
-      },
-      "additionalProperties": false
-    },
-    "systemPrompt": "Extract financial data from the Asian/Thai derivative warrant PDF term sheet. Ensure maximum data fidelity. The schema operates under an additionalProperties: false restriction. Do not invent new JSON keys.\n\n1. Non-linear reading comprehension: Financial term sheets are not read sequentially. Ingest the entire document, synthesize interrelated parameters, and construct the JSON output. Specifically, for product_description, synthesize data across multiple nodes (underlying ticker, instrument type, issuer name, maturity date) to concatenate the final string precisely.\n2. Structural nullification & The Epoch Date Artifact: The vast majority of extraneous fields (coupon generation, autocall, complex barriers) must be structural nulls. Under no circumstances should missing, blank, or structurally inapplicable data be substituted with epoch timestamps (like 1899-12-31 00:00:00) or default integers (like 0). Omitted fields must be returned as strictly null.\n3. Logic-gated mathematical string building: When evaluating the strike level fields, determine the option directionality. If Call, populate call_strike_level with the exact string concatenation of '[Quantity]*[Issue Price]' (e.g., '100000000*1.00') and leave put_strike_level null. Reverse this logic if it is a Put. Do not execute the mathematical operation. Do not insert the absolute financial strike price into these specific fields.\n4. Cross-Lingual Semantic Mapping: Execute cross-lingual semantic reasoning. Map Thai terms to English (e.g. 'สิทธิในการซื้อ' to 'Call Warrant', 'สิทธิในการขาย' to 'Put Warrant', 'แบบยุโรป' to 'European', 'ชำระเงินตามส่วนต่างของราคา' to 'Cash').\n5. Ticker Normalization: Isolate the corporate entity mentioned in the Thai text, deduce its official SET trading symbol, and construct the correct Bloomberg syntax by appending \" TB Equity\" to underlying_ticker.\n6. Chronological Milestones: All localized Thai Buddhist Era (BE) dates and Thai months must be mathematically converted and normalized into the universal DD/MM/YYYY or YYYY-MM-DD string format.",
-    "fewShotExamples": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k",
-    "defaultModel": "gpt-4o-mini"
-  },
-  {
-    "name": "BNP Paribas",
-    "description": "Automated Data Extraction Architecture for Derivative Warrants",
-    "schema": {
-      "type": "object",
-      "required": [],
-      "properties": {
-        "isin": {
-          "type": "string",
-          "description": "The International Securities Identification Number. Extract if available; otherwise, return null."
-        },
-        "issuer": {
-          "type": "string",
-          "description": "Extract the full legal name of the issuing entity"
-        },
-        "currency": { "type": "string", "description": "Product Currency" },
-        "issue_date": {
-          "type": "string",
-          "description": "Extract the issuance date to Gregorian DD/MM/YYYY format"
-        },
-        "issue_price": {
-          "type": "number",
-          "description": "Issue Price in percentage format"
-        },
-        "strike_date": {
-          "type": "string",
-          "description": "Strike Date in DD/MM/YYYY format"
-        },
-        "notional_amount": {
-          "type": "number",
-          "description": "Notional Amount, an amount in product currency"
-        }
-      },
-      "additionalProperties": false
-    },
-    "systemPrompt": "Extract financial data from the Asian/Thai derivative warrant PDF term sheet. Ensure maximum data fidelity. The schema operates under an additionalProperties: false restriction. Do not invent new JSON keys.\n\n1. Non-linear reading comprehension: Financial term sheets are not read sequentially. Ingest the entire document, synthesize interrelated parameters, and construct the JSON output. Specifically, for product_description, synthesize data across multiple nodes (underlying ticker, instrument type, issuer name, maturity date) to concatenate the final string precisely.\n2. Structural nullification & The Epoch Date Artifact: The vast majority of extraneous fields (coupon generation, autocall, complex barriers) must be structural nulls. Under no circumstances should missing, blank, or structurally inapplicable data be substituted with epoch timestamps (like 1899-12-31 00:00:00) or default integers (like 0). Omitted fields must be returned as strictly null.\n3. Logic-gated mathematical string building: When evaluating the strike level fields, determine the option directionality. If Call, populate call_strike_level with the exact string concatenation of '[Quantity]*[Issue Price]' (e.g., '100000000*1.00') and leave put_strike_level null. Reverse this logic if it is a Put. Do not execute the mathematical operation. Do not insert the absolute financial strike price into these specific fields.\n4. Cross-Lingual Semantic Mapping: Execute cross-lingual semantic reasoning. Map Thai terms to English (e.g. 'สิทธิในการซื้อ' to 'Call Warrant', 'สิทธิในการขาย' to 'Put Warrant', 'แบบยุโรป' to 'European', 'ชำระเงินตามส่วนต่างของราคา' to 'Cash').\n5. Ticker Normalization: Isolate the corporate entity mentioned in the Thai text, deduce its official SET trading symbol, and construct the correct Bloomberg syntax by appending \" TB Equity\" to underlying_ticker.\n6. Chronological Milestones: All localized Thai Buddhist Era (BE) dates and Thai months must be mathematically converted and normalized into the universal DD/MM/YYYY or YYYY-MM-DD string format.",
-    "fewShotExamples": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k",
-    "defaultModel": "gpt-4o-mini"
-  },
-  {
-    "name": "(Use this) BNP Paribas KID Extractor",
+    "id": "e6a0b48f-6348-41f7-b146-7640994115d0",
+    "name": "Societe General Extractor V2",
     "description": "Expert-level extractor for BNP Paribas PRIIPs Key Information Documents (KIDs) — Autocallable Barrier Reverse Convertible certificates issued by BNP Paribas Issuance B.V. with BNP Paribas S.A. guarantee. Handles both directly extractable fields and derived/inferred fields requiring financial domain reasoning.",
+    "thumbnailUrl": null,
     "schema": {
       "type": "object",
       "required": [
@@ -867,76 +360,77 @@
         "product_subtype",
         "settlement_type",
         "autocall_applies",
-        "global_identifier"
+        "global_identifier",
+        "knock_in_barrier",
+        "put_strike_level",
+        "knock_in_barrier_event_observation_type"
       ],
       "fieldOrder": [
+        "global_identifier",
         "isin",
-        "issuer",
-        "cap",
-        "floor",
-        "currency",
+        "initial_valuation_date",
         "issue_date",
-        "trade_date",
+        "final_valuation_date",
+        "maturity_date",
+        "coupon_applies",
         "coupon_rate",
+        "coupon_barrier",
+        "coupon_interval",
+        "issuer",
+        "currency",
+        "trade_date",
         "distributor",
         "issue_price",
         "strike_date",
-        "buffer_level",
+        "knock_in_barrier",
+        "knock_in_barrier_event_type",
+        "principal_amount",
+        "underlying_ticker",
         "product_type",
         "upside_style",
-        "call_schedule",
         "document_type",
-        "maturity_date",
-        "maximumpayout",
-        "coupon_applies",
-        "coupon_barrier",
-        "digital_amount",
         "downside_style",
         "minimum_payout",
-        "coupon_interval",
         "investment_type",
         "offering_closes",
         "product_subtype",
+        "memory_coupon_applies",
         "settlement_type",
-        "autocall_applies",
-        "autocall_barrier",
+        "contingent_coupon_applies",
+        "coupon_first_observation_date",
+        "coupon_last_observation_date",
+        "coupon_first_date",
         "coupon_last_date",
-        "knock_in_barrier",
-        "principal_amount",
         "put_strike_level",
         "sales_concession",
+        "autocall_barrier",
+        "autocall_applies",
         "autocall_interval",
         "call_strike_level",
-        "coupon_first_date",
-        "global_identifier",
-        "underlying_ticker",
-        "autocall_last_date",
-        "proceeds_to_issuer",
+        "autocall_first_payment_date",
+        "autocall_last_payment_date",
         "autocall_first_date",
+        "autocall_last_date",
+        "cap",
+        "proceeds_to_issuer",
         "issuer_call_applies",
+        "digital_amount",
         "product_description",
         "digital_strike_level",
-        "final_valuation_date",
         "trading_jurisdiction",
-        "memory_coupon_applies",
-        "initial_valuation_date",
         "additional_upside_style",
         "basket_weightings_unequal",
-        "contingent_coupon_applies",
         "upside_participation_rate",
-        "autocall_last_payment_date",
-        "autocall_first_payment_date",
         "downside_participation_rate",
-        "knock_in_barrier_event_type",
-        "coupon_last_observation_date",
-        "coupon_first_observation_date",
         "proportional_principal_amount",
         "aggregate_principal_amount_type",
         "autocall_settlement_date_offset",
         "autocall_step_up_down_frequency",
+        "floor",
         "autocall_step_up_down_step_amount",
         "autocall_step_up_down_initial_amount",
-        "knock_in_barrier_event_observation_type"
+        "knock_in_barrier_event_observation_type",
+        "coupon_rate_per_payment_date"
       ],
       "properties": {
         "cap": {
@@ -971,7 +465,7 @@
         },
         "coupon_rate": {
           "type": "number",
-          "description": "DIRECTLY EXTRACTABLE. Found in 'Conditional Coupon Rate(s)'. E.g. '5% of the Notional Amount' → 5. FINANCIAL CONTEXT: This is the coupon per observation PERIOD (not annualized). To calculate the annualized coupon: multiply by the number of periods per year. E.g. 5% semi-annual = 10% p.a. yield, 1.75% quarterly = 7% p.a. yield, 4.875% semi-annual = 9.75% p.a. yield, 1.5% quarterly = 6% p.a. yield. These rates are significantly above risk-free rates because the investor is implicitly selling downside put options."
+          "description": "DIRECTLY EXTRACTABLE. Found in 'Conditional Coupon Rate(s)'. E.g. '5% of the Notional Amount' → 5. FINANCIAL CONTEXT: This is the coupon per observation PERIOD (not annualized). To calculate the annualized coupon: multiply by the number of periods per year. E.g. 5% semi-annual = 10% p.a. yield, 1.75% quarterly = 7% p.a. yield, 4.875% semi-annual = 9.75% p.a. yield, 1.5% quarterly = 6% p.a. yield. These rates are significantly above risk-free rates because the investor is implicitly selling downside put options. look for the\"WHAT IS THIS PRODUCT? section if you find \"coupon\" value such as \"4% per annum\", return this field with 4%. specifically look for \"per annum/annually\". this field is only for annual coupon rate. carefully find out \"per annum\""
         },
         "distributor": {
           "type": "string",
@@ -986,10 +480,6 @@
           "format": "date",
           "description": "DIRECTLY EXTRACTABLE. Found in PRODUCT DATA row 'Strike Date'. This is the most critical date in the product — it is the date when ALL Initial Reference Prices are fixed at closing levels. Every barrier, coupon condition, and autocall condition references back to the Initial Reference Price determined on this date. The Strike Date is typically BEFORE the Issue Date. Convert to yyyy-mm-ddThh:mm:ssZ."
         },
-        "buffer_level": {
-          "type": "number",
-          "description": "REQUIRES FINANCIAL REASONING. CRITICAL DISTINCTION between 'buffer' and 'barrier': (1) BUFFER = absorbs losses up to a certain percentage (e.g. 10% buffer means first 10% of losses are absorbed, investor only loses beyond that). (2) BARRIER = provides FULL protection above the barrier level, but if breached, ALL protection disappears (cliff risk). BNP autocallable KIDs use BARRIERS, not buffers. The barrier provides contingent (not continuous) protection. If the Final Reference Price is ≥ barrier → full principal return. If < barrier → protection evaporates entirely and investor bears losses from a potentially higher level. Since these are barrier products → return null for buffer_level."
-        },
         "product_type": {
           "type": "string",
           "description": "DIRECTLY EXTRACTABLE. Found in TYPE section: 'This product is a certificate, a transferable debt instrument.' Return 'certificate'. In structured product taxonomy, certificates are securitized derivatives listed on exchanges, distinct from OTC notes or bonds. They are senior unsecured debt obligations of the issuer."
@@ -997,10 +487,6 @@
         "upside_style": {
           "type": "string",
           "description": "DERIVED FROM PAYOFF ANALYSIS. BNP autocallable BRCs have NO upside participation in the underlying's appreciation. The maximum return is Notional Amount (100% of principal) + accumulated coupons. This is a DIGITAL payoff: either you receive notional (if above barrier) or you receive physical shares (if below). There is no linear participation in upside. → Return 'Digital'. CONTRAST: A 'Participation' product would say 'you receive 100% + X% of the underlying's performance'. A 'Capped' product would provide partial upside up to a limit. These BNP products provide ZERO underlying upside beyond the fixed coupon."
-        },
-        "call_schedule": {
-          "type": "string",
-          "description": "DERIVED BY PAIRING dates with barriers. Construct a structured string by pairing each Autocall Valuation Date with its corresponding barrier level. FORMAT: 'yyyy-mm-ddThh:mm:ssZ:XX%; yyyy-mm-ddThh:mm:ssZ:XX%; ...' RULES FOR PAIRING: (1) For FLAT barriers (single value like '100%'), repeat the same barrier for every date. (2) For STEP-DOWN barriers, match barriers to dates IN ORDER (first barrier with first date, second with second, etc.). The number of barriers MUST equal the number of autocall dates. (3) VALIDATION: barriers should be monotonically non-increasing (step-down) or constant (flat). EXAMPLE: CE14812LBH with 7 dates and barriers '100%, 95%, 90%, 85%, 80%, 75%, 70%' → '2026-02-20:100%; 2026-05-20:95%; 2026-08-20:90%; 2026-11-20:85%; 2027-02-22:80%; 2027-05-20:75%; 2027-08-20:70%'."
         },
         "document_type": {
           "type": "string",
@@ -1011,17 +497,13 @@
           "format": "date",
           "description": "DIRECTLY EXTRACTABLE. Found in PRODUCT DATA row 'Redemption Date (maturity)'. This is the payment/settlement date — typically 5-10 business days AFTER the Redemption Valuation Date. The gap allows the issuer to calculate payoffs, arrange share delivery if needed, and settle through Euroclear/Clearstream. VALIDATION: maturity_date should always be AFTER final_valuation_date. Convert to yyyy-mm-ddThh:mm:ssZ format."
         },
-        "maximumpayout": {
-          "type": "number",
-          "description": "DERIVED BY CALCULATION. Maximum possible payout = 100% (notional) + ALL coupons (if every coupon condition is met). Formula: 100 + (coupon_rate × total_number_of_coupon_periods). This assumes the product runs to maturity AND every coupon is paid. If autocall occurs early, the max would be lower (100% + coupons earned up to that point). Return the FULL LIFE maximum. E.g. CE4130AET: 100 + (5 × 8) = 140. CE4475CLV: 100 + (1.75 × 8) = 114. IMPORTANT: The Performance Scenarios section in the KID shows the Favourable scenario payout, which can serve as a VALIDATION cross-check. CE4130AET favorable: EUR 12,500 on EUR 10,000 = 125% (autocalled at year 2.5 with some coupons)."
-        },
         "coupon_applies": {
           "type": "boolean",
           "description": "DIRECTLY EXTRACTABLE. Look for 'Coupon:' paragraph in OBJECTIVES AND 'Conditional Coupon Rate(s)' in PRODUCT DATA. If any coupon mechanism exists → true. FINANCIAL CONTEXT: In autocallable BRCs, the coupon is the primary return mechanism for investors — they sacrifice upside equity participation in exchange for these enhanced coupons. The coupon rate is typically much higher than risk-free rates because the investor is implicitly short a put option on the underlying(s)."
         },
         "coupon_barrier": {
           "type": "number",
-          "description": "DIRECTLY EXTRACTABLE. Found in PRODUCT DATA row 'Conditional Coupon Barrier(s)'. Extract percentage number ONLY. E.g. '70% of the Initial Reference Price' → 70. FINANCIAL CONTEXT: This is the threshold that each underlying's closing price must meet or exceed (on the observation date) for the coupon to be paid. For worst-of baskets, ALL underlyings must be ≥ this barrier simultaneously. RELATIONSHIP TO knock_in_barrier: The coupon barrier and the knock-in (downside protection) barrier are OFTEN the same level (e.g. both 70%) but CAN differ. Always extract them independently. IMPORTANT: If multiple barrier levels are listed for different dates, extract the most common one or the first one."
+          "description": "DIRECTLY EXTRACTABLE. Found in PRODUCT DATA row 'Conditional Coupon Barrier(s)'. Extract percentage number ONLY. E.g. '70% of the Initial Reference Price' → 70. FINANCIAL CONTEXT: This is the threshold that each underlying's closing price must meet or exceed (on the observation date) for the coupon to be paid. For worst-of baskets, ALL underlyings must be ≥ this barrier simultaneously. RELATIONSHIP TO knock_in_barrier: The coupon barrier and the knock-in (downside protection) barrier are OFTEN the same level (e.g. both 70%) but CAN differ. Always extract them independently. IMPORTANT: If multiple barrier levels are listed for different dates, extract the most common one or the first one.look for\" WHAT IS THIS PRODUCT?\" section and find if there is \" Coupon barrier\". if find then return this field with coupon barrier value"
         },
         "digital_amount": {
           "type": "number",
@@ -1054,7 +536,7 @@
         },
         "settlement_type": {
           "type": "string",
-          "description": "DERIVED FROM REDEMPTION MECHANICS. BNP autocallable KIDs describe TWO settlement scenarios: (1) CASH: If above barrier at maturity → 'a payment in cash of the Notional Amount'. Also, if autocall triggers → 'a payment in cash equal to the Notional Amount'. (2) PHYSICAL: If below barrier at maturity → 'delivery of the number of shares of the Worst-Performing Underlying... plus a payment in cash in respect of any fraction of a share.' Since BOTH outcomes are possible depending on market conditions → return 'Cash or Physical'. NOTE: The physical delivery is to the WORST-performing underlying only (not all underlyings in the basket). Fractional shares are cash-settled."
+          "description": "Go to the \"Final Redemption\" section of the document and if there is \" physical delivery\" mentioned , then return this field with\"Cash or physical\". if there is no mention of this word, then return this field with \"Cash\""
         },
         "autocall_applies": {
           "type": "boolean",
@@ -1078,8 +560,8 @@
           "description": "DIRECTLY EXTRACTABLE. Found in PRODUCT DATA row 'Notional Amount (per certificate)'. Strip currency code and formatting. E.g. 'EUR 1,000' → 1000, 'CHF 1,000' → 1000. This is the face value per certificate — the amount used to calculate ALL payoffs. Coupon payments = coupon_rate% × principal_amount. Autocall redemption = 100% × principal_amount. Share delivery calculation also references this amount."
         },
         "put_strike_level": {
-          "type": "string",
-          "description": "REQUIRES FINANCIAL REASONING. In the derivatives decomposition of a BRC: the investor is SHORT a put option. The strike of this put depends on the share delivery formula: (1) CE4130AET & CE4475CLV: 'Notional Amount / (Barrier% × Initial Reference Price)' — the effective put strike is at the BARRIER level (e.g. 70% or 78%). The investor starts losing money from the barrier downward, with GEARED exposure. (2) CE4515CLV & CE14812LBH: 'Notional Amount / Initial Reference Price' — the effective put strike is at 100% (Initial Reference Price). The barrier only determines IF the put activates (down-and-in), but losses are 1:1 from 100% down. For this field, return the barrier percentage as a string (e.g. '70' or '78') or null if not determinable."
+          "type": "number",
+          "description": "REQUIRES FINANCIAL REASONING. In the derivatives decomposition of a BRC: the investor is SHORT a put option. The strike of this put depends on the share delivery formula: (1) CE4130AET & CE4475CLV: 'Notional Amount / (Barrier% × Initial Reference Price)' — the effective put strike is at the BARRIER level (e.g. 70% or 78%). The investor starts losing money from the barrier downward, with GEARED exposure. (2) CE4515CLV & CE14812LBH: 'Notional Amount / Initial Reference Price' — the effective put strike is at 100% (Initial Reference Price). The barrier only determines IF the put activates (down-and-in), but losses are 1:1 from 100% down. For this field, return the barrier percentage as a string (e.g. '70' or '78') or null if not determinable. if there is \"capital barrier\", return this field with'100%\". if there is no \"capital barrier\"  and  in the\" Final Redemption\" section if u find \" The Conversion Factor is equal to the Initial Value multiplied by the Capital Barrier\"then return this field with \"capital barrier value\""
         },
         "sales_concession": {
           "type": "number",
@@ -1100,7 +582,7 @@
         },
         "global_identifier": {
           "type": "string",
-          "description": "DIRECTLY EXTRACTABLE. The Internal Reference code. Found next to 'Internal Ref.:' in the top-right header (e.g. 'CE4130AET', 'CE4475CLV', 'CE4515CLV', 'CE14812LBH'). This is the issuer's internal product code — NOT the ISIN. Starts with 'CE' followed by digits and optional suffix letters. Also appears embedded in the URL (e.g. 'http://kid.bnpparibas.com/CE4130AET-B83B6-EN.pdf')."
+          "description": "DIRECTLY EXTRACTABLE. The Internal Reference code. Found next to 'Internal Ref.:' in the top-right header (e.g. 'CE4130AET', 'CE4475CLV', 'CE4515CLV', 'CE14812LBH'). This is the issuer's internal product code — NOT the ISIN. Starts with 'CE' followed by digits and optional suffix letters. Also appears embedded in the URL (e.g. 'http://kid.bnpparibas.com/CE4130AET-B83B6-EN.pdf'). look for the \"PRODUCT\" section , in the second line there is \" ISIN\" so return this field with ISIN value such as  \"CH1513911847\""
         },
         "underlying_ticker": {
           "type": "string",
@@ -1160,7 +642,7 @@
         },
         "contingent_coupon_applies": {
           "type": "boolean",
-          "description": "DERIVED FROM COUPON CONDITION LANGUAGE. Look for 'A conditional coupon is due for payment... each time the following condition (Coupon Condition) is met: if, on a Coupon Valuation Date, the closing price of each underlying is greater than or equal to the relevant Conditional Coupon Barrier.' If coupon payment depends on underlying performance → true. CONTRAST: An unconditional/guaranteed coupon would say 'a fixed coupon of X% will be paid regardless of performance' — in that case → false. ALL BNP autocallable KIDs in the sample set have contingent coupons."
+          "description": "DERIVED FROM COUPON CONDITION LANGUAGE. Look for 'A conditional coupon is due for payment... each time the following condition (Coupon Condition) is met: if, on a Coupon Valuation Date, the closing price of each underlying is greater than or equal to the relevant Conditional Coupon Barrier.' If coupon payment depends on underlying performance → true. CONTRAST: An unconditional/guaranteed coupon would say 'a fixed coupon of X% will be paid regardless of performance' — in that case → false. ALL BNP autocallable KIDs in the sample set have contingent coupons. look for \"WHAT IS THIS PRODUCT?\" section , if you find \"coupon barrier\" , then return this field with \"TRUE\". If you do not find any \"coupon barrier\" return this field with\" FALSE\"."
         },
         "upside_participation_rate": {
           "type": "number",
@@ -1187,7 +669,11 @@
         "coupon_last_observation_date": {
           "type": "string",
           "format": "date",
-          "description": "DIRECTLY EXTRACTABLE. The LAST date in 'Coupon Valuation Date(s)' list. If not found, use Redemption Valuation Date. RELATIONSHIP: This should equal or be very close to the final_valuation_date (Redemption Valuation Date), because the last coupon observation typically coincides with the final product valuation.  Convert to yyyy-mm-ddThh:mm:ssZ."
+          "description": "DIRECTLY EXTRACTABLE. The LAST date in 'Coupon Valuation Date(s)' list. RELATIONSHIP: This should equal or be very close to the final_valuation_date (Redemption Valuation Date), because the last coupon observation typically coincides with the final product valuation. Convert to yyyy-mm-ddThh:mm:ssZ."
+        },
+        "coupon_rate_per_payment_date": {
+          "type": "number",
+          "description": "look for the \"WHAT IS THIS PRODUCT?\" section, if you find \"coupon\" rate such as 4% , return this field with 4%. "
         },
         "coupon_first_observation_date": {
           "type": "string",
@@ -1220,424 +706,247 @@
         },
         "knock_in_barrier_event_observation_type": {
           "type": "string",
-          "description": "DERIVED — complementary to knock_in_barrier_event_type. Specifies observation frequency: 'At Expiry Only' (single date observation = European), 'Daily Close' (checked at each trading day close), 'Continuous' (real-time intraday monitoring). For BNP autocallable KIDs where the barrier is only evaluated on the Redemption Valuation Date → 'At Expiry Only'. VALIDATION: Must be consistent with knock_in_barrier_event_type."
+          "description": "DERIVED — complementary to knock_in_barrier_event_type. Specifies observation frequency: 'At Expiry Only' (single date observation = European), 'Daily Close' (checked at each trading day close), 'Continuous' (real-time intraday monitoring). For BNP autocallable KIDs where the barrier is only evaluated on the Redemption Valuation Date → 'At Expiry Only'. VALIDATION: Must be consistent with knock_in_barrier_event_type. GO TO the \" WHAT IS THIS PRODUCT?\"section and if you find\"capital barrier type\" carefully notice the value of it. if there is \"Observed on the Final Observation Date only\" , return this field with\" At maturity at the close\", for \"observed Continuously\" return with \"Continuous\" and for \"observed daily\" , return with\"Daily at the close\""
         }
       },
       "additionalProperties": false
     },
-    "systemPrompt": "You are an expert financial analyst specializing in structured product data extraction from BNP Paribas PRIIPs Key Information Documents (KIDs). You understand autocallable barrier reverse convertible (BRC) certificate mechanics at the level of a derivatives structurer.\n\nDOCUMENT CONTEXT:\nThese are PRIIPs KIDs (EU Regulation 1286/2014) for autocallable certificates issued by BNP Paribas Issuance B.V. (Dutch SPV) with BNP Paribas S.A. (French parent) as guarantor. The products are yield enhancement structured products — economically equivalent to: (1) Long zero-coupon bond at par, (2) Short a European down-and-in put option on the worst-performing underlying, (3) Long a series of digital call options (conditional coupons) with memory feature, (4) Short a series of binary up-and-out options (autocall feature).\n\nDOCUMENT LAYOUT (BNP standard):\nPage 1: Header (Internal Ref, URL) → PURPOSE → PRODUCT section (heading e.g. 'Autocall', ISIN, Manufacturer/Issuer/Guarantor, KID Production Date) → WHAT IS THIS PRODUCT? (TYPE, TERM, OBJECTIVES with payoff mechanics) → PRODUCT DATA table → Underlying table\nPage 2: INTENDED RETAIL INVESTOR → RISK INDICATOR (SRI 1-7) → PERFORMANCE SCENARIOS → WHAT HAPPENS IF MANUFACTURER UNABLE TO PAY\nPage 3: COSTS (Costs Over Time table, Composition of Costs table) → HOW LONG SHOULD I HOLD IT → HOW CAN I COMPLAIN → OTHER RELEVANT INFORMATION\n\nEXTRACTION METHODOLOGY — THREE TIERS:\n\nTIER 1 — DIRECTLY EXTRACTABLE (look for exact labels):\n• global_identifier → 'Internal Ref.:' in header\n• isin → 'ISIN' row in PRODUCT table\n• issuer → 'Issuer:' label (NOT Manufacturer)\n• strike_date → 'Strike Date' in PRODUCT DATA\n• issue_date → 'Issue Date' in PRODUCT DATA\n• final_valuation_date → 'Redemption Valuation Date' in PRODUCT DATA\n• maturity_date → 'Redemption Date (maturity)' in PRODUCT DATA\n• principal_amount → 'Notional Amount (per certificate)' (strip currency)\n• issue_price → 'Issue Price' (strip %)\n• currency → 'Product Currency'\n• coupon_barrier → 'Conditional Coupon Barrier(s)' (extract number)\n• coupon_rate → 'Conditional Coupon Rate(s)' (extract number)\n• autocall_barrier → 'Autocall Barrier(s)' (first value if step-down)\n• knock_in_barrier → 'Barrier' row in PRODUCT DATA, OR from redemption payoff text\n• All date lists (coupon observation dates, coupon payment dates, autocall observation dates, early redemption dates) → first and last items\n\nTIER 2 — DERIVED BY CALCULATION:\n• initial_valuation_date = strike_date (Initial Reference Price is fixed on Strike Date)\n• coupon_interval → count coupon dates, determine spacing\n• autocall_interval → count autocall dates, determine spacing\n• autocall_settlement_date_offset → business days between autocall observation date and corresponding early redemption date (~10 for BNP)\n• autocall_step_up_down_step_amount → difference between consecutive barrier levels\n• call_schedule → pair each autocall date with its barrier\n• maximumpayout → 100 + (coupon_rate × number_of_coupon_periods)\n• proceeds_to_issuer → issue_price - entry_cost_percentage (from Composition of Costs)\n• sales_concession → Entry costs percentage from COMPOSITION OF COSTS\n• downside_participation_rate → analyze share delivery formula denominator\n\nTIER 3 — DERIVED FROM FINANCIAL DOMAIN KNOWLEDGE:\n• investment_type → 'Yield Enhancement' (autocallable BRC = yield enhancement category per SSPA/EUSIPA)\n• product_type → 'certificate' (from TYPE section)\n• document_type → 'KID' (PRIIPs document)\n• coupon_applies, contingent_coupon_applies, memory_coupon_applies → from specific language patterns\n• autocall_applies → from 'Automatic Early Redemption' presence\n• issuer_call_applies → false (autocall ≠ issuer discretionary call)\n• basket_weightings_unequal → false for worst-of (no weights)\n• knock_in_barrier_event_type → 'At Expiry' (European-style, checked only at Redemption Valuation Date)\n• upside_style → 'Digital' (no participation in price appreciation)\n• downside_style → 'Barrier' (cliff risk, not buffer/continuous protection)\n• settlement_type → 'Cash or Physical' (cash if above barrier, share delivery if below)\n• buffer_level → null (barrier ≠ buffer)\n• floor → null (no minimum guaranteed return)\n\nSHARE DELIVERY FORMULA ANALYSIS (for downside_participation_rate):\nTWO BNP VARIANTS — examine the denominator carefully:\n• GEARED (CE4130AET, CE4475CLV): 'Notional / (Barrier% × Initial Price)' → geared participation = 100/barrier_pct × 100\n  - The investor receives more shares than would correspond to initial price, amplifying losses\n  - 70% barrier → 142.86% geared downside, 78% barrier → 128.21%\n• LINEAR (CE4515CLV, CE14812LBH): 'Notional / Initial Price' → 1:1 participation = 100%\n  - The investor receives shares at initial price, losses are proportional\n\nDATE CONVERSION: All dates are in 'DD Month YYYY' format. Convert to yyyy-mm-ddThh:mm:ssZ ( you can put zeros in place of hh:mm:ss if note present) . Handle UK/EU month names.\n\nNULL HANDLING: Return null for absent fields. NEVER return epoch dates, empty strings, or placeholder values.\n\nNUMERIC EXTRACTION: '5% of the Notional Amount' → 5. 'EUR 1,000' → 1000. '70% of the Initial Reference Price' → 70.\n\nCROSS-VALIDATION RULES:\n• maturity_date > final_valuation_date > strike_date > (any preceding dates)\n• coupon_last_date ≈ maturity_date\n• coupon_last_observation_date ≈ final_valuation_date\n• autocall_last_date < final_valuation_date (last autocall is before final valuation)\n• Number of Autocall Valuation Dates = Number of Early Redemption Dates = Number of Autocall Barriers (if step-down)\n• Number of Coupon Valuation Dates = Number of Coupon Payment Dates\n\nSTRICTLY use the schema fields. Do not add extra keys (additionalProperties: false).",
-    "fewShotExamples": [],
+    "systemPrompt": "You are an expert financial analyst specializing in structured product data extraction from BNP Paribas PRIIPs Key Information Documents (KIDs). You understand autocallable barrier reverse convertible (BRC) certificate mechanics at the level of a derivatives structurer.\n\nDOCUMENT CONTEXT:\nThese are PRIIPs KIDs (EU Regulation 1286/2014) for autocallable certificates issued by BNP Paribas Issuance B.V. (Dutch SPV) with BNP Paribas S.A. (French parent) as guarantor. The products are yield enhancement structured products — economically equivalent to: (1) Long zero-coupon bond at par, (2) Short a European down-and-in put option on the worst-performing underlying, (3) Long a series of digital call options (conditional coupons) with memory feature, (4) Short a series of binary up-and-out options (autocall feature).\n\nDOCUMENT LAYOUT (BNP standard):\nPage 1: Header (Internal Ref, URL) → PURPOSE → PRODUCT section (heading e.g. 'Autocall', ISIN, Manufacturer/Issuer/Guarantor, KID Production Date) → WHAT IS THIS PRODUCT? (TYPE, TERM, OBJECTIVES with payoff mechanics) → PRODUCT DATA table → Underlying table\nPage 2: INTENDED RETAIL INVESTOR → RISK INDICATOR (SRI 1-7) → PERFORMANCE SCENARIOS → WHAT HAPPENS IF MANUFACTURER UNABLE TO PAY\nPage 3: COSTS (Costs Over Time table, Composition of Costs table) → HOW LONG SHOULD I HOLD IT → HOW CAN I COMPLAIN → OTHER RELEVANT INFORMATION\n\nEXTRACTION METHODOLOGY — THREE TIERS:\n\nTIER 1 — DIRECTLY EXTRACTABLE (look for exact labels):\n• global_identifier → 'Internal Ref.:' in header\n• isin → 'ISIN' row in PRODUCT table\n• issuer → 'Issuer:' label (NOT Manufacturer)\n• strike_date → 'Strike Date' in PRODUCT DATA\n• issue_date → 'Issue Date' in PRODUCT DATA\n• final_valuation_date → 'Redemption Valuation Date' in PRODUCT DATA\n• maturity_date → 'Redemption Date (maturity)' in PRODUCT DATA\n• principal_amount → 'Notional Amount (per certificate)' (strip currency)\n• issue_price → 'Issue Price' (strip %)\n• currency → 'Product Currency'\n• coupon_barrier → 'Conditional Coupon Barrier(s)' (extract number)\n• coupon_rate → 'Conditional Coupon Rate(s)' (extract number)\n• autocall_barrier → 'Autocall Barrier(s)' (first value if step-down)\n• knock_in_barrier → 'Barrier' row in PRODUCT DATA, OR from redemption payoff text\n• All date lists (coupon observation dates, coupon payment dates, autocall observation dates, early redemption dates) → first and last items\n\nTIER 2 — DERIVED BY CALCULATION:\n• initial_valuation_date = strike_date (Initial Reference Price is fixed on Strike Date)\n• coupon_interval → count coupon dates, determine spacing\n• autocall_interval → count autocall dates, determine spacing\n• autocall_settlement_date_offset → business days between autocall observation date and corresponding early redemption date (~10 for BNP)\n• autocall_step_up_down_step_amount → difference between consecutive barrier levels\n• call_schedule → pair each autocall date with its barrier\n• maximumpayout → 100 + (coupon_rate × number_of_coupon_periods)\n• proceeds_to_issuer → issue_price - entry_cost_percentage (from Composition of Costs)\n• sales_concession → Entry costs percentage from COMPOSITION OF COSTS\n• downside_participation_rate → analyze share delivery formula denominator\n\nTIER 3 — DERIVED FROM FINANCIAL DOMAIN KNOWLEDGE:\n• investment_type → 'Yield Enhancement' (autocallable BRC = yield enhancement category per SSPA/EUSIPA)\n• product_type → 'certificate' (from TYPE section)\n• document_type → 'KID' (PRIIPs document)\n• coupon_applies, contingent_coupon_applies, memory_coupon_applies → from specific language patterns\n• autocall_applies → from 'Automatic Early Redemption' presence\n• issuer_call_applies → false (autocall ≠ issuer discretionary call)\n• basket_weightings_unequal → false for worst-of (no weights)\n• knock_in_barrier_event_type → 'At Expiry' (European-style, checked only at Redemption Valuation Date)\n• upside_style → 'Digital' (no participation in price appreciation)\n• downside_style → 'Barrier' (cliff risk, not buffer/continuous protection)\n• settlement_type → 'Cash or Physical' (cash if above barrier, share delivery if below)\n• buffer_level → null (barrier ≠ buffer)\n• floor → null (no minimum guaranteed return)\n\nSHARE DELIVERY FORMULA ANALYSIS (for downside_participation_rate):\nTWO BNP VARIANTS — examine the denominator carefully:\n• GEARED (CE4130AET, CE4475CLV): 'Notional / (Barrier% × Initial Price)' → geared participation = 100/barrier_pct × 100\n  - The investor receives more shares than would correspond to initial price, amplifying losses\n  - 70% barrier → 142.86% geared downside, 78% barrier → 128.21%\n• LINEAR (CE4515CLV, CE14812LBH): 'Notional / Initial Price' → 1:1 participation = 100%\n  - The investor receives shares at initial price, losses are proportional\n\nDATE CONVERSION: All BNP dates are in 'DD Month YYYY' format. Convert to yyyy-mm-ddThh:mm:ssZ. Handle UK/EU month names.\n\nNULL HANDLING: Return null for absent fields. NEVER return epoch dates, empty strings, or placeholder values.\n\nNUMERIC EXTRACTION: '5% of the Notional Amount' → 5. 'EUR 1,000' → 1000. '70% of the Initial Reference Price' → 70.\n\nCROSS-VALIDATION RULES:\n• maturity_date > final_valuation_date > strike_date > (any preceding dates)\n• coupon_last_date ≈ maturity_date\n• coupon_last_observation_date ≈ final_valuation_date\n• autocall_last_date < final_valuation_date (last autocall is before final valuation)\n• Number of Autocall Valuation Dates = Number of Early Redemption Dates = Number of Autocall Barriers (if step-down)\n• Number of Coupon Valuation Dates = Number of Coupon Payment Dates\n\nSTRICTLY use the schema fields. Do not add extra keys (additionalProperties: false).",
+    "fewShotExamples": [
+      {
+        "id": "fad985d6-5be1-4b10-89de-a224b23f4951",
+        "name": "Example 1",
+        "output": "{\n  \n  \"isin\": \"CH1498142160\",\n  \"issuer\": \"SG Issuer S.A.\",\n  \"distributor\": \"SG Issuer S.A.\",\n  \"issue_date\": \"2025-11-25T00:00:00Z\",\n  \"payment_date\": \"2025-12-02T00:00:00Z\",\n  \"initial_valuation_date\": \"2025-11-25T00:00:00Z\",\n  \"final_valuation_date\": \"2027-05-26T00:00:00Z\",\n  \"maturity_date\": \"2027-06-02T00:00:00Z\",\n  \"denomination\": 30000.00,\n  \"status\": \"Estimate\",\n  \"minimum_investment\": 5000.00,\n  \"program\": \"MTN\",\n  \"documentation\": \"Preliminary\",\n  \"product_category\": \"Income\",\n  \"product_type\": \"barrierReverseConvertible\",\n  \"underlyings\": [\n    \"ABBN SE Equity\",\n    \"ROG SE Equity\",\n    \"SCMN SE Equity\",\n    \"SREN SE Equity\"\n  ],\n  \"underlying_type\": \"Worst of\",\n  \"callable\": true,\n  \"autocall\": false,\n  \"coupon_memory\": false,\n  \"coupon_frequency\": \"Quarterly\",\n  \"trade_date\": \"2025-11-25T00:00:00Z\",\n  \"observation_start\": \"2025-11-25T00:00:00Z\",\n  \"observation_end\": \"2027-05-26T00:00:00Z\",\n  \"first_coupon_date\": \"2026-03-02T00:00:00Z\",\n  \"final_coupon_date\": \"2027-06-02T00:00:00Z\",\n  \"coupon_rate\": \"1.5370%\",\n  \"autocall_frequency\": \"Quarterly\",\n  \"autocall_dates\": [\n    \"2026-12-02T00:00:00Z\",\n    \"2027-03-02T00:00:00Z\"\n  ],\n  \"autocall_observation_dates\": [\n    \"2026-11-25T00:00:00Z\",\n    \"2027-02-23T00:00:00Z\"\n  ],\n  \"autocall_barrier\": \"100%\",\n  \"coupon_barrier\": \"100%\",\n  \"downside_barrier\": \"56%\",\n  \"barrier_type\": \"Continuous\",\n  \"product_name\": \"Autocallable Worst-of Barrier Reverse Convertible\",\n  \"coupon\": \"0.0000%\",\n  \"redemption\": \"100.0000%\",\n  \"strike\": \"100%\",\n  \"currency\": \"CHF\",\n  \"issue_price\": \"Par\",\n  \"option_type\": \"KI Put\",\n  \"settlement\": \"Cash or physical\",\n  \"country\": \"CH\"\n\n}",
+        "sources": [
+          {
+            "id": "d81e1058-26cd-49ef-b7a5-414cf22db18a",
+            "name": "KID-AST-9gNWjvoVdk_eng.pdf",
+            "type": "file",
+            "content": "https://docxtractor.sk-salman.com/storage/docxtractor-documents/dfa0ef96-189d-40b7-8fd5-0ba94a74775e/1776788957647_c0c12f69_KID-AST-9gNWjvoVdk_eng.pdf",
+            "storageKey": "dfa0ef96-189d-40b7-8fd5-0ba94a74775e/1776788957647_c0c12f69_KID-AST-9gNWjvoVdk_eng.pdf",
+            "description": "210.5 KB",
+            "parsedContent": "<!-- image -->\n\n## Key Information Document\n\n## PURPOSE\n\nThis document provides you with key information about this investment product. It is not marketing material. The information is required by law to help you understand the nature, risks, costs, potential gains and losses of this product and to help you compare it with other products.\n\n## PRODUCT\n\n## Autocallable Worst-of Barrier Reverse Convertible\n\nISIN: CH1498142160\n\nMANUFACTURER: Société Générale, http://kid.sgmarkets.com, Call +33(0) 969 32 08 07 for more information\n\nCOMPETENT AUTHORITY OF THE MANUFACTURER: Autorité des Marchés Financiers (AMF) &amp; Autorité de Contrôle Prudentiel et de Résolution (ACPR) is responsible for supervising Société Générale in relation to this Key Information Document.\n\nDATE OF PRODUCTION OF THIS KID: 30/12/2025\n\nISSUER: SG Issuer  |  GUARANTOR: Société Générale\n\nYou are about  to purchase a product that is not simple and may be difficult to understand\n\n## WHAT IS THIS PRODUCT?\n\n| Product Currency         | CHF        |\n|--------------------------|------------|\n| Listing                  | None       |\n| Minimum Investment       | CHF 5,000  |\n| Maturity Date            | 02/06/2027 |\n| Capital Barrier          | 56%        |\n| Coupon Type              | Fixed      |\n| Early Redemption Barrier | 100%       |\n| Final Barrier            | 100%       |\n\n## Underlying\n\n| Settlement Currency   | CHF                                             |\n|-----------------------|-------------------------------------------------|\n| Nominal Value         | CHF 5,000 per note                              |\n| Issue Price           | 100% of the Nominal Value                       |\n| Minimum Reimbursement | No, you can lose up to the full invested amount |\n| Capital Barrier Type  | Observed continuously                           |\n| Coupon                | 1.537%                                          |\n\n| Underlying       | Identifier   | Relevant Exchange   | Currency   |   Initial Value |\n|------------------|--------------|---------------------|------------|-----------------|\n| ABB Ltd          | CH0012221716 | Six Swiss Exchange  | CHF        |         55.5228 |\n| Roche Holding AG | CH0012032048 | Six Swiss Exchange  | CHF        |        310.4914 |\n| Swisscom AG      | CH0008742519 | Six Swiss Exchange  | CHF        |        586.9607 |\n| Swiss Re AG      | CH0126881561 | Six Swiss Exchange  | CHF        |        136.8549 |\n\n## Type\n\nThis product is an unsecured debt instrument governed by English law.\n\n## Term\n\nThis product has a life span of 1 year 6 months but can be redeemed earlier according to the conditions indicated in the \"objectives\" section below.\n\n## Objectives\n\nThis product is designed to provide a fixed coupon on a periodic basis during the product life time. It is possible for the product to be automatically redeemed early based on pre-defined conditions. If the product is not redeemed early, the capital redemption amount is linked to the performance of the underlyings. Your capital will be fully at risk when investing in this product.\n\nThe Reference Underlying is the Underlying with the lowest observed level on the relevant observation.\n\n## Coupon\n\nProvided that the product has not been previously redeemed early:\n\nOn each Coupon Payment Date, you will receive the Coupon.\n\n## Automatic Early Redemption\n\nOn any Early Redemption Observation Date, if the level of the Reference Underlying is at or above the Early Redemption Barrier, the product will be redeemed early and you will receive 100% of the Nominal Value, on the Early Redemption Payment Date.\n\n## Final Redemption\n\nOn the Maturity Date, provided that the product has not been redeemed early, you will receive a final redemption amount.\n\n- If a Capital Barrier Event has not occurred or the Final Level of the Reference Underlying is at or above the Final Barrier, you will receive:\n\n100% of the Nominal Value.\n\n- Otherwise, you will receive physical delivery of the Reference Underlying. The number of shares to be delivered will be equal to the Nominal Value divided by the Initial Value of the Reference Underlying. If the number of shares to be delivered does not equal a whole number, the number of shares to be delivered will be rounded down and the remaining amount will be paid in cash. As the value of the physical delivery is expected to be below the value of your initial investment when you receive the delivery, you are therefore likely to suffer a partial or total loss of your invested amount in this scenario.\n\nA Capital Barrier Event occurs if the level of any of the underlyings have been observed at or below the Capital Barrier at any time since the Initial Observation Date (including any time during a single business day).\n\n## Additional Information\n\n- The level of each Underlying corresponds to its value expressed as a percentage of its Initial Value.\n- The Final Level is the level of the Reference Underlying observed on the Final Observation Date.\n- Coupons are expressed as a percentage of the Nominal Value.\n- Extraordinary events may lead to changes to the product's terms or the early termination of the product and could result in losses on your investment.\n- The product is available through a public offering during the applicable offering period in the following jurisdiction(s): Switzerland\n\n## Calendar\n\n| Issue Date               | 02/12/2025   |\n|--------------------------|--------------|\n| Initial Observation Date | 25/11/2025   |\n\n<!-- image -->\n\n| Final Observation Date             | 26/05/2027                                                             |\n|------------------------------------|------------------------------------------------------------------------|\n| Maturity Date                      | 02/06/2027                                                             |\n| Coupon Payment Dates               | 02/03/2026, 02/06/2026, 02/09/2026, 02/12/2026, 02/03/2027, 02/06/2027 |\n| Early Redemption Observation Dates | 25/11/2026, 23/02/2027                                                 |\n| Early Redemption Payment Dates     | 02/12/2026, 02/03/2027                                                 |\n\n## Intended Retail Investor\n\nThe product is aimed at investors who:\n\n- Have specific knowledge or experience of investing in similar products and in financial markets, and have the ability to understand the product and its risks and rewards.\n- Seek a product offering income and have an investment horizon in line with the recommended holding period stated below.\n- Are able to bear total loss of their investment and accept the risk that the Issuer and / or Guarantor could fail to pay the capital and any potential return.\n- Are willing to accept a level of risk to achieve potential returns that is consistent with the summary risk indicator shown below.\n\n## WHAT ARE THE RISKS AND WHAT COULD I GET IN RETURN?\n\n## Summary Risk Indicator\n\nLower risk\n\n\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\nThe risk indicator assumes you keep the product for 1 year 5 months 3 days.\n\nThe actual risk can vary significantly if you cash in at an early stage and you may get back less. You may not be able to sell your product easily or you may have to sell at a price that significantly impacts on how much you get back.\n\n<!-- image -->\n\nThe summary risk indicator is a guide to the level of risk of this product compared to other products. It shows how likely it is that the product will lose money because of movements in the markets or because we are not able to pay you.\n\nWe have classified this product as 5 out of 7, which is a medium-high risk class.\n\nThis rates the potential losses from future performance at a medium-high level, and poor market conditions are very unlikely to impact our capacity to pay you.\n\nThis product does not include any protection from future market performance so you could lose some or all of your investment.\n\nIf we are not able to pay you what is owed, you could lose your entire investment.\n\nInflation Risk : if the economic situation is characterized by a high inflation persisting throughout the life time of the product, then the 'real' return of the product, equal to its return minus the inflation rate, might be negative.\n\n## Performance Scenarios\n\nWhat you will get from this product depends on future market performance. Market developments in the future are uncertain and cannot be accurately predicted. The scenarios shown are illustrations based on results from the past and on certain assumptions. Market could develop very differently in the future.\n\n<!-- image -->\n\n| Recommended holding period:               | Recommended holding period:                                                          | Until the product is called or matures This may be different in each scenario and is indicated in the table CHF 10,000   | Until the product is called or matures This may be different in each scenario and is indicated in the table CHF 10,000   |\n|-------------------------------------------|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|\n| Example Investment:                       | Example Investment:                                                                  |                                                                                                                          |                                                                                                                          |\n|                                           |                                                                                      | If you exit after 1 year                                                                                                 | If you exit at call or maturity                                                                                          |\n| Scenarios                                 |                                                                                      |                                                                                                                          |                                                                                                                          |\n| Minimum*                                  | There is no minimum guaranteed return. You could lose some or all of your investment | There is no minimum guaranteed return. You could lose some or all of your investment                                     |                                                                                                                          |\n| Stress                                    | What you might get back after costs                                                  | CHF 5,438                                                                                                                | CHF 5,577                                                                                                                |\n| Product ends after 1 year 5 months 3 days | Average return each year                                                             | -45.6%                                                                                                                   | -34.0%                                                                                                                   |\n| Unfavourable                              | What you might get back after costs                                                  |                                                                                                                          | CHF 10,662                                                                                                               |\n| Product ends after 11 months 2 days       | Percentage Return                                                                    |                                                                                                                          | 6.6%                                                                                                                     |\n| Moderate                                  | What you might get back after costs                                                  |                                                                                                                          | CHF 10,662                                                                                                               |\n| Product ends after 11 months 2 days       | Percentage Return                                                                    |                                                                                                                          | 6.6%                                                                                                                     |\n| Favourable                                | What you might get back after costs                                                  |                                                                                                                          | CHF 10,662                                                                                                               |\n| Product ends after 11 months 2 days       | Percentage Return                                                                    |                                                                                                                          | 6.6%                                                                                                                     |\n\n(*) the return shown in the Minimum Scenario is the Minimum Reimbursement and does not include other type of return such as guaranteed coupon payments. The figures shown include all the costs of the product itself, but may not include all the costs that you pay to your advisor or distributor. The figures do not take into account your personal tax situation, which may also affect how much you get back.\n\nThe stress scenario shows what you might get back in extreme market circumstances.\n\nThe % figures in the table represent the potential positive (green) or negative (red) returns you might achieve at the end of the recommended holding period (last column) or by selling the product before (previous column) and for a stressed, unfavourable, moderate and favourable scenario (per line). These scenarios were calculated using simulations based on the underlying's past performance.\n\n## WHAT HAPPENS IF SOCIÉTÉ GÉNÉRALE IS UNABLE TO PAY OUT?\n\nIf the Issuer defaults you may only claim any unpaid amount from Société Générale (the Guarantor). Should Société Générale default or file for bankruptcy, you may suffer a partial or total loss of the invested amount. If the Issuer and/or the Guarantor becomes subject to resolution measures in the form of the bail-in tool (\"bail-in\"), your claim may be reduced to zero, converted into equity or its maturity may be postponed. Please be aware that your Investment is not covered by any investor compensation or guarantee scheme.\n\nPlease find the ratings of Société Générale at https://investors.societegenerale.com/en/financial-and-non-financial-information/ratings/credit-ratings.\n\n## WHAT ARE THE COSTS?\n\nThe person advising on or selling you this product may charge you other costs. If so, this person will provide you with information about these costs and how they affect your investment.\n\n<!-- image -->\n\n<!-- image -->\n\n\n\n\n\n\n\nHigher risk\n\n<!-- image -->\n\n## Costs over Time\n\nThe tables show the amounts that are taken from your investment to cover different types of costs. These amounts depend on how much you invest, how long you hold the product. The amounts shown here are illustrations based on an example investment amount and different possible investment periods.\n\nThe duration of this product is uncertain as it may terminate at different times depending on how the market evolves. The amounts shown here consider two different scenarios (early call and maturity). In case you decide to exit before the product ends, exit costs may apply in addition to the amounts shown here.\n\n## We have assumed:\n\n- CHF 10,000 is invested\n- a performance of the product that is consistent with each holding period shown.\n\nAnnual cost impact(*)\n\n|             | If the product is called at the first possible date 02/12/2026   | If the product reaches maturity   |\n|-------------|------------------------------------------------------------------|-----------------------------------|\n| Total costs | CHF 100                                                          | CHF 100                           |\n\n1.1%\n\n0.8% each year\n\n- (*) This illustrates how costs reduce your return each year over the holding period. For example it shows that if you exit at maturity your average return per year is projected to be 7.4% before costs and 6.6% after costs.\n\nWe may share part of the costs with the person selling you the product to cover the services they provide to you. They will inform you of the amount.\n\n| One-off costs upon entry or exit   |                                                             | If you exit after 1 year   |\n|------------------------------------|-------------------------------------------------------------|----------------------------|\n| Entry costs                        | 1.0 %of the amount you pay in when entering this investment | CHF 99                     |\n| Exit costs                         | 0.5 %of your investment before it is paid out to you        | CHF 50                     |\n\n## HOW LONG SHOULD I HOLD IT AND CAN I TAKE MONEY OUT EARLY?\n\nRecommended Holding Period: 1 year 5 months 3 days, which corresponds to the product maturity.\n\nUnder normal market conditions, Société Générale or an entity of its group ensures a daily secondary market during the life of the product by providing bid and offer prices expressed as percentages of the Nominal Value and the difference between the bid and offer prices (the spread) will not be more than 1.00% of such Nominal Value. If you want to sell the product before the Maturity Date, the price of the product will depend on market parameters at the time you wish to sell and you may sustain a partial or total capital loss. In unusual market condition, the resale of the product may be temporarily or permanently suspended.\n\n## HOW CAN I COMPLAIN?\n\nAny complaint regarding the person advising on, or selling, the product can be submitted directly to that person. Any complaint regarding the product or the conduct of the product manufacturer can be submitted to Société Générale at the following address: SOCIETE GENERALE, Regulatory Information Department, 17 cours Valmy, 92987 PARIS LA DEFENSE CEDEX, FRANCE - SG-complaints-kid@sgcib.com (http://kid.sgmarkets.com).\n\n## OTHER RELEVANT INFORMATION\n\nThe latest Key Information Document is available online at http://kid.sgmarkets.com. This document may be updated as of the date it is first created and for as long as the product is available for purchase, including during the marketing period of the product, where applicable. Further risks and information about the product are detailed in the product prospectus in accordance with Regulation (EU) 2017/1129. The prospectus (including its summary in the relevant local languages annexed to the Final Terms when the context requires) is available online at http://prospectus.socgen.com, and/or may be obtained free of charge upon request by calling +33(0) 969 32 08 07."
+          }
+        ]
+      },
+      {
+        "id": "3586b3e0-8ff6-4604-b89a-4b6881d2082d",
+        "name": "Example 2",
+        "output": "{\n  \"isin\": \"CH1498142368\",\n  \"issuer\": \"SG Issuer S.A.\",\n  \"distributor\": \"SG Issuer S.A.\",\n  \"issue_date\": \"2025-11-25T00:00:00Z\",\n  \"payment_date\": \"2025-12-02T00:00:00Z\",\n  \"initial_valuation_date\": \"2025-11-25T00:00:00Z\",\n  \"final_valuation_date\": \"2026-05-27T00:00:00Z\",\n  \"maturity_date\": \"2026-06-03T00:00:00Z\",\n  \"denomination\": 350000.00,\n  \"status\": \"Estimate\",\n  \"minimum_investment\": 1000.00,\n  \"program\": \"MTN\",\n  \"documentation\": \"Preliminary\",\n  \"product_category\": \"Income\",\n  \"product_type\": \"reverseConvertible\",\n  \"underlyings\": [\n    \"SPX Index\"\n  ],\n  \"callable\": true,\n  \"autocall\": false,\n  \"coupon_memory\": false,\n  \"coupon_frequency\": \"Quarterly\",\n  \"trade_date\": \"2025-11-25T00:00:00Z\",\n  \"observation_start\": \"2025-11-25T00:00:00Z\",\n  \"observation_end\": \"2026-05-27T00:00:00Z\",\n  \"first_coupon_date\": \"2026-03-02T00:00:00Z\",\n  \"final_coupon_date\": \"2026-06-03T00:00:00Z\",\n  \"coupon_rate\": \"6.7949%\",\n  \"autocall_frequency\": null,\n  \"downside_barrier\": \"75%\",\n  \"product_name\": \"Barrier Reverse Convertible\",\n  \"coupon\": \"0%\",\n  \"redemption\": \"100.0000%\",\n  \"strike\": \"100%\",\n  \"currency\": \"USD\",\n  \"issue_price\": \"Par\",\n  \"option_type\": \"Vanilla Put\",\n  \"settlement\": \"Cash\",\n  \"country\": \"CH\"\n}",
+        "sources": [
+          {
+            "id": "fa70fc1e-4ef9-496a-986b-1dfa9c856002",
+            "name": "KID-AST-41DWE3N12r_eng.pdf",
+            "type": "file",
+            "content": "https://docxtractor.sk-salman.com/storage/docxtractor-documents/dfa0ef96-189d-40b7-8fd5-0ba94a74775e/1776789512135_1196b96d_KID-AST-41DWE3N12r_eng.pdf",
+            "storageKey": "dfa0ef96-189d-40b7-8fd5-0ba94a74775e/1776789512135_1196b96d_KID-AST-41DWE3N12r_eng.pdf",
+            "description": "208.2 KB",
+            "parsedContent": "<!-- image -->\n\n## Key Information Document\n\n## PURPOSE\n\nThis document provides you with key information about this investment product. It is not marketing material. The information is required by law to help you understand the nature, risks, costs, potential gains and losses of this product and to help you compare it with other products.\n\n## PRODUCT\n\n## Barrier Reverse Convertible on S&amp;P 500 COMPOSITE STOCK PRICE INDEX\n\nISIN: CH1498142368\n\nMANUFACTURER: Société Générale, http://kid.sgmarkets.com, Call +33(0) 969 32 08 07 for more information\n\nCOMPETENT AUTHORITY OF THE MANUFACTURER: Autorité des Marchés Financiers (AMF) &amp; Autorité de Contrôle Prudentiel et de Résolution (ACPR) is responsible for supervising Société Générale in relation to this Key Information Document.\n\nDATE OF PRODUCTION OF THIS KID: 25/11/2025\n\nISSUER: SG Issuer  |  GUARANTOR: Société Générale\n\nYou are about  to purchase a product that is not simple and may be difficult to understand\n\n## WHAT IS THIS PRODUCT?\n\n| Product Currency   | USD        | Settlement Currency   | USD                                             |\n|--------------------|------------|-----------------------|-------------------------------------------------|\n| Listing            | None       | Nominal Value         | USD 1,000 per note                              |\n| Minimum Investment | USD 1,000  | Issue Price           | 100% of the Nominal Value                       |\n| Maturity Date      | 03/06/2026 | Minimum Reimbursement | No, you can lose up to the full invested amount |\n| Capital Barrier    | 75%        | Capital Barrier Type  | Observed on the Final Observation Date only     |\n| Coupon Type        | Fixed      | Coupon                | 6.7949% per annum                               |\n\n## Underlying\n\n| Reference Underlying                  | Identifier   | Index Sponsor    | Currency   |   Initial Value |\n|---------------------------------------|--------------|------------------|------------|-----------------|\n| S&P 500 COMPOSITE STOCK PRICE ® INDEX | US78378X1072 | Standard & Poors | USD        |         6,709.4 |\n\n## Type\n\nThis product is an unsecured debt instrument governed by English law.\n\n## Term\n\nThis product has a life span of 6 months 1 day.\n\n## Objectives\n\nThis product is a fixed term investment which is designed to provide a fixed coupon on a periodic basis. The capital redemption amount is linked to the performance of the Reference Underlying. Your capital will be fully at risk when investing in this product.\n\n## Coupon\n\nOn each Coupon Payment Date, you will receive the Coupon.\n\n## Final Redemption\n\nOn the Maturity Date, you will receive a final redemption amount.\n\n- If the Final Level of the Reference Underlying is above the Capital Barrier, you will receive:\n\n100% of the Nominal Value.\n\n- Otherwise, you will receive the Final Level of the Reference Underlying multiplied by the Nominal Value. In this scenario, you will suffer a partial or total loss of your invested amount.\n\n## Additional Information\n\n- The level of the Reference Underlying corresponds to its value expressed as a percentage of its Initial Value.\n- The Final Level is the level of the Reference Underlying observed on the Final Observation Date.\n- Coupons are expressed as a percentage of the Nominal Value.\n- Extraordinary events may lead to changes to the product's terms or the early termination of the product and could result in losses on your investment.\n- The product is available through a public offering during the applicable offering period in the following jurisdiction(s): Switzerland\n\n## Calendar\n\nIssue Date\n\n02/12/2025\n\n| Initial Observation Date   | 25/11/2025             |\n|----------------------------|------------------------|\n| Final Observation Date     | 27/05/2026             |\n| Maturity Date              | 03/06/2026             |\n| Coupon Payment Dates       | 02/03/2026, 03/06/2026 |\n\nThe Performance scenarios and costs of the product are presented over its Recommended holding period (which is less than one year). They are not comparable with Performance scenarios and costs of other product having a different Recommended holding period and being calculated on annualized basis.\n\n## Intended Retail Investor\n\nThe product is aimed at investors who:\n\n- Have specific knowledge or experience of investing in similar products and in financial markets, and have the ability to understand the product and its risks and rewards.\n- Seek a product offering income and have an investment horizon in line with the recommended holding period stated below.\n- Are able to bear total loss of their investment and accept the risk that the Issuer and / or Guarantor could fail to pay the capital and any potential return.\n- Are willing to accept a level of risk to achieve potential returns that is consistent with the summary risk indicator shown below.\n\n<!-- image -->\n\n## WHAT ARE THE RISKS AND WHAT COULD I GET IN RETURN?\n\nSummary Risk Indicator\n\nLower risk\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\nThe risk indicator assumes you keep the product for 6 months 1 day.\n\nThe actual risk can vary significantly if you cash in at an early stage and you may get back less. You may not be able to sell your product easily or you may have to sell at a price that significantly impacts on how much you get back.\n\n<!-- image -->\n\nThe summary risk indicator is a guide to the level of risk of this product compared to other products. It shows how likely it is that the product will lose money because of movements in the markets or because we are not able to pay you.\n\nWe have classified this product as 1 out of 7, which is the lowest risk class.\n\nThis rates the potential losses from future performance at a very low level, and poor market conditions are very unlikely to impact our capacity to pay you.\n\nBe aware of currency risk. You will receive payments in a different currency, so the final return you will get depend on the exchange rate between the two currencies. This risk is not considered in the indicator shown above.\n\nThis product does not include any protection from future market performance so you could lose some or all of your investment.\n\nIf we are not able to pay you what is owed, you could lose your entire investment.\n\nInflation Risk : if the economic situation is characterized by a high inflation persisting throughout the life time of the product, then the 'real' return of the product, equal to its return minus the inflation rate, might be negative.\n\n## Performance Scenarios\n\nWhat you will get from this product depends on future market performance. Market developments in the future are uncertain and cannot be accurately predicted.\n\nThe scenarios shown are illustrations based on results from the past and on certain assumptions. Market could develop very differently in the future.\n\nRecommended holding period:\n\nExample Investment:\n\n6 months 1 day USD 10,000\n\nIf you exit after 6 months 1 day\n\n(Recommended holding period)\n\n| Scenarios    |                                     |            |\n|--------------|-------------------------------------|------------|\n| Stress       | What you might get back after costs | USD 6,146  |\n|              | Percentage Return                   | -38.5%     |\n| Unfavourable | What you might get back after costs | USD 10,341 |\n|              | Percentage Return                   | 3.4%       |\n| Moderate     | What you might get back after costs | USD 10,341 |\n|              | Percentage Return                   | 3.4%       |\n| Favourable   | What you might get back after costs | USD 10,341 |\n|              | Percentage Return                   | 3.4%       |\n\nThis product cannot be easily cashed in. If you exit the investment earlier than the recommended holding period you may have to pay extra cost.\n\nThe % figures in the table represent the potential positive (green) or negative (red) returns you might achieve at the end of the recommended holding period (last column) or by selling the product before (previous column) and for a stressed, unfavourable, moderate and favourable scenario (per line). These scenarios were calculated using simulations based on the underlying's past performance.\n\n## WHAT HAPPENS IF SOCIÉTÉ GÉNÉRALE IS UNABLE TO PAY OUT?\n\nIf the Issuer defaults you may only claim any unpaid amount from Société Générale (the Guarantor). Should Société Générale default or file for bankruptcy, you may suffer a partial or total loss of the invested amount. If the Issuer and/or the Guarantor becomes subject to resolution measures in the form of the bail-in tool (\"bail-in\"), your claim may be reduced to zero, converted into equity or its maturity may be postponed. Please be aware that your Investment is not covered by any investor compensation or guarantee scheme.\n\nPlease find the ratings of Société Générale at https://investors.societegenerale.com/en/financial-and-non-financial-information/ratings/credit-ratings.\n\n## WHAT ARE THE COSTS?\n\nThe person advising on or selling you this product may charge you other costs. If so, this person will provide you with information about these costs and how they affect your investment.\n\n## Costs over Time\n\nThe tables show the amounts that are taken from your investment to cover different types of costs. These amounts depend on how much you invest, how long you hold the product. The amounts shown here are illustrations based on an example investment amount and different possible investment periods.\n\nWe have assumed:\n\n- You would get back the amount that you invested (0 % annual return).\n- USD 10,000 is invested\n\n|                | If you exit after the Recommended Holding Period   |\n|----------------|----------------------------------------------------|\n| Total costs    | USD 40                                             |\n| Cost impact(*) | 0.4%                                               |\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n\n\nHigher risk\n\n<!-- image -->\n\n## Composition of Costs\n\n| One-off costs upon entry or exit   |                                                             | If you exit after the Recommended Holding Period   |\n|------------------------------------|-------------------------------------------------------------|----------------------------------------------------|\n| Entry costs                        | 0.4 %of the amount you pay in when entering this investment | USD 40                                             |\n| Exit costs                         | 0.5 %of your investment before it is paid out to you        | USD 50                                             |\n\n## HOW LONG SHOULD I HOLD IT AND CAN I TAKE MONEY OUT EARLY?\n\n## Recommended Holding Period: 6 months 1 day, which corresponds to the product maturity.\n\nUnder normal market conditions, Société Générale or an entity of its group ensures a daily secondary market during the life of the product by providing bid and offer prices expressed as percentages of the Nominal Value and the difference between the bid and offer prices (the spread) will not be more than 1.00% of such Nominal Value. If you want to sell the product before the Maturity Date, the price of the product will depend on market parameters at the time you wish to sell and you may sustain a partial or total capital loss. In unusual market condition, the resale of the product may be temporarily or permanently suspended.\n\n## HOW CAN I COMPLAIN?\n\nAny complaint regarding the person advising on, or selling, the product can be submitted directly to that person. Any complaint regarding the product or the conduct of the product manufacturer can be submitted to Société Générale at the following address: SOCIETE GENERALE, Regulatory Information Department, 17 cours Valmy, 92987 PARIS LA DEFENSE CEDEX, FRANCE - SG-complaints-kid@sgcib.com (http://kid.sgmarkets.com).\n\n## OTHER RELEVANT INFORMATION\n\nThe latest Key Information Document is available online at http://kid.sgmarkets.com. This document may be updated as of the date it is first created and for as long as the product is available for purchase, including during the marketing period of the product, where applicable. Further risks and information about the product are detailed in the product prospectus in accordance with Regulation (EU) 2017/1129. The prospectus (including its summary in the relevant local languages annexed to the Final Terms when the context requires) is available online at http://prospectus.socgen.com, and/or may be obtained free of charge upon request by calling +33(0) 969 32 08 07."
+          }
+        ]
+      },
+      {
+        "id": "15e21a06-8374-4bfd-bfb9-d6ce113e6020",
+        "name": "Example 3",
+        "output": "\n  {\n  \"isin\": \"CH1498142616\",\n  \"issuer\": \"SG Issuer S.A.\",\n  \"distributor\": \"SG Issuer S.A.\",\n  \"issue_date\": \"2025-11-26T00:00:00Z\",\n  \"payment_date\": \"2025-12-03T00:00:00Z\",\n  \"initial_valuation_date\": \"2025-11-26T00:00:00Z\",\n  \"final_valuation_date\": \"2026-11-26T00:00:00Z\",\n  \"maturity_date\": \"2026-12-03T00:00:00Z\",\n  \"denomination\": 80000.00,\n  \"status\": \"Estimate\",\n  \"minimum_investment\": 5000.00,\n  \"program\": \"MTN\",\n  \"documentation\": \"Preliminary\",\n  \"product_category\": \"Income\",\n  \"product_type\": \"barrierReverseConvertible\",\n  \"underlyings\": [\n    \"LONN SE Equity\",\n    \"ROG SE Equity\",\n    \"ALC SE Equity\"\n  ],\n  \"underlying_type\": \"Worst of\",\n  \"callable\": true,\n  \"autocall\": false,\n  \"coupon_memory\": false,\n  \"coupon_frequency\": \"Quarterly\",\n  \"trade_date\": \"2025-11-26T00:00:00Z\",\n  \"observation_start\": \"2025-11-26T00:00:00Z\",\n  \"observation_end\": \"2026-11-26T00:00:00Z\",\n  \"first_coupon_date\": \"2026-03-03T00:00:00Z\",\n  \"final_coupon_date\": \"2026-12-03T00:00:00Z\",\n  \"coupon_rate\": \"2.50%\",\n  \"autocall\": true,\n  \"autocall_frequency\": \"Quarterly\",\n  \"autocall_dates\": [\n    \"2026-03-03T00:00:00Z\",\n    \"2026-09-03T00:00:00Z\"\n  ],\n  \"autocall_observation_dates\": [\n    \"2026-02-24T00:00:00Z\",\n    \"2026-08-27T00:00:00Z\"\n  ],\n  \"autocall_barrier\": \"100%\",\n  \"coupon_barrier\": \"100%\",\n  \"downside_barrier\": \"76.9283%\",\n  \"barrier_type\": \"At maturity at the close\",\n  \"product_name\": \"Autocallable Worst-of Barrier Reverse Convertible\",\n  \"coupon\": \"0%\",\n  \"redemption\": \"100.0000%\",\n  \"strike\": \"100%\",\n  \"currency\": \"CHF\",\n  \"issue_price\": \"Par\",\n  \"option_type\": \"KI Put\",\n  \"participation\": \"130%\",\n  \"settlement\": \"Cash or physical\",\n  \"country\": \"CH\"\n}\n",
+        "sources": [
+          {
+            "id": "d899ec8f-0490-4b0c-8ef0-dd05337dc1d0",
+            "name": "KID-AST-9gNWjjd2E6_eng.pdf",
+            "type": "file",
+            "content": "https://docxtractor.sk-salman.com/storage/docxtractor-documents/dfa0ef96-189d-40b7-8fd5-0ba94a74775e/1776789907596_0b935600_KID-AST-9gNWjjd2E6_eng.pdf",
+            "storageKey": "dfa0ef96-189d-40b7-8fd5-0ba94a74775e/1776789907596_0b935600_KID-AST-9gNWjjd2E6_eng.pdf",
+            "description": "205.5 KB",
+            "parsedContent": "<!-- image -->\n\n## Key Information Document\n\n## PURPOSE\n\nThis document provides you with key information about this investment product. It is not marketing material. The information is required by law to help you understand the nature, risks, costs, potential gains and losses of this product and to help you compare it with other products.\n\n## PRODUCT\n\n## Autocallable Worst-of Barrier Reverse Convertible\n\nISIN: CH1498142616\n\nMANUFACTURER: Société Générale, http://kid.sgmarkets.com, Call +33(0) 969 32 08 07 for more information\n\nDATE OF PRODUCTION OF THIS KID: 18/12/2025\n\nISSUER: SG Issuer  |  GUARANTOR: Société Générale\n\nYou are about  to purchase a product that is not simple and may be difficult to understand\n\n## WHAT IS THIS PRODUCT?\n\n| Product Currency         | CHF        |\n|--------------------------|------------|\n| Listing                  | None       |\n| Minimum Investment       | CHF 5,000  |\n| Maturity Date            | 03/12/2026 |\n| Capital Barrier          | 76.9283%   |\n| Coupon Type              | Fixed      |\n| Early Redemption Barrier | 100%       |\n\n## Underlying\n\n| Settlement Currency   | CHF                                             |\n|-----------------------|-------------------------------------------------|\n| Nominal Value         | CHF 5,000 per note                              |\n| Issue Price           | 100% of the Nominal Value                       |\n| Minimum Reimbursement | No, you can lose up to the full invested amount |\n| Capital Barrier Type  | Observed on the Final Observation Date only     |\n| Coupon                | 2.5%                                            |\n\n| Underlying       | Identifier   | Relevant Exchange   | Currency   |   Initial Value |\n|------------------|--------------|---------------------|------------|-----------------|\n| Lonza Group AG   | CH0013841017 | Six Swiss Exchange  | CHF        |        542.6744 |\n| Roche Holding AG | CH0012032048 | Six Swiss Exchange  | CHF        |        311.4888 |\n| Alcon AG         | CH0432492467 | Six Swiss Exchange  | CHF        |          64.375 |\n\n## Type\n\nThis product is an unsecured debt instrument governed by English law.\n\n## Objectives\n\nThis product is designed to provide a fixed coupon on a periodic basis during the product life time. It is possible for the product to be automatically redeemed early based on pre-defined conditions. If the product is not redeemed early, the capital redemption amount is linked to the performance of the underlyings. Your capital will be fully at risk when investing in this product.\n\nThe Reference Underlying is the Underlying with the lowest observed level on the relevant observation.\n\n## Coupon\n\nProvided that the product has not been previously redeemed early:\n\nOn each Coupon Payment Date, you will receive the Coupon.\n\n## Automatic Early Redemption\n\nOn any Early Redemption Observation Date, if the level of the Reference Underlying is at or above the Early Redemption Barrier, the product will be redeemed early and you will receive 100% of the Nominal Value, on the Early Redemption Payment Date.\n\n## Final Redemption\n\nOn the Maturity Date, provided that the product has not been redeemed early, you will receive a final redemption amount.\n\n- If the Final Level of the Reference Underlying is above the Capital Barrier, you will receive:\n\n100% of the Nominal Value.\n\n- Otherwise, you will receive physical delivery of the Reference Underlying. The number of shares to be delivered will be equal to the Nominal Value divided by the Initial Value of the Reference Underlying. If the number of shares to be delivered does not equal a whole number, the number of shares to be delivered will be rounded down and the remaining amount will be paid in cash. As the value of the physical delivery is expected to be below the value of your initial investment when you receive the delivery, you are therefore likely to suffer a partial or total loss of your invested amount in this scenario.\n\n## Additional Information\n\n- The level of each Underlying corresponds to its value expressed as a percentage of its Initial Value.\n- The Final Level is the level of the Reference Underlying observed on the Final Observation Date.\n- Coupons are expressed as a percentage of the Nominal Value.\n- Extraordinary events may lead to changes to the product's terms or the early termination of the product and could result in losses on your investment.\n- The product is available through a public offering during the applicable offering period in the following jurisdiction(s): Switzerland\n\n## Calendar\n\n| Issue Date                         | 03/12/2025                                     |\n|------------------------------------|------------------------------------------------|\n| Initial Observation Date           | 26/11/2025                                     |\n| Final Observation Date             | 26/11/2026                                     |\n| Maturity Date                      | 03/12/2026                                     |\n| Coupon Payment Dates               | 03/03/2026, 03/06/2026, 03/09/2026, 03/12/2026 |\n| Early Redemption Observation Dates | 24/02/2026, 27/05/2026, 27/08/2026             |\n| Early Redemption Payment Dates     | 03/03/2026, 03/06/2026, 03/09/2026             |\n\n<!-- image -->\n\nThe Performance scenarios and costs of the product are presented over its Recommended holding period (which is less than one year). They are not comparable with Performance scenarios and costs of other product having a different Recommended holding period and being calculated on annualized basis.\n\n## Intended Retail Investor\n\n## The product is aimed at investors who:\n\n- Have specific knowledge or experience of investing in similar products and in financial markets, and have the ability to understand the product and its risks and rewards.\n- Seek a product offering income and have an investment horizon in line with the recommended holding period stated below.\n- Are able to bear total loss of their investment and accept the risk that the Issuer and / or Guarantor could fail to pay the capital and any potential return.\n- Are willing to accept a level of risk to achieve potential returns that is consistent with the summary risk indicator shown below.\n\n## WHAT ARE THE RISKS AND WHAT COULD I GET IN RETURN?\n\n## Summary Risk Indicator\n\nLower risk\n\n\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n<!-- image -->\n\nThe risk indicator assumes you keep the product for 11 months 15 days.\n\nThe actual risk can vary significantly if you cash in at an early stage and you may get back less. You may not be able to sell your product easily or you may have to sell at a price that significantly impacts on how much you get back.\n\n<!-- image -->\n\nThe summary risk indicator is a guide to the level of risk of this product compared to other products. It shows how likely it is that the product will lose money because of movements in the markets or because we are not able to pay you.\n\nWe have classified this product as 5 out of 7, which is a medium-high risk class.\n\nThis rates the potential losses from future performance at a medium-high level, and poor market conditions are very unlikely to impact our capacity to pay you.\n\nThis product does not include any protection from future market performance so you could lose some or all of your investment.\n\nIf we are not able to pay you what is owed, you could lose your entire investment.\n\n## Investment Performance Information\n\n## Factors affecting the product performance\n\nThe main factors that could affect the performance of the product is the performance of the underlying instrument(s) along with Société Générale (the Guarantor) creditworthiness, which could have a material impact on the return, for instance if Société Générale (the Guarantor) is unable to pay out the redemption amount. Some other factors (such as the remaining time to the redemption date, interest rates, exchange rates, credit spreads, the dividend yield of the underlying where applicable, and in the case of multiple underlyings, the correlation between the various underlyings) could also affect the overall performance of the product on the secondary market.\n\nThere is no relevant index, benchmark or proxy which historical performance can be compared to the potential future performance of this structured product.\n\n## What could affect my returns?\n\nThe potential yield of the product at maturity will depend, in particular, on the scenario of evolution, until maturity of the product, of the factors that may affect its performance, mentioned above.\n\nIn a favorable scenario, if you hold the product to maturity or, (where applicable) until it early redeems, you might expect a return of 11.69% per annum. In a moderate scenario, you might expect a return of 4.07% per annum.\n\nIn an unfavorable scenario, you will lose money. You might expect a negative return of -27.72% per annum based on an estimate of future performance. This case occurs (i) when the underlying performs negatively, i.e. falls compared to its reference level in the product or (ii) when the underlying falls below the Capital protection barrier.\n\nFor the three scenarios above, if the manufacturer is not able to meet its obligation, you will have a negative return and could lose the entire initial amount.\n\n## Outcomes in severely adverse market conditions\n\nIn severely adverse market conditions, the product may undergo major price movements until its maturity which, in the worst case scenario, may cause its value at maturity falling to 0 .\n\nIf the product incorporates a leverage effect the variation of its price will be amplified and a price drop strongly accelerated .\n\nAt maturity of the product you may have lost the entire initial amount you invested in the product if the underlying asset of the product has suffered a sharp decline in its value until this date.\n\nAll expected return figures presented in this section result from statistical calculations in accordance with the methodology prescribed under the PRIIP Regulation. They do not represent the return you will receive in each scenario but only a probability of return.\n\n## WHAT HAPPENS IF SOCIÉTÉ GÉNÉRALE IS UNABLE TO PAY OUT?\n\nIf the Issuer defaults you may only claim any unpaid amount from Société Générale (the Guarantor). Should Société Générale default or file for bankruptcy, you may suffer a partial or total loss of the invested amount. If the Issuer and/or the Guarantor becomes subject to resolution measures in the form of the bail-in tool (\"bail-in\"), your claim may be reduced to zero, converted into equity or its maturity may be postponed. Please be aware that your Investment is not covered by any investor compensation or guarantee scheme.\n\nPlease find the ratings of Société Générale at https://investors.societegenerale.com/en/financial-and-non-financial-information/ratings/credit-ratings.\n\n## WHAT ARE THE COSTS?\n\n## Costs over Time\n\nThe person selling you or advising you about this product may charge you other costs. If so, this person will provide you with information about these costs, and show you the impact that all costs will have on your investment over time.\n\n| Investment CHF 10,000.00 Scenarios   | If you cash in at the end of the Recommended Holding Period   |\n|--------------------------------------|---------------------------------------------------------------|\n| Total costs                          | CHF 137.00                                                    |\n| Impact on return (RIY)               | 1.37%                                                         |\n\n<!-- image -->\n\n\n\n<!-- image -->\n\n\n\n\n\n\n\nHigher risk\n\n<!-- image -->\n\n## Composition of Costs\n\nThe table below shows:\n\n- the impact of the different types of costs on the investment return you might get at the end of the recommended holding period;\n- the meaning of the different cost categories.\n\n## This table shows the impact on return\n\n| One-off costs                 | Entry costs                 | 1.37%   | The impact of the costs you pay when entering your investment. The impact of the costs already included in the price.   |\n|-------------------------------|-----------------------------|---------|-------------------------------------------------------------------------------------------------------------------------|\n|                               | Exit costs                  | 0.00%   | The impact of the costs of exiting your investment when it matures.                                                     |\n| Ongoing costs taken each year | Portfolio transaction costs | 0.00%   | The impact of the costs of us buying and selling underlying investments for the product.                                |\n|                               | Other ongoing costs         | 0.00%   | The impact of the costs that we take for managing your investments and the costs presented in Section II.               |\n\n## HOW LONG SHOULD I HOLD IT AND CAN I TAKE MONEY OUT EARLY?\n\n## Recommended Holding Period: 11 months 15 days, which corresponds to the product maturity.\n\nUnder normal market conditions, Société Générale or an entity of its group ensures a daily secondary market during the life of the product by providing bid and offer prices expressed as percentages of the Nominal Value and the difference between the bid and offer prices (the spread) will not be more than 1.00% of such Nominal Value. If you want to sell the product before the Maturity Date, the price of the product will depend on market parameters at the time you wish to sell and you may sustain a partial or total capital loss. In unusual market condition, the resale of the product may be temporarily or permanently suspended.\n\n## HOW CAN I COMPLAIN?\n\nAny complaint regarding the person advising on, or selling, the product can be submitted directly to that person. Any complaint regarding the product or the conduct of the product manufacturer can be submitted to Société Générale at the following address: SOCIETE GENERALE, Regulatory Information Department, 17 cours Valmy, 92987 PARIS LA DEFENSE CEDEX, FRANCE - SG-complaints-kid@sgcib.com (http://kid.sgmarkets.com).\n\n## OTHER RELEVANT INFORMATION\n\nThe latest Key Information Document is available online at http://kid.sgmarkets.com. This document may be updated as of the date it is first created and for as long as the product is available for purchase, including during the marketing period of the product, where applicable. Further risks and information about the product are detailed in the product prospectus in accordance with Regulation (EU) 2017/1129. The prospectus (including its summary in the relevant local languages annexed to the Final Terms when the context requires) is available online at http://prospectus.socgen.com, and/or may be obtained free of charge upon request by calling +33(0) 969 32 08 07."
+          }
+        ]
+      }
+    ],
+    "variants": [],
     "consensusEnabled": false,
-    "confidenceThreshold": 85,
+    "confidenceThreshold": 85.0,
     "conflictResolution": "majority",
+    "parserEngine": "docling",
     "citationEnabled": true,
     "citationIncludePdfPage": true,
     "citationIncludeBbox": false,
     "citationIncludeParagraphId": false,
     "contextWindow": "128k",
-    "defaultModel": "gpt-4o-mini"
+    "defaultModel": "gpt-4o",
+    "createdAt": "2026-04-21T10:20:17.225Z",
+    "updatedAt": "2026-04-22T04:03:38.169Z"
   },
   {
-    "name": "Invoice Parser Global",
-    "description": "Standard extraction for invoices from 50+ countries. Optimized for digital PDFs and scanned bills.",
-    "category": "Financial",
-    "icon": "receipt_long",
-    "tags": ["24 Fields", "Line Items", "Multi-Currency"],
-    "defaultModel": "free",
-    "systemPrompt": "You are an expert accountant. Extract vendor, date, total, and line items from this invoice. Return null for any field not present in the document. Ensure amounts are returned as numbers, not strings.",
+    "id": "f7894890-452b-4c25-a2a2-993247fda019",
+    "name": "Thai derivative Warrants Extractor V1",
+    "description": "Automated Data Extraction Architecture for Derivative Warrants",
+    "thumbnailUrl": null,
     "schema": {
       "type": "object",
+      "required": [
+        "isin",
+        "global_identifier",
+        "leveraged_product_strike_level_absolute",
+        "principal_amount"
+      ],
+      "fieldOrder": [
+        "global_identifier",
+        "isin",
+        "issuer",
+        "currency",
+        "issue_date",
+        "trade_date",
+        "distributor",
+        "buffer_level",
+        "product_type",
+        "document_type",
+        "maturity_date",
+        "investment_type",
+        "offering_closes",
+        "product_subtype",
+        "settlement_type",
+        "principal_amount",
+        "underlying_ticker",
+        "expiry_payment_date",
+        "final_valuation_date",
+        "trading_jurisdiction",
+        "initial_valuation_date",
+        "expiry_observation_date",
+        "investment_or_leveraged",
+        "proportional_principal_amount",
+        "leveraged_product_exercise_style",
+        "leveraged_product_exercise_period_end_date",
+        "leveraged_product_strike_level_absolute"
+      ],
       "properties": {
-        "vendor_name": {
+        "isin": {
           "type": "string",
-          "description": "Name of the vendor or seller"
+          "description": "DIRECTLY EXTRACTABLE. Found in the PRODUCT section table row labeled 'ISIN'. A 12-character International Securities Identification Number. BNP Paribas certificates typically use 'XS' prefix (cross-border Euroclear/Clearstream settled). Validate: must be exactly 12 alphanumeric characters, starting with a 2-letter country/system code (XS, DE, FR, etc.). LOOK for \"ชื่อของใบสำคัญแสดงสิทธิอนุพันธ\" in this line value find the Ebmglish word such as \" ADVANC01C2610A\" and return this value to this fie;d"
         },
-        "invoice_date": {
+        "issuer": {
           "type": "string",
-          "format": "date",
-          "description": "Date of the invoice"
-        },
-        "total_amount": {
-          "type": "number",
-          "description": "Total invoice amount"
+          "description": "Extract the full legal name of the issuing entity and translate to English. For the provided documents, this maps to 'ผู้ออกใบสำคัญแสดงสิทธิอนุพันธ์ฯ' and must be output exactly as 'Bualuang Securities Public Company Limited'"
         },
         "currency": {
           "type": "string",
-          "description": "Currency code, e.g. USD, EUR"
+          "description": "Hardcode as 'THB' based on the Thai Baht denomination of the SET"
         },
-        "line_items": {
-          "type": "array",
-          "description": "Individual line items on the invoice",
-          "items": {
-            "type": "object",
-            "properties": {
-              "description": { "type": "string" },
-              "quantity": { "type": "number" },
-              "unit_price": { "type": "number" },
-              "total": { "type": "number" }
-            }
-          }
+        "issue_date": {
+          "type": "string",
+          "description": "Extract the issuance date ('วันออกใบสำคัญแสดงสิทธิอนุพันธ์ฯ'). Convert Thai BE dates to Gregorian DD/MM/YYYY (e.g., '6 กุมภาพันธ์ 2569' becomes '06/02/2026')"
+        },
+        "trade_date": {
+          "type": "string",
+          "description": "Identical to issue_date for Direct Listing (Direct Listing) SET DWs, representing the first day of exchange trading.2 Format as DD/MM/YYYY."
+        },
+        "distributor": {
+          "type": "string",
+          "description": "Default to the identical value extracted for the 'issuer' parameter, as the issuer acts as its own direct listing distributor on the SET"
+        },
+        "buffer_level": {
+          "type": "string",
+          "description": "Set strictly to null."
+        },
+        "product_type": {
+          "type": "string",
+          "description": "Hardcode as 'Growth'"
+        },
+        "document_type": {
+          "type": "string",
+          "description": "Hardcode as 'Final' to indicate these are finalized, non-draft pricing term sheets"
+        },
+        "maturity_date": {
+          "type": "number",
+          "description": "Extract the maturity date ('วันครบกำหนดอายุ'). Format as YYYY-MM-DDTHH:MM:SSZ"
+        },
+        "investment_type": {
+          "type": "string",
+          "description": "Hardcode as 'Warrant'"
+        },
+        "offering_closes": {
+          "type": "string",
+          "description": "The date the subscription period ends. For direct market listings lacking a discrete subscription window, return null."
+        },
+        "product_subtype": {
+          "type": "string",
+          "description": "Determine the option directionality. If the document states 'สิทธิในการซื้อ' (Right to buy), output 'Call Warrant'. If it states 'สิทธิในการขาย' (Right to sell), output 'Put Warrant'"
+        },
+        "settlement_type": {
+          "type": "string",
+          "description": "Extract the settlement method. This should map from 'ชำระเงินตามส่วนต่างของราคา' to the English string 'Cash' or 'Cash Settlement'"
+        },
+        "principal_amount": {
+          "type": "number",
+          "description": "Extract the absolute total offering value ('มูลค่ารวมที่เสนอขาย') without currency symbols (e.g., 40000000.00 for the ADVANC Put) beside this \"จํานวนที่เสนอขาย\". and give\"*\" and look for \"อัตราการใช้สิทธิต่อหน่วย\" get fraction like 0.67. the formate is 40000000*0.67"
+        },
+        "global_identifier": {
+          "type": "string",
+          "description": "go to the \"ชื่อของใบสำคัญแสดงสิทธิอนุพันธ\" and find the english word suc as \"BABA41C2610A\" and return the field with this value"
+        },
+        "underlying_ticker": {
+          "type": "string",
+          "description": "Identify the underlying asset ('หลักทรัพย์อ้างอิง'). Determine its standard SET symbol and append ' TB Equity' to format it as a valid Bloomberg ticker (e.g., 'COM7 TB Equity', 'CPF TB Equity')"
+        },
+        "expiry_payment_date": {
+          "type": "string",
+          "description": "Mirror the maturity_date, as settlement occurs precisely upon expiration."
+        },
+        "final_valuation_date": {
+          "type": "number",
+          "description": "Extract the last trading day ('วันทำการซื้อขายสุดท้าย'). Format as YYYY-MM-DDTHH:MM:SSZ"
+        },
+        "trading_jurisdiction": {
+          "type": "string",
+          "description": "Extract the exchange locale. Hardcode as 'TH' (Thailand) based on the SET regulatory framework"
+        },
+        "initial_valuation_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Extract the date used to determine the initial reference price. If not explicitly isolated from the issue date, return null. date formate is YYYY-MM-DDTHH:MM:SSZ"
+        },
+        "expiry_observation_date": {
+          "type": "string",
+          "description": "Mirror the final_valuation_date, as European DWs observe the underlying price strictly on the final trading day."
+        },
+        "investment_or_leveraged": {
+          "type": "string",
+          "description": "Hardcode as 'Leveraged Product', indicating the derivative nature of the warrant"
+        },
+        "proportional_principal_amount": {
+          "type": "number",
+          "description": "Set to null or a default integer if required by the legacy schema (e.g., 1 or 10)"
+        },
+        "leveraged_product_exercise_style": {
+          "type": "string",
+          "description": "Extract the exercise architecture. Expected to perfectly map from 'แบบยุโรป' to the string 'European'"
+        },
+        "leveraged_product_strike_level_absolute": {
+          "type": "number",
+          "description": "look for this \"ราคาใช้สิทธ\", the correspondednt number of the such as 89 is the value. so return this field with 89"
+        },
+        "leveraged_product_exercise_period_end_date": {
+          "type": "string",
+          "description": "a date"
         }
       },
-      "required": ["vendor_name", "total_amount", "invoice_date"]
+      "additionalProperties": false
     },
+    "systemPrompt": "Extract financial data from the Asian/Thai derivative warrant PDF term sheet. Ensure maximum data fidelity. The schema operates under an additionalProperties: false restriction. Do not invent new JSON keys.\n\n1. Non-linear reading comprehension: Financial term sheets are not read sequentially. Ingest the entire document, synthesize interrelated parameters, and construct the JSON output. Specifically, for product_description, synthesize data across multiple nodes (underlying ticker, instrument type, issuer name, maturity date) to concatenate the final string precisely.\n2. Structural nullification & The Epoch Date Artifact: The vast majority of extraneous fields (coupon generation, autocall, complex barriers) must be structural nulls. Under no circumstances should missing, blank, or structurally inapplicable data be substituted with epoch timestamps (like 1899-12-31 00:00:00) or default integers (like 0). Omitted fields must be returned as strictly null.\n3. Logic-gated mathematical string building: When evaluating the strike level fields, determine the option directionality. If Call, populate call_strike_level with the exact string concatenation of '[Quantity]*[Issue Price]' (e.g., '100000000*1.00') and leave put_strike_level null. Reverse this logic if it is a Put. Do not execute the mathematical operation. Do not insert the absolute financial strike price into these specific fields.\n4. Cross-Lingual Semantic Mapping: Execute cross-lingual semantic reasoning. Map Thai terms to English (e.g. 'สิทธิในการซื้อ' to 'Call Warrant', 'สิทธิในการขาย' to 'Put Warrant', 'แบบยุโรป' to 'European', 'ชำระเงินตามส่วนต่างของราคา' to 'Cash').\n5. Ticker Normalization: Isolate the corporate entity mentioned in the Thai text, deduce its official SET trading symbol, and construct the correct Bloomberg syntax by appending \" TB Equity\" to underlying_ticker.\n6. Chronological Milestones: All localized Thai Buddhist Era (BE) dates and Thai months must be mathematically converted and normalized into the universal DD/MM/YYYY or YYYY-MM-DD string format.",
     "fewShotExamples": [],
     "variants": [],
     "consensusEnabled": false,
-    "confidenceThreshold": 85,
+    "confidenceThreshold": 85.0,
     "conflictResolution": "majority",
     "parserEngine": "docling",
     "citationEnabled": false,
     "citationIncludePdfPage": false,
     "citationIncludeBbox": false,
     "citationIncludeParagraphId": false,
-    "contextWindow": "128k"
-  },
-  {
-    "name": "Bank Statement Analyzer",
-    "description": "Extract transactions, account info, and balances from monthly bank statements (PDF/Scanned).",
-    "category": "Financial",
-    "icon": "account_balance",
-    "tags": ["Transaction List", "Balance Check"],
-    "defaultModel": "free",
-    "systemPrompt": "Extract account holder details and all transaction rows from the bank statement. Return transaction amounts as numbers (positive for credits, negative for debits). Return null for missing fields.",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "account_holder": {
-          "type": "string",
-          "description": "Name of the account holder"
-        },
-        "account_number": {
-          "type": "string",
-          "description": "Bank account number"
-        },
-        "statement_period": {
-          "type": "string",
-          "description": "Period covered by the statement"
-        },
-        "opening_balance": {
-          "type": "number",
-          "description": "Opening balance"
-        },
-        "closing_balance": {
-          "type": "number",
-          "description": "Closing balance"
-        },
-        "transactions": {
-          "type": "array",
-          "description": "List of transactions",
-          "items": {
-            "type": "object",
-            "properties": {
-              "date": { "type": "string" },
-              "description": { "type": "string" },
-              "amount": { "type": "number" },
-              "type": { "type": "string", "enum": ["debit", "credit"] }
-            }
-          }
-        }
-      }
-    },
-    "fewShotExamples": [],
-    "variants": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "parserEngine": "docling",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k"
-  },
-  {
-    "name": "AI Resume Parser",
-    "description": "Extract structured candidate data, skills, and work history from resumes and CVs.",
-    "category": "HR",
-    "icon": "person_search",
-    "tags": ["HR Tech", "Structured CV"],
-    "defaultModel": "free",
-    "systemPrompt": "Act as a technical recruiter. Extract contact info, skills, and work history from this resume or CV. Return skills as a list of strings. Return null for any field not present.",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "full_name": {
-          "type": "string",
-          "description": "Candidate's full name"
-        },
-        "email": { "type": "string", "description": "Email address" },
-        "phone": { "type": "string", "description": "Phone number" },
-        "skills": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "List of skills"
-        },
-        "experience": {
-          "type": "array",
-          "description": "Work experience entries",
-          "items": {
-            "type": "object",
-            "properties": {
-              "title": { "type": "string" },
-              "company": { "type": "string" },
-              "duration": { "type": "string" }
-            }
-          }
-        },
-        "education": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "Education entries"
-        }
-      }
-    },
-    "fewShotExamples": [],
-    "variants": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "parserEngine": "docling",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k"
-  },
-  {
-    "name": "Purchase Order Processor",
-    "description": "Extract PO numbers, vendor details, and line item tables for automated procurement.",
-    "category": "Logistics",
-    "icon": "shopping_cart",
-    "tags": ["Logistics", "Procure-to-Pay"],
-    "defaultModel": "free",
-    "systemPrompt": "Extract PO number, vendor, shipping address, and itemized list from this purchase order. Return numeric values as numbers. Return null for missing fields.",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "po_number": {
-          "type": "string",
-          "description": "Purchase order number"
-        },
-        "vendor_name": { "type": "string", "description": "Vendor name" },
-        "shipping_address": {
-          "type": "string",
-          "description": "Shipping address"
-        },
-        "total_order_value": {
-          "type": "number",
-          "description": "Total order value"
-        },
-        "items": {
-          "type": "array",
-          "description": "Ordered items",
-          "items": {
-            "type": "object",
-            "properties": {
-              "sku": { "type": "string" },
-              "description": { "type": "string" },
-              "quantity": { "type": "number" },
-              "unit_price": { "type": "number" }
-            }
-          }
-        }
-      }
-    },
-    "fewShotExamples": [],
-    "variants": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "parserEngine": "docling",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k"
-  },
-  {
-    "name": "Lease Agreement Extractor",
-    "description": "Pulls rent amounts, security deposits, and key dates from residential or commercial leases.",
-    "category": "Legal",
-    "icon": "home_work",
-    "tags": ["PropTech", "Legal Clauses"],
-    "defaultModel": "free",
-    "systemPrompt": "Identify landlord, tenant, rent amount, and lease term dates from this lease agreement. Return monetary values as numbers. Return null for any field not present in the document.",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "landlord": { "type": "string", "description": "Landlord name" },
-        "tenant": { "type": "string", "description": "Tenant name" },
-        "property_address": {
-          "type": "string",
-          "description": "Property address"
-        },
-        "monthly_rent": {
-          "type": "number",
-          "description": "Monthly rent amount"
-        },
-        "security_deposit": {
-          "type": "number",
-          "description": "Security deposit amount"
-        },
-        "start_date": { "type": "string", "description": "Lease start date" },
-        "end_date": { "type": "string", "description": "Lease end date" }
-      }
-    },
-    "fewShotExamples": [],
-    "variants": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "parserEngine": "docling",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k"
-  },
-  {
-    "name": "Medical Prescription Parser",
-    "description": "Specialized pipeline for handwritten doctors notes and prescription pads.",
-    "category": "Medical",
-    "icon": "medication",
-    "tags": ["MedTech", "Handwriting"],
-    "defaultModel": "free",
-    "systemPrompt": "You are a pharmacist's assistant. Extract patient info and medication details from this handwritten prescription. Be precise about dosage and frequency. Return null for any field not legible or present.",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "patient_name": {
-          "type": "string",
-          "description": "Patient's full name"
-        },
-        "medications": {
-          "type": "array",
-          "description": "List of prescribed medications",
-          "items": {
-            "type": "object",
-            "properties": {
-              "drug_name": { "type": "string" },
-              "dosage": { "type": "string" },
-              "frequency": { "type": "string" }
-            }
-          }
-        }
-      }
-    },
-    "fewShotExamples": [],
-    "variants": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "parserEngine": "docling",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k"
-  },
-  {
-    "name": "ID / Passport Scanner",
-    "description": "Extract MRZ codes, names, and bio-metric info from global identity documents.",
-    "category": "Identity",
-    "icon": "badge",
-    "tags": ["KYC", "Auth"],
-    "defaultModel": "free",
-    "systemPrompt": "Extract the MRZ code, full name, date of birth, and document number from this ID card or Passport. Return dates in YYYY-MM-DD format. Return null for fields not present or not legible.",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "full_name": {
-          "type": "string",
-          "description": "Full name as on document"
-        },
-        "document_number": {
-          "type": "string",
-          "description": "Document number"
-        },
-        "date_of_birth": {
-          "type": "string",
-          "format": "date",
-          "description": "Date of birth"
-        },
-        "expiry_date": {
-          "type": "string",
-          "format": "date",
-          "description": "Document expiry date"
-        },
-        "mrz_code": {
-          "type": "string",
-          "description": "Machine readable zone code"
-        },
-        "nationality": { "type": "string", "description": "Nationality" }
-      },
-      "required": ["full_name", "document_number", "mrz_code"]
-    },
-    "fewShotExamples": [],
-    "variants": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "parserEngine": "docling",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k"
-  },
-  {
-    "name": "CMS-1500 Claim Parser",
-    "description": "Extract charges, ICD codes, and provider info from standard health insurance claim forms.",
-    "category": "Medical",
-    "icon": "health_and_safety",
-    "tags": ["Billing", "Healthcare"],
-    "defaultModel": "free",
-    "systemPrompt": "Extract patient information, diagnosis codes, and service charges from this CMS-1500 health insurance claim form. Return charge amounts as numbers. Return null for missing fields.",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "patient_name": {
-          "type": "string",
-          "description": "Patient's full name"
-        },
-        "diagnosis_codes": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "ICD diagnosis codes"
-        },
-        "total_charge": {
-          "type": "number",
-          "description": "Total charge amount"
-        },
-        "provider_npi": {
-          "type": "string",
-          "description": "Provider NPI number"
-        },
-        "services": {
-          "type": "array",
-          "description": "Individual services billed",
-          "items": {
-            "type": "object",
-            "properties": {
-              "date_of_service": { "type": "string" },
-              "procedure_code": { "type": "string" },
-              "charge": { "type": "number" }
-            }
-          }
-        }
-      }
-    },
-    "fewShotExamples": [],
-    "variants": [],
-    "consensusEnabled": false,
-    "confidenceThreshold": 85,
-    "conflictResolution": "majority",
-    "parserEngine": "docling",
-    "citationEnabled": false,
-    "citationIncludePdfPage": false,
-    "citationIncludeBbox": false,
-    "citationIncludeParagraphId": false,
-    "contextWindow": "128k"
+    "contextWindow": "128k",
+    "defaultModel": "gpt-4o",
+    "createdAt": "2026-04-21T10:20:17.225Z",
+    "updatedAt": "2026-04-24T00:18:42.584Z"
   }
 ]

@@ -202,6 +202,8 @@ export const TemplateWizardModal = NiceModal.create(() => {
           schema: selectedTemplate.schema,
           systemPrompt: selectedTemplate.systemPrompt,
           defaultModel: selectedTemplate.defaultModel,
+          fewShotExamples: selectedTemplate.fewShotExamples ?? [],
+          variants: selectedTemplate.variants ?? [],
         },
       } as any,
     });

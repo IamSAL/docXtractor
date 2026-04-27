@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Run Details — DocXtractor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Archivo", system-ui, sans-serif;
+        background: #f5f5f5;
+      }
+      .shadow-brutal {
+        box-shadow: 4px 4px 0px 0px #000;
+      }
+      .shadow-brutal-sm {
+        box-shadow: 2px 2px 0px 0px #000;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 700,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+    </style>
+  </head>
+  <body class="text-black">
+    <div class="flex flex-col h-screen overflow-hidden relative">
+      <!-- Top Header -->
+      <header
+        class="h-auto min-h-[80px] bg-gray-50 border-b-4 border-black p-6 flex flex-col md:flex-row items-start md:items-center justify-between shrink-0 gap-4"
+      >
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2 text-sm font-bold text-gray-500">
+            <a href="#" class="hover:underline hover:text-black">RUNS</a>
+            <span>/</span>
+            <span class="text-black">RUN #a3f2c891-7b4d-4e8a-9c1f-2d5e6f8a9b0c</span>
+          </div>
+          <h2 class="text-3xl font-black uppercase tracking-tight">Run #a3f2c891</h2>
+        </div>
+        <div class="flex items-center gap-4">
+          <div
+            class="flex items-center gap-2 px-4 py-2 bg-white border-2 border-black shadow-brutal-sm rounded-full"
+          >
+            <span class="material-symbols-outlined text-lg">layers</span>
+            <span class="font-bold text-xs uppercase tracking-wide">5 Sources</span>
+          </div>
+          <div
+            class="flex items-center gap-2 px-4 py-2 border-2 border-black shadow-brutal-sm rounded-full bg-green-400"
+          >
+            <span class="font-bold text-xs uppercase tracking-wide">COMPLETED</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Scrollable Content -->
+      <div class="flex-1 p-4 lg:p-8 overflow-y-auto">
+        <div class="max-w-[1600px] mx-auto flex flex-col xl:flex-row gap-8 pb-12">
+          <div class="flex-1 flex flex-col gap-8">
+            <!-- Extraction Results Section -->
+            <section class="flex flex-col gap-4">
+              <div class="flex items-end justify-between">
+                <h3 class="text-xl font-black uppercase flex items-center gap-2 tracking-tighter">
+                  <span class="material-symbols-outlined font-black">monitor_heart</span>
+                  Extraction Results
+                </h3>
+                <span
+                  class="text-xs font-black bg-black text-white px-2 py-1 rounded-sm uppercase tracking-widest"
+                  >complete</span
+                >
+              </div>
+              <!-- Progress Card -->
+              <div
+                class="bg-white border-2 border-black shadow-brutal p-6 rounded-sm flex flex-col gap-6"
+              >
+                <div
+                  class="flex justify-between items-center text-xs font-black uppercase tracking-widest"
+                >
+                  <span class="text-[#007AFF]">01. Parsing (5/5)</span>
+                  <span class="text-[#7A00FF]">02. Extracting (5/5)</span>
+                  <span class="text-green-600">03. Complete</span>
+                </div>
+                <!-- Segmented Bar -->
+                <div
+                  class="w-full h-8 border-2 border-black bg-gray-100 flex rounded-sm overflow-hidden relative"
+                >
+                  <div
+                    class="h-full w-1/3 border-r-2 border-black flex items-center justify-center bg-[#007AFF]"
+                  >
+                    <span class="material-symbols-outlined text-white text-sm font-black"
+                      >check</span
+                    >
+                  </div>
+                  <div
+                    class="h-full w-1/3 border-r-2 border-black flex items-center justify-center bg-[#7A00FF]"
+                  >
+                    <span class="material-symbols-outlined text-white text-sm font-black"
+                      >check</span
+                    >
+                  </div>
+                  <div class="h-full w-1/3 flex items-center justify-center bg-green-400">
+                    <span class="material-symbols-outlined text-white text-sm font-black"
+                      >check</span
+                    >
+                  </div>
+                </div>
+                <!-- Status info bar (done) -->
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 flex gap-4 items-start">
+                  <span class="material-symbols-outlined text-green-600 mt-0.5"
+                    >check_circle</span
+                  >
+                  <div>
+                    <p class="font-black text-sm uppercase tracking-tight text-green-700">
+                      Extraction Complete
+                    </p>
+                    <p class="text-xs mt-1 text-green-600 font-medium">
+                      All documents processed and data extracted successfully. Duration: 47s
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Results Section: Tabs -->
+                <div class="flex flex-col gap-4 mt-2">
+                  <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div
+                      class="inline-flex items-center bg-gray-100 border-2 border-black rounded-sm p-1 gap-1"
+                    >
+                      <button
+                        class="px-3 py-1.5 text-xs font-black uppercase bg-white border-2 border-black shadow-brutal-sm flex items-center gap-1.5"
+                      >
+                        <span class="material-symbols-outlined text-[16px]">table_chart</span>
+                        Spreadsheet
+                      </button>
+                      <button
+                        class="px-3 py-1.5 text-xs font-black uppercase text-gray-500 flex items-center gap-1.5"
+                      >
+                        <span class="material-symbols-outlined text-[16px]">code</span>
+                        JSON
+                      </button>
+                    </div>
+                    <button
+                      class="text-xs font-bold uppercase tracking-wide text-[#007AFF] hover:underline"
+                    >
+                      Copy JSON
+                    </button>
+                  </div>
+
+                  <!-- Spreadsheet view -->
+                  <div
+                    class="bg-white border-2 border-black shadow-brutal rounded-sm overflow-hidden"
+                  >
+                    <div
+                      class="bg-gray-50 border-b-2 border-black p-3 px-4 flex items-center justify-between"
+                    >
+                      <span
+                        class="text-xs font-black uppercase tracking-widest text-gray-600"
+                        >5 rows × 6 cols</span
+                      >
+                      <div class="flex items-center gap-2">
+                        <button
+                          class="text-[10px] font-black uppercase px-2 py-1 border-2 border-black bg-white shadow-brutal-sm"
+                        >
+                          Search
+                        </button>
+                        <button
+                          class="text-[10px] font-black uppercase px-2 py-1 border-2 border-black bg-white shadow-brutal-sm"
+                        >
+                          Sort
+                        </button>
+                        <button
+                          class="text-[10px] font-black uppercase px-2 py-1 border-2 border-black bg-white shadow-brutal-sm"
+                        >
+                          CSV
+                        </button>
+                      </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-xs">
+                        <thead class="bg-gray-100 border-b-2 border-black">
+                          <tr>
+                            <th class="p-2 px-3 text-left font-black uppercase tracking-wide">
+                              ISIN
+                            </th>
+                            <th class="p-2 px-3 text-left font-black uppercase tracking-wide">
+                              Issuer
+                            </th>
+                            <th class="p-2 px-3 text-left font-black uppercase tracking-wide">
+                              Currency
+                            </th>
+                            <th class="p-2 px-3 text-left font-black uppercase tracking-wide">
+                              Issue Date
+                            </th>
+                            <th class="p-2 px-3 text-left font-black uppercase tracking-wide">
+                              Coupon Rate
+                            </th>
+                            <th class="p-2 px-3 text-left font-black uppercase tracking-wide">
+                              Maturity Date
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="p-2 px-3 font-mono">XS2741305789</td>
+                            <td class="p-2 px-3">BNP Paribas Issuance B.V.</td>
+                            <td class="p-2 px-3">EUR</td>
+                            <td class="p-2 px-3">2024-03-15</td>
+                            <td class="p-2 px-3">5.00%</td>
+                            <td class="p-2 px-3">2026-03-15</td>
+                          </tr>
+                          <tr class="border-b border-gray-200 bg-gray-50">
+                            <td class="p-2 px-3 font-mono">XS2475321098</td>
+                            <td class="p-2 px-3">BNP Paribas Issuance B.V.</td>
+                            <td class="p-2 px-3">USD</td>
+                            <td class="p-2 px-3">2024-04-22</td>
+                            <td class="p-2 px-3">1.75%</td>
+                            <td class="p-2 px-3">2026-04-22</td>
+                          </tr>
+                          <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="p-2 px-3 font-mono">XS2515678234</td>
+                            <td class="p-2 px-3">BNP Paribas Issuance B.V.</td>
+                            <td class="p-2 px-3">CHF</td>
+                            <td class="p-2 px-3">2024-05-10</td>
+                            <td class="p-2 px-3">4.875%</td>
+                            <td class="p-2 px-3">2025-05-10</td>
+                          </tr>
+                          <tr class="border-b border-gray-200 bg-gray-50">
+                            <td class="p-2 px-3 font-mono">XS14812LBHX</td>
+                            <td class="p-2 px-3">BNP Paribas Issuance B.V.</td>
+                            <td class="p-2 px-3">EUR</td>
+                            <td class="p-2 px-3">2024-06-01</td>
+                            <td class="p-2 px-3">1.50%</td>
+                            <td class="p-2 px-3">2026-06-01</td>
+                          </tr>
+                          <tr class="hover:bg-gray-50">
+                            <td class="p-2 px-3 font-mono">XS2839472610</td>
+                            <td class="p-2 px-3">BNP Paribas Issuance B.V.</td>
+                            <td class="p-2 px-3">GBP</td>
+                            <td class="p-2 px-3">2024-07-18</td>
+                            <td class="p-2 px-3">3.25%</td>
+                            <td class="p-2 px-3">2026-07-18</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Sources List -->
+            <section class="flex flex-col gap-4">
+              <h3 class="text-lg font-black uppercase flex items-center gap-2 tracking-tighter">
+                <span class="material-symbols-outlined font-black">folder_open</span>
+                Active Sources
+              </h3>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Source Card 1: done -->
+                <div
+                  class="bg-white border-2 border-black shadow-brutal p-3 rounded-sm group hover:translate-x-1 transition-transform flex flex-col gap-2"
+                >
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="size-10 border-2 border-black rounded-sm flex items-center justify-center bg-red-50"
+                      >
+                        <span class="material-symbols-outlined text-red-600"
+                          >picture_as_pdf</span
+                        >
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="font-black text-xs uppercase tracking-tight"
+                          >BNP_KID_CE4130AET.pdf</span
+                        >
+                        <span class="text-[10px] font-bold text-gray-400"
+                          >File • parsed • 12,453 tokens • Extraction: done</span
+                        >
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="size-8 border-2 border-black rounded-full flex items-center justify-center bg-green-400"
+                      >
+                        <span class="material-symbols-outlined text-[16px] font-black"
+                          >check</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex gap-4 ml-12">
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-gray-700 bg-gray-50 border-2 border-black shadow-brutal-sm hover:bg-gray-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">visibility</span>
+                      View Parsed
+                    </button>
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-brutal-sm hover:bg-blue-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">replay</span>
+                      Retry
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Source Card 2: done -->
+                <div
+                  class="bg-white border-2 border-black shadow-brutal p-3 rounded-sm group hover:translate-x-1 transition-transform flex flex-col gap-2"
+                >
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="size-10 border-2 border-black rounded-sm flex items-center justify-center bg-red-50"
+                      >
+                        <span class="material-symbols-outlined text-red-600"
+                          >picture_as_pdf</span
+                        >
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="font-black text-xs uppercase tracking-tight"
+                          >BNP_KID_CE4475CLV.pdf</span
+                        >
+                        <span class="text-[10px] font-bold text-gray-400"
+                          >File • parsed • 11,892 tokens • Extraction: done</span
+                        >
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="size-8 border-2 border-black rounded-full flex items-center justify-center bg-green-400"
+                      >
+                        <span class="material-symbols-outlined text-[16px] font-black"
+                          >check</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex gap-4 ml-12">
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-gray-700 bg-gray-50 border-2 border-black shadow-brutal-sm hover:bg-gray-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">visibility</span>
+                      View Parsed
+                    </button>
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-brutal-sm hover:bg-blue-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">replay</span>
+                      Retry
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Source Card 3: URL done -->
+                <div
+                  class="bg-white border-2 border-black shadow-brutal p-3 rounded-sm group hover:translate-x-1 transition-transform flex flex-col gap-2"
+                >
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="size-10 border-2 border-black rounded-sm flex items-center justify-center bg-blue-50"
+                      >
+                        <span class="material-symbols-outlined text-blue-600">link</span>
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="font-black text-xs uppercase tracking-tight"
+                          >bnpparibas.com/kid/CE4515CLV</span
+                        >
+                        <span class="text-[10px] font-bold text-gray-400"
+                          >URL • parsed • 8,231 tokens • Extraction: done</span
+                        >
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="size-8 border-2 border-black rounded-full flex items-center justify-center bg-green-400"
+                      >
+                        <span class="material-symbols-outlined text-[16px] font-black"
+                          >check</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex gap-4 ml-12">
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-gray-700 bg-gray-50 border-2 border-black shadow-brutal-sm hover:bg-gray-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">visibility</span>
+                      View Parsed
+                    </button>
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-brutal-sm hover:bg-blue-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">replay</span>
+                      Retry
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Source Card 4: done -->
+                <div
+                  class="bg-white border-2 border-black shadow-brutal p-3 rounded-sm group hover:translate-x-1 transition-transform flex flex-col gap-2"
+                >
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="size-10 border-2 border-black rounded-sm flex items-center justify-center bg-red-50"
+                      >
+                        <span class="material-symbols-outlined text-red-600"
+                          >picture_as_pdf</span
+                        >
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="font-black text-xs uppercase tracking-tight"
+                          >BNP_KID_14812LBH.pdf</span
+                        >
+                        <span class="text-[10px] font-bold text-gray-400"
+                          >File • parsed • 14,201 tokens • Extraction: done</span
+                        >
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="size-8 border-2 border-black rounded-full flex items-center justify-center bg-green-400"
+                      >
+                        <span class="material-symbols-outlined text-[16px] font-black"
+                          >check</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex gap-4 ml-12">
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-gray-700 bg-gray-50 border-2 border-black shadow-brutal-sm hover:bg-gray-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">visibility</span>
+                      View Parsed
+                    </button>
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-brutal-sm hover:bg-blue-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">replay</span>
+                      Retry
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Source Card 5: failed example -->
+                <div
+                  class="bg-white border-2 border-black shadow-brutal p-3 rounded-sm group hover:translate-x-1 transition-transform flex flex-col gap-2"
+                >
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="size-10 border-2 border-black rounded-sm flex items-center justify-center bg-red-50"
+                      >
+                        <span class="material-symbols-outlined text-red-600"
+                          >picture_as_pdf</span
+                        >
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="font-black text-xs uppercase tracking-tight"
+                          >BNP_KID_CE2839472.pdf</span
+                        >
+                        <span class="text-[10px] font-bold text-gray-400"
+                          >File • failed • 9,103 tokens</span
+                        >
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="size-8 border-2 border-black rounded-full flex items-center justify-center bg-red-500"
+                      >
+                        <span
+                          class="material-symbols-outlined text-[16px] font-black text-white"
+                          >close</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex gap-4 ml-12">
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-gray-700 bg-gray-50 border-2 border-black shadow-brutal-sm hover:bg-gray-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">visibility</span>
+                      View Parsed
+                    </button>
+                    <button
+                      class="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-blue-700 bg-blue-50 border-2 border-black shadow-brutal-sm hover:bg-blue-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">replay</span>
+                      Retry
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Logs -->
+            <section class="flex flex-col gap-4">
+              <details class="group" open>
+                <summary
+                  class="flex cursor-pointer items-center gap-2 select-none list-none"
+                >
+                  <h3
+                    class="text-lg font-black uppercase flex items-center gap-2 tracking-tighter"
+                  >
+                    <span class="material-symbols-outlined font-black">terminal</span>
+                    Technical Logs
+                  </h3>
+                  <span
+                    class="text-xs font-bold text-gray-400 border border-gray-300 px-2 py-0.5 rounded"
+                    >24 entries</span
+                  >
+                  <span
+                    class="material-symbols-outlined text-gray-400 ml-auto transition-transform duration-200 group-open:rotate-180"
+                    >expand_more</span
+                  >
+                </summary>
+                <div
+                  class="mt-3 bg-black text-white border-2 border-black shadow-brutal rounded-sm overflow-hidden flex flex-col h-full min-h-[300px]"
+                >
+                  <div
+                    class="bg-gray-800 border-b-2 border-black p-2 flex items-center justify-between px-4"
+                  >
+                    <span
+                      class="text-[10px] font-mono text-[#00FF99] font-black uppercase tracking-widest"
+                      >LIVE_LOG (24 entries)</span
+                    >
+                    <span class="material-symbols-outlined text-sm text-gray-400"
+                      >terminal</span
+                    >
+                  </div>
+                  <div
+                    class="p-4 font-mono text-[11px] leading-relaxed overflow-y-auto font-medium max-h-[400px]"
+                  >
+                    <p class="mb-2">
+                      <span class="text-gray-500">[10:42:01]</span>
+                      <span class="font-black uppercase text-gray-400">[server]</span>
+                      <span class="font-black uppercase text-[#007AFF]">[info]</span>
+                      <span>Run created with 5 sources</span>
+                    </p>
+                    <p class="mb-2">
+                      <span class="text-gray-500">[10:42:02]</span>
+                      <span class="font-black uppercase text-gray-400">[server]</span>
+                      <span class="font-black uppercase text-[#007AFF]">[info]</span>
+                      <span>Queued 5 documents to parser-service</span>
+                    </p>
+                    <p class="mb-2">
+                      <span class="text-gray-500">[10:42:05]</span>
+                      <span class="font-black uppercase text-cyan-400">[parser]</span>
+                      <span class="font-black uppercase text-[#007AFF]">[info]</span>
+                      <span>Parsing BNP_KID_CE4130AET.pdf with Docling</span>
+                    </p>
+                    <p class="mb-2">
+                      <span class="text-gray-500">[10:42:18]</span>
+                      <span class="font-black uppercase text-cyan-400">[parser]</span>
+                      <span class="font-black uppercase text-[#007AFF]">[info]</span>
+                      <span>Parsed 12,453 tokens from BNP_KID_CE4130AET.pdf</span>
+                    </p>
+                    <p class="mb-2">
+                      <span class="text-gray-500">[10:42:24]</span>
+                      <span class="font-black uppercase text-cyan-400">[parser]</span>
+                      <span class="font-black uppercase text-[#FFD700]">[warn]</span>
+                      <span>OCR fallback triggered for BNP_KID_CE2839472.pdf</span>
+                    </p>
+                    <p class="mb-2">
+                      <span class="text-gray-500">[10:42:31]</span>
+                      <span class="font-black uppercase text-purple-400">[extractor]</span>
+                      <span class="font-black uppercase text-[#007AFF]">[info]</span>
+                      <span>Starting extraction with FreeLLM (model=free)</span>
+                    </p>
+                    <p class="mb-2">
+                      <span class="text-gray-500">[10:42:36]</span>
+                      <span class="font-black uppercase text-purple-400">[extractor]</span>
+                      <span class="font-black uppercase text-red-400">[error]</span>
+                      <span>Schema validation failed for BNP_KID_CE2839472.pdf</span>
+                    </p>
+                    <p class="mb-2">
+                      <span class="text-gray-500">[10:42:48]</span>
+                      <span class="font-black uppercase text-purple-400">[extractor]</span>
+                      <span class="font-black uppercase text-[#007AFF]">[info]</span>
+                      <span>Extracted 21 fields across 4 documents</span>
+                    </p>
+                    <p class="mb-2">
+                      <span class="text-gray-500">[10:42:48]</span>
+                      <span class="font-black uppercase text-gray-400">[server]</span>
+                      <span class="font-black uppercase text-[#007AFF]">[info]</span>
+                      <span>Run completed in 47s</span>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </section>
+          </div>
+
+          <!-- Sidebar Stats -->
+          <aside class="w-full xl:w-80 gap-6 shrink-0">
+            <!-- Needs Review Badge -->
+            <div
+              class="bg-[#FF6B00] border-2 my-4 border-black shadow-brutal p-4 flex items-center justify-between cursor-pointer hover:bg-[#e66000] rounded-sm"
+            >
+              <div class="flex flex-col text-white drop-shadow-md">
+                <span class="font-black text-xl italic tracking-tighter leading-none"
+                  >1 ISSUE</span
+                >
+                <span class="text-[10px] font-black uppercase tracking-widest mt-1"
+                  >Needs Review</span
+                >
+              </div>
+              <span class="material-symbols-outlined text-white text-3xl drop-shadow-md"
+                >rate_review</span
+              >
+            </div>
+
+            <div class="mt-auto flex flex-col gap-3">
+              <button
+                class="bg-yellow-300 hover:brightness-95 text-black w-full py-3 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-2 border-black shadow-brutal transition-all"
+              >
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                Review Results
+              </button>
+              <button
+                class="bg-blue-50 hover:bg-blue-100 text-blue-700 w-full py-3 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border-2 border-black shadow-brutal transition-all"
+              >
+                <span class="material-symbols-outlined text-sm">replay</span>
+                Retry Run
+              </button>
+            </div>
+
+            <h3
+              class="text-lg font-black uppercase border-b-4 border-black pb-2 tracking-tighter mt-4"
+            >
+              Job Statistics
+            </h3>
+            <div class="flex flex-col gap-4 mt-4">
+              <!-- Completed -->
+              <div
+                class="bg-white border-2 border-black shadow-brutal p-4 rounded-sm relative overflow-hidden"
+              >
+                <div class="flex justify-between items-start">
+                  <span class="font-bold text-xs text-gray-500 uppercase tracking-widest"
+                    >Completed</span
+                  >
+                  <span class="material-symbols-outlined text-[#00FF99] font-black"
+                    >check_circle</span
+                  >
+                </div>
+                <div class="mt-2 text-4xl font-black italic tracking-tighter">4</div>
+                <div
+                  class="w-full bg-gray-100 h-2 mt-3 border-2 border-black rounded-full overflow-hidden"
+                >
+                  <div class="bg-[#00FF99] h-full" style="width: 80%"></div>
+                </div>
+              </div>
+              <!-- Processing -->
+              <div class="bg-white border-2 border-black shadow-brutal p-4 rounded-sm">
+                <div class="flex justify-between items-start">
+                  <span class="font-bold text-xs text-gray-500 uppercase tracking-widest"
+                    >Processing</span
+                  >
+                  <span class="material-symbols-outlined text-[#FFD700]"
+                    >hourglass_top</span
+                  >
+                </div>
+                <div class="mt-2 text-4xl font-black italic tracking-tighter">0</div>
+              </div>
+              <!-- Failed -->
+              <div class="bg-white border-2 border-black shadow-brutal p-4 rounded-sm">
+                <div class="flex justify-between items-start">
+                  <span class="font-bold text-xs text-gray-500 uppercase tracking-widest"
+                    >Failed</span
+                  >
+                  <span class="material-symbols-outlined text-red-500">warning</span>
+                </div>
+                <div class="mt-2 text-4xl font-black italic tracking-tighter text-red-500">
+                  1
+                </div>
+              </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="flex flex-col gap-2 mt-4">
+              <h4
+                class="text-xs font-black uppercase tracking-widest text-gray-500 border-b-2 border-gray-200 pb-2"
+              >
+                Content Processed
+              </h4>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-xs font-bold text-gray-600">Words analyzed</span>
+                <span class="font-black text-sm">~41,160</span>
+              </div>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-xs font-bold text-gray-600">Fields extracted</span>
+                <span class="font-black text-sm">~1,575 words</span>
+              </div>
+            </div>
+
+            <!-- Timestamps -->
+            <div class="flex flex-col gap-2 mt-4">
+              <h4
+                class="text-xs font-black uppercase tracking-widest text-gray-500 border-b-2 border-gray-200 pb-2"
+              >
+                Timing
+              </h4>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-xs font-bold text-gray-600">Started</span>
+                <span class="font-bold text-xs">4/27/2026, 10:42:01 AM</span>
+              </div>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-xs font-bold text-gray-600">Finished</span>
+                <span class="font-bold text-xs">4/27/2026, 10:42:48 AM</span>
+              </div>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-xs font-bold text-gray-600">Duration</span>
+                <span class="font-black text-xs">47s</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
