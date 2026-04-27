@@ -274,6 +274,7 @@ services:
 volumes:
   postgres_data:
   minio_data:
+  redis_data:
   ollama1_data:
   ollama2_data:
   ollama3_data:
