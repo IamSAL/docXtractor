@@ -88,7 +88,14 @@ Key entities:
 
 **Auth pattern**: All routes are JWT-protected by default via global `AccessTokenGuard`. Use the `@Public()` decorator to make endpoints public. Global guards are applied in order: `ThrottlerGuard` → `AccessTokenGuard` → `RolesGuard`.
 
-**Database**: TypeORM with `synchronize: true` — entities auto-sync to PostgreSQL on restart. No migrations workflow needed for dev.
+**Database**: TypeORM with migrations. `synchronize` is OFF in all envs; `migrationsRun: true` auto-applies pending migrations on app boot. Workflow after editing any `*.entity.ts`:
+
+1. From `server/`, run: `DATABASE_URL=postgres://postgres:postgres@localhost:5433/docxtractor npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ./src/database/data-source.ts ./src/migrations/<ShortName>` (dev DB must be reachable on `localhost:5433`).
+2. Review the generated file in `server/src/migrations/`.
+3. Commit it alongside the entity change.
+4. Next app boot — local restart or fresh VPS deploy — applies it automatically.
+
+Fresh VPS first deploy: schema is built from migration files on container start; no manual SQL needed.
 
 **Swagger**: Available at `/api` (basic auth: `admin`/`admin`). JSON spec at `/api/swagger.json` (consumed by Orval).
 
