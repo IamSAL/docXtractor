@@ -32,38 +32,47 @@ services:
       timeout: 5s
       retries: 5
 
-  minio:
-    image: minio/minio:RELEASE.2024-01-18T22-51-28Z-cpuv1
-    container_name: docxtractor-minio
+  ollama1:
+    image: alpine/ollama:latest
+    container_name: docxtractor-ollama1
     restart: unless-stopped
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     volumes:
-      - minio_data:/data
-    command: server /data --console-address ":9001"
-    ports:
-      - "9000:9000"
+      - ollama1_data:/root/.ollama
+
     networks:
       - docxtractor-network
 
-  createbuckets:
-    image: minio/minio:RELEASE.2024-01-18T22-51-28Z-cpuv1
+  ollama2:
+    image: alpine/ollama:latest
+    container_name: docxtractor-ollama2
+    restart: unless-stopped
+    volumes:
+      - ollama2_data:/root/.ollama
+
+    networks:
+      - docxtractor-network
+
+  ollama3:
+    image: alpine/ollama:latest
+    container_name: docxtractor-ollama3
+    restart: unless-stopped
+    volumes:
+      - ollama3_data:/root/.ollama
+
+    networks:
+      - docxtractor-network
+
+  ollama-lb:
+    image: nginx:alpine
+    container_name: docxtractor-ollama-lb
+    restart: unless-stopped
+    volumes:
+      - ./infra/ollama-lb.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - minio
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
-    entrypoint: >
-      /bin/sh -c "
-      echo 'Waiting for MinIO...';
-      while ! /usr/bin/mc alias set local http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} > /dev/null 2>&1; do
-        sleep 2;
-      done;
-      /usr/bin/mc mb -p local/docxtractor-documents;
-      /usr/bin/mc anonymous set public local/docxtractor-documents;
-      exit 0;
-      "
+      - ollama1
+      - ollama2
+      - ollama3
+
     networks:
       - docxtractor-network
 
@@ -80,6 +89,13 @@ services:
       - CEREBRAS_API_KEY=${CEREBRAS_API_KEY}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - FREELLM_TOKEN_SECRET=${FREELLM_TOKEN_SECRET}
+      - GITHUB_MODELS_API_KEY=${GITHUB_MODELS_API_KEY}
+      - CLOUDFLARE_ACCOUNT_ID=${CLOUDFLARE_ACCOUNT_ID}
+      - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
+      - OLLAMA_BASE_URL=http://ollama-lb:11434
+      - OLLAMA_MODELS=gpt-oss:120b-cloud
+    depends_on:
+      - ollama-lb
     networks:
       - docxtractor-network
     healthcheck:
@@ -223,7 +239,9 @@ services:
 volumes:
   postgres_data:
   minio_data:
-  redis_data:
+  ollama1_data:
+  ollama2_data:
+  ollama3_data:
 
 networks:
   docxtractor-network:
