@@ -1356,18 +1356,17 @@ export class RunsService {
 
     await this.queueService.addBulk(QueueName.UPLOADED_DOCUMENTS, parseJobs);
 
-    const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
     // Refetch from DB to ensure WebSocket emits committed data
     const freshRun = await this.runRepo.findOne({
       where: { id: run.id },
       relations: ['extractor'],
     });
-    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
+    this.runsGateway.emitRunUpdated(run.id, freshRun || run);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: (freshRun || savedRun).status,
-      progress: (freshRun || savedRun).progress,
+      status: (freshRun || run).status,
+      progress: (freshRun || run).progress,
     });
 
     return run;
@@ -1577,6 +1576,7 @@ export class RunsService {
             ? 'langextract'
             : 'llm';
 
+        await this.runRepo.save(run);
         await this.queueService.addJob(
           QueueName.EXTRACTION_REQUESTS,
           'extract-data',
