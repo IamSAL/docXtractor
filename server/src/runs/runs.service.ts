@@ -308,9 +308,18 @@ export class RunsService {
 
     this.addLog(run, 'info', `Run started with ${sources.length} document(s)`);
 
-    // Send each source to parser via BullMQ
+    // Mark all sources as 'parsing' and persist BEFORE queuing any jobs.
+    // Without this, a fast worker can complete and push a parsed event while
+    // the DB still shows 'pending', causing the handler to drop the event.
     for (const source of run.sources) {
       source.status = 'parsing';
+    }
+    run.status = RunStatus.PARSING;
+    run.progress!.currentStep = 'parsing';
+    await this.runRepo.save(run);
+
+    // Now safe to queue — any completion event will find 'parsing' in DB
+    for (const source of run.sources) {
       this.addLog(run, 'info', `Queuing document '${source.name}' for parsing`);
       try {
         await this.queueService.addJob(
@@ -340,8 +349,6 @@ export class RunsService {
 
     this.addLog(run, 'info', 'All documents queued, parsing started');
 
-    run.status = RunStatus.PARSING;
-    run.progress!.currentStep = 'parsing';
     const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
 
