@@ -823,6 +823,9 @@ export class RunsService {
       };
 
       try {
+        // Persist extractionStatus = 'extracting' before the job enters the queue
+        // so the completion handler always sees the correct DB state.
+        await this.runRepo.save(run);
         await this.queueService.addJob(
           QueueName.EXTRACTION_REQUESTS,
           'extract-data',
