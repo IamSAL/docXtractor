@@ -1851,6 +1851,8 @@ export class RunsService {
             ? 'langextract'
             : 'llm';
 
+        await this.runRepo.save(run);
+
         // For unified mode, combine all source content into one job
         if (run.processingMode === ProcessingMode.UNIFIED) {
           const combinedMarkdown = run.sources
