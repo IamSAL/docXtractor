@@ -1326,8 +1326,7 @@ export class RunsService {
     await this.flushLogs(run.id);
 
     // Re-queue documents: increment retryGeneration per source so stale results
-    // from the previous attempt are rejected by handleDocumentParsed (Fix 6)
-    // Fix 7: bulk-queue all parse jobs at once
+    // from the previous attempt are rejected by handleDocumentParsed
     const parseJobs = run.sources.map((source) => {
       source.status = 'parsing';
       source.retryGeneration = (source.retryGeneration || 0) + 1;
@@ -1346,10 +1345,14 @@ export class RunsService {
       };
     });
 
-    await this.queueService.addBulk(QueueName.UPLOADED_DOCUMENTS, parseJobs);
-
+    // Persist 'parsing' status BEFORE bulk-queuing so any fast completion
+    // event finds the correct DB state.
     run.status = RunStatus.PARSING;
     run.progress.currentStep = 'parsing';
+    await this.runRepo.save(run);
+
+    await this.queueService.addBulk(QueueName.UPLOADED_DOCUMENTS, parseJobs);
+
     const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
     // Refetch from DB to ensure WebSocket emits committed data
