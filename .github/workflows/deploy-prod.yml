@@ -119,7 +119,7 @@ jobs:
 
             # Verify critical services are running
             # Fixed-name containers
-            for container in docxtractor-server docxtractor-client docxtractor-db docxtractor-redis docxtractor-minio docxtractor-freellm docxtractor-extractor; do
+            for container in docxtractor-server docxtractor-client docxtractor-db docxtractor-redis docxtractor-minio docxtractor-extractor; do
               if ! docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
                 echo "ERROR: ${container} is not running!"
                 docker logs "${container}" --tail 30 2>&1 || true

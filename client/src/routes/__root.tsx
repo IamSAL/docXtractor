@@ -56,10 +56,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
         <link rel="stylesheet" href={appCss} />
 
-        {/* <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
-        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script> */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&amp;display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+          rel="stylesheet"
+        />
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
       </head>
       <body className="bg-background-cream min-h-screen  flex text-black light">
         <NiceModal.Provider>{children}</NiceModal.Provider>

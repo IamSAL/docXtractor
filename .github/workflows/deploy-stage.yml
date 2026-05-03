@@ -116,7 +116,7 @@ jobs:
             sleep 15
 
             # Verify critical services are running
-            for container in docxtractor-stage-server docxtractor-stage-client docxtractor-stage-db docxtractor-stage-redis docxtractor-stage-minio docxtractor-stage-freellm docxtractor-stage-extractor docxtractor-stage-parser; do
+            for container in docxtractor-stage-server docxtractor-stage-client docxtractor-stage-db docxtractor-stage-redis docxtractor-stage-minio docxtractor-stage-extractor docxtractor-stage-parser; do
               if ! docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
                 echo "ERROR: ${container} is not running!"
                 docker logs "${container}" --tail 30 2>&1 || true
