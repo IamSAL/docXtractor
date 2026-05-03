@@ -38,6 +38,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
     links: [
       {
+        rel: "stylesheet",
+        href: appCss,
+      },
+      {
         rel: "icon",
         href: "/logo.svg",
       },
@@ -52,7 +56,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" className="light">
       <head>
         <HeadContent />
-        <link rel="stylesheet" href={appCss} />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap"
           rel="stylesheet"
@@ -68,7 +71,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body
         className="bg-background-cream min-h-screen  flex text-black light "
-        style={{ opacity: 0 }}
+        // style={{ opacity: 0 }}
       >
         <NiceModal.Provider>{children}</NiceModal.Provider>
         {import.meta.env.DEV && (
