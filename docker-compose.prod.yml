@@ -93,7 +93,7 @@ services:
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET}
       - FRONTEND_URL=${FRONTEND_URL:-https://docxtractor.sk-salman.com}
-      - FREELLM_BASE_URL=https://freellm.sk-salman.com/v1
+      - FREELLM_BASE_URL=${FREELLM_BASE_URL}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - SWAGGER_USER=${SWAGGER_USER:-admin}
@@ -188,7 +188,7 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=docxtractor-documents
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - FREELLM_BASE_URL=https://freellm.sk-salman.com/v1
+      - FREELLM_BASE_URL=${FREELLM_BASE_URL}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - EXTRACTION_CONCURRENCY=${EXTRACTION_CONCURRENCY:-3}
@@ -203,6 +203,9 @@ volumes:
   postgres_data:
   minio_data:
   redis_data:
+  ollama1_data:
+  ollama2_data:
+  ollama3_data:
 
 networks:
   docxtractor-network:

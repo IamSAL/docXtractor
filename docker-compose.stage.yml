@@ -94,7 +94,7 @@ services:
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET}
       - FRONTEND_URL=${FRONTEND_URL:-https://docxtractor-stage.sk-salman.com}
-      - FREELLM_BASE_URL=https://freellm.sk-salman.com/v1
+      - FREELLM_BASE_URL=${FREELLM_BASE_URL}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - LLM_EXTRACTION_MODEL=${LLM_EXTRACTION_MODEL}
@@ -191,7 +191,7 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=docxtractor-documents
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - FREELLM_BASE_URL=https://freellm.sk-salman.com/v1
+      - FREELLM_BASE_URL=${FREELLM_BASE_URL}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - EXTRACTION_CONCURRENCY=${EXTRACTION_CONCURRENCY:-3}
