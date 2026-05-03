@@ -308,9 +308,18 @@ export class RunsService {
 
     this.addLog(run, 'info', `Run started with ${sources.length} document(s)`);
 
-    // Send each source to parser via BullMQ
+    // Mark all sources as 'parsing' and persist BEFORE queuing any jobs.
+    // Without this, a fast worker can complete and push a parsed event while
+    // the DB still shows 'pending', causing the handler to drop the event.
     for (const source of run.sources) {
       source.status = 'parsing';
+    }
+    run.status = RunStatus.PARSING;
+    run.progress!.currentStep = 'parsing';
+    await this.runRepo.save(run);
+
+    // Now safe to queue — any completion event will find 'parsing' in DB
+    for (const source of run.sources) {
       this.addLog(run, 'info', `Queuing document '${source.name}' for parsing`);
       try {
         await this.queueService.addJob(
@@ -340,8 +349,6 @@ export class RunsService {
 
     this.addLog(run, 'info', 'All documents queued, parsing started');
 
-    run.status = RunStatus.PARSING;
-    run.progress!.currentStep = 'parsing';
     const savedRun = await this.runRepo.save(run);
     await this.flushLogs(run.id);
 
@@ -816,6 +823,9 @@ export class RunsService {
       };
 
       try {
+        // Persist extractionStatus = 'extracting' before the job enters the queue
+        // so the completion handler always sees the correct DB state.
+        await this.runRepo.save(run);
         await this.queueService.addJob(
           QueueName.EXTRACTION_REQUESTS,
           'extract-data',
@@ -1319,8 +1329,7 @@ export class RunsService {
     await this.flushLogs(run.id);
 
     // Re-queue documents: increment retryGeneration per source so stale results
-    // from the previous attempt are rejected by handleDocumentParsed (Fix 6)
-    // Fix 7: bulk-queue all parse jobs at once
+    // from the previous attempt are rejected by handleDocumentParsed
     const parseJobs = run.sources.map((source) => {
       source.status = 'parsing';
       source.retryGeneration = (source.retryGeneration || 0) + 1;
@@ -1339,22 +1348,25 @@ export class RunsService {
       };
     });
 
-    await this.queueService.addBulk(QueueName.UPLOADED_DOCUMENTS, parseJobs);
-
+    // Persist 'parsing' status BEFORE bulk-queuing so any fast completion
+    // event finds the correct DB state.
     run.status = RunStatus.PARSING;
     run.progress.currentStep = 'parsing';
-    const savedRun = await this.runRepo.save(run);
+    await this.runRepo.save(run);
+
+    await this.queueService.addBulk(QueueName.UPLOADED_DOCUMENTS, parseJobs);
+
     await this.flushLogs(run.id);
     // Refetch from DB to ensure WebSocket emits committed data
     const freshRun = await this.runRepo.findOne({
       where: { id: run.id },
       relations: ['extractor'],
     });
-    this.runsGateway.emitRunUpdated(run.id, freshRun || savedRun);
+    this.runsGateway.emitRunUpdated(run.id, freshRun || run);
     this.runsGateway.emitRunsListUpdated({
       runId: run.id,
-      status: (freshRun || savedRun).status,
-      progress: (freshRun || savedRun).progress,
+      status: (freshRun || run).status,
+      progress: (freshRun || run).progress,
     });
 
     return run;
@@ -1564,6 +1576,7 @@ export class RunsService {
             ? 'langextract'
             : 'llm';
 
+        await this.runRepo.save(run);
         await this.queueService.addJob(
           QueueName.EXTRACTION_REQUESTS,
           'extract-data',
@@ -1837,6 +1850,8 @@ export class RunsService {
           run.extractionProvider === ExtractionProvider.LANGEXTRACT
             ? 'langextract'
             : 'llm';
+
+        await this.runRepo.save(run);
 
         // For unified mode, combine all source content into one job
         if (run.processingMode === ProcessingMode.UNIFIED) {

@@ -68,76 +68,6 @@ services:
     networks:
       - docxtractor-stage-network
 
-  ollama1:
-    image: alpine/ollama:latest
-    container_name: docxtractor-stage-ollama1
-    restart: unless-stopped
-    volumes:
-      - ollama1_data:/root/.ollama
-    ports:
-      - "11434:11434"
-    networks:
-      - docxtractor-stage-network
-
-  ollama2:
-    image: alpine/ollama:latest
-    container_name: docxtractor-stage-ollama2
-    restart: unless-stopped
-    volumes:
-      - ollama2_data:/root/.ollama
-    ports:
-      - "11435:11434"
-    networks:
-      - docxtractor-stage-network
-
-  ollama3:
-    image: alpine/ollama:latest
-    container_name: docxtractor-stage-ollama3
-    restart: unless-stopped
-    volumes:
-      - ollama3_data:/root/.ollama
-    ports:
-      - "11436:11434"
-    networks:
-      - docxtractor-stage-network
-
-  ollama-lb:
-    image: nginx:alpine
-    container_name: docxtractor-stage-ollama-lb
-    restart: unless-stopped
-    volumes:
-      - ./infra/ollama-lb.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - ollama1
-      - ollama2
-      - ollama3
-    networks:
-      - docxtractor-stage-network
-
-  freellm:
-    image: ghcr.io/devansh-365/freellm:latest
-    container_name: docxtractor-stage-freellm
-    restart: unless-stopped
-    ports:
-      - "4002:3000"
-    environment:
-      - GROQ_API_KEY=${GROQ_API_KEY}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
-      - CEREBRAS_API_KEY=${CEREBRAS_API_KEY}
-      - FREELLM_API_KEY=${FREELLM_API_KEY}
-      - FREELLM_TOKEN_SECRET=${FREELLM_TOKEN_SECRET}
-      - OLLAMA_BASE_URL=http://ollama-lb:11434
-      - OLLAMA_MODELS=gpt-oss:120b-cloud
-    depends_on:
-      - ollama-lb
-    networks:
-      - docxtractor-stage-network
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/v1/models"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
   server:
     image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-server:latest
     build:
@@ -164,11 +94,10 @@ services:
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET}
       - FRONTEND_URL=${FRONTEND_URL:-https://docxtractor-stage.sk-salman.com}
-      - FREELLM_BASE_URL=http://docxtractor-stage-freellm:3000/v1
+      - FREELLM_BASE_URL=${FREELLM_BASE_URL}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - LLM_EXTRACTION_MODEL=${LLM_EXTRACTION_MODEL}
-      - OLLAMA_BASE_URL=http://ollama-lb:11434
       - SWAGGER_USER=${SWAGGER_USER:-admin}
       - SWAGGER_PASS=${SWAGGER_PASS:-admin}
       - THROTTLER_TTL=${THROTTLER_TTL:-60000}
@@ -262,7 +191,7 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=docxtractor-documents
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - FREELLM_BASE_URL=http://docxtractor-stage-freellm:3000/v1
+      - FREELLM_BASE_URL=${FREELLM_BASE_URL}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - EXTRACTION_CONCURRENCY=${EXTRACTION_CONCURRENCY:-3}
@@ -277,9 +206,6 @@ volumes:
   stage_postgres_data:
   stage_minio_data:
   stage_redis_data:
-  ollama1_data:
-  ollama2_data:
-  ollama3_data:
 
 networks:
   docxtractor-stage-network:

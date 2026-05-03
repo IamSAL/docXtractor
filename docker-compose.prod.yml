@@ -67,78 +67,6 @@ services:
     networks:
       - docxtractor-network
 
-  ollama1:
-    image: alpine/ollama:latest
-    container_name: docxtractor-ollama1
-    restart: unless-stopped
-    volumes:
-      - ollama1_data:/root/.ollama
-
-    networks:
-      - docxtractor-network
-
-  ollama2:
-    image: alpine/ollama:latest
-    container_name: docxtractor-ollama2
-    restart: unless-stopped
-    volumes:
-      - ollama2_data:/root/.ollama
-
-    networks:
-      - docxtractor-network
-
-  ollama3:
-    image: alpine/ollama:latest
-    container_name: docxtractor-ollama3
-    restart: unless-stopped
-    volumes:
-      - ollama3_data:/root/.ollama
-
-    networks:
-      - docxtractor-network
-
-  ollama-lb:
-    image: nginx:alpine
-    container_name: docxtractor-ollama-lb
-    restart: unless-stopped
-    volumes:
-      - ./infra/ollama-lb.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - ollama1
-      - ollama2
-      - ollama3
-
-    networks:
-      - docxtractor-network
-
-  freellm:
-    image: ghcr.io/devansh-365/freellm:latest
-    container_name: docxtractor-freellm
-    restart: unless-stopped
-    ports:
-      - "3002:3000"
-    environment:
-      - GROQ_API_KEY=${GROQ_API_KEY}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
-      - CEREBRAS_API_KEY=${CEREBRAS_API_KEY}
-      - FREELLM_API_KEY=${FREELLM_API_KEY}
-      - FREELLM_TOKEN_SECRET=${FREELLM_TOKEN_SECRET}
-      - GITHUB_MODELS_API_KEY=${GITHUB_MODELS_API_KEY}
-      - CLOUDFLARE_ACCOUNT_ID=${CLOUDFLARE_ACCOUNT_ID}
-      - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
-      - OLLAMA_BASE_URL=http://ollama-lb:11434
-      - OLLAMA_MODELS=gpt-oss:120b-cloud
-    depends_on:
-      - ollama-lb
-    networks:
-      - docxtractor-network
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/v1/models"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-
   server:
     image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-server:latest
     build:
@@ -165,7 +93,7 @@ services:
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_RESET_SECRET=${JWT_RESET_SECRET}
       - FRONTEND_URL=${FRONTEND_URL:-https://docxtractor.sk-salman.com}
-      - FREELLM_BASE_URL=http://freellm:3000/v1
+      - FREELLM_BASE_URL=${FREELLM_BASE_URL}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - SWAGGER_USER=${SWAGGER_USER:-admin}
@@ -260,7 +188,7 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=docxtractor-documents
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - FREELLM_BASE_URL=http://freellm:3000/v1
+      - FREELLM_BASE_URL=${FREELLM_BASE_URL}
       - FREELLM_API_KEY=${FREELLM_API_KEY}
       - LLM_DEFAULT_MODEL=${LLM_DEFAULT_MODEL:-free}
       - EXTRACTION_CONCURRENCY=${EXTRACTION_CONCURRENCY:-3}
