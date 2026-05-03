@@ -13,7 +13,7 @@
   -moz-osx-font-smoothing: grayscale;
 } */
 body {
-  transition: opacity ease-in-out 0.5s;
+  transition: opacity ease-in-out 0.2s;
   opacity: 1 !important;
 }
 @theme {
