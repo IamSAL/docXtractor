@@ -52,7 +52,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" className="light">
       <head>
         <HeadContent />
-        {/* <link rel="stylesheet" href={appCss} /> */}
+        <link rel="stylesheet" href={appCss} />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap"
           rel="stylesheet"
@@ -66,7 +66,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           rel="stylesheet"
         />
       </head>
-      <body className="bg-background-cream min-h-screen  flex text-black light">
+      <body
+        className="bg-background-cream min-h-screen  flex text-black light "
+        style={{ opacity: 0 }}
+      >
         <NiceModal.Provider>{children}</NiceModal.Provider>
         {import.meta.env.DEV && (
           <TanStackDevtools
