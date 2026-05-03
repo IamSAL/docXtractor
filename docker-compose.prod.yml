@@ -126,7 +126,7 @@ services:
     container_name: docxtractor-client
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3300:3000"
     environment:
       - NODE_ENV=production
       - NITRO_PORT=3000
