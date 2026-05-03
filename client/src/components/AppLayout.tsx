@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth'
 export function AppLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(
-        () => localStorage.getItem('sidebar-collapsed') === 'true'
+        () => typeof window !== 'undefined' && localStorage.getItem('sidebar-collapsed') === 'true'
     )
     const { user } = useAuth()
 

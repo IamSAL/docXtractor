@@ -15,6 +15,7 @@ const STEPS = [
 ] as const;
 
 function getOrCreateFingerprint(): string {
+	if (typeof window === 'undefined') return '';
 	const stored = localStorage.getItem("demo_fp");
 	if (stored) return stored;
 	const fp = crypto.randomUUID();

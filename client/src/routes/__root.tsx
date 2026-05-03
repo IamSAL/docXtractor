@@ -43,10 +43,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         rel: "icon",
         href: "/logo.svg",
       },
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
     ],
   }),
 
@@ -58,6 +54,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" className="light">
       <head>
         <HeadContent />
+        <link rel="stylesheet" href={appCss} />
 
         {/* <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet" />
