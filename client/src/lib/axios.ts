@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/lib/auth-store";
-import { cookieStorage } from "./cookie-storage";
 
 const SERVER_URL =
   import.meta.env.VITE_API_URL ||
@@ -13,7 +12,6 @@ export const AXIOS_INSTANCE = axios.create({
 });
 
 AXIOS_INSTANCE.interceptors.request.use((config) => {
-  // If we are refreshing the token, attach the refresh token
   if (config.url?.includes("/auth/refresh")) {
     const refreshToken = useAuthStore.getState().refreshToken;
     if (refreshToken) {
@@ -29,17 +27,33 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
   return config;
 });
 
+// Single in-flight refresh promise shared across all concurrent 401s
+let refreshPromise: Promise<string | null> | null = null;
+
+function refreshOnce(): Promise<string | null> {
+  if (!refreshPromise) {
+    refreshPromise = useAuthStore
+      .getState()
+      .refreshAccessToken()
+      .then(() => useAuthStore.getState().accessToken)
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
 AXIOS_INSTANCE.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle 401 errors (Unauthorized) — skip auth endpoints so login/setup
-    // failures return the real server error instead of "No refresh token available"
     const isAuthEndpoint =
       originalRequest.url?.includes("/auth/login") ||
       originalRequest.url?.includes("/auth/admin-setup") ||
-      originalRequest.url?.includes("/auth/signup");
+      originalRequest.url?.includes("/auth/signup") ||
+      originalRequest.url?.includes("/auth/refresh");
+
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -48,55 +62,17 @@ AXIOS_INSTANCE.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // Attempt to refresh the access token
-        await useAuthStore.getState().refreshAccessToken();
-        const newToken = useAuthStore.getState().accessToken;
-
-        if (newToken) {
-          // Update the authorization header with the new token
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          // Retry the original request
-          return AXIOS_INSTANCE(originalRequest);
-        }
-      } catch (refreshError: any) {
-        // Only logout if refresh token is also invalid
-        // This prevents logout on network errors
+        const token = await refreshOnce();
+        if (!token) throw new Error("No token after refresh");
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return AXIOS_INSTANCE(originalRequest);
+      } catch (refreshError) {
+        useAuthStore.getState().logout();
         if (
-          refreshError?.response?.status === 401 ||
-          refreshError?.response?.status === 403
+          typeof window !== "undefined" &&
+          !window.location.pathname.startsWith("/login")
         ) {
-          console.error("Refresh token expired or invalid. Logging out...");
-
-          // Final check: did another tab refresh it while we were trying?
-          const storedValue = cookieStorage.getItem("auth-storage");
-          const resolvedValue =
-            storedValue instanceof Promise ? await storedValue : storedValue;
-          if (resolvedValue) {
-            try {
-              const parsed = JSON.parse(resolvedValue);
-              if (
-                parsed.state?.accessToken &&
-                parsed.state.accessToken !== useAuthStore.getState().accessToken
-              ) {
-                // Yes! Someone else fixed it. Don't logout.
-                originalRequest.headers.Authorization = `Bearer ${parsed.state.accessToken}`;
-                return AXIOS_INSTANCE(originalRequest);
-              }
-            } catch (e) {}
-          }
-
-          // logout() already clears query cache and disconnects socket
-          useAuthStore.getState().logout();
-
-          // Redirect to login page
-          if (typeof window !== "undefined") {
-            window.location.href = "/login";
-          }
-        } else {
-          console.error(
-            "Token refresh failed due to network or server error:",
-            refreshError,
-          );
+          window.location.href = "/login";
         }
         return Promise.reject(refreshError);
       }

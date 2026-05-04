@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuthStore } from "@/lib/auth-store";
-import { useTokenRefresh } from "@/hooks/useAuth";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -16,9 +15,6 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, isHydrated } = useAuthStore();
   const navigate = useNavigate();
-
-  // Enable automatic token refresh
-  useTokenRefresh();
 
   useEffect(() => {
     // Only check auth after hydration is complete

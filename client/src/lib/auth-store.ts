@@ -204,94 +204,29 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           error: null,
         });
-        // Disconnect socket on logout
         disconnectSocket();
-        // Clear query cache to prevent stale data from previous session
         _clearQueryCache?.();
       },
 
-      // Refresh access token
+      // Refresh access token — throws on failure; interceptor handles logout
       refreshAccessToken: async () => {
-        // First check if another tab already refreshed the token
-        // Use cookieStorage directly for the freshest possible data
-        const storedValue = cookieStorage.getItem("auth-storage");
-
-        // Handle potential Promise from getItem (though our implementation is sync)
-        const resolvedValue =
-          storedValue instanceof Promise ? await storedValue : storedValue;
-
-        if (resolvedValue) {
-          try {
-            const parsed = JSON.parse(resolvedValue);
-            if (
-              parsed.state?.refreshToken &&
-              parsed.state.refreshToken !== get().refreshToken
-            ) {
-              set({
-                accessToken: parsed.state.accessToken,
-                refreshToken: parsed.state.refreshToken,
-                user: parsed.state.user || get().user,
-                isAuthenticated:
-                  parsed.state.isAuthenticated ?? get().isAuthenticated,
-              });
-              return;
-            }
-          } catch (e) {
-            console.error("Failed to parse auth storage during refresh", e);
-          }
-        }
-
         const { refreshToken } = get();
-        if (!refreshToken) {
-          throw new Error("No refresh token available");
-        }
+        if (!refreshToken) throw new Error("No refresh token");
 
-        try {
-          const response = await authApi.authControllerRefreshToken({
-            refreshToken,
-          });
-          const successResponse = response as unknown as {
+        const response = await authApi.authControllerRefreshToken({
+          refreshToken,
+        });
+        const { accessToken, refreshToken: newRefreshToken } = (
+          response as unknown as {
             data: { accessToken: string; refreshToken: string };
-          };
-          const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-            successResponse.data;
-
-          set({
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-          });
-        } catch (error) {
-          // Double check if it's already refreshed by another tab even if we failed
-          const latestValue = cookieStorage.getItem("auth-storage");
-          const resolvedLatest =
-            latestValue instanceof Promise ? await latestValue : latestValue;
-
-          if (resolvedLatest) {
-            try {
-              const parsed = JSON.parse(resolvedLatest);
-              if (
-                parsed.state?.refreshToken &&
-                parsed.state.refreshToken !== refreshToken
-              ) {
-                set({
-                  accessToken: parsed.state.accessToken,
-                  refreshToken: parsed.state.refreshToken,
-                });
-                return;
-              }
-            } catch (e) {}
           }
+        ).data;
 
-          get().logout();
-          throw error;
-        }
+        set({ accessToken, refreshToken: newRefreshToken });
       },
 
       // Clear error
       clearError: () => set({ error: null }),
-
-      // Set loading
-      setLoading: (loading: boolean) => set({ isLoading: loading }),
 
       // Hydration state
       isHydrated: false,
@@ -308,23 +243,18 @@ export const useAuthStore = create<AuthState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          // Validate rehydrated auth state
           if (state.isAuthenticated) {
-            // Missing essential data — clear immediately
-            if (!state.accessToken || !state.refreshToken || !state.user) {
+            // Clear if essential data missing or refresh token expired
+            if (
+              !state.accessToken ||
+              !state.refreshToken ||
+              !state.user ||
+              isTokenExpired(state.refreshToken)
+            ) {
               state.logout();
             }
-            // Access token expired — try refresh, or clear if refresh token is also expired
-            else if (isTokenExpired(state.accessToken)) {
-              if (isTokenExpired(state.refreshToken)) {
-                state.logout();
-              } else {
-                // Access token expired but refresh token still valid — trigger refresh
-                state.refreshAccessToken().catch(() => {
-                  state.logout();
-                });
-              }
-            }
+            // If access token expired but refresh token valid, leave state as-is.
+            // The axios interceptor will refresh lazily on the first 401.
           }
           state.setHydrated(true);
         }
