@@ -9,6 +9,7 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import * as basicAuth from 'express-basic-auth';
 import { TimeoutInterceptor } from './timeout-intercepter';
+import { LoggingInterceptor } from './logging.interceptor';
 import * as compression from 'compression';
 
 async function bootstrap() {
@@ -63,7 +64,10 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
-  app.useGlobalInterceptors(new TimeoutInterceptor(300000));
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new TimeoutInterceptor(300000),
+  );
 
   // Swagger configuration
   const config = new DocumentBuilder()
