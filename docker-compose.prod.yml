@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:7432:5432"
     networks:
       - docxtractor-network
     healthcheck:
