@@ -82,7 +82,7 @@ function LoginComponent() {
 
   const handleGoogleLogin = () => {
     // Redirect to Google OAuth endpoint
-    window.location.href = `${import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:3001`}/auth/google`;
+    window.location.href = `${import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:3002`}/auth/google`;
   };
 
   return (

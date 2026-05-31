@@ -1,0 +1,24 @@
+services:
+  db:
+    container_name: !reset null
+    ports: !reset []
+
+  redis:
+    container_name: !reset null
+    ports: !reset []
+
+  server:
+    container_name: !reset null
+    ports: !reset []
+
+  client:
+    container_name: !reset null
+    ports: !reset []
+
+  minio:
+    container_name: !reset null
+    ports: !reset []
+
+  extraction-service:
+    container_name: !reset null
+    ports: !reset []

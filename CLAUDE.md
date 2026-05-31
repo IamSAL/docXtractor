@@ -138,17 +138,35 @@ Queue names are defined in `server/src/shared/queue/queue-names.ts`. NestJS cons
 
 ### Infrastructure Ports
 
-| Service            | Port |
-| ------------------ | ---- |
-| React Client       | 5174 |
-| NestJS API         | 3001 |
-| PostgreSQL         | 5433 |
-| Redis (BullMQ)     | 6380 |
-| MinIO API          | 9005 |
-| MinIO Console      | 9006 |
-| Parser Service     | 8001 |
-| Extraction Service | 8002 |
-| FreeLLM            | 3002 |
+| Service            | Port                              |
+| ------------------ | --------------------------------- |
+| React Client       | 5174                              |
+| NestJS API         | 3002 (dev host) / 3001 (prod host, container always 3001) |
+| PostgreSQL         | 5433                              |
+| Redis (BullMQ)     | 6380                              |
+| MinIO API          | 9005                              |
+| MinIO Console      | 9006                              |
+| Parser Service     | 8001                              |
+| Extraction Service | 8002                              |
+| FreeLLM            | 3002 (internal container)         |
+
+Dev uses host port 3002 for NestJS; prod still uses 3001. The two stacks no longer collide.
+
+## Agent Runbook
+
+**Never run `docker compose up` (without the agent override) from an agent worktree.** The default `docker-compose.yml` binds to host ports that conflict with the shared preview stack. Use one of the following instead:
+
+- **Integration tests in an agent worktree**: `scripts/agent-test.sh` — spins up an isolated stack with no host ports (uses `docker-compose.agent.yml` override), runs lint + tests, tears down on exit.
+- **Lint/unit tests only (no containers)**: `pnpm run lint` and `pnpm run test` directly inside `server/` or `client/` when containers are not needed.
+
+## Preview Stack Lifecycle
+
+The shared dev preview runs from the `main` worktree at `docxtractor-preview.sk-salman.com`.
+
+- Bring up: `scripts/preview-up.sh`
+- Tear down: `scripts/preview-down.sh`
+- nginx config: `infra/nginx-preview.conf` (DevOps maintains the `/etc/nginx/sites-enabled/` symlink)
+- Cloudflare tunnel handles TLS; no certs in the nginx config.
 
 ## Development Patterns
 
