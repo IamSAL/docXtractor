@@ -9,7 +9,7 @@ RUN npm install -g pnpm@${PNPM_VERSION}
 WORKDIR /app
 
 # Copy package files and install dependencies
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml .npmrc ./
 RUN --mount=type=cache,id=pnpm-client,target=/pnpm/store pnpm install --frozen-lockfile --store-dir /pnpm/store
 
 # Copy source code
