@@ -116,6 +116,9 @@ services:
         condition: service_completed_successfully
     networks:
       - docxtractor-network
+    mem_limit: 2g
+    mem_reservation: 512m
+    cpus: 1.5
 
   client:
     image: ghcr.io/${GHCR_OWNER:-iamsal}/docxtractor-client:latest
@@ -168,6 +171,9 @@ services:
       - OMP_NUM_THREADS=2
     networks:
       - docxtractor-network
+    mem_limit: 4g
+    mem_reservation: 1g
+    cpus: 2.0
     command: uvicorn src.main:app --host 0.0.0.0 --port 8001
 
   extraction-service:
