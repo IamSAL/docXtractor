@@ -4,6 +4,8 @@ ARG PNPM_VERSION=10.11.0
 # Use Node.js Alpine as base image
 FROM node:${NODE_VERSION}-alpine
 
+ARG PNPM_VERSION
+
 # Install pnpm globally
 RUN npm install -g pnpm@${PNPM_VERSION}
 
@@ -11,7 +13,7 @@ RUN npm install -g pnpm@${PNPM_VERSION}
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Install dependencies
 RUN pnpm config set store-dir /pnpm/store
