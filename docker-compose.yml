@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: docxtractor
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     command: redis-server --port 6380
     ports:
-      - "6381:6380"
+      - "127.0.0.1:6381:6380"
     networks:
       - docxtractor-network
     healthcheck:
@@ -41,7 +41,7 @@ services:
     container_name: docxtractor-server
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3002:3001"
     env_file:
       - path: ./server/.env
         required: false
@@ -88,9 +88,10 @@ services:
     container_name: docxtractor-client
     restart: unless-stopped
     ports:
-      - "5174:5173"
+      - "127.0.0.1:5174:5173"
     environment:
       - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3002
     env_file:
       - path: ./client/.env.local
         required: false
@@ -107,8 +108,8 @@ services:
     image: minio/minio
     container_name: docxtractor-minio
     ports:
-      - "9005:9000"
-      - "9006:9001"
+      - "127.0.0.1:9005:9000"
+      - "127.0.0.1:9006:9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
