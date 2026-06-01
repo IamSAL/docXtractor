@@ -10,8 +10,7 @@ WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm config set store-dir /pnpm/store
-RUN --mount=type=cache,id=pnpm-client,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm-client,target=/pnpm/store pnpm install --frozen-lockfile --store-dir /pnpm/store
 
 # Copy source code
 COPY . .
