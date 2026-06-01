@@ -154,17 +154,24 @@ Dev uses host port 3002 for NestJS; prod still uses 3001. The two stacks no long
 
 ## Agent Runbook
 
-**Never run `docker compose up` (without the agent override) from an agent worktree.** The default `docker-compose.yml` binds to host ports that conflict with the shared preview stack. Use one of the following instead:
+**Never run `docker compose up` (without the agent override) from an agent worktree.** The default `docker-compose.yml` binds to host ports that conflict with the shared staging stack. Use one of the following instead:
 
 - **Integration tests in an agent worktree**: `scripts/agent-test.sh` — spins up an isolated stack with no host ports (uses `docker-compose.agent.yml` override), runs lint + tests, tears down on exit.
 - **Lint/unit tests only (no containers)**: `pnpm run lint` and `pnpm run test` directly inside `server/` or `client/` when containers are not needed.
 
-## Preview Stack Lifecycle
+## Agent Branch Policy
 
-The shared dev preview runs from the `main` worktree at `docxtractor-preview.sk-salman.com`.
+**Agents must target `stage`, never `main`.** PRs to `main` deploy to production.
 
-- Bring up: `scripts/preview-up.sh`
-- Tear down: `scripts/preview-down.sh`
+- Branch off `stage`: `git checkout -b agent/<short-description> origin/stage`
+- Open PRs against `stage`
+- Merging to `stage` triggers `deploy-stage.yml` → auto-deploys to `https://docxtractor-stage.sk-salman.com`
+
+## Staging Stack Lifecycle
+
+The shared staging environment runs at `https://docxtractor-stage.sk-salman.com` (VPS: `/home/ubuntu/stage_docxtractor`).
+
+- Managed by `deploy-stage.yml` on every push to `stage`
 - nginx config: `infra/nginx-preview.conf` (DevOps maintains the `/etc/nginx/sites-enabled/` symlink)
 - Cloudflare tunnel handles TLS; no certs in the nginx config.
 
