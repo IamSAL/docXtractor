@@ -91,6 +91,15 @@
     "ts-node": "^10.9.2",
     "ts-loader": "^9.5.2"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@scarf/scarf",
+      "@swc/core",
+      "bcrypt",
+      "msgpackr-extract"
+    ]
+  },
   "jest": {
     "moduleFileExtensions": [
       "js",

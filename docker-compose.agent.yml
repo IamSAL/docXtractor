@@ -1,0 +1,18 @@
+services:
+  db:
+    ports: !reset []
+
+  redis:
+    ports: !reset []
+
+  server:
+    ports: !reset []
+
+  client:
+    ports: !reset []
+
+  minio:
+    ports: !reset []
+
+  extraction-service:
+    ports: !reset []

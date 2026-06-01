@@ -4,8 +4,8 @@ import { useAuthStore } from "@/lib/auth-store";
 const SERVER_URL =
   import.meta.env.VITE_API_URL ||
   (typeof window !== "undefined"
-    ? `${window.location.protocol}//${window.location.hostname}:3001`
-    : "http://localhost:3001");
+    ? `${window.location.protocol}//${window.location.hostname}:3002`
+    : "http://localhost:3002");
 
 export const AXIOS_INSTANCE = axios.create({
   baseURL: SERVER_URL,
