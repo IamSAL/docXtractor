@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { cookieStorage } from "./cookie-storage";
 import * as authApi from "@/api/endpoints/auth/auth";
 import type { UserResponseDto } from "@/api/models";
-import { disconnectSocket } from "./socket";
+import { disconnectSocket, setTokenRefresher } from "./socket";
 
 // Callback to clear query cache on logout, set by root-provider to avoid circular deps
 let _clearQueryCache: (() => void) | null = null;
@@ -332,3 +332,7 @@ export const useAuthStore = create<AuthState>()(
     },
   ),
 );
+
+// Wire the socket token-refresher. auth-store already imports from socket.ts (disconnectSocket),
+// so socket.ts cannot import back — we inject the callback here instead.
+setTokenRefresher(() => useAuthStore.getState().refreshAccessToken());

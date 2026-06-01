@@ -75,11 +75,13 @@ function RunsComponent() {
 
     socket.on("runs:list:updated", handleRunsListUpdated);
     socket.io.on("reconnect", handleReconnect);
+    socket.on("connect", handleReconnect);
 
     return () => {
       socket.emit("leaveRunsList");
       socket.off("runs:list:updated", handleRunsListUpdated);
       socket.io.off("reconnect", handleReconnect);
+      socket.off("connect", handleReconnect);
     };
   }, [queryClient]);
 

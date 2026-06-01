@@ -12,6 +12,12 @@ const SERVER_URL =
 
 let socket: Socket | null = null;
 
+// Injected by auth-store.ts to avoid a circular import (auth-store imports disconnectSocket from here)
+let _refreshAccessToken: (() => Promise<void>) | null = null;
+export const setTokenRefresher = (fn: () => Promise<void>) => {
+  _refreshAccessToken = fn;
+};
+
 const getTokenFromCookie = (): string | undefined => {
   try {
     const raw = cookieStorage.getItem("auth-storage");
@@ -47,12 +53,36 @@ export const getSocket = (token?: string): Socket => {
     console.log("Socket scheduled connection established", socket?.id);
   });
 
-  socket.on("disconnect", () => {
-    console.log("Socket disconnected");
+  socket.on("disconnect", (reason) => {
+    console.log("Socket disconnected", reason);
+    // "io server disconnect" means the server explicitly closed the connection (e.g. expired token).
+    // Socket.IO will NOT auto-reconnect in this case, so we refresh the token and reconnect manually.
+    if (reason === "io server disconnect" && _refreshAccessToken) {
+      _refreshAccessToken()
+        .then(() => {
+          const newToken = getTokenFromCookie();
+          if (newToken && socket) {
+            socket.auth = { token: newToken };
+            socket.connect();
+          }
+        })
+        .catch(() => {
+          // Refresh failed — auth-store.refreshAccessToken already calls logout()
+        });
+    }
   });
 
   socket.on("connect_error", (err: any) => {
     console.error("Socket connection error:", err);
+  });
+
+  // Before each auto-reconnect attempt, pull the freshest token from the cookie.
+  // This covers the case where an HTTP request already refreshed the token but socket.auth is stale.
+  socket.io.on("reconnect_attempt", () => {
+    const latestToken = getTokenFromCookie();
+    if (latestToken && socket) {
+      socket.auth = { token: latestToken };
+    }
   });
 
   return socket;
