@@ -18,4 +18,11 @@ export class AppController {
   handleGetRequest(): { success: boolean } {
     return { success: true };
   }
+
+  @Public()
+  @Get('api/ping')
+  @ApiOperation({ summary: 'Ping' })
+  ping(): { ok: boolean; timestamp: string } {
+    return { ok: true, timestamp: new Date().toISOString() };
+  }
 }
