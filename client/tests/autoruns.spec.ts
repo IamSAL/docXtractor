@@ -49,39 +49,39 @@ test.describe('AutoRuns routes', () => {
 
   test.describe('/autoruns/edit/:id', () => {
     test('renders autorun edit form (authenticated)', async ({ page, authenticatedPage: _ }) => {
-      await page.goto(`/autoruns/edit.${AUTORUN_ID}`);
+      await page.goto(`/autoruns/edit/${AUTORUN_ID}`);
       await expect(page.locator('body')).toBeVisible();
       await expect(page.locator('form, h1, h2').first()).toBeVisible({ timeout: 15_000 });
     });
 
     test('auth guard — unauthenticated redirects', async ({ page }) => {
-      await page.goto(`/autoruns/edit.${AUTORUN_ID}`);
+      await page.goto(`/autoruns/edit/${AUTORUN_ID}`);
       await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
     });
   });
 
   test.describe('/autoruns/builder/:id', () => {
     test('renders autorun builder (authenticated)', async ({ page, authenticatedPage: _ }) => {
-      await page.goto(`/autoruns/builder.${AUTORUN_ID}`);
+      await page.goto(`/autoruns/builder/${AUTORUN_ID}`);
       await expect(page.locator('body')).toBeVisible();
       await expect(page.locator('h1, h2, canvas, [role="application"]').first()).toBeVisible({ timeout: 15_000 });
     });
 
     test('auth guard — unauthenticated redirects', async ({ page }) => {
-      await page.goto(`/autoruns/builder.${AUTORUN_ID}`);
+      await page.goto(`/autoruns/builder/${AUTORUN_ID}`);
       await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
     });
   });
 
   test.describe('/autoruns/runs/:id', () => {
     test('renders autorun runs history (authenticated)', async ({ page, authenticatedPage: _ }) => {
-      await page.goto(`/autoruns/runs.${AUTORUN_ID}`);
+      await page.goto(`/autoruns/runs/${AUTORUN_ID}`);
       await expect(page.locator('body')).toBeVisible();
       await expect(page.locator('h1, h2, [role="heading"]').first()).toBeVisible({ timeout: 15_000 });
     });
 
     test('auth guard — unauthenticated redirects', async ({ page }) => {
-      await page.goto(`/autoruns/runs.${AUTORUN_ID}`);
+      await page.goto(`/autoruns/runs/${AUTORUN_ID}`);
       await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
     });
   });

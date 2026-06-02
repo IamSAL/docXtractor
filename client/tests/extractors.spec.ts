@@ -51,13 +51,13 @@ test.describe('Extractors routes', () => {
 
   test.describe('/extractors/edit/:id', () => {
     test('renders extractor edit form (authenticated)', async ({ page, authenticatedPage: _ }) => {
-      await page.goto(`/extractors/edit.${EXTRACTOR_ID}`);
+      await page.goto(`/extractors/edit/${EXTRACTOR_ID}`);
       await expect(page.locator('body')).toBeVisible();
       await expect(page.locator('form, h1, h2').first()).toBeVisible({ timeout: 15_000 });
     });
 
     test('auth guard — unauthenticated redirects', async ({ page }) => {
-      await page.goto(`/extractors/edit.${EXTRACTOR_ID}`);
+      await page.goto(`/extractors/edit/${EXTRACTOR_ID}`);
       await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
     });
   });

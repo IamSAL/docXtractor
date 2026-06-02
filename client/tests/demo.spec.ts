@@ -23,13 +23,13 @@ test.describe('Demo routes (public)', () => {
 
   test.describe('/demo/result/:runId', () => {
     test('renders demo result page without auth', async ({ page }) => {
-      await page.goto(`/demo/result.${DEMO_RUN_ID}`);
+      await page.goto(`/demo/result/${DEMO_RUN_ID}`);
       await expect(page.locator('body')).toBeVisible();
       await expect(page.locator('h1, h2, [role="heading"]').first()).toBeVisible({ timeout: 15_000 });
     });
 
     test('demo result accessible without login', async ({ page }) => {
-      await page.goto(`/demo/result.${DEMO_RUN_ID}`);
+      await page.goto(`/demo/result/${DEMO_RUN_ID}`);
       await expect(page).not.toHaveURL(/\/login/);
     });
   });

@@ -49,13 +49,13 @@ test.describe('Runs routes', () => {
 
   test.describe('/runs/review/:id', () => {
     test('renders run review (authenticated)', async ({ page, authenticatedPage: _ }) => {
-      await page.goto(`/runs/review.${RUN_ID}`);
+      await page.goto(`/runs/review/${RUN_ID}`);
       await expect(page.locator('body')).toBeVisible();
       await expect(page.locator('h1, h2, [role="heading"]').first()).toBeVisible({ timeout: 15_000 });
     });
 
     test('auth guard — unauthenticated redirects', async ({ page }) => {
-      await page.goto(`/runs/review.${RUN_ID}`);
+      await page.goto(`/runs/review/${RUN_ID}`);
       await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
     });
   });
