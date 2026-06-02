@@ -8,6 +8,7 @@
     "build": "vite build && cp instrument.server.mjs .output/server",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
@@ -88,6 +89,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.11",
     "@tanstack/devtools-event-client": "^0.4.0",
