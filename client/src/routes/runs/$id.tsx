@@ -142,6 +142,7 @@ function RunDetailComponent() {
     socket.on("run:source:updated", handleSourceUpdated);
     socket.on("run:log", handleRunLog);
     socket.io.on("reconnect", handleReconnect);
+    socket.on("connect", handleReconnect);
 
     return () => {
       socket.emit("leaveRun", { runId: id });
@@ -149,6 +150,7 @@ function RunDetailComponent() {
       socket.off("run:source:updated", handleSourceUpdated);
       socket.off("run:log", handleRunLog);
       socket.io.off("reconnect", handleReconnect);
+      socket.off("connect", handleReconnect);
     };
   }, [id, queryClient]);
 
