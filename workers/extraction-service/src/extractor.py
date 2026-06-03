@@ -2,9 +2,6 @@ import os
 import logging
 import json
 import textwrap
-from openai import OpenAI
-import langextract as lx
-from langextract.data import ExampleData, Extraction
 try:
     from json_repair import repair_json
 except ImportError:
@@ -14,22 +11,41 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-# Monkeypatch langextract to log raw model output
-from langextract.core.format_handler import FormatHandler
-original_parse_output = FormatHandler.parse_output
-def patched_parse_output(self, text, *args, **kwargs):
-    logger.debug(f"RAW MODEL OUTPUT RECEIVED BY LANGEXTRACT: {repr(text)}")
-    return original_parse_output(self, text, *args, **kwargs)
-FormatHandler.parse_output = patched_parse_output
-
 FREELLM_BASE_URL = os.getenv("FREELLM_BASE_URL", "http://freellm:3000/v1")
 FREELLM_API_KEY = os.getenv("FREELLM_API_KEY", "freellm")
 LLM_DEFAULT_MODEL = os.getenv("LLM_DEFAULT_MODEL", "free")
 
-_llm_client = OpenAI(
-    base_url=FREELLM_BASE_URL,
-    api_key=FREELLM_API_KEY,
-)
+# Heavy deps (openai client, langextract) are loaded lazily on first use so an
+# idle worker doesn't hold their memory. See _get_llm_client / _get_langextract.
+_llm_client = None
+_langextract = None
+
+
+def _get_llm_client():
+    """Lazily build the OpenAI-compatible client on first extraction."""
+    global _llm_client
+    if _llm_client is None:
+        from openai import OpenAI
+        _llm_client = OpenAI(
+            base_url=FREELLM_BASE_URL,
+            api_key=FREELLM_API_KEY,
+        )
+    return _llm_client
+
+
+def _get_langextract():
+    """Lazily import langextract and install the raw-output debug monkeypatch."""
+    global _langextract
+    if _langextract is None:
+        import langextract as lx
+        from langextract.core.format_handler import FormatHandler
+        original_parse_output = FormatHandler.parse_output
+        def patched_parse_output(self, text, *args, **kwargs):
+            logger.debug(f"RAW MODEL OUTPUT RECEIVED BY LANGEXTRACT: {repr(text)}")
+            return original_parse_output(self, text, *args, **kwargs)
+        FormatHandler.parse_output = patched_parse_output
+        _langextract = lx
+    return _langextract
 
 
 def _build_few_shot_block(examples: list) -> str:
@@ -156,7 +172,7 @@ def run_llm_extraction(
             f"Important, Your output structure must match 100% of this json schema:\n {json.dumps(schema_properties)}"
         )
 
-        response = _llm_client.chat.completions.create(
+        response = _get_llm_client().chat.completions.create(
             model=resolved_model,
             messages=[{"role": "user", "content": full_prompt}],
             response_format={"type": "json_object"},
@@ -190,6 +206,7 @@ def run_langextract_extraction(
     Points at FreeLLM as the OpenAI-compatible backend.
     """
     try:
+        lx = _get_langextract()
         lx_examples = []
         if raw_examples:
             for ex in raw_examples:
