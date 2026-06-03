@@ -23,7 +23,8 @@ export class GenerateExtractorDto {
   description: string;
 
   @ApiPropertyOptional({
-    description: 'Sample document text to improve field inference (max 3000 chars)',
+    description:
+      'Sample document text to improve field inference (max 3000 chars)',
     maxLength: 3000,
   })
   @IsString()

@@ -90,7 +90,8 @@ export class CreateRunDto {
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({
-    description: 'LLM model to use for extraction (overrides extractor default)',
+    description:
+      'LLM model to use for extraction (overrides extractor default)',
     example: 'free-smart',
   })
   model?: string;

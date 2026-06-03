@@ -72,15 +72,24 @@ export class Extractor {
   @Column({ type: 'text', nullable: true })
   thumbnailUrl: string;
 
-  @ApiPropertyOptional({ example: 'Financial', description: 'Template category for display' })
+  @ApiPropertyOptional({
+    example: 'Financial',
+    description: 'Template category for display',
+  })
   @Column({ type: 'text', nullable: true })
   category?: string;
 
-  @ApiPropertyOptional({ example: 'receipt_long', description: 'Material Symbols icon name' })
+  @ApiPropertyOptional({
+    example: 'receipt_long',
+    description: 'Material Symbols icon name',
+  })
   @Column({ type: 'text', nullable: true })
   icon?: string;
 
-  @ApiPropertyOptional({ type: [String], description: 'Display tags for templates' })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Display tags for templates',
+  })
   @Column('jsonb', { nullable: true })
   tags?: string[];
 
