@@ -9,7 +9,7 @@ services:
     ports:
       - "127.0.0.1:5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
     networks:
       - docxtractor-network
     healthcheck:
@@ -109,7 +109,7 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
-      - minio_data:/data
+      - ./data/minio:/data
     command: server /data --console-address ":9001"
     networks:
       - docxtractor-network
@@ -185,10 +185,6 @@ services:
     volumes:
       - ./workers/extraction-service:/app
     command: uvicorn src.main:app --host 0.0.0.0 --port 8002 --reload
-
-volumes:
-  postgres_data:
-  minio_data:
 
 networks:
   docxtractor-network:

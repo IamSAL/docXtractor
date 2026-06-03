@@ -58,3 +58,4 @@ test/**/output.worktrees/
 .playwright-mcp
 .gstack/
 .fallow/
+data/
