@@ -10,7 +10,7 @@ services:
     ports:
       - "127.0.0.1:8432:5432"
     volumes:
-      - stage_postgres_data:/var/lib/postgresql/data
+      - ./data/stage-postgres:/var/lib/postgresql/data
     networks:
       - docxtractor-stage-network
     healthcheck:
@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     command: redis-server --port 6379
     volumes:
-      - stage_redis_data:/data
+      - ./data/stage-redis:/data
     networks:
       - docxtractor-stage-network
     healthcheck:
@@ -42,7 +42,7 @@ services:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     volumes:
-      - stage_minio_data:/data
+      - ./data/stage-minio:/data
     command: server /data --console-address ":9001"
     ports:
       - "9010:9000"
@@ -203,11 +203,6 @@ services:
     networks:
       - docxtractor-stage-network
     command: uvicorn src.main:app --host 0.0.0.0 --port 8002
-
-volumes:
-  stage_postgres_data:
-  stage_minio_data:
-  stage_redis_data:
 
 networks:
   docxtractor-stage-network:
