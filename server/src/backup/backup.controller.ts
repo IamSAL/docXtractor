@@ -21,6 +21,8 @@ import {
 import { Response } from 'express';
 import { Roles } from '../auth/decorators/roles.decorators';
 import { Role } from '../auth/enums/role.enum';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { JWTPayload } from 'src/shared/types/jwt-payload.types';
 import { BackupService } from './backup.service';
 
 @ApiTags('Backup')
@@ -41,22 +43,19 @@ export class BackupController {
   async export(@Res({ passthrough: true }) res: Response) {
     const { filename, buffer } = await this.backupService.createBackup();
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename="${filename}"`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(buffer);
   }
 
   @Get('download/:filename')
   @ApiOperation({ summary: 'Download a specific stored backup' })
-  async download(@Param('filename') filename: string, @Res({ passthrough: true }) res: Response) {
+  async download(
+    @Param('filename') filename: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const buffer = await this.backupService.downloadBackup(filename);
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename="${filename}"`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(buffer);
   }
 
@@ -94,8 +93,11 @@ export class BackupController {
       },
     }),
   )
-  async import(@UploadedFile() file: Express.Multer.File) {
+  async import(
+    @UploadedFile() file: Express.Multer.File,
+    @GetUser() user: JWTPayload,
+  ) {
     if (!file) throw new BadRequestException('No file uploaded');
-    return this.backupService.importBackup(file.buffer);
+    return this.backupService.importBackup(file.buffer, user.sub);
   }
 }

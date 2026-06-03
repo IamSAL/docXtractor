@@ -80,7 +80,10 @@ export class ExtractorsController {
     description: 'The extractor configuration has been generated.',
   })
   generateExtractor(@Body() dto: GenerateExtractorDto) {
-    return this.extractorsService.generateExtractor(dto.description, dto.sampleText);
+    return this.extractorsService.generateExtractor(
+      dto.description,
+      dto.sampleText,
+    );
   }
 
   @Post('parse-preview')

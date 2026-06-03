@@ -38,7 +38,7 @@ function getMockCreate(): jest.Mock {
 
 function getWrappedCreate(): jest.Mock {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return (require('openai') as any).__wrappedCreate as jest.Mock;
+  return require('openai').__wrappedCreate as jest.Mock;
 }
 
 const mockConfigGet = jest.fn((key: string, def?: any) => {
@@ -157,7 +157,9 @@ describe('LlmService', () => {
 
       const callArg = wrappedCreate.mock.calls[0][0];
       expect(callArg.response_format.type).toBe('json_schema');
-      expect(callArg.response_format.json_schema.name).toBe('extraction_result');
+      expect(callArg.response_format.json_schema.name).toBe(
+        'extraction_result',
+      );
     });
 
     it('uses system/user message split with document in user message', async () => {
@@ -195,7 +197,9 @@ describe('LlmService', () => {
 
     it('uses model override when provided', async () => {
       mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: '{"invoice_number":"X","amount":0}' } }],
+        choices: [
+          { message: { content: '{"invoice_number":"X","amount":0}' } },
+        ],
         usage: { total_tokens: 5 },
       });
 
@@ -221,7 +225,9 @@ describe('LlmService', () => {
       expect(result.data).toEqual({ total: '100' });
       const callArg = wrappedCreate.mock.calls[0][0];
       expect(callArg.response_format).toEqual({ type: 'json_object' });
-      expect(callArg.messages[0].content).toContain('- total (string): Total value');
+      expect(callArg.messages[0].content).toContain(
+        '- total (string): Total value',
+      );
     });
 
     it('retries when FreeLLM returns truncation warning header', async () => {
@@ -232,7 +238,9 @@ describe('LlmService', () => {
         (promise as any).withResponse = () =>
           Promise.resolve({
             data: {
-              choices: [{ message: { content: '{"invoice_number":"T","amount":0}' } }],
+              choices: [
+                { message: { content: '{"invoice_number":"T","amount":0}' } },
+              ],
               usage: { total_tokens: 10 },
             },
             response: { headers: { get: () => 'json-possibly-truncated' } },

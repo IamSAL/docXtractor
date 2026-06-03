@@ -169,7 +169,7 @@ export class BackupService implements OnModuleInit {
     this.logger.log(`Deleted backup: ${filename}`);
   }
 
-  async importBackup(buffer: Buffer): Promise<ImportResult> {
+  async importBackup(buffer: Buffer, userId: string): Promise<ImportResult> {
     let bundle: BackupBundle;
     try {
       bundle = JSON.parse(buffer.toString('utf-8'));
@@ -179,7 +179,7 @@ export class BackupService implements OnModuleInit {
 
     if (bundle.version !== 1) {
       throw new BadRequestException(
-        `Unsupported backup version: ${bundle.version}`,
+        `Unsupported backup version: ${String((bundle as any).version)}`,
       );
     }
 
@@ -188,6 +188,9 @@ export class BackupService implements OnModuleInit {
       runs: { imported: 0, updated: 0, skipped: 0 },
       errors: [],
     };
+
+    // Track successfully imported/updated extractor IDs so runs can validate FK
+    const importedExtractorIds = new Set<string>();
 
     for (const raw of bundle.extractors ?? []) {
       try {
@@ -206,12 +209,11 @@ export class BackupService implements OnModuleInit {
           if (raw[col] !== undefined) safe[col] = raw[col];
         }
 
-        // Always null userId to avoid cross-instance user ID collisions
-        if (safe.userId) {
-          safe.userId = null;
-        }
+        // Assign to the importing user so records are visible in their account
+        safe.userId = userId;
 
         await this.extractorRepo.save(safe);
+        if (raw.id) importedExtractorIds.add(raw.id as string);
         if (existing) {
           result.extractors.updated++;
         } else {
@@ -219,12 +221,26 @@ export class BackupService implements OnModuleInit {
         }
       } catch (err: any) {
         result.extractors.skipped++;
-        result.errors.push(`Extractor ${raw.id}: ${err.message}`);
+        result.errors.push(
+          `Extractor ${String(raw.id)}: ${String(err.message)}`,
+        );
       }
     }
 
     for (const raw of bundle.runs ?? []) {
       try {
+        // Skip runs whose extractor was not successfully imported — FK would fail
+        if (
+          raw.extractorId &&
+          !importedExtractorIds.has(raw.extractorId as string)
+        ) {
+          result.runs.skipped++;
+          result.errors.push(
+            `Run ${String(raw.id)}: skipped because extractor ${String(raw.extractorId)} was not imported`,
+          );
+          continue;
+        }
+
         const existing = raw.id
           ? await this.runRepo.findOne({ where: { id: raw.id as string } })
           : null;
@@ -237,9 +253,23 @@ export class BackupService implements OnModuleInit {
           if (raw[col] !== undefined) safe[col] = raw[col];
         }
 
-        // Always null userId to avoid cross-instance user ID collisions
-        if (safe.userId) {
-          safe.userId = null;
+        // Assign to the importing user so records are visible in their account
+        safe.userId = userId;
+
+        // Workflow executions are not included in the backup scope — clear FK to
+        // avoid constraint violations on the target DB.
+        safe.workflowExecutionId = null;
+
+        // Autorun links are environment-specific; clear to avoid stale references.
+        safe.autorunId = null;
+
+        // Runs that were mid-flight when the backup was taken will never be
+        // picked up by a worker on the restored instance — mark them failed so
+        // the user knows they need to be re-run.
+        const inProgress = new Set(['pending', 'queued', 'parsing', 'extracting']);
+        if (inProgress.has(safe.status as string)) {
+          safe.status = 'failed';
+          safe.error = 'Run was in-progress at backup time and cannot be resumed after restore.';
         }
 
         await this.runRepo.save(safe);
@@ -250,7 +280,7 @@ export class BackupService implements OnModuleInit {
         }
       } catch (err: any) {
         result.runs.skipped++;
-        result.errors.push(`Run ${raw.id}: ${err.message}`);
+        result.errors.push(`Run ${String(raw.id)}: ${String(err.message)}`);
       }
     }
 

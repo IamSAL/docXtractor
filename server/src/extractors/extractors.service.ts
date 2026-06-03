@@ -52,11 +52,21 @@ export class ExtractorsService implements OnModuleInit {
         where: { name: d.name, isPublic: true, userId: IsNull() },
       });
       if (existing) {
-        await this.extractorRepository.save({ ...existing, ...d, id: existing.id, isPublic: true, userId: null });
+        await this.extractorRepository.save({
+          ...existing,
+          ...d,
+          id: existing.id,
+          isPublic: true,
+          userId: null,
+        });
         this.logger.log(`Updated template: ${d.name}`);
       } else {
         await this.extractorRepository.save(
-          this.extractorRepository.create({ ...d, isPublic: true, userId: null }),
+          this.extractorRepository.create({
+            ...d,
+            isPublic: true,
+            userId: null,
+          }),
         );
         this.logger.log(`Seeded template: ${d.name}`);
       }
@@ -393,7 +403,11 @@ Return ONLY a JSON object with this exact structure:
       process.env.PARSER_SERVICE_URL || 'http://parser-service:8001';
     try {
       const form = new FormData();
-      form.append('file', new Blob([fileBuffer.buffer as ArrayBuffer]), fileName);
+      form.append(
+        'file',
+        new Blob([fileBuffer.buffer as ArrayBuffer]),
+        fileName,
+      );
       const res = await axios.post<{ text: string }>(
         `${parserUrl}/parse-file`,
         form,

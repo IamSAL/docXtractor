@@ -140,7 +140,9 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   emitRunUpdated(runId: string, payload: any) {
     if (!this.server) return;
     try {
-      this.server.to(`run:${runId}`).emit('run:updated', { seq: ++this.seq, ...payload });
+      this.server
+        .to(`run:${runId}`)
+        .emit('run:updated', { seq: ++this.seq, ...payload });
     } catch (e) {
       this.logger.warn(`emitRunUpdated failed: ${e.message}`);
     }
@@ -149,7 +151,9 @@ export class RunsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   emitRunSourceUpdated(runId: string, payload: any) {
     if (!this.server) return;
     try {
-      this.server.to(`run:${runId}`).emit('run:source:updated', { seq: ++this.seq, ...payload });
+      this.server
+        .to(`run:${runId}`)
+        .emit('run:source:updated', { seq: ++this.seq, ...payload });
     } catch (e) {
       this.logger.warn(`emitRunSourceUpdated failed: ${e.message}`);
     }

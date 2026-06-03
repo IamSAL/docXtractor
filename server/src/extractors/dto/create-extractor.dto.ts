@@ -101,7 +101,10 @@ export class CreateExtractorDto {
   @IsOptional()
   icon?: string;
 
-  @ApiPropertyOptional({ type: [String], example: ['24 Fields', 'Multi-Currency'] })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['24 Fields', 'Multi-Currency'],
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
