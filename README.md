@@ -1,259 +1,141 @@
-# DocXtractor Full-Stack Starter with NestJS & React
+# DocXtractor
 
-![NestJS Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/server/@nestjs/core?color=red&logo=nestjs)
-![React Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/client/react?color=61dafb&logo=react)
-![TypeScript Version](https://img.shields.io/github/package-json/dependency-version/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/client/dev/typescript?color=3178c6&logo=typescript)
-![Docker](https://img.shields.io/badge/Docker-✓-blue?logo=docker)
-![PNPM](https://img.shields.io/badge/pnpm-✓-orange?logo=pnpm)
-![TypeORM](https://img.shields.io/badge/TypeORM-✓-informational)
-![License](https://img.shields.io/github/license/devalentineomonya/DocXtractor-NestJs-Tanstack-Start?color=blue)
+**Turn any document into structured, validated JSON — without writing a parser.**
 
-## Overview
+DocXtractor is a full-stack platform for extracting structured data out of messy, unstructured documents (PDFs, spreadsheets, scanned files, web pages). You describe *what* you want — a JSON schema and a plain-English prompt — and the system parses the document, runs an LLM against it, and returns clean, typed JSON you can review, correct, and export.
 
-The DocXtractor Full-Stack Starter is a modern application template featuring a NestJS backend with TypeORM and a React frontend with TanStack Query. Designed for rapid development and deployment, this project provides a complete foundation for building enterprise-grade applications with best practices in mind.
-
-**Live Demo**: [https://doc-xtractor-demo.com](https://doc-xtractor-demo.com) (example)
-
-## Architecture Diagram
-
-```mermaid
-graph LR
-    A[React Client] -->|HTTP Requests| B[NestJS API]
-    B --> C[(PostgreSQL Database)]
-    D[Docker] --> E[Client Container]
-    D --> F[API Container]
-    D --> G[DB Container]
-    E -->|Port 5174| H[Browser]
-    F -->|Port 3001| H
-```
-
-## Key Features
-
-### Backend (NestJS)
-
-- 🐳 **Dockerized** container deployment
-- 🗄️ **TypeORM** with PostgreSQL integration
-- 🛡️ **JWT Authentication** with protected routes
-- 📊 **Swagger Documentation** for API endpoints
-- 📝 **DTO Validation** with class-validator
-- 🔌 **Environment Configuration** system
-
-### Frontend (React)
-
-- ⚡ **Vite** for blazing fast development
-- 🔄 **TanStack Query** for data fetching
-- 🎨 **Tailwind CSS** for utility-first styling
-- 🔐 **Authentication Flow** with protected routes
-- 📱 **Fully Responsive** mobile-first design
-- 🧩 **Modular Component Architecture**
-
-## Prerequisites
-
-- Node.js v18+
-- Docker & Docker Compose
-- PNPM (recommended)
-- PostgreSQL (for development without Docker)
-
-## Getting Started
-
-### 1. Clone the repository:
-
-```bash
-git clone https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start.git
-cd DocXtractor-NestJs-Tanstack-Start
-```
-
-### 2. Configure environment variables:
-
-```bash
-# Backend
-cp server/.env.example server/.env
-
-# Frontend
-cp client/.env.example client/.env.local
-```
-
-Edit the files with your configuration values.
-
-### 3. Start with Docker Compose:
-
-```bash
-docker-compose up -d --build
-```
-
-### 4. Run database migrations:
-
-```bash
-docker exec docxtractor-server pnpm typeorm migration:run
-```
-
-### 5. Access the applications:
-
-- **API Server**: http://localhost:3001
-- **React Client**: http://localhost:5174
-- **API Documentation**: http://localhost:3001/api
-
-## Development Workflow
-
-### Start all services:
-
-```bash
-docker-compose up -d
-```
-
-### Access containers:
-
-```bash
-# API container
-docker exec -it docxtractor-server sh
-
-# DB container
-docker exec -it docxtractor-db psql -U postgres
-```
-
-### Generate new migration:
-
-```bash
-docker exec docxtractor-server pnpm typeorm migration:generate src/migrations/<MigrationName>
-```
-
-### View logs:
-
-```bash
-docker-compose logs -f
-```
-
-## Project Structure
-
-```
-DocXtractor-NestJs-Tanstack-Start/
-├── client/               # React frontend application
-│   ├── public/           # Static assets
-│   ├── src/              # Application source code
-│   ├── .env.example      # Environment template
-│   ├── index.html        # Main HTML template
-│   └── vite.config.ts    # Vite configuration
-│
-├── server/               # NestJS backend application
-│   ├── src/              # Application source code
-│   ├── docker/           # Docker configuration
-│   ├── .env.example      # Environment template
-│   └── docker-compose.yml # Docker compose config
-│
-├── docker-compose.yml    # Main Docker compose file
-└── README.md             # Project documentation
-```
-
-## Configuration
-
-### Backend (.env)
-
-```env
-PORT=3000
-DB_HOST=docxtractor-db
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-DB_NAME=docxtractor
-JWT_SECRET=your-secret-key
-JWT_EXPIRES_IN=1h
-```
-
-### Frontend (.env.local)
-
-```env
-VITE_API_BASE_URL=http://localhost:3001
-VITE_APP_NAME=DocXtractor App
-```
-
-## Deployment
-
-### Production Build:
-
-```bash
-docker-compose -f docker-compose.prod.yml up -d --build
-```
-
-### Deployment Options:
-
-1. **Cloud Providers**:
-   - AWS ECS/EKS
-   - Google Cloud Run
-   - Azure Container Instances
-   - DigitalOcean App Platform
-
-2. **Server Deployment**:
-
-   ```bash
-   # Build production images
-   docker-compose -f docker-compose.prod.yml build
-
-   # Push to container registry
-   docker push your-registry/docxtractor-client:latest
-   docker push your-registry/docxtractor-server:latest
-   ```
-
-## Key API Endpoints
-
-| Method | Endpoint       | Description                |
-| ------ | -------------- | -------------------------- |
-| POST   | /auth/register | Register new user          |
-| POST   | /auth/login    | Authenticate user          |
-| GET    | /users         | Get all users (protected)  |
-| GET    | /users/:id     | Get user by ID (protected) |
-| PUT    | /users/:id     | Update user (protected)    |
-| DELETE | /users/:id     | Delete user (protected)    |
-
-## Frontend Features
-
-- User authentication (login/register)
-- Protected dashboard view
-- User profile management
-- Responsive navigation
-- Form validation with React Hook Form
-- API error handling
-- Dark/light mode support
-- Toast notifications
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a pull request
-
-## Troubleshooting
-
-**Database connection issues:**
-
-- Verify DB credentials in `.env` file
-- Check if database container is running: `docker ps`
-- View database logs: `docker-compose logs -f db`
-
-**Migration errors:**
-
-- Ensure migrations are run after database is ready
-- Check for existing migrations in the database
-- Verify TypeORM configuration
-
-**Client not connecting to API:**
-
-- Confirm API container is running
-- Check `VITE_API_BASE_URL` in client environment
-- Verify CORS configuration in server
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/blob/main/LICENSE) file for details.
-
-## Support
-
-For issues or questions, please [open an issue](https://github.com/devalentineomonya/DocXtractor-NestJs-Tanstack-Start/issues) on GitHub.
+> ⚙️ **Built with Claude Code.** This project was developed end-to-end with [Claude Code](https://claude.ai/code) — architecture, backend, workers, and frontend. The UI was designed using [Google Stitch](https://stitch.withgoogle.com/) and implemented from those designs.
 
 ---
 
-**Project Maintainer**: [Valentine Omonya](https://github.com/devalentineomonya)  
-**Project Status**: Active Development (July 2025)
+## The Problem
+
+Getting structured data out of documents is painful:
+
+- **PDFs and scans are unstructured** — tables, columns, and layout are lost the moment you `pdftotext` them.
+- **Every document type needs a bespoke parser** — a financial prospectus, an invoice, and a lab report share nothing.
+- **Regex and template parsers break** the instant a vendor changes their layout.
+- **Raw LLM calls are unreliable** — they hallucinate fields, drift from your schema, and give you no way to review or correct the output.
+
+DocXtractor solves this by combining **document-aware parsing** (layout, OCR, tables → Markdown) with **schema-constrained LLM extraction** (your JSON schema + prompt → validated JSON), wrapped in a UI where you define extractors once and run them against many documents with live progress and human review.
+
+## How It Works
+
+An **Extractor** is a reusable config: a **JSON schema**, a **system prompt**, and optional **few-shot examples**. You point it at one or more sources (uploaded files or URLs) and trigger a **Run**. Each run flows through an asynchronous, queue-driven pipeline:
+
+```
+Upload (file / URL)
+  → NestJS API                          (creates Run, dispatches jobs)
+  → [queue] uploaded-documents
+  → Parser Service   (Python · Docling + RapidOCR)   → document to Markdown
+  → [queue] parsed-documents
+  → NestJS API                          (queues extraction)
+  → [queue] extraction-requests
+  → Extraction Service (Python · LLM / LangExtract)  → structured JSON
+  → [queue] extraction-completed
+  → NestJS API        (persists result, emits WebSocket events)
+  → React Client      (live status, results table, review UI)
+```
+
+Every stage reports back over WebSockets, so the client shows real-time status per document (`pending → parsing → extracting → done / review / failed`) instead of a spinner.
+
+## How AI / LLMs Are Used
+
+AI is the core of the product, applied at three distinct points:
+
+### 1. Schema generation from natural language
+When you create an Extractor, you don't have to hand-write JSON Schema. Describe the fields you want in plain English and an LLM generates the schema for you. The `ExtractorsModule` calls the LLM gateway to turn intent into a structured, editable schema.
+
+### 2. Document parsing (layout & OCR intelligence)
+The **parser-service** uses [**Docling**](https://github.com/DS4SD/docling) with **RapidOCR** to convert documents into clean Markdown while preserving structure — tables, headings, reading order — and OCR-ing scanned or image-based pages. This gives the LLM a faithful, text-native view of the document instead of garbled PDF dumps.
+
+### 3. Schema-constrained extraction
+The **extraction-service** takes the parsed Markdown plus the Extractor's schema, prompt, and few-shot examples, and produces JSON that conforms to the schema. It supports multiple extraction backends:
+
+- **FreeLLM gateway** — an OpenAI-compatible endpoint fronting free/rotating providers (**Groq, Gemini, Mistral, Cerebras**), so the platform isn't locked to a single vendor or a paid key.
+- **[LangExtract](https://github.com/google/langextract)** — Google's grounded-extraction library, for source-attributed field extraction.
+
+Runs can process documents in **batch and in parallel** (`Promise.allSettled` on the NestJS side; configurable concurrency in the Python workers), and results that need a human check are routed to a `review` state rather than silently accepted.
+
+### The LLM gateway: FreeLLM
+Instead of calling a provider SDK directly, the backend talks to **FreeLLM** — a self-hosted, OpenAI-compatible gateway that runs as a service in the stack (model id: `free`). This keeps model access swappable and keeps the app code provider-agnostic: NestJS and the Python extraction worker both point at the same base URL.
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| **Backend API** | NestJS (TypeScript), TypeORM, JWT + Google OAuth, Swagger |
+| **Frontend** | React 19, TanStack Start / Router / Query / Table, Vite, Tailwind CSS v4, Radix UI, custom "RetroUI" neobrutalist components, Monaco editor |
+| **Parser worker** | Python · FastAPI · Docling · RapidOCR |
+| **Extraction worker** | Python · FastAPI · OpenAI-compatible client · LangExtract |
+| **LLM access** | FreeLLM gateway (Groq / Gemini / Mistral / Cerebras) |
+| **Queue / jobs** | BullMQ on Redis (4 queues bridging NestJS ↔ Python workers) |
+| **Database** | PostgreSQL (TypeORM migrations, auto-applied on boot) |
+| **Object storage** | MinIO (uploaded files + run logs) |
+| **Real-time** | Socket.IO (`/runs` namespace) |
+| **API client** | Orval — typed TanStack Query hooks generated from the Swagger spec |
+| **Email** | Brevo (SMTP) for transactional mail |
+| **Infra** | Docker Compose (dev / stage / prod), nginx, Cloudflare tunnel |
+
+### Architecture notes
+
+- **Async pipeline over BullMQ** — NestJS and the Python workers communicate purely through Redis-backed queues, so parsing and extraction scale independently and don't block the API.
+- **Type-safe front-to-back** — the OpenAPI spec drives Orval, which generates the client's API hooks, models, and Zod schemas; a backend DTO change flows to the frontend via `pnpm run gen:api`.
+- **Migrations, never `synchronize`** — schema changes are committed as TypeORM migration files and applied automatically on container start (fresh deploys build the schema from migrations, no manual SQL).
+
+## Getting Started
+
+Requirements: **Docker & Docker Compose**, **Node 18+**, **pnpm**.
+
+```bash
+# 1. Configure environment
+cp server/env.example server/.env
+# also create workers/extraction-service/.env with FREELLM_BASE_URL + LANGEXTRACT_API_KEY
+
+# 2. Bring up the full stack (API, client, workers, FreeLLM, Postgres, Redis, MinIO)
+docker-compose up -d --build
+```
+
+Migrations run automatically on server boot. Once up:
+
+| Service | URL |
+| --- | --- |
+| React Client | http://localhost:5174 |
+| NestJS API | http://localhost:3001 |
+| API docs (Swagger) | http://localhost:3001/api  (`admin` / `admin`) |
+| MinIO Console | http://localhost:9006 |
+
+### Running pieces individually
+
+```bash
+# NestJS API (server/)
+pnpm run start:dev
+
+# React client (client/)
+pnpm run dev            # Vite dev server
+pnpm run gen:api        # regenerate typed API client after backend changes
+
+# Python workers
+cd workers/parser-service     && uvicorn src.main:app --port 8001 --reload
+cd workers/extraction-service && uvicorn src.main:app --port 8002 --reload
+```
+
+See [`CLAUDE.md`](./CLAUDE.md) for the full development guide — module layout, queue contracts, WebSocket events, migration workflow, and agent runbook.
+
+## Repository Layout
+
+```
+docXtractor/
+├── server/     # NestJS API — extractors, runs, files, auth, LLM gateway, queues
+├── client/     # React + TanStack Start frontend (UI designed in Google Stitch)
+├── workers/
+│   ├── parser-service/       # Python · Docling + RapidOCR → Markdown
+│   └── extraction-service/   # Python · LLM / LangExtract → structured JSON
+├── migrations/ # TypeORM migrations
+├── infra/      # nginx configs, deployment
+└── docs/       # PRD, design specs, audits, plans
+```
+
+## License
+
+MIT
