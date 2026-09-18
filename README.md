@@ -1,6 +1,8 @@
 # DocXtractor
 
 **Turn any document into structured, validated JSON — without writing a parser.**
+<img width="1015" height="703" alt="image" src="https://github.com/user-attachments/assets/a690802d-16da-467f-92e3-898af4fbb2f5" />
+
 
 DocXtractor is a full-stack platform for extracting structured data out of messy, unstructured documents (PDFs, spreadsheets, scanned files, web pages). You describe *what* you want — a JSON schema and a plain-English prompt — and the system parses the document, runs an LLM against it, and returns clean, typed JSON you can review, correct, and export.
 
